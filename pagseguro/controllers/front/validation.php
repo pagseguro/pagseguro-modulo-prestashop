@@ -1,37 +1,26 @@
 <?php
 
 /*
- * 2012-2013 S2IT Solutions Consultoria LTDA.
- *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Academic Free License (AFL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/afl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to license@prestashop.com so we can send you a copy immediately.
- *
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
- * versions in the future. If you wish to customize PrestaShop for your
- * needs please refer to http://www.prestashop.com for more information.
- *
- *  @author Wellington Camargo <wellington.camargo@s2it.com.br>
- *  @copyright  2012-2013 S2IT Solutions Consultoria LTDA
- *  @version  Release: $Revision: 1 $
- *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
- *  International Registered Trademark & Property of PrestaShop SA
- */
+************************************************************************
+Copyright [2013] [PagSeguro Internet Ltda.]
 
-/**
- * @since 1.5.2
- */
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+************************************************************************
+*/
+
 class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 
-    private $_paymentRequest;
+    private $_payment_request;
     
     /**
      *  Post data process function
@@ -41,12 +30,28 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
         $this->_verifyPaymentOptionAvailability();
         $this->_validateCart();
         $this->_generatePagSeguroRequestData();
-        $redirectData = $this->_validateOrder();
+        $additional_infos = $this->_validateOrder();
+        $this->_setAdditionalRequestData($additional_infos);
         $this->_performPagSeguroRequest();
-        $this->_redirectToOrderConfirmationPage($redirectData);
         
     }
 
+    /**
+     * Set additional infos to PagSeguroPaymentRequest object
+     * @param array $additional_infos
+     */
+    private function _setAdditionalRequestData(Array $additional_infos){
+        
+        // setting reference
+        $this->_payment_request->setReference($additional_infos['id_order']);
+        
+        // setting redirect url
+        $redirect_url = $this->_payment_request->getRedirectURL();
+        if (Tools::isEmpty($redirect_url))
+            $this->_payment_request->setRedirectURL($this->_generateRedirectUrl($additional_infos));
+    
+    }
+    
     /**
      *  Verify if PagSeguro payment module still available
      */
@@ -100,8 +105,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
      * 
      * @param array $arrayData
      */
-    private function _redirectToOrderConfirmationPage(Array $arrayData){
-        Tools::redirect('index.php?controller=order-confirmation&id_cart=' . $arrayData['id_cart'] . '&id_module=' . $arrayData['id_module'] . '&id_order=' . $arrayData['id_order'] . '&key=' . $arrayData['key']);
+    private function _generateRedirectUrl(Array $arrayData){
+        return _PS_BASE_URL_.__PS_BASE_URI__.'index.php?controller=order-confirmation&id_cart='.$arrayData['id_cart'].'&id_module='.$arrayData['id_module'].'&id_order='.$arrayData['id_order'].'&key='.$arrayData['key'];
     }
     
     /**
@@ -114,15 +119,19 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
             // retrieving PagSeguro configurations
             $this->_retrievePagSeguroConfiguration();
             
-            // retrieving PagSeguro Prestashop module version
-            $this->_retrievePagSeguroModuleVersion();
+            // set PagSeguro Prestashop module version
+            $this->_setPagSeguroModuleVersion();
+            
+            // set PagSeguro PrestaShop CMS version
+            $this->_setPagSeguroCMSVersion();
             
             // performing request
             $credentials = new PagSeguroAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), Configuration::get('PAGSEGURO_TOKEN'));
-            $url = $this->_paymentRequest->register($credentials);
+            $url = $this->_payment_request->register($credentials);
             
+            // redirecting to PagSeguro
             if (Validate::isUrl($url))
-                $this->context->cookie->__set('pagseguroResponseUrl', $url);
+                Tools::redirectLink (Tools::truncate($url, 255, ''));
             
         }
         catch(PagSeguroServiceException $e){
@@ -139,17 +148,24 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
         PagSeguroConfig::setApplicationCharset(Configuration::get('PAGSEGURO_CHARSET'));
         
         // retrieving configurated default log info
-        $logActive = Configuration::get('PAGSEGURO_LOG_ACTIVE');
-        if ($logActive)
+        $log_active = Configuration::get('PAGSEGURO_LOG_ACTIVE');
+        if ($log_active)
             PagSeguroConfig::activeLog(_PS_ROOT_DIR_.Configuration::get('PAGSEGURO_LOG_FILELOCATION'));
 
     }
     
     /**
-     * Retrieve PagSeguro PrestaShop module version
+     * Set PagSeguro PrestaShop module version
      */
-    private function _retrievePagSeguroModuleVersion(){
+    private function _setPagSeguroModuleVersion(){
         PagSeguroLibrary::setModuleVersion('prestashop-v'.$this->module->version);
+    }
+    
+    /**
+     * Set PagSeguro CMS version
+     */
+    private function _setPagSeguroCMSVersion(){
+        PagSeguroLibrary::setCMSVersion('prestashop-v'._PS_VERSION_);
     }
     
     /**
@@ -157,16 +173,32 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
      */
     private function _generatePagSeguroRequestData(){
         
-        $paymentRequest = new PagSeguroPaymentRequest();
-        $paymentRequest->setCurrency($this->context->currency->iso_code); // currency
-        $paymentRequest->setReference($this->module->currentOrderReference); // reference
-        $paymentRequest->setItems($this->_generateProductsData()); // products
-        $paymentRequest->setSender($this->_generateSenderData()); // sender
-        $paymentRequest->setShipping($this->_generateShippingData()); // shipping
+        $payment_request = new PagSeguroPaymentRequest();
+        $payment_request->setCurrency(PagSeguroCurrencies::getIsoCodeByName('Real')); // currency
+        $payment_request->setExtraAmount($this->_getCartRulesValues()); // extra amount
+        $payment_request->setItems($this->_generateProductsData()); // products
+        $payment_request->setSender($this->_generateSenderData()); // sender
+        $payment_request->setShipping($this->_generateShippingData()); // shipping
         if (!Tools::isEmpty(Configuration::get('PAGSEGURO_URL_REDIRECT'))) // redirect url
-            $paymentRequest->setRedirectURL(Configuration::get('PAGSEGURO_URL_REDIRECT'));
+            $payment_request->setRedirectURL(Configuration::get('PAGSEGURO_URL_REDIRECT'));
         
-        $this->_paymentRequest = $paymentRequest;
+        $this->_payment_request = $payment_request;
+    }
+    
+    /**
+     * Gets extra amount cart values
+     * @return float
+     */
+    private function _getCartRulesValues(){
+        $rules_values = (float)0;
+        
+        $cart_rules = $this->context->cart->getCartRules();
+        if (count($cart_rules) > 0){
+            foreach ($cart_rules as $rule)
+                $rules_values += $rule['value_real'];
+        }
+
+        return number_format(Tools::ps_round($rules_values, 2), 2, '.', '') * (-1);
     }
     
     /**
@@ -177,26 +209,26 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
     private function _generateProductsData(){
         
         $products = $this->context->cart->getProducts();
-        $pagSeguroItems = array();
+        $pagseguro_items = array();
         
         $cont = 1;
         
         foreach ($products as $product) {
             
-            $pagSeguroItem = new PagSeguroItem();
-            $pagSeguroItem->setId($cont++);
-            $pagSeguroItem->setDescription($this->_truncateValue($product['name'], 255));
-            $pagSeguroItem->setQuantity($product['quantity']);
-            $pagSeguroItem->setAmount($product['price_wt']);
-            $pagSeguroItem->setWeight($product['weight'] * 1000); // defines weight in gramas
+            $pagSeguro_item = new PagSeguroItem();
+            $pagSeguro_item->setId($cont++);
+            $pagSeguro_item->setDescription(Tools::truncate($product['name'], 255));
+            $pagSeguro_item->setQuantity($product['quantity']);
+            $pagSeguro_item->setAmount($product['price_wt']);
+            $pagSeguro_item->setWeight($product['weight'] * 1000); // defines weight in gramas
             
             if ($product['additional_shipping_cost'] > 0)
-                $pagSeguroItem->setShippingCost($product['additional_shipping_cost']);
+                $pagSeguro_item->setShippingCost($product['additional_shipping_cost']);
             
-            array_push($pagSeguroItems, $pagSeguroItem);
+            array_push($pagseguro_items, $pagSeguro_item);
         }
         
-        return $pagSeguroItems;
+        return $pagseguro_items;
     }
     
     /**
@@ -210,7 +242,7 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
         
         if (isset($customer) && !is_null($customer)){
             $sender->setEmail($customer->email);
-            $sender->setName($customer->firstname. ' ' . $customer->lastname);
+            $sender->setName(trim($customer->firstname). ' ' .trim($customer->lastname));
         }
         
         return $sender;
@@ -237,10 +269,10 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
      *  @return PagSeguroShippingType
      */
     private function _generateShippingType(){
-        $shippingType = new PagSeguroShippingType();
-        $shippingType->setByType('NOT_SPECIFIED');
+        $shipping_type = new PagSeguroShippingType();
+        $shipping_type->setByType('NOT_SPECIFIED');
         
-        return $shippingType;
+        return $shipping_type;
     }
     
     /**
@@ -251,46 +283,24 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
     private function _generateShippingAddressData(){
         
         $address = new PagSeguroAddress();
-        $deliveryAddress = new Address($this->context->cart->id_address_delivery);
+        $delivery_address = new Address($this->context->cart->id_address_delivery);
         
-        if (!is_null($deliveryAddress)){
-            $address->setCity($deliveryAddress->city);
-            $address->setPostalCode($deliveryAddress->postcode);
-            $address->setStreet($deliveryAddress->address1);
-            $address->setDistrict($deliveryAddress->address2);
-            $address->setComplement($deliveryAddress->other);
-            $address->setCity($deliveryAddress->city);
+        if (!is_null($delivery_address)){
+            $address->setCity($delivery_address->city);
+            $address->setPostalCode($delivery_address->postcode);
+            $address->setStreet($delivery_address->address1);
+            $address->setDistrict($delivery_address->address2);
+            $address->setComplement($delivery_address->other);
+            $address->setCity($delivery_address->city);
             
-            $country = new Country($deliveryAddress->id_country);
+            $country = new Country($delivery_address->id_country);
             $address->setCountry($country->iso_code);
             
-            $state = new State($deliveryAddress->id_state);
+            $state = new State($delivery_address->id_state);
             $address->setState($state->iso_code);
         }
         
         return $address;
     }
     
-    /**
-     *  Perform truncate of string value
-     * 
-     * @param string $string
-     * @param type $limit
-     * @param type $endchars
-     * @return string
-     */
-    private function _truncateValue($string, $limit, $endchars = '...'){
-        
-        if (!is_array($string) || !is_object($string)){
-            
-            $stringLength = Tools::strlen($string);
-            $endcharsLength  = Tools::strlen($endchars);
-            
-            if ($stringLength > (int)$limit){
-                $cut = (int)($limit - $endcharsLength);
-                $string = Tools::substr($string, 0, $cut).$endchars;
-            }
-        }
-        return $string;
-    }
 }

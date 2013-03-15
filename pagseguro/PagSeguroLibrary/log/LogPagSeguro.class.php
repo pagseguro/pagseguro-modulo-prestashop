@@ -39,6 +39,7 @@ class LogPagSeguro{
 	}
 	
 	public static function reLoad() {
+
 		self::$active = PagSeguroConfig::logIsActive();
 		if (self::$active) {
 			$fileLocation = PagSeguroConfig::getLogFileLocation();
@@ -61,11 +62,15 @@ class LogPagSeguro{
 		$defaultPath   = PagSeguroLibrary::getPath();
 		$defaultName   = 'PagSeguro.log';
 		self::$fileLocation = $defaultPath.DIRECTORY_SEPARATOR.$defaultName;
-		if ($f = @fopen(self::$fileLocation, "a")) {
+		
+		try {
+			$f = fopen(self::$fileLocation, "a");
 			fclose($f);
-		} else {
-			throw new Exception("Can't create log file. Permission denied. File location: ".self::$fileLocation);				
-		}		
+		}
+		catch (Exception $e){
+			echo $e->getMessage(). " - Can't create log file. Permission denied. File location: " . self::$fileLocation;
+		}
+
 	}
 	
 	/**
@@ -108,7 +113,10 @@ class LogPagSeguro{
 	 */
 	private static function logMessage($message, $type = null) {
 		if (!self::$active) { return false; }
-		if ($file = @fopen(self::$fileLocation, "a") ) {
+		
+		try {
+
+			$file = fopen(self::$fileLocation, "a");
 			$date_message = "{" . @date("Y/m/d H:i:s", time()) . "}";
 			$type_message = "";
 			switch ($type) {
@@ -121,9 +129,12 @@ class LogPagSeguro{
 			$str = "$date_message $type_message $message";
 			fwrite($file, "$str \r\n");
 			fclose($file);
-		} else {
-			throw new Exception("Can't create log file. Permission denied. File location: ".self::$fileLocation);				
+
 		}
+		catch(Exception $e){
+			echo $e->getMessage(). " - Can't create log file. Permission denied. File location: " . self::$fileLocation;
+		}
+		 
 	}
 	
 	/**
