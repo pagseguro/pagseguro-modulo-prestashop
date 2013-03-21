@@ -28,7 +28,7 @@ var pagseguro_config = ({
     },
     
     initBinds : function(){
-        $('select#pagseguroLog').bind('change', function(){
+        $('select#pagseguro_log').bind('change', function(){
             if ($(this).val() == '1')
                 $('table tr#logDir').show();
             else 
@@ -37,7 +37,7 @@ var pagseguro_config = ({
     },
     
     initialVerification : function(){
-        $('select#pagseguroLog').change();
+        $('select#pagseguro_log').change();
     }
 
 });
