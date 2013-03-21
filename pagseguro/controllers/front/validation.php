@@ -175,7 +175,7 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
         
         $payment_request = new PagSeguroPaymentRequest();
         $payment_request->setCurrency(PagSeguroCurrencies::getIsoCodeByName('Real')); // currency
-        $payment_request->setExtraAmount($this->_getCartRulesValues()); // extra amount
+        $payment_request->setExtraAmount($this->_getExtraAmountValues()); // extra amount
         $payment_request->setItems($this->_generateProductsData()); // products
         $payment_request->setSender($this->_generateSenderData()); // sender
         $payment_request->setShipping($this->_generateShippingData()); // shipping
@@ -186,7 +186,15 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
     }
     
     /**
-     * Gets extra amount cart values
+     * Gets extra amount values for order
+     * @return float
+     */
+    private function _getExtraAmountValues(){
+        return Tools::convertPrice($this->_getCartRulesValues() + $this->_getWrappingValues());
+    }
+    
+    /**
+     * Gets cart rules values
      * @return float
      */
     private function _getCartRulesValues(){
@@ -199,6 +207,14 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
         }
 
         return number_format(Tools::ps_round($rules_values, 2), 2, '.', '') * (-1);
+    }
+    
+    /**
+     * Gets wrapping values for order
+     * @return float
+     */
+    private function _getWrappingValues(){
+        return number_format(Tools::ps_round($this->context->cart->getOrderTotal(TRUE, Cart::ONLY_WRAPPING), 2), 2, '.', '');
     }
     
     /**
@@ -242,10 +258,34 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
         
         if (isset($customer) && !is_null($customer)){
             $sender->setEmail($customer->email);
-            $sender->setName(trim($customer->firstname). ' ' .trim($customer->lastname));
+            $name = $this->_generateName($customer->firstname).' '.$this->_generateName($customer->lastname);
+            $sender->setName(Tools::truncate($name, 50));
         }
         
         return $sender;
+    }
+    
+    /**
+     * Generate name 
+     * @param type $value
+     * @return string
+     */
+    private function _generateName($value){
+        $name = '';
+        $cont = 0;
+        
+        $customer = explode(" ", $value );
+        
+            foreach ($customer as $first){
+                if(!Tools::isEmpty($first))
+                        if($cont == 0){
+                            $name .= ($first);
+                            $cont++;
+                        } else 
+                            $name .= ' '.($first);
+                }
+
+        return $name;
     }
     
     /**
