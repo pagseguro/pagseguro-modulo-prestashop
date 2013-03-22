@@ -288,7 +288,7 @@ class PagSeguro extends PaymentModule {
                                 </tr>
                                  <tr>
                                     <td></td>
-                                    <td>Ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado de volta para sua loja ou para a URL que você informar no campo acima.<br />Para tanto, é preciso que você ative o recebimento exclusivo de <a href="https://pagseguro.uol.com.br/integracao/pagamentos-via-api.jhtml" target="_blank" >Pagamentos via API</a>.<br /><br />
+                                    <td>Ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado de volta para sua loja ou para a URL que você informar no campo acima.<br />Para tanto, é preciso que você ative o recebimento exclusivo de <a href="https://pagseguro.uol.com.br/integracao/pagamentos-via-api.jhtml" target="_blank" >Pagamentos via API</a>.<br />.
                                 </tr>
                                 <tr>
                                     <td width="60" style="height: 35px;">'.$this->l('Charset').':</td>
@@ -320,7 +320,7 @@ class PagSeguro extends PaymentModule {
                                     <td width="60" style="height: 35px;">'.$this->l('Notifica&ccedil;&otilde;es de transa&ccedil;&otilde;es').':</td>
                                     <td>'.
                                         $this->l('Para receber e processar automaticamente os novos status das transações com o PagSeguro você deve ativar o serviço de ').'<a href="https://pagseguro.uol.com.br/integracao/notificacao-de-transacoes.jhtml" target="_blank">'.$this->l('Notificação de Transações.').'</a>'.
-                                        $this->l(' No painel de controle de sua conta PagSeguro, informe a seguinte url para receber as notificações automaticamente:').
+                                        $this->l('No painel de controle de sua conta PagSeguro, informe a seguinte url para receber as notificações automaticamente:').
                                     '</td>
                                 </tr>
                                  <tr>
@@ -372,11 +372,11 @@ class PagSeguro extends PaymentModule {
      * @return string
      */
     public function hookPaymentReturn($params) {
+        
         if (!$this->active)
             return;
         
-        $state = $params['objOrder']->getCurrentState();
-        if ($state == Configuration::get('PS_OS_PAGSEGURO') || $state == Configuration::get('PS_OS_OUTOFSTOCK')) {
+        if (!Tools::isEmpty($params['objOrder']) && $params['objOrder']->module === $this->name) {
             $this->smarty->assign(array(
                 'total_to_pay' => Tools::displayPrice($params['total_to_pay'], $params['currencyObj'], false),
                 'status' => 'ok',
@@ -387,6 +387,7 @@ class PagSeguro extends PaymentModule {
         }
         else
             $this->smarty->assign('status', 'failed');
+        
         return $this->display(__FILE__, 'payment_return.tpl');
     }
     
