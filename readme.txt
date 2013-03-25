@@ -13,6 +13,11 @@ Este módulo tem por finalidade integrar o PagSeguro como meio de pagamento dentr
 
 Disponível para as versões 1.5.2 e 1.5.3.1 do PrestaShop.
 
+PHP 5.1.6+
+SPL
+cURL
+DOM
+
 
 = Instalação =
 
@@ -37,6 +42,7 @@ Após instalado o módulo, é necessário que se faça algumas configurações para que
 		- https://pagseguro.uol.com.br/integracao/pagamentos-via-api.jhtml
 	- charset: codificação do seu sistema (ISO-8859-1 ou UTF-8)
 	- log: ativa/desativa a geração de logs
+		- diretório a partir da raíz de instalação do PrestaShop onde se deseja criar o arquivo de log. Ex.: /logs/log_pagseguro.log
 	- Notificações de Transação
 		- Para receber e processar automaticamente os novos status das transações com o PagSeguro você deve ativar o serviço de Notificação de Transações. Basta acessar o painel de controle de sua conta PagSeguro e informe a url que aparece nas configurações do módulo;
 		- https://pagseguro.uol.com.br/integracao/notificacao-de-transacoes.jhtml
