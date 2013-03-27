@@ -158,14 +158,14 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
      * Set PagSeguro PrestaShop module version
      */
     private function _setPagSeguroModuleVersion(){
-        PagSeguroLibrary::setModuleVersion('prestashop-v'.$this->module->version);
+        PagSeguroLibrary::setModuleVersion('prestashop-v.'.$this->module->version);
     }
     
     /**
      * Set PagSeguro CMS version
      */
     private function _setPagSeguroCMSVersion(){
-        PagSeguroLibrary::setCMSVersion('prestashop-v'._PS_VERSION_);
+        PagSeguroLibrary::setCMSVersion('prestashop-v.'._PS_VERSION_);
     }
     
     /**
