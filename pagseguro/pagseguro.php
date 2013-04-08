@@ -25,7 +25,7 @@ class PagSeguro extends PaymentModule {
 
     protected $errors = array();
     private $_html;
-    private $_charset_options = array('1' => 'ISO-8859-1', '2' =>'UTF-8');
+    private $_charset_options = array('1' => 'UTF-8', '2' =>'ISO-8859-1');
     private $_active_log = array('0' => 'NÃO', '1' => 'SIM');
     
     function __construct() {
@@ -59,8 +59,8 @@ class PagSeguro extends PaymentModule {
         if (    !parent::install() ||
                 !$this->registerHook('payment') || 
                 !$this->registerHook('paymentReturn') ||
-                !Configuration::updateValue('PAGSEGURO_EMAIL', 'informe seu e-mail cadastrado no PagSeguro') ||
-                !Configuration::updateValue('PAGSEGURO_TOKEN', 'informe seu token de segurança') ||
+                !Configuration::updateValue('PAGSEGURO_EMAIL', '') ||
+                !Configuration::updateValue('PAGSEGURO_TOKEN', '') ||
                 !Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') ||
                 !Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset')) ||
                 !Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active')) ||
@@ -242,105 +242,138 @@ class PagSeguro extends PaymentModule {
      *  Display configuration form
      */
     private function _displayForm() {
-        
-        $this->context->controller->addJS($this->_path.'assets/js/configuration.js');
-        
-        $this->_html .=
-                '<form action="'.Tools::htmlentitiesUTF8($_SERVER['REQUEST_URI']).'" method="post">
-                    <fieldset>
-			<legend><img src="../img/admin/edit.gif" />'.$this->l('Configurações').'</legend>
-                            <table border="0" width="1100px" cellpadding="0" cellspacing="0" id="form">
-                                <tr>
-                                    <td colspan="2">'.$this->l('Você precisa informar alguns dados antes de começar a usar o módulo de integração com PagSeguro. ').'<br/>
-                                </tr>
-                                <tr>
-                                    <td><br/></td>
-                                </tr>
-                                <tr>
-                                    <td width="60" style="height: 35px;">'.$this->l('E-mail').':</td>
-                                    <td><input type="text" name="pagseguro_email" id="pagseguro_email" value="'.Configuration::get('PAGSEGURO_EMAIL').'" style="width:300px;" maxlength="60" /></td>
-                                </tr>
-                                <tr>
-                                     <td></td> 
-                                     <td colspan="2">'.$this->l('Não tem conta no PagSeguro?').'<a href="https://pagseguro.uol.com.br/registration/registration.jhtml?ep=5&tipo=cadastro#!vendedor" target="_blank">'.$this->l(' Crie uma nova conta').'</a>'.$this->l(' selecionando o tipo vendedor ou empresarial.').'</td>    
-                                </tr>
-                                 <tr>
-                                    <td><br/></td>
-                                </tr>
-                                <tr>
-                                    <td width="60" style="height: 35px;">'.$this->l('Token').':</td>
-                                    <td>
-                                        <input type="text" name="pagseguro_token" id="pagseguro_token" value="'.Configuration::get('PAGSEGURO_TOKEN').'" style="width:300px;" maxlength="32" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                         <td></td> 
-                                         <td colspan="2">'.$this->l('N&atilde;o tem ou n&atilde;o sabe seu token?').'<a href="https://pagseguro.uol.com.br/integracao/token-de-seguranca.jhtml" target="_blank">'.$this->l(' Criar um novo token de segurança.').'</a></td>  
-                                </tr>
-                                 <tr>
-                                    <td><br/></td>
-                                </tr>
-                                <tr>
-                                    <td width="60" style="height: 35px;">'.$this->l('Url de redirecionamento').':</td>
-                                    <td>
-                                        <input type="text" name="pagseguro_url_redirect" id="pagseguro_url_redirect" value="'.Configuration::get('PAGSEGURO_URL_REDIRECT').'" style="width:300px;" maxlength="255" />
-                                    </td>
-                                </tr>
-                                 <tr>
-                                    <td></td>
-                                    <td>Ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado de volta para sua loja ou para a URL que você informar no campo acima.<br />Para tanto, é preciso que você ative o recebimento exclusivo de <a href="https://pagseguro.uol.com.br/integracao/pagamentos-via-api.jhtml" target="_blank" >Pagamentos via API</a>.<br /><br />
-                                </tr>
-                                <tr>
-                                    <td width="60" style="height: 35px;">'.$this->l('Charset').':</td>
-                                    <td>'.$this->_generateSelectTag('pagseguro_charset', $this->_charset_options, array_search(Configuration::get('PAGSEGURO_CHARSET'), $this->_charset_options), 'class="select"').'</td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td colspan="2">'.$this->l('Defina o charset de acordo com a codificação do seu sistema.').'</td>
-                                </tr>
-                                 <tr>
-                                    <td><br/></td>
-                                </tr>
-                                <tr>
-                                    <td width="60" style="height: 35px;">'.$this->l('Log').':</td>
-                                    <td>'.$this->_generateSelectTag('pagseguro_log', $this->_active_log, Configuration::get('PAGSEGURO_LOG_ACTIVE'), 'class="select"').'</td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td colspan="2">'.$this->l('Criar arquivo de log?').'</td>
-                                </tr>
-                                <tr style="display:none;" id="logDir">
-                                    <td width="60" style="height: 35px;">'.$this->l('Diretório').':</td>
-                                    <td><input type="text" id="pagseguro_log_dir" name="pagseguro_log_dir" value="'.Configuration::get('PAGSEGURO_LOG_FILELOCATION').'" style="width:300px;"/></td>
-                                </tr>
-                                <tr>
-                                    <td><br/></td>
-                                </tr>
-                                <tr>
-                                    <td width="60" style="height: 35px;">'.$this->l('Notifica&ccedil;&otilde;es de transa&ccedil;&otilde;es').':</td>
-                                    <td>'.
-                                        $this->l('Para receber e processar automaticamente os novos status das transações com o PagSeguro você deve ativar o serviço de ').'<a href="https://pagseguro.uol.com.br/integracao/notificacao-de-transacoes.jhtml" target="_blank">'.$this->l('Notificação de Transações.').'</a><br />'.
-                                        $this->l('No painel de controle de sua conta PagSeguro, informe a seguinte url para receber as notificações automaticamente:').
-                                    '</td>
-                                </tr>
-                                 <tr>
-                                    <td><br/></td>
-                                    <td><br/></td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td><strong>'.$this->_getNotificationUrl().'</strong></td>
-                                </tr>
-                                <tr>
-                                    <td><br/></td>
-                                    <td><br/></td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" align="left"><br /><input class="button" name="btnSubmit" value="'.$this->l('Atualizar').'" type="submit" /></td>
-                                </tr>
-                            </table>
-			</fieldset>
-		</form>';
+	$this->context->controller->addCSS($this->_path.'assets/css/styles.css');
+
+	$this->context->controller->addJS($this->_path.'assets/js/behaviors.js');
+
+	$this->_html .=
+		'<form class="psplugin" action="'.Tools::htmlentitiesUTF8($_SERVER['REQUEST_URI']).'" method="POST">
+			<h1>
+				<img src="'.$this->_path.'assets/images/logops_228x56.png" />
+				<span>Mais de 23 milhões de brasileiros já utilizam o PagSeguro. <br />Faça parte você também!</span>
+			</h1>
+			<div id="mainps">
+				<ol>
+					<li>
+						<h2><span>Como funciona</span></h2>
+						<div>
+							<h2>Sem convênios. Sem taxa mínima, adesão ou mensalidade.</h2>
+							<br />
+							<p>PagSeguro é a solução completa para pagamentos online, que garante a segurança de quem compra e de quem vende na web. Quem compra com PagSeguro tem a garantia de produto ou serviço entregue ou seu dinheiro de volta. Quem vende utilizando o serviço do PagSeguro tem o gerenciamento de risco de suas transações*. Quem integra lojas ao PagSeguro tem ferramentas, comissão e publicidade gratuita.</p>
+
+							<p>Não é necessário fazer convênios com operadoras. O PagSeguro é a única empresa no Brasil a oferecer todas as opções em um só pacote. O PagSeguro não cobra nenhuma taxa para você abrir sua conta, não cobra taxas mensais, não cobra multa caso você queira parar de usar os serviços.</p>
+
+							<p>Use PagSeguro para receber pagamentos de modo fácil e seguro. Comece a aceitar em alguns minutos, pagamentos por cartões de crédito, boletos e transferências bancárias online e alcance milhares de compradores. Mesmo que você já ofereça outros meios de pagamento, adicione o PagSeguro e ofereça a opção Carteira Eletrônica PagSeguro. Milhões de usuários já usam o Saldo PagSeguro para compras online, e compram com segurança, rapidez e comodidade.</p>
+
+
+							<p class="small">* Gerenciamento de risco de acordo com nossas <a href=\'https://pagseguro.uol.com.br/regras-de-uso.jhtml\' target=\'_blank\'>Regras de uso</a>.</p>
+						</div>
+					</li>
+					<li>
+						<h2><span>Crie sua conta</span></h2>
+						<div>
+							<h2>A forma mais fácil de vender</h2>
+							<br />
+							<ul>
+								<li>Comece hoje a vender pela internet</li>
+								<li>Venda pela internet sem pagar mensalidade</li>
+								<li>Ofereça parcelamento com ou sem acréscimo</li>
+								<li>Venda parcelado e receba de uma única vez</li>
+								<li>Proteção total contra fraudes</li>
+							</ul>
+							<br />
+							<a href="https://pagseguro.uol.com.br/registration/registration.jhtml?ep=5&tipo=cadastro#!vendedor" target="_blank" class="pagseguro-button green-theme normal">Faça seu cadastro</a>
+						</div>
+					</li>
+					<li>
+						<h2><span>Configurações</span></h2>
+						<div>
+							<label>E-mail:</label><br />
+							<input type="text" name="pagseguro_email" id="pagseguro_email" value="'.Configuration::get('PAGSEGURO_EMAIL').'" maxlength="60"  hint="Para oferecer o PagSeguro em sua loja é preciso ter uma conta do tipo vendedor ou empresarial. Se você ainda não tem uma conta PagSeguro <a href=\'https://pagseguro.uol.com.br/registration/registration.jhtml?ep=5&tipo=cadastro#!vendedor\' target=\'_blank\'>clique aqui</a>, caso contrário informe neste campo o e-mail associado à sua conta PagSeguro." />
+							<br/>
+							<label>Token:</label><br />
+							<input type="text" name="pagseguro_token" id="pagseguro_token" value="'.Configuration::get('PAGSEGURO_TOKEN').'" maxlength="32"  hint="Para utilizar qualquer serviço de integração do PagSeguro, é necessário ter um token de segurança. O token é um código único, gerado pelo PagSeguro. Caso não tenha um token, <a href=\'https://pagseguro.uol.com.br/integracao/token-de-seguranca.jhtml\' target=\'_blank\'>clique aqui</a> para gerar." />
+							<br />
+							<label>URL de Redirecionamento:</label><br />
+							<input type="text" name="pagseguro_url_redirect" id="pagseguro_url_redirect" value="'.Configuration::get('PAGSEGURO_URL_REDIRECT').'" maxlength="255" hint="Ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado de volta para sua loja ou para a URL que você informar neste campo. Para utilizar essa funcionalidade você deve configurar sua conta para aceitar somente requisições de pagamentos gerados via API. <a href=\'https://pagseguro.uol.com.br/integracao/pagamentos-via-api.jhtml\' target=\'_blank\'>Clique aqui</a> para ativar este serviço." />
+							<br />
+							<label>URL de Notificação:</label><br />
+							<input type="text" value="'.$this->_getNotificationUrl().'" hint="Ao final do processo de pagamento ou toda vez que uma transação mudar de status, o PagSeguro manda uma notificação via HTTP POST para sua loja, entretanto, você deve ativar o serviço de Notificação de Transações e informar a URL de Notificação. <a href=\'https://pagseguro.uol.com.br/integracao/notificacao-de-transacoes.jhtml\' target=\'_blank\'>Clique aqui</a> para ativar este serviço." readonly />
+
+							<div class="hintps _config"></div>
+						</div>
+					</li>
+					<li>
+						<h2><span>Extras</span></h2>
+						<div>
+							<label>Charset:</label><br />
+								'.$this->_generateSelectTag('pagseguro_charset', $this->_charset_options, array_search(Configuration::get('PAGSEGURO_CHARSET'), $this->_charset_options), 'class="select"').'
+							<br />
+							<label>Log:</label><br />
+								'.$this->_generateSelectTag('pagseguro_log', $this->_active_log, Configuration::get('PAGSEGURO_LOG_ACTIVE'), 'class="select"').'
+							<br />
+							<span id="directory-log">
+								<label>Diretório:</label><br />
+								<input type="text" id="pagseguro_log_dir" name="pagseguro_log_dir" value="'.Configuration::get('PAGSEGURO_LOG_FILELOCATION').'" hint="Diretório a partir da raíz de instalação do PrestaShop onde se deseja criar o arquivo de log. Ex.: /logs/log_ps.log" />
+							</span>
+
+							<div class="hintps _extras"></div>
+						</div>
+					</li>
+				</ol>
+				<noscript>
+					<p>Please enable JavaScript to get the full experience.</p>
+				</noscript>
+			</div>
+			<br />
+
+			<button id="update" class="pagseguro-button green-theme normal" name="btnSubmit">Atualizar</button>
+		</form>
+		<script>
+			$(\'#mainps\').liteAccordion({
+				theme : \'ps\',
+				rounded : true,
+				containerHeight : 400,
+				onTriggerSlide : function() {
+					$(\'.hintps\').fadeOut(400);
+				}
+			});
+
+			$(\'#pagseguro_log\').on(
+				\'change\',
+				function(e) {
+					$(\'#directory-log\').toggle(300);
+				}
+			);
+
+			$(\'input\').on(
+				\'focus\',
+				function(e) {
+					_$this = $(this);
+
+					$(this).addClass(\'focus\');
+					$(this).parent().parent().find(\'.hintps\').fadeOut(210, function() {
+						$(this).html(_$this.attr(\'hint\')).fadeIn(210);
+					});
+				}
+			);
+
+			$(\'input\').on(
+				\'blur\',
+				function(e) {
+					$(this).removeClass(\'focus\');
+				}
+			);
+
+			$(\'.alert, .conf\').insertBefore(\'#mainps\');
+
+			$(\'#psplugin\').on(
+				\'submit\',
+				function(e) {
+					$(\'#mainps ol li:nth-child(3) h2\').trigger(\'click\');
+				}
+			);
+		</script>';
     }
 
     /**
