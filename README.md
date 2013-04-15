@@ -105,7 +105,6 @@ Achou e corrigiu um bug ou tem alguma feature em mente e deseja contribuir?
 
 * Faça um fork.
 * Adicione sua feature ou correção de bug.
-* Adicione seu nome na lista de contribuidores no README.md.
 * Envie um pull request no GitHub.
 
 

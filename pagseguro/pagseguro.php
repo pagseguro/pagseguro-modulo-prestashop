@@ -112,15 +112,18 @@ class PagSeguro extends PaymentModule {
     public function getContent() {
         
         if (Tools::isSubmit('btnSubmit')) {
-            $this->_postValidation();
-            
-            // if no errors in form
-            if (!count($this->errors))
-                $this->_postProcess();
-            // if errors
-            else
-                foreach ($this->errors as $error)
-                    $this->_html .= '<div class="alert error">'.$error.'</div>';
+	    $this->_postProcess();
+	/**            
+	* $this->_postValidation();
+        *    
+        *    // if no errors in form
+        *    if (!count($this->errors))
+        *        $this->_postProcess();
+        *    // if errors
+        *    else
+        *        foreach ($this->errors as $error)
+        *            $this->_html .= '<div class="alert error">'.$error.'</div>';
+        */
         }
         
         $this->_displayForm();
@@ -497,7 +500,7 @@ class PagSeguro extends PaymentModule {
             $order_state = new OrderState();
             $order_state->module_name = $this->name;
             $order_state->send_email = false;
-            $order_state->color = '#DDEEFF';
+            $order_state->color = '#95D061';
             $order_state->hidden = false;
             $order_state->delivery = false;
             $order_state->logable = true;
