@@ -21,18 +21,19 @@ limitations under the License.
 if (!defined('_PS_VERSION_'))
 	exit;
 
+	include_once 'pagseguroorderstatustranslation.php';
 class PagSeguro extends PaymentModule {
 
     protected $errors = array();
     private $_html;
-    private $_charset_options = array('1' => 'UTF-8', '2' =>'ISO-8859-1');
+    private $_charset_options = array('1' => 'ISO-8859-1', '2' =>'UTF-8');
     private $_active_log = array('0' => 'NÃO', '1' => 'SIM');
     
     function __construct() {
 
         $this->name = 'pagseguro';
         $this->tab = 'payments_gateways';
-        $this->version = '1.1';
+        $this->version = '1.2';
         $this->author = 'PagSeguro Internet LTDA.';
 
         $this->currencies = true;
@@ -59,9 +60,10 @@ class PagSeguro extends PaymentModule {
         if (    !parent::install() ||
                 !$this->registerHook('payment') || 
                 !$this->registerHook('paymentReturn') ||
-                !Configuration::updateValue('PAGSEGURO_EMAIL', '') ||
-                !Configuration::updateValue('PAGSEGURO_TOKEN', '') ||
+                !Configuration::updateValue('PAGSEGURO_EMAIL', 'informe seu e-mail cadastrado no PagSeguro') ||
+                !Configuration::updateValue('PAGSEGURO_TOKEN', 'informe seu token de segurança') ||
                 !Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') ||
+                !Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', $this->_notificationURL()) ||
                 !Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset')) ||
                 !Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active')) ||
                 !Configuration::updateValue('PAGSEGURO_LOG_FILELOCATION', PagSeguroConfig::getData('log', 'fileLocation')) ||
@@ -81,6 +83,7 @@ class PagSeguro extends PaymentModule {
         if (    !Configuration::deleteByName('PAGSEGURO_EMAIL') ||
                 !Configuration::deleteByName('PAGSEGURO_TOKEN') ||
                 !Configuration::deleteByName('PAGSEGURO_URL_REDIRECT') ||
+                !Configuration::deleteByName('PAGSEGURO_NOTIFICATION_URL') ||
                 !Configuration::deleteByName('PAGSEGURO_CHARSET') ||
                 !Configuration::deleteByName('PAGSEGURO_LOG_ACTIVE') ||
                 !Configuration::deleteByName('PAGSEGURO_LOG_FILELOCATION') ||
@@ -99,9 +102,33 @@ class PagSeguro extends PaymentModule {
      * @return bool
      */
     private function _deleteOrderState(){
-        $id = Configuration::get('PS_OS_PAGSEGURO');
-        $order_state = new OrderState($id);
-        return $order_state->delete();
+         $list_status = array_keys(PagSeguroTransactionStatus::getStatusList());
+        $list_languages = Language::getLanguages(false);
+        $delete = false;
+        
+      foreach ($list_languages as $language){
+        foreach ($list_status as $status){
+         
+            $status_ps = PagSeguroOrderStatusTranslation::getStatusTranslation($status, $language['iso_code']);
+            
+           $id_order_state = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
+		SELECT distinct os.`id_order_state`
+		FROM `' . _DB_PREFIX_ . 'order_state` os
+		INNER JOIN `' . _DB_PREFIX_ . 'order_state_lang` osl ON (
+                    os.`id_order_state` = osl.`id_order_state` 
+                    AND osl.`name` = \'' . $status_ps . '\' 
+                    AND os.`module_name` = \'pagseguro\' 
+                    AND osl.`id_lang` = '.(int) $language['id_lang'].' )
+		WHERE deleted = 0'));
+               
+                if(!Tools::isEmpty($id_order_state)){
+                  $order_state = new OrderState($id_order_state[0]['id_order_state']);
+                   $order_state->delete(); 
+                   $delete = true;
+                } 
+            }
+        } 
+        return $delete;
     }
 
     /**
@@ -112,18 +139,15 @@ class PagSeguro extends PaymentModule {
     public function getContent() {
         
         if (Tools::isSubmit('btnSubmit')) {
-	    $this->_postProcess();
-	/**            
-	* $this->_postValidation();
-        *    
-        *    // if no errors in form
-        *    if (!count($this->errors))
-        *        $this->_postProcess();
-        *    // if errors
-        *    else
-        *        foreach ($this->errors as $error)
-        *            $this->_html .= '<div class="alert error">'.$error.'</div>';
-        */
+            $this->_postValidation();
+            
+            // if no errors in form
+            if (!count($this->errors))
+                $this->_postProcess();
+            // if errors
+            else
+                foreach ($this->errors as $error)
+                    $this->_html .= '<div class="alert error">'.$error.'</div>';
         }
         
         $this->_displayForm();
@@ -180,6 +204,7 @@ class PagSeguro extends PaymentModule {
             Configuration::updateValue('PAGSEGURO_EMAIL', Tools::getValue('pagseguro_email'));
             Configuration::updateValue('PAGSEGURO_TOKEN', Tools::getValue('pagseguro_token'));
             Configuration::updateValue('PAGSEGURO_URL_REDIRECT', Tools::getValue('pagseguro_url_redirect'));
+             Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', Tools::getValue('pagseguro_notification_url'));
             Configuration::updateValue('PAGSEGURO_CHARSET', $this->_charset_options[Tools::getValue('pagseguro_charset')]);
             Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', Tools::getValue('pagseguro_log'));
             Configuration::updateValue('PAGSEGURO_LOG_FILELOCATION', Tools::getValue('pagseguro_log_dir'));
@@ -245,11 +270,12 @@ class PagSeguro extends PaymentModule {
      *  Display configuration form
      */
     private function _displayForm() {
-	$this->context->controller->addCSS($this->_path.'assets/css/styles.css');
-
+        // adding css
+        $this->context->controller->addCSS($this->_path.'assets/css/styles.css');
+        // adding js
 	$this->context->controller->addJS($this->_path.'assets/js/behaviors.js');
-
-	$this->_html .=
+        // html
+        $this->_html .=
 		'<form class="psplugin" action="'.Tools::htmlentitiesUTF8($_SERVER['REQUEST_URI']).'" method="POST">
 			<h1>
 				<img src="'.$this->_path.'assets/images/logops_228x56.png" />
@@ -291,17 +317,17 @@ class PagSeguro extends PaymentModule {
 					<li>
 						<h2><span>Configurações</span></h2>
 						<div>
-							<label>E-mail:</label><br />
+							<label>E-MAIL</label><br />
 							<input type="text" name="pagseguro_email" id="pagseguro_email" value="'.Configuration::get('PAGSEGURO_EMAIL').'" maxlength="60"  hint="Para oferecer o PagSeguro em sua loja é preciso ter uma conta do tipo vendedor ou empresarial. Se você ainda não tem uma conta PagSeguro <a href=\'https://pagseguro.uol.com.br/registration/registration.jhtml?ep=5&tipo=cadastro#!vendedor\' target=\'_blank\'>clique aqui</a>, caso contrário informe neste campo o e-mail associado à sua conta PagSeguro." />
 							<br/>
-							<label>Token:</label><br />
+							<label>TOKEN</label><br />
 							<input type="text" name="pagseguro_token" id="pagseguro_token" value="'.Configuration::get('PAGSEGURO_TOKEN').'" maxlength="32"  hint="Para utilizar qualquer serviço de integração do PagSeguro, é necessário ter um token de segurança. O token é um código único, gerado pelo PagSeguro. Caso não tenha um token, <a href=\'https://pagseguro.uol.com.br/integracao/token-de-seguranca.jhtml\' target=\'_blank\'>clique aqui</a> para gerar." />
 							<br />
-							<label>URL de Redirecionamento:</label><br />
+							<label>URL DE REDIRECIONAMENTO</label><br />
 							<input type="text" name="pagseguro_url_redirect" id="pagseguro_url_redirect" value="'.Configuration::get('PAGSEGURO_URL_REDIRECT').'" maxlength="255" hint="Ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado de volta para sua loja ou para a URL que você informar neste campo. Para utilizar essa funcionalidade você deve configurar sua conta para aceitar somente requisições de pagamentos gerados via API. <a href=\'https://pagseguro.uol.com.br/integracao/pagamentos-via-api.jhtml\' target=\'_blank\'>Clique aqui</a> para ativar este serviço." />
 							<br />
-							<label>URL de Notificação:</label><br />
-							<input type="text" value="'.$this->_getNotificationUrl().'" hint="Ao final do processo de pagamento ou toda vez que uma transação mudar de status, o PagSeguro manda uma notificação via HTTP POST para sua loja, entretanto, você deve ativar o serviço de Notificação de Transações e informar a URL de Notificação. <a href=\'https://pagseguro.uol.com.br/integracao/notificacao-de-transacoes.jhtml\' target=\'_blank\'>Clique aqui</a> para ativar este serviço." readonly />
+							<label>URL DE NOTIFICAÇÃO</label><br />
+							<input type="text" value="'.$this->getNotificationUrl().'" hint="Ao final do processo de pagamento ou toda vez que uma transação mudar de status, o PagSeguro manda uma notificação via HTTP POST para sua loja, entretanto, você deve ativar o serviço de Notificação de Transações e informar a URL de Notificação. <a href=\'https://pagseguro.uol.com.br/integracao/notificacao-de-transacoes.jhtml\' target=\'_blank\'>Clique aqui</a> para ativar este serviço." readonly="readonly" />
 
 							<div class="hintps _config"></div>
 						</div>
@@ -309,14 +335,14 @@ class PagSeguro extends PaymentModule {
 					<li>
 						<h2><span>Extras</span></h2>
 						<div>
-							<label>Charset:</label><br />
-								'.$this->_generateSelectTag('pagseguro_charset', $this->_charset_options, array_search(Configuration::get('PAGSEGURO_CHARSET'), $this->_charset_options), 'class="select"').'
+							<label>CHARSET</label><br />
+								'.$this->_generateSelectTag('pagseguro_charset', $this->_charset_options, array_search(Configuration::get('PAGSEGURO_CHARSET'), $this->_charset_options), 'class="select" hint="Informe a codificação utilizada pelo seu sistema. Isso irá prevenir que as transações gerem possíveis erros ou quebras ou ainda que caracteres especiais possam ser apresentados de maneira diferente do habitual."').'
 							<br />
-							<label>Log:</label><br />
-								'.$this->_generateSelectTag('pagseguro_log', $this->_active_log, Configuration::get('PAGSEGURO_LOG_ACTIVE'), 'class="select"').'
+							<label>LOG</label><br />
+								'.$this->_generateSelectTag('pagseguro_log', $this->_active_log, Configuration::get('PAGSEGURO_LOG_ACTIVE'), 'class="select" hint="Deseja habilitar a geração de log?"').'
 							<br />
 							<span id="directory-log">
-								<label>Diretório:</label><br />
+								<label>DIRETÓRIO</label><br />
 								<input type="text" id="pagseguro_log_dir" name="pagseguro_log_dir" value="'.Configuration::get('PAGSEGURO_LOG_FILELOCATION').'" hint="Diretório a partir da raíz de instalação do PrestaShop onde se deseja criar o arquivo de log. Ex.: /logs/log_ps.log" />
 							</span>
 
@@ -349,7 +375,7 @@ class PagSeguro extends PaymentModule {
 				}
 			);
 
-			$(\'input\').on(
+			$(\'input, select\').on(
 				\'focus\',
 				function(e) {
 					_$this = $(this);
@@ -376,6 +402,11 @@ class PagSeguro extends PaymentModule {
 					$(\'#mainps ol li:nth-child(3) h2\').trigger(\'click\');
 				}
 			);
+                        
+			if ($(\'select#pagseguro_log\').val() == \'0\'){
+				$(\'#directory-log\').hide();
+			}
+                        
 		</script>';
     }
 
@@ -527,7 +558,16 @@ class PagSeguro extends PaymentModule {
      * Gets notification url
      * @return string
      */
-    private function _getNotificationUrl(){
+    public function getNotificationUrl(){
+        return ( Configuration::get('PAGSEGURO_NOTIFICATION_URL') != null && Configuration::get('PAGSEGURO_NOTIFICATION_URL') != "" ) ? Configuration::get('PAGSEGURO_NOTIFICATION_URL')  : $this->_notificationURL() ;
+     }
+    
+    /**
+     * 
+     * Notification Url
+     * @return type
+     */
+    private function _notificationURL(){
         return _PS_BASE_URL_.__PS_BASE_URI__.'index.php?fc=module&module=pagseguro&controller=notification';
     }
 }

@@ -19,14 +19,14 @@ limitations under the License.
 
 /*
  * PagSeguro Library Class
- * Version: 2.1.4
- * Date: 14/03/2013
+ * Version: 2.1.5
+ * Date: 15/04/2013
  */
 define('PAGSEGURO_LIBRARY', TRUE);
 require_once "loader".DIRECTORY_SEPARATOR."PagSeguroAutoLoader.class.php";
 class PagSeguroLibrary {
 	
-	const VERSION = "2.1.4";
+	const VERSION = "2.1.5";
 	public static $resources;
 	public static $config;
 	public static $log;

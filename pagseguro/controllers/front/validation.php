@@ -32,6 +32,7 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
         $this->_generatePagSeguroRequestData();
         $additional_infos = $this->_validateOrder();
         $this->_setAdditionalRequestData($additional_infos);
+        $this->_setNotificationUrl();
         $this->_performPagSeguroRequest();
         
     }
@@ -49,7 +50,14 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
         $redirect_url = $this->_payment_request->getRedirectURL();
         if (Tools::isEmpty($redirect_url))
             $this->_payment_request->setRedirectURL($this->_generateRedirectUrl($additional_infos));
+    }
     
+    /**
+     * set notification url
+     */
+    private function _setNotificationUrl(){
+        $obj_ps = new PagSeguro();
+        $this->_payment_request->setNotificationURL( $obj_ps->getNotificationUrl() );
     }
     
     /**

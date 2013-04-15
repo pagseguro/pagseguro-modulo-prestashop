@@ -54,6 +54,12 @@ Para acessar e configurar o módulo acesse o menu Módulos -> Modules -> Payment
 Changelog
 ---------
 ---
+1.2
+
+ - Atualização de biblioteca.
+ - Melhoria de layout.
+ - Correção: Remoção de lista de status quando o módulo é removido.
+
 1.1
 
 - Integração com API de Notificação do PagSeguro.
