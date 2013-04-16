@@ -60,10 +60,10 @@ class PagSeguro extends PaymentModule {
         if (    !parent::install() ||
                 !$this->registerHook('payment') || 
                 !$this->registerHook('paymentReturn') ||
-                !Configuration::updateValue('PAGSEGURO_EMAIL', 'informe seu e-mail cadastrado no PagSeguro') ||
-                !Configuration::updateValue('PAGSEGURO_TOKEN', 'informe seu token de segurança') ||
+                !Configuration::updateValue('PAGSEGURO_EMAIL', '') ||
+                !Configuration::updateValue('PAGSEGURO_TOKEN', '') ||
                 !Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') ||
-                !Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', $this->_notificationURL()) ||
+                !Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '') ||
                 !Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset')) ||
                 !Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active')) ||
                 !Configuration::updateValue('PAGSEGURO_LOG_FILELOCATION', PagSeguroConfig::getData('log', 'fileLocation')) ||
@@ -165,6 +165,7 @@ class PagSeguro extends PaymentModule {
             $email = Tools::getValue('pagseguro_email');
             $token = Tools::getValue('pagseguro_token');
             $pagseguro_url_redirect = Tools::getValue('pagseguro_url_redirect');
+	    $pagseguro_notification_url = Tools::getValue('pagseguro_notification_url');
             $charset = Tools::getValue('pagseguro_charset');
             $pagseguro_log = Tools::getValue('pagseguro_log');
             
@@ -185,6 +186,10 @@ class PagSeguro extends PaymentModule {
             // url redirect validation
             if ($pagseguro_url_redirect && !Validate::isUrl($pagseguro_url_redirect))
                 $this->errors[] = $this->_invalidUrl('Url de redirecionamento');
+
+	    // notification url validation
+            if ($pagseguro_notification_url && !Validate::isUrl($pagseguro_notification_url))
+                $this->errors[] = $this->_invalidUrl('Url de notificação');
             
             // charset validation
             if (!array_key_exists($charset, $this->_charset_options))
@@ -204,7 +209,7 @@ class PagSeguro extends PaymentModule {
             Configuration::updateValue('PAGSEGURO_EMAIL', Tools::getValue('pagseguro_email'));
             Configuration::updateValue('PAGSEGURO_TOKEN', Tools::getValue('pagseguro_token'));
             Configuration::updateValue('PAGSEGURO_URL_REDIRECT', Tools::getValue('pagseguro_url_redirect'));
-             Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', Tools::getValue('pagseguro_notification_url'));
+            Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', Tools::getValue('pagseguro_notification_url'));
             Configuration::updateValue('PAGSEGURO_CHARSET', $this->_charset_options[Tools::getValue('pagseguro_charset')]);
             Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', Tools::getValue('pagseguro_log'));
             Configuration::updateValue('PAGSEGURO_LOG_FILELOCATION', Tools::getValue('pagseguro_log_dir'));
@@ -327,7 +332,7 @@ class PagSeguro extends PaymentModule {
 							<input type="text" name="pagseguro_url_redirect" id="pagseguro_url_redirect" value="'.Configuration::get('PAGSEGURO_URL_REDIRECT').'" maxlength="255" hint="Ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado de volta para sua loja ou para a URL que você informar neste campo. Para utilizar essa funcionalidade você deve configurar sua conta para aceitar somente requisições de pagamentos gerados via API. <a href=\'https://pagseguro.uol.com.br/integracao/pagamentos-via-api.jhtml\' target=\'_blank\'>Clique aqui</a> para ativar este serviço." />
 							<br />
 							<label>URL DE NOTIFICAÇÃO</label><br />
-							<input type="text" value="'.$this->getNotificationUrl().'" hint="Ao final do processo de pagamento ou toda vez que uma transação mudar de status, o PagSeguro manda uma notificação via HTTP POST para sua loja, entretanto, você deve ativar o serviço de Notificação de Transações e informar a URL de Notificação. <a href=\'https://pagseguro.uol.com.br/integracao/notificacao-de-transacoes.jhtml\' target=\'_blank\'>Clique aqui</a> para ativar este serviço." readonly="readonly" />
+							<input type="text" value="'.Configuration::get('PAGSEGURO_NOTIFICATION_URL').'" maxlength="255" hint="Sempre que uma transação mudar de status, o PagSeguro envia uma notificação para sua loja ou para a URL que você informar neste campo." />
 
 							<div class="hintps _config"></div>
 						</div>
