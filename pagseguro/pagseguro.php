@@ -21,7 +21,8 @@ limitations under the License.
 if (!defined('_PS_VERSION_'))
 	exit;
 
-	include_once 'pagseguroorderstatustranslation.php';
+include_once 'pagseguroorderstatustranslation.php';
+
 class PagSeguro extends PaymentModule {
 
     protected $errors = array();
@@ -171,33 +172,33 @@ class PagSeguro extends PaymentModule {
             
             // mail validations
             if (!$email)
-                $this->errors[] = $this->_errorMessage('E-mail');
+                $this->errors[] = $this->_errorMessage('E-MAIL');
             elseif (strlen($email)> 60)
-                $this->errors[] = $this->_invalidFieldSizeMessage('E-mail');
+                $this->errors[] = $this->_invalidFieldSizeMessage('E-MAIL');
             elseif (!Validate::isEmail($email))
-                $this->errors[] = $this->_invalidMailMessage('E-mail');
+                $this->errors[] = $this->_invalidMailMessage('E-MAIL');
             
             // token validations
             if (!$token)
-                $this->errors[] = $this->_errorMessage('Token');
+                $this->errors[] = $this->_errorMessage('TOKEN');
             elseif (strlen($token)!= 32)
-                $this->errors[] = $this->_invalidFieldSizeMessage('Token');
+                $this->errors[] = $this->_invalidFieldSizeMessage('TOKEN');
             
             // url redirect validation
-            if ($pagseguro_url_redirect && !Validate::isUrl($pagseguro_url_redirect))
-                $this->errors[] = $this->_invalidUrl('Url de redirecionamento');
+            if ($pagseguro_url_redirect && !filter_var($pagseguro_url_redirect, FILTER_VALIDATE_URL))
+                $this->errors[] = $this->_invalidUrl('URL DE REDIRECIONAMENTO');
 
 	    // notification url validation
-            if ($pagseguro_notification_url && !Validate::isUrl($pagseguro_notification_url))
-                $this->errors[] = $this->_invalidUrl('Url de notificação');
+            if ($pagseguro_notification_url && !filter_var($pagseguro_notification_url, FILTER_VALIDATE_URL))
+                $this->errors[] = $this->_invalidUrl('URL DE NOTIFICAÇÃO');
             
             // charset validation
             if (!array_key_exists($charset, $this->_charset_options))
-                $this->errors[] = $this->_invalidValue('Charset');
+                $this->errors[] = $this->_invalidValue('CHARSET');
             
             // log validation
             if (!array_key_exists($pagseguro_log, $this->_active_log))
-                $this->errors[] = $this->_invalidValue('Log');
+                $this->errors[] = $this->_invalidValue('LOG');
         }
     }
     
@@ -206,6 +207,7 @@ class PagSeguro extends PaymentModule {
      */
     private function _postProcess(){
         if (Tools::isSubmit('btnSubmit')){
+            
             Configuration::updateValue('PAGSEGURO_EMAIL', Tools::getValue('pagseguro_email'));
             Configuration::updateValue('PAGSEGURO_TOKEN', Tools::getValue('pagseguro_token'));
             Configuration::updateValue('PAGSEGURO_URL_REDIRECT', Tools::getValue('pagseguro_url_redirect'));
@@ -332,7 +334,7 @@ class PagSeguro extends PaymentModule {
 							<input type="text" name="pagseguro_url_redirect" id="pagseguro_url_redirect" value="'.Configuration::get('PAGSEGURO_URL_REDIRECT').'" maxlength="255" hint="Ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado de volta para sua loja ou para a URL que você informar neste campo. Para utilizar essa funcionalidade você deve configurar sua conta para aceitar somente requisições de pagamentos gerados via API. <a href=\'https://pagseguro.uol.com.br/integracao/pagamentos-via-api.jhtml\' target=\'_blank\'>Clique aqui</a> para ativar este serviço." />
 							<br />
 							<label>URL DE NOTIFICAÇÃO</label><br />
-							<input type="text" value="'.Configuration::get('PAGSEGURO_NOTIFICATION_URL').'" maxlength="255" hint="Sempre que uma transação mudar de status, o PagSeguro envia uma notificação para sua loja ou para a URL que você informar neste campo." />
+							<input type="text" name="pagseguro_notification_url" id="pagseguro_notification_url" value="'.Configuration::get('PAGSEGURO_NOTIFICATION_URL').'" maxlength="255" hint="Sempre que uma transação mudar de status, o PagSeguro envia uma notificação para sua loja ou para a URL que você informar neste campo." />
 
 							<div class="hintps _config"></div>
 						</div>
@@ -564,7 +566,7 @@ class PagSeguro extends PaymentModule {
      * @return string
      */
     public function getNotificationUrl(){
-        return ( Configuration::get('PAGSEGURO_NOTIFICATION_URL') != null && Configuration::get('PAGSEGURO_NOTIFICATION_URL') != "" ) ? Configuration::get('PAGSEGURO_NOTIFICATION_URL')  : $this->_notificationURL() ;
+        return (!PagSeguroHelper::isEmpty(Configuration::get('PAGSEGURO_NOTIFICATION_URL'))) ? Configuration::get('PAGSEGURO_NOTIFICATION_URL')  : $this->_notificationURL() ;
      }
     
     /**
