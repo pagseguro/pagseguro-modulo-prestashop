@@ -427,6 +427,8 @@ class PagSeguro extends PaymentModule {
 				}
 			);
 
+			$(\'.alert, .conf\').insertBefore(\'#mainps\');
+
 			$(\'#psplugin\').on(
 				\'submit\',
 				function(e) {
