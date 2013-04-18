@@ -21,7 +21,8 @@ limitations under the License.
 if (!defined('_PS_VERSION_'))
 	exit;
 
-	include_once 'pagseguroorderstatustranslation.php';
+include_once 'pagseguroorderstatustranslation.php';
+
 class PagSeguro extends PaymentModule {
 
     protected $errors = array();
@@ -171,33 +172,33 @@ class PagSeguro extends PaymentModule {
             
             // mail validations
             if (!$email)
-                $this->errors[] = $this->_errorMessage('E-mail');
+                $this->errors[] = $this->_errorMessage('E-MAIL');
             elseif (strlen($email)> 60)
-                $this->errors[] = $this->_invalidFieldSizeMessage('E-mail');
+                $this->errors[] = $this->_invalidFieldSizeMessage('E-MAIL');
             elseif (!Validate::isEmail($email))
-                $this->errors[] = $this->_invalidMailMessage('E-mail');
+                $this->errors[] = $this->_invalidMailMessage('E-MAIL');
             
             // token validations
             if (!$token)
-                $this->errors[] = $this->_errorMessage('Token');
+                $this->errors[] = $this->_errorMessage('TOKEN');
             elseif (strlen($token)!= 32)
-                $this->errors[] = $this->_invalidFieldSizeMessage('Token');
+                $this->errors[] = $this->_invalidFieldSizeMessage('TOKEN');
             
             // url redirect validation
-            if ($pagseguro_url_redirect && !Validate::isUrl($pagseguro_url_redirect))
-                $this->errors[] = $this->_invalidUrl('Url de redirecionamento');
+            if ($pagseguro_url_redirect && !filter_var($pagseguro_url_redirect, FILTER_VALIDATE_URL))
+                $this->errors[] = $this->_invalidUrl('URL DE REDIRECIONAMENTO');
 
 	    // notification url validation
-            if ($pagseguro_notification_url && !Validate::isUrl($pagseguro_notification_url))
-                $this->errors[] = $this->_invalidUrl('Url de notificação');
+            if ($pagseguro_notification_url && !filter_var($pagseguro_notification_url, FILTER_VALIDATE_URL))
+                $this->errors[] = $this->_invalidUrl('URL DE NOTIFICAÇÃO');
             
             // charset validation
             if (!array_key_exists($charset, $this->_charset_options))
-                $this->errors[] = $this->_invalidValue('Charset');
+                $this->errors[] = $this->_invalidValue('CHARSET');
             
             // log validation
             if (!array_key_exists($pagseguro_log, $this->_active_log))
-                $this->errors[] = $this->_invalidValue('Log');
+                $this->errors[] = $this->_invalidValue('LOG');
         }
     }
     
@@ -206,6 +207,7 @@ class PagSeguro extends PaymentModule {
      */
     private function _postProcess(){
         if (Tools::isSubmit('btnSubmit')){
+            
             Configuration::updateValue('PAGSEGURO_EMAIL', Tools::getValue('pagseguro_email'));
             Configuration::updateValue('PAGSEGURO_TOKEN', Tools::getValue('pagseguro_token'));
             Configuration::updateValue('PAGSEGURO_URL_REDIRECT', Tools::getValue('pagseguro_url_redirect'));
@@ -260,6 +262,17 @@ class PagSeguro extends PaymentModule {
     private function _invalidValue($field){
         return $this->l("O campo <strong>{$field}</strong> contém um valor inválido.");
     }
+
+    /**
+     * Check if has the $_POST['activeslide']
+     */
+    private function _checkActiveSlide() {
+        if (Tools::getValue('activeslide')) {
+            return Tools::getValue('activeslide');
+        }
+
+        return '1';
+    }
     
     /**
      * Create invalid url messages
@@ -281,14 +294,14 @@ class PagSeguro extends PaymentModule {
 	$this->context->controller->addJS($this->_path.'assets/js/behaviors.js');
         // html
         $this->_html .=
-		'<form class="psplugin" action="'.Tools::htmlentitiesUTF8($_SERVER['REQUEST_URI']).'" method="POST">
+		'<form class="psplugin" id="psplugin" action="'.Tools::htmlentitiesUTF8($_SERVER['REQUEST_URI']).'" method="POST">
 			<h1>
 				<img src="'.$this->_path.'assets/images/logops_228x56.png" />
 				<span>Mais de 23 milhões de brasileiros já utilizam o PagSeguro. <br />Faça parte você também!</span>
 			</h1>
 			<div id="mainps">
 				<ol>
-					<li>
+					<li class="ps-slide1">
 						<h2><span>Como funciona</span></h2>
 						<div>
 							<h2>Sem convênios. Sem taxa mínima, adesão ou mensalidade.</h2>
@@ -303,7 +316,7 @@ class PagSeguro extends PaymentModule {
 							<p class="small">* Gerenciamento de risco de acordo com nossas <a href=\'https://pagseguro.uol.com.br/regras-de-uso.jhtml\' target=\'_blank\'>Regras de uso</a>.</p>
 						</div>
 					</li>
-					<li>
+					<li class="ps-slide2">
 						<h2><span>Crie sua conta</span></h2>
 						<div>
 							<h2>A forma mais fácil de vender</h2>
@@ -319,25 +332,28 @@ class PagSeguro extends PaymentModule {
 							<a href="https://pagseguro.uol.com.br/registration/registration.jhtml?ep=5&tipo=cadastro#!vendedor" target="_blank" class="pagseguro-button green-theme normal">Faça seu cadastro</a>
 						</div>
 					</li>
-					<li>
+					<li class="ps-slide3">
 						<h2><span>Configurações</span></h2>
 						<div>
-							<label>E-MAIL</label><br />
+							<label>E-MAIL*</label><br />
 							<input type="text" name="pagseguro_email" id="pagseguro_email" value="'.Configuration::get('PAGSEGURO_EMAIL').'" maxlength="60"  hint="Para oferecer o PagSeguro em sua loja é preciso ter uma conta do tipo vendedor ou empresarial. Se você ainda não tem uma conta PagSeguro <a href=\'https://pagseguro.uol.com.br/registration/registration.jhtml?ep=5&tipo=cadastro#!vendedor\' target=\'_blank\'>clique aqui</a>, caso contrário informe neste campo o e-mail associado à sua conta PagSeguro." />
 							<br/>
-							<label>TOKEN</label><br />
+							<label>TOKEN*</label><br />
 							<input type="text" name="pagseguro_token" id="pagseguro_token" value="'.Configuration::get('PAGSEGURO_TOKEN').'" maxlength="32"  hint="Para utilizar qualquer serviço de integração do PagSeguro, é necessário ter um token de segurança. O token é um código único, gerado pelo PagSeguro. Caso não tenha um token, <a href=\'https://pagseguro.uol.com.br/integracao/token-de-seguranca.jhtml\' target=\'_blank\'>clique aqui</a> para gerar." />
 							<br />
 							<label>URL DE REDIRECIONAMENTO</label><br />
 							<input type="text" name="pagseguro_url_redirect" id="pagseguro_url_redirect" value="'.Configuration::get('PAGSEGURO_URL_REDIRECT').'" maxlength="255" hint="Ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado de volta para sua loja ou para a URL que você informar neste campo. Para utilizar essa funcionalidade você deve configurar sua conta para aceitar somente requisições de pagamentos gerados via API. <a href=\'https://pagseguro.uol.com.br/integracao/pagamentos-via-api.jhtml\' target=\'_blank\'>Clique aqui</a> para ativar este serviço." />
 							<br />
 							<label>URL DE NOTIFICAÇÃO</label><br />
-							<input type="text" value="'.Configuration::get('PAGSEGURO_NOTIFICATION_URL').'" maxlength="255" hint="Sempre que uma transação mudar de status, o PagSeguro envia uma notificação para sua loja ou para a URL que você informar neste campo." />
+							<input type="text" name="pagseguro_notification_url" id="pagseguro_notification_url" value="'.Configuration::get('PAGSEGURO_NOTIFICATION_URL').'" maxlength="255" hint="Sempre que uma transação mudar de status, o PagSeguro envia uma notificação para sua loja ou para a URL que você informar neste campo." />
+							<br />
+							<br />
+							<p class="small">* Campos obrigatórios</p>
 
 							<div class="hintps _config"></div>
 						</div>
 					</li>
-					<li>
+					<li class="ps-slide4">
 						<h2><span>Extras</span></h2>
 						<div>
 							<label>CHARSET</label><br />
@@ -360,6 +376,8 @@ class PagSeguro extends PaymentModule {
 				</noscript>
 			</div>
 			<br />
+			
+			<input type="hidden" name="activeslide" id="activeslide" value="'.$this->_checkActiveSlide().'" />
 
 			<button id="update" class="pagseguro-button green-theme normal" name="btnSubmit">Atualizar</button>
 		</form>
@@ -367,11 +385,21 @@ class PagSeguro extends PaymentModule {
 			$(\'#mainps\').liteAccordion({
 				theme : \'ps\',
 				rounded : true,
+				firstSlide : parseInt($(\'#activeslide\').val()),
 				containerHeight : 400,
 				onTriggerSlide : function() {
 					$(\'.hintps\').fadeOut(400);
+					
 				}
 			});
+
+			$(\'li[class*=ps-slide] h2\').on(
+				\'click\',
+				function(e) {
+					var active = /ps-slide(\d)/;
+					$(\'#activeslide\').val( active.exec($(this).parent().attr(\'class\'))[1] );
+				}
+			);
 
 			$(\'#pagseguro_log\').on(
 				\'change\',
@@ -392,25 +420,36 @@ class PagSeguro extends PaymentModule {
 				}
 			);
 
-			$(\'input\').on(
+			$(\'input, select\').on(
 				\'blur\',
 				function(e) {
 					$(this).removeClass(\'focus\');
 				}
 			);
 
-			$(\'.alert, .conf\').insertBefore(\'#mainps\');
-
 			$(\'#psplugin\').on(
 				\'submit\',
 				function(e) {
-					$(\'#mainps ol li:nth-child(3) h2\').trigger(\'click\');
+					//$(\'#mainps ol li:nth-child(3) h2\').trigger(\'click\');
 				}
 			);
                         
 			if ($(\'select#pagseguro_log\').val() == \'0\'){
 				$(\'#directory-log\').hide();
 			}
+
+			$(\'.alert, .conf\').insertBefore(\'#mainps\');
+			
+			$(\'.alert, .conf\').on(
+				\'click\',
+				function() {
+					$(this).fadeOut(450);
+				}
+			);
+
+			setTimeout(function() {
+				$(\'.conf\').fadeOut(450);
+			}, 3000);
                         
 		</script>';
     }
@@ -564,7 +603,7 @@ class PagSeguro extends PaymentModule {
      * @return string
      */
     public function getNotificationUrl(){
-        return ( Configuration::get('PAGSEGURO_NOTIFICATION_URL') != null && Configuration::get('PAGSEGURO_NOTIFICATION_URL') != "" ) ? Configuration::get('PAGSEGURO_NOTIFICATION_URL')  : $this->_notificationURL() ;
+        return (!PagSeguroHelper::isEmpty(Configuration::get('PAGSEGURO_NOTIFICATION_URL'))) ? Configuration::get('PAGSEGURO_NOTIFICATION_URL')  : $this->_notificationURL() ;
      }
     
     /**

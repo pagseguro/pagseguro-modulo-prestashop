@@ -295,7 +295,7 @@
 
 form.psplugin { position : relative !important; width : 980px; left : -480px !important; margin-left : 50%; }
 .psplugin input {}
-.psplugin input[type=text], .psplugin select { width : 450px; border : 1px solid #cecece; border-radius : 3px 3px 3px 3px; font-size : 16pt; padding : 8px 8px 8px 8px; }
+.psplugin input[type=text], .psplugin select { width : 450px; border : 1px solid #cecece; border-radius : 3px 3px 3px 3px; font-size : 16pt; padding : 8px 8px 8px 8px;}
 .psplugin input[type=option] {}
 .psplugin input[type=submit] {}
 .psplugin label { font: 'Helvetica Neue', Verdana, Arial, sans-serif !important; color : #57AD29; font-weight : bold; text-align : left; }
@@ -307,7 +307,7 @@ form.psplugin { position : relative !important; width : 980px; left : -480px !im
 .psplugin a { text-decoration : none; }
 .psplugin div.hintps { position : absolute !important; display : none;width : 240px;height : 390px; top : 4px; right : 50px; color : #5B9028; }
 .psplugin p.small { font-size : 10pt !important; }
-.psplugin input:focus { outline : none; }
+.psplugin input:focus, .psplugin select:focus { outline : none; }
 
 /** onFocus form input animation **/
 @-webkit-keyframes focus {
