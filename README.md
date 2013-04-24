@@ -112,7 +112,7 @@ Achou e corrigiu um bug ou tem alguma feature em mente e deseja contribuir?
 
 * Faça um fork.
 * Adicione sua feature ou correção de bug.
-* Envie um pull request no GitHub.
+* Envie um pull request no [GitHub].
 
 
   [API de Pagamentos]: https://pagseguro.uol.com.br/v2/guia-de-integracao/api-de-pagamentos.html
@@ -127,3 +127,4 @@ Achou e corrigiu um bug ou tem alguma feature em mente e deseja contribuir?
   [SPL]: http://php.net/manual/en/book.spl.php
   [cURL]: http://php.net/manual/en/book.curl.php
   [DOM]: http://php.net/manual/en/book.dom.php
+  [GitHub]: https://github.com/pagseguro/prestashop
