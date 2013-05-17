@@ -54,6 +54,10 @@ Para acessar e configurar o módulo acesse o menu Módulos -> Modules -> Payment
 Changelog
 ---------
 ---
+1.3
+
+ - Tornando o código compliance com os requisitos do PrestaShop.
+
 1.2
 
  - A URL de notificação passa a ser enviada no parâmetro notificationURL.
