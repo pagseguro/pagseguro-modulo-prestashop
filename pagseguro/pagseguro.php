@@ -1,7 +1,33 @@
 <?php
+/*
+* 2007-2013 PrestaShop
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Academic Free License (AFL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/afl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to license@prestashop.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+* versions in the future. If you wish to customize PrestaShop for your
+* needs please refer to http://www.prestashop.com for more information.
+*
+*  @author PrestaShop SA <contact@prestashop.com>
+*  @copyright  2007-2013 PrestaShop SA
+*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  International Registered Trademark & Property of PrestaShop SA
+*/
 
 if (!defined('_PS_VERSION_'))
 	exit;
+
+include_once 'PagSeguroLibrary/PagSeguroLibrary.php';
 
 class PagSeguro extends PaymentModule
 {
@@ -9,6 +35,15 @@ class PagSeguro extends PaymentModule
 	private $_html;
 	private $_charset_options = array('1' => 'ISO-8859-1', '2' =>'UTF-8');
 	private $_active_log = array('0' => 'NÃO', '1' => 'SIM');
+        private $order_status = array(
+            'INITIATED' => array('br' => 'Iniciado', 'en' => 'Initiated'),
+            'WAITING_PAYMENT' => array('br' => 'Aguardando pagamento', 'en' => 'Waiting payment'),
+            'IN_ANALYSIS' => array('br' => 'Em análise', 'en' => 'In analysis'),
+            'PAID' => array('br' => 'Paga', 'en' => 'Paid'),
+            'AVAILABLE' => array('br' => 'Disponível', 'en' => 'Available'),
+            'IN_DISPUTE' => array('br' => 'Em disputa', 'en' => 'In dispute'),
+            'REFUNDED' => array('br' => 'Devolvida', 'en' => 'Refunded'),
+            'CANCELLED' => array('br' => 'Cancelada', 'en' => 'Cancelled'));
 
 	function __construct()
 	{
@@ -22,7 +57,7 @@ class PagSeguro extends PaymentModule
 		$this->displayName = $this->l('PagSeguro');
 		$this->description = $this->l('Receba pagamentos por cartão de crédito, transferência bancária e boleto.');
 		$this->confirmUninstall = $this->l('Tem certeza que deseja remover este módulo ?');
-		include_once 'PagSeguroLibrary/PagSeguroLibrary.php';
+		
 	}
 
 	/**
@@ -64,17 +99,14 @@ class PagSeguro extends PaymentModule
 	*/
 	private function _deleteOrderState()
 	{
-		/* Including pagseguroorderstatustranslation file to generate OrderStatus names */
-		include_once('pagseguroorderstatustranslation.php');
 
-		$list_status = array_keys(PagSeguroTransactionStatus::getStatusList());
-		$list_languages = Language::getLanguages(false);
+		$list_status = array_keys($this->order_status);
 		$delete = false;
 
-		foreach ($list_languages as $language)
+		foreach (Language::getLanguages(false) as $language)
 			foreach ($list_status as $status)
 			{
-				$status_ps = PagSeguroOrderStatusTranslation::getStatusTranslation($status, $language['iso_code']);
+				$status_ps = $this->getStatusTranslation($status, $language['iso_code']);
 
 				$id_order_state = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
 				SELECT distinct os.`id_order_state`
@@ -194,7 +226,7 @@ class PagSeguro extends PaymentModule
 	*/
 	private function _errorMessage($field)
 	{
-		return $this->l('O campo <strong>{$field}</strong> deve ser informado.');
+		return sprintf($this->l('O campo <strong>%s</strong> deve ser informado.'), $field);
 	}
 
 	/**
@@ -205,7 +237,7 @@ class PagSeguro extends PaymentModule
 	*/
 	private function _invalidMailMessage($field)
 	{
-		return $this->l('O campo <strong>{$field}</strong> deve ser conter um email válido.');
+		return sprintf($this->l('O campo <strong>%s</strong> deve ser conter um email válido.'), $field);
 	}
     
 	/**
@@ -216,7 +248,7 @@ class PagSeguro extends PaymentModule
 	*/
 	private function _invalidFieldSizeMessage($field)
 	{
-		return $this->l('O campo <strong>{$field}</strong> está com um tamanho inválido');
+		return sprintf($this->l('O campo <strong>%s</strong> está com um tamanho inválido'), $field);
 	}
 
 	/**
@@ -227,7 +259,7 @@ class PagSeguro extends PaymentModule
 	*/
 	private function _invalidValue($field)
 	{
-		return $this->l('O campo <strong>{$field}</strong> contém um valor inválido.');
+		return sprintf($this->l('O campo <strong>%s</strong> contém um valor inválido.'), $field);
 	}
 
 	/**
@@ -246,7 +278,7 @@ class PagSeguro extends PaymentModule
 	*/
 	private function _invalidUrl($field)
 	{
-		return $this->l('O campo <strong>{$field}</strong> deve conter uma url válida.');
+		return sprintf($this->l('O campo <strong>%s</strong> deve conter uma url válida.'), $field);
 	}
     
 	/**
@@ -261,74 +293,74 @@ class PagSeguro extends PaymentModule
 		'<form class="psplugin" id="psplugin" action="'.Tools::htmlentitiesUTF8($_SERVER['REQUEST_URI']).'" method="POST">
 			<h1>
 				<img src="'.$this->_path.'assets/images/logops_228x56.png" />
-				<span>Mais de 23 milhões de brasileiros já utilizam o PagSeguro.<br />Faça parte você também!</span>
+				<span>'.$this->l('Mais de 23 milhões de brasileiros já utilizam o PagSeguro.').'<br />'.$this->l('Faça parte você também!').'</span>
 			</h1>
 			<div id="mainps">
 				<ol>
 					<li class="ps-slide1">
-						<h2><span>Como funciona</span></h2>
+						<h2><span>'.$this->l('Como funciona').'</span></h2>
 						<div>
-							<h2>Sem convênios. Sem taxa mínima, adesão ou mensalidade.</h2>
+							<h2>'.$this->l('Sem convênios. Sem taxa mínima, adesão ou mensalidade.').'</h2>
 							<br />
-							<p>PagSeguro é a solução completa para pagamentos online, que garante a segurança de quem compra e de quem vende na web. Quem compra com PagSeguro tem a garantia de produto ou serviço entregue ou seu dinheiro de volta. Quem vende utilizando o serviço do PagSeguro tem o gerenciamento de risco de suas transações*. Quem integra lojas ao PagSeguro tem ferramentas, comissão e publicidade gratuita.</p>
+							<p>'.$this->l('PagSeguro é a solução completa para pagamentos online, que garante a segurança de quem compra e de quem vende na web. Quem compra com PagSeguro tem a garantia de produto ou serviço entregue ou seu dinheiro de volta. Quem vende utilizando o serviço do PagSeguro tem o gerenciamento de risco de suas transações*. Quem integra lojas ao PagSeguro tem ferramentas, comissão e publicidade gratuita.').'</p>
 
-							<p>Não é necessário fazer convênios com operadoras. O PagSeguro é a única empresa no Brasil a oferecer todas as opções em um só pacote. O PagSeguro não cobra nenhuma taxa para você abrir sua conta, não cobra taxas mensais, não cobra multa caso você queira parar de usar os serviços.</p>
+							<p>'.$this->l('Não é necessário fazer convênios com operadoras. O PagSeguro é a única empresa no Brasil a oferecer todas as opções em um só pacote. O PagSeguro não cobra nenhuma taxa para você abrir sua conta, não cobra taxas mensais, não cobra multa caso você queira parar de usar os serviços.').'</p>
 
-							<p>Use PagSeguro para receber pagamentos de modo fácil e seguro. Comece a aceitar em alguns minutos, pagamentos por cartões de crédito, boletos e transferências bancárias online e alcance milhares de compradores. Mesmo que você já ofereça outros meios de pagamento, adicione o PagSeguro e ofereça a opção Carteira Eletrônica PagSeguro. Milhões de usuários já usam o Saldo PagSeguro para compras online, e compram com segurança, rapidez e comodidade.</p>
+							<p>'.$this->l('Use PagSeguro para receber pagamentos de modo fácil e seguro. Comece a aceitar em alguns minutos, pagamentos por cartões de crédito, boletos e transferências bancárias online e alcance milhares de compradores. Mesmo que você já ofereça outros meios de pagamento, adicione o PagSeguro e ofereça a opção Carteira Eletrônica PagSeguro. Milhões de usuários já usam o Saldo PagSeguro para compras online, e compram com segurança, rapidez e comodidade.').'</p>
 
 
-							<p class="small">* Gerenciamento de risco de acordo com nossas <a href=\'https://pagseguro.uol.com.br/regras-de-uso.jhtml\' target=\'_blank\'>Regras de uso</a>.</p>
+							<p class="small">* '.$this->l('Gerenciamento de risco de acordo com nossas').' <a href=\'https://pagseguro.uol.com.br/regras-de-uso.jhtml\' target=\'_blank\'>'.$this->l('Regras de uso').'</a>.</p>
 						</div>
 					</li>
 					<li class="ps-slide2">
-						<h2><span>Crie sua conta</span></h2>
+						<h2><span>'.$this->l('Crie sua conta').'</span></h2>
 						<div>
-							<h2>A forma mais fácil de vender</h2>
+							<h2>'.$this->l('A forma mais fácil de vender').'</h2>
 							<br />
 							<ul>
-								<li>Comece hoje a vender pela internet</li>
-								<li>Venda pela internet sem pagar mensalidade</li>
-								<li>Ofereça parcelamento com ou sem acréscimo</li>
-								<li>Venda parcelado e receba de uma única vez</li>
-								<li>Proteção total contra fraudes</li>
+								<li>'.$this->l('Comece hoje a vender pela internet').'</li>
+								<li>'.$this->l('Venda pela internet sem pagar mensalidade').'</li>
+								<li>'.$this->l('Ofereça parcelamento com ou sem acréscimo').'</li>
+								<li>'.$this->l('Venda parcelado e receba de uma única vez').'</li>
+								<li>'.$this->l('Proteção total contra fraudes').'</li>
 							</ul>
 							<br />
-							<a href="https://pagseguro.uol.com.br/registration/registration.jhtml?ep=5&tipo=cadastro#!vendedor" target="_blank" class="pagseguro-button green-theme normal">Faça seu cadastro</a>
+							<a href="https://pagseguro.uol.com.br/registration/registration.jhtml?ep=5&tipo=cadastro#!vendedor" target="_blank" class="pagseguro-button green-theme normal">'.$this->l('Faça seu cadastro').'</a>
 						</div>
 					</li>
 					<li class="ps-slide3">
-						<h2><span>Configurações</span></h2>
+						<h2><span>'.$this->l('Configurações').'</span></h2>
 						<div>
-							<label>E-MAIL*</label><br />
-							<input type="text" name="pagseguro_email" id="pagseguro_email" value="'.Configuration::get('PAGSEGURO_EMAIL').'" maxlength="60"  hint="Para oferecer o PagSeguro em sua loja é preciso ter uma conta do tipo vendedor ou empresarial. Se você ainda não tem uma conta PagSeguro <a href=\'https://pagseguro.uol.com.br/registration/registration.jhtml?ep=5&tipo=cadastro#!vendedor\' target=\'_blank\'>clique aqui</a>, caso contrário informe neste campo o e-mail associado à sua conta PagSeguro." />
+							<label>'.$this->l('E-MAIL').'*</label><br />
+							<input type="text" name="pagseguro_email" id="pagseguro_email" value="'.Configuration::get('PAGSEGURO_EMAIL').'" maxlength="60"  hint="'.$this->l('Para oferecer o PagSeguro em sua loja é preciso ter uma conta do tipo vendedor ou empresarial. Se você ainda não tem uma conta PagSeguro').' <a href=\'https://pagseguro.uol.com.br/registration/registration.jhtml?ep=5&tipo=cadastro#!vendedor\' target=\'_blank\'>'.$this->l('clique aqui').'</a>'.$this->l(', caso contrário informe neste campo o e-mail associado à sua conta PagSeguro.').'" />
 							<br/>
-							<label>TOKEN*</label><br />
-							<input type="text" name="pagseguro_token" id="pagseguro_token" value="'.Configuration::get('PAGSEGURO_TOKEN').'" maxlength="32"  hint="Para utilizar qualquer serviço de integração do PagSeguro, é necessário ter um token de segurança. O token é um código único, gerado pelo PagSeguro. Caso não tenha um token, <a href=\'https://pagseguro.uol.com.br/integracao/token-de-seguranca.jhtml\' target=\'_blank\'>clique aqui</a> para gerar." />
+							<label>'.$this->l('TOKEN').'*</label><br />
+							<input type="text" name="pagseguro_token" id="pagseguro_token" value="'.Configuration::get('PAGSEGURO_TOKEN').'" maxlength="32"  hint="'.$this->l('Para utilizar qualquer serviço de integração do PagSeguro, é necessário ter um token de segurança. O token é um código único, gerado pelo PagSeguro. Caso não tenha um token,').' <a href=\'https://pagseguro.uol.com.br/integracao/token-de-seguranca.jhtml\' target=\'_blank\'>'.$this->l('clique aqui').'</a> '.$this->l('para gerar.').'" />
 							<br />
-							<label>URL DE REDIRECIONAMENTO</label><br />
-							<input type="text" name="pagseguro_url_redirect" id="pagseguro_url_redirect" value="'.Configuration::get('PAGSEGURO_URL_REDIRECT').'" maxlength="255" hint="Ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado de volta para sua loja ou para a URL que você informar neste campo. Para utilizar essa funcionalidade você deve configurar sua conta para aceitar somente requisições de pagamentos gerados via API. <a href=\'https://pagseguro.uol.com.br/integracao/pagamentos-via-api.jhtml\' target=\'_blank\'>Clique aqui</a> para ativar este serviço." />
+							<label>'.$this->l('URL DE REDIRECIONAMENTO').'</label><br />
+							<input type="text" name="pagseguro_url_redirect" id="pagseguro_url_redirect" value="'.Configuration::get('PAGSEGURO_URL_REDIRECT').'" maxlength="255" hint="'.$this->l('Ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado de volta para sua loja ou para a URL que você informar neste campo. Para utilizar essa funcionalidade você deve configurar sua conta para aceitar somente requisições de pagamentos gerados via API.').' <a href=\'https://pagseguro.uol.com.br/integracao/pagamentos-via-api.jhtml\' target=\'_blank\'>'.$this->l('Clique aqui</a> para ativar este serviço.').'" />
 							<br />
-							<label>URL DE NOTIFICAÇÃO</label><br />
-							<input type="text" name="pagseguro_notification_url" id="pagseguro_notification_url" value="'.Configuration::get('PAGSEGURO_NOTIFICATION_URL').'" maxlength="255" hint="Sempre que uma transação mudar de status, o PagSeguro envia uma notificação para sua loja ou para a URL que você informar neste campo." />
+							<label>'.$this->l('URL DE NOTIFICAÇÃO').'</label><br />
+							<input type="text" name="pagseguro_notification_url" id="pagseguro_notification_url" value="'.Configuration::get('PAGSEGURO_NOTIFICATION_URL').'" maxlength="255" hint="'.$this->l('Sempre que uma transação mudar de status, o PagSeguro envia uma notificação para sua loja ou para a URL que você informar neste campo.').'" />
 							<br />
 							<br />
-							<p class="small">* Campos obrigatórios</p>
+							<p class="small">* '.$this->l('Campos obrigatórios').'</p>
 
 							<div class="hintps _config"></div>
 						</div>
 					</li>
 					<li class="ps-slide4">
-						<h2><span>Extras</span></h2>
+						<h2><span>'.$this->l('Extras').'</span></h2>
 						<div>
-							<label>CHARSET</label><br />
-								'.$this->_generateSelectTag('pagseguro_charset', $this->_charset_options, array_search(Configuration::get('PAGSEGURO_CHARSET'), $this->_charset_options), 'class="select" hint="Informe a codificação utilizada pelo seu sistema. Isso irá prevenir que as transações gerem possíveis erros ou quebras ou ainda que caracteres especiais possam ser apresentados de maneira diferente do habitual."').'
+							<label>'.$this->l('CHARSET').'</label><br />
+								'.$this->_generateSelectTag('pagseguro_charset', $this->_charset_options, array_search(Configuration::get('PAGSEGURO_CHARSET'), $this->_charset_options), 'class="select" hint="'.$this->l('Informe a codificação utilizada pelo seu sistema. Isso irá prevenir que as transações gerem possíveis erros ou quebras ou ainda que caracteres especiais possam ser apresentados de maneira diferente do habitual.').'"').'
 							<br />
-							<label>LOG</label><br />
+							<label>'.$this->l('LOG').'</label><br />
 								'.$this->_generateSelectTag('pagseguro_log', $this->_active_log, Configuration::get('PAGSEGURO_LOG_ACTIVE'), 'class="select" hint="Deseja habilitar a geração de log?"').'
 							<br />
 							<span id="directory-log">
-								<label>DIRETÓRIO</label><br />
-								<input type="text" id="pagseguro_log_dir" name="pagseguro_log_dir" value="'.Configuration::get('PAGSEGURO_LOG_FILELOCATION').'" hint="Diretório a partir da raíz de instalação do PrestaShop onde se deseja criar o arquivo de log. Ex.: /logs/log_ps.log" />
+								<label>'.$this->l('DIRETÓRIO').'</label><br />
+								<input type="text" id="pagseguro_log_dir" name="pagseguro_log_dir" value="'.Configuration::get('PAGSEGURO_LOG_FILELOCATION').'" hint="'.$this->l('Diretório a partir da raíz de instalação do PrestaShop onde se deseja criar o arquivo de log. Ex.: /logs/log_ps.log').'" />
 							</span>
 
 							<div class="hintps _extras"></div>
@@ -336,14 +368,14 @@ class PagSeguro extends PaymentModule
 					</li>
 				</ol>
 				<noscript>
-					<p>Please enable JavaScript to get the full experience.</p>
+					<p>'.$this->l('Please enable JavaScript to get the full experience.').'</p>
 				</noscript>
 			</div>
 			<br />
 			
 			<input type="hidden" name="activeslide" id="activeslide" value="'.$this->_checkActiveSlide().'" />
 
-			<button id="update" class="pagseguro-button green-theme normal" name="btnSubmit">Atualizar</button>
+			<button id="update" class="pagseguro-button green-theme normal" name="btnSubmit">'.$this->l('Atualizar').'</button>
 		</form>
 		<script>
 			$(\'#mainps\').liteAccordion({
@@ -520,12 +552,10 @@ class PagSeguro extends PaymentModule
 	*/
 	private function _generatePagSeguroOrderStatus()
 	{
-		/* Including pagseguroorderstatustranslation file to generate OrderStatus names */
-		include_once 'pagseguroorderstatustranslation.php';
 
 		$orders_added = true;
 		$initial_state = 0;
-		foreach (array_keys(PagSeguroTransactionStatus::getStatusList()) as $status)
+		foreach (array_keys($this->order_status) as $status)
 		{
 			$order_state = new OrderState();
 			$order_state->module_name = $this->name;
@@ -538,7 +568,7 @@ class PagSeguro extends PaymentModule
 			$order_state->name = array();
 
 			foreach (Language::getLanguages() as $language)
-				$order_state->name[$language['id_lang']] = PagSeguroOrderStatusTranslation::getStatusTranslation($status, strtolower($language['iso_code']));
+				$order_state->name[$language['id_lang']] = $this->getStatusTranslation($status, strtolower($language['iso_code']));
 
 			$orders_added &= $order_state->add();
 
@@ -553,6 +583,21 @@ class PagSeguro extends PaymentModule
 		return $orders_added;
 	}
     
+        /**
+         * Return current translation for infomed status and language iso code
+         * @param string $status
+         * @param string $lang_iso_code
+         * @return string
+         */
+        private function getStatusTranslation($status, $lang_iso_code = 'br')
+        {
+            if (isset($this->order_status[$status][$lang_iso_code]))
+                return $this->order_status[$status][$lang_iso_code];
+
+            /* Default return in English */
+            return $this->order_status[$status]['en'];
+        }
+        
 	/**
 	* Gets notification url
 	* @return string
