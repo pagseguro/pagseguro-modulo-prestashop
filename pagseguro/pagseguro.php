@@ -556,7 +556,7 @@ class PagSeguro extends PaymentModule
 				
                        if($continue){
                            $orders_added &= $order_state->add();
-
+                           copy(dirname(__FILE__).'/logo.gif', dirname(__FILE__).'/../../img/os/'.(int)$order_state->id.'.gif');
 			/* getting initial state id to update PS_OS_PAGSEGURO config */
 			if ($status == 'WAITING_PAYMENT')
 				$initial_state = (int)$order_state->id;
