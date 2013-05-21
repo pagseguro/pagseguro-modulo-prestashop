@@ -44,6 +44,7 @@ class PagSeguro extends PaymentModule
             'IN_DISPUTE' => array('br' => 'Em disputa', 'en' => 'In dispute'),
             'REFUNDED' => array('br' => 'Devolvida', 'en' => 'Refunded'),
             'CANCELLED' => array('br' => 'Cancelada', 'en' => 'Cancelled'));
+        private $list_states = array();
 
 	function __construct()
 	{
@@ -57,7 +58,6 @@ class PagSeguro extends PaymentModule
 		$this->displayName = $this->l('PagSeguro');
 		$this->description = $this->l('Receba pagamentos por cartão de crédito, transferência bancária e boleto.');
 		$this->confirmUninstall = $this->l('Tem certeza que deseja remover este módulo ?');
-		
 	}
 
 	/**
@@ -67,6 +67,7 @@ class PagSeguro extends PaymentModule
 	*/
 	public function install()
 	{        
+                
 		if (!parent::install() || !$this->registerHook('payment') || !$this->registerHook('paymentReturn') || !Configuration::updateValue('PAGSEGURO_EMAIL', '') ||
 		!Configuration::updateValue('PAGSEGURO_TOKEN', '') || !Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') ||
 		!Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '') || !Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset')) ||
@@ -86,44 +87,22 @@ class PagSeguro extends PaymentModule
 	{
 		if (!Configuration::deleteByName('PAGSEGURO_EMAIL') || !Configuration::deleteByName('PAGSEGURO_TOKEN') || !Configuration::deleteByName('PAGSEGURO_URL_REDIRECT') ||
 		!Configuration::deleteByName('PAGSEGURO_NOTIFICATION_URL') || !Configuration::deleteByName('PAGSEGURO_CHARSET') || !Configuration::deleteByName('PAGSEGURO_LOG_ACTIVE') ||
-		!Configuration::deleteByName('PAGSEGURO_LOG_FILELOCATION') || !Configuration::deleteByName('PS_OS_PAGSEGURO') || !$this->_deleteOrderState() || !parent::uninstall())
+		!Configuration::deleteByName('PAGSEGURO_LOG_FILELOCATION') || !Configuration::deleteByName('PS_OS_PAGSEGURO') || !parent::uninstall())
 		    return false;
 		return true;
 	}
 
 	/**
-	* Perform deletion of PS_OS_PAGSEGURO configuration from database
-	* where module will uninstalled
-	* 
-	* @return bool
-	*/
-	private function _deleteOrderState()
+         * Gets order states saved in the bank
+         * @return boolean
+         */
+	private function _findOrderStates()
 	{
-
-		$list_status = array_keys($this->order_status);
-		$delete = false;
-
-		foreach (Language::getLanguages(false) as $language)
-			foreach ($list_status as $status)
-			{
-				$status_ps = $this->getStatusTranslation($status, $language['iso_code']);
-
-				$id_order_state = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-				SELECT distinct os.`id_order_state`
-				FROM `' . _DB_PREFIX_ . 'order_state` os
-				INNER JOIN `' . _DB_PREFIX_ . 'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`name` = \''.pSQL($status_ps).'\' 
-					AND os.`module_name` = \'pagseguro\' AND osl.`id_lang` = '.(int)$language['id_lang'].')
-				WHERE deleted = 0'));
-
-				if (!Tools::isEmpty($id_order_state))
-				{
-					$order_state = new OrderState((int)$id_order_state[0]['id_order_state']);
-					$order_state->delete(); 
-					$delete = true;
-				} 
-			}
-
-		return $delete;
+		return (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
+			SELECT osl.`id_lang`, osl.`name` 
+			FROM `' . _DB_PREFIX_ . 'order_state` os
+			INNER JOIN `' . _DB_PREFIX_ . 'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state`)
+			WHERE os.`module_name` = \'pagseguro\''));
 	}
 
 	/**
@@ -552,9 +531,10 @@ class PagSeguro extends PaymentModule
 	*/
 	private function _generatePagSeguroOrderStatus()
 	{
-
 		$orders_added = true;
 		$initial_state = 0;
+                $this->list_states = $this->_findOrderStates();
+                
 		foreach (array_keys($this->order_status) as $status)
 		{
 			$order_state = new OrderState();
@@ -566,22 +546,45 @@ class PagSeguro extends PaymentModule
 			$order_state->logable = true;
 			$order_state->invoice = true;
 			$order_state->name = array();
-
-			foreach (Language::getLanguages() as $language)
-				$order_state->name[$language['id_lang']] = $this->getStatusTranslation($status, strtolower($language['iso_code']));
-
-			$orders_added &= $order_state->add();
+                        $continue = false;
+			foreach (Language::getLanguages() as $language){
+                            $continue = $this->_checkIfOrderStatusExists($language['id_lang'], $this->getStatusTranslation($status, strtolower($language['iso_code'])));
+                            
+                                if($continue)
+                                   $order_state->name[$language['id_lang']] = $this->getStatusTranslation($status, strtolower($language['iso_code']));
+                        }
+				
+                       if($continue){
+                           $orders_added &= $order_state->add();
 
 			/* getting initial state id to update PS_OS_PAGSEGURO config */
 			if ($status == 'WAITING_PAYMENT')
 				$initial_state = (int)$order_state->id;
-		}
-
+                      }
+              }
+			
 		if ($orders_added)
 			Configuration::updateValue('PS_OS_PAGSEGURO', $initial_state);
 
 		return $orders_added;
 	}
+        
+     /**
+     * Check if PagSeguro order status already exists on database
+     * @param String $status
+     * @return boolean
+     */
+     private function _checkIfOrderStatusExists($id_lang, $status_name){
+         if(Tools::isEmpty($this->list_states)){
+             return true;
+         }
+            $save = true;
+            foreach ($this->list_states as $state) {
+               if($state['id_lang'] == $id_lang && $state['name'] == $status_name)
+                 $save = false;
+            }
+       return $save;
+    }
     
         /**
          * Return current translation for infomed status and language iso code
