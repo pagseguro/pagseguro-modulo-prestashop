@@ -13,7 +13,7 @@ Com o módulo instalado e configurado, você pode pode oferecer o PagSeguro como
 Requisitos
 ----------
 ---
- - [PrestaShop] 1.5.3.1
+ - [PrestaShop] 1.5.3.1 e 1.5.4.1
  - [PHP] 5.1.6+
  - [SPL]
  - [cURL]
@@ -54,6 +54,10 @@ Para acessar e configurar o módulo acesse o menu Módulos -> Modules -> Payment
 Changelog
 ---------
 ---
+1.4
+
+ - Compatibilidade com a versão 1.5.4.1 do PrestaShop.
+
 1.3
 
  - Tornando o código compliance com os requisitos do PrestaShop.

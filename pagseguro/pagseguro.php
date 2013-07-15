@@ -339,7 +339,7 @@ class PagSeguro extends PaymentModule
 							<br />
 							<span id="directory-log">
 								<label>'.$this->l('DIRETÓRIO').'</label><br />
-								<input type="text" id="pagseguro_log_dir" name="pagseguro_log_dir" value="'.Tools::safeOutput(Configuration::get('PAGSEGURO_LOG_FILELOCATION')).'" hint="'.$this->l('Nome do arquivo de log localizado no módulo diretor. Ex.: log_ps.log').'" />
+								<input type="text" id="pagseguro_log_dir" name="pagseguro_log_dir" value="'.Tools::safeOutput(Configuration::get('PAGSEGURO_LOG_FILELOCATION')).'" hint="'.$this->l('Diretório a partir da raíz de instalação do PrestaShop onde se deseja criar o arquivo de log. Ex.: /logs/log_ps.log').'" />
 							</span>
 
 							<div class="hintps _extras"></div>
@@ -515,9 +515,7 @@ class PagSeguro extends PaymentModule
 	{
 		try
 		{
-			if (!preg_match('/^[^\\/?*:;{}\\\\]+\\.[^\\/?*:;{}\\\\]{3}$/', $file))
-				die('Inválido nome do arquivo de log');
-			$f = @fopen(dirname(__FILE__).'/'.$file, 'a');
+			$f = @fopen(_PS_ROOT_DIR_.$file, 'a');
 			fclose($f);
 		}
 		catch (Exception $e)
