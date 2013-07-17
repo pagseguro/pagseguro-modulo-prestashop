@@ -13,7 +13,7 @@ Com o módulo instalado e configurado, você pode pode oferecer o PagSeguro como
 Requisitos
 ----------
 ---
- - [PrestaShop] 1.5.3.1 e 1.5.4.1
+ - [PrestaShop] 1.5.3.1 ou 1.5.4.1
  - [PHP] 5.1.6+
  - [SPL]
  - [cURL]
@@ -23,6 +23,8 @@ Requisitos
 Instalação
 ----------
 ---
+- O PagSeguro vem instalado nativamente no PrestaShop desde a versão 1.5.4.1, sendo assim, só é preciso fazer sua configuração. Siga os passos abaixo, se, e somente se, você utilizar uma versão do PrestaShop anterior a 1.5.4.1:
+
 - Certifique-se de que não há instalação de outros módulos para o PagSeguro em seu sistema;
 - Baixe o repositório como arquivo zip ou faça um clone;
 - Na área administrativa do seu sistema, acesse o menu Módulos -> Modules -> Add new module, aponte para o caminho do arquivo pagseguro.zip e faça o upload;
