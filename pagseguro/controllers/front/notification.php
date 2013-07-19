@@ -27,7 +27,8 @@
 /*
  * Class Notification
  */
-class PagSeguroNotificationModuleFrontController extends ModuleFrontController {
+class PagSeguroNotificationModuleFrontController extends ModuleFrontController
+{
 	private $obj_transaction;
 	private $obj_notification_type;
 	private $obj_order_history;
@@ -41,7 +42,8 @@ class PagSeguroNotificationModuleFrontController extends ModuleFrontController {
 	/**
 	 *  Post data process function
 	 */
-	public function postProcess() {
+	public function postProcess()
+	{
 		parent::postProcess();
 
 		$this->_createNotification($_POST);
@@ -59,7 +61,8 @@ class PagSeguroNotificationModuleFrontController extends ModuleFrontController {
 	 *
 	 * @param array $post
 	 */
-	private function _createNotification(Array $post) {
+	private function _createNotification(Array $post)
+	{
 		$this->notification_type = (isset($post['notificationType']) && trim($post['notificationType']) !== '' ? trim($post['notificationType']) : null);
 		$this->notification_code = (isset($post['notificationCode']) && trim($post['notificationCode']) !== '' ? trim($post['notificationCode']) : null);
 	}
@@ -67,14 +70,16 @@ class PagSeguroNotificationModuleFrontController extends ModuleFrontController {
 	/**
 	 * Create Credential
 	 */
-	private function _createCredential() {
+	private function _createCredential()
+	{
 		$this->obj_credential = new PagSeguroAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), Configuration::get('PAGSEGURO_TOKEN'));
 	}
 
 	/**
 	 * Inicialize Objects
 	 */
-	private function _inicializeObjects() {
+	private function _inicializeObjects()
+	{
 		$this->_createNotificationType();
 		$this->_createArrayStatusCms();
 	}
@@ -82,7 +87,8 @@ class PagSeguroNotificationModuleFrontController extends ModuleFrontController {
 	/**
 	 * Create Notification Type
 	 */
-	private function _createNotificationType() {
+	private function _createNotificationType()
+	{
 		$this->obj_notification_type = new PagSeguroNotificationType();
 		$this->obj_notification_type->setByType('TRANSACTION');
 	}
@@ -90,14 +96,16 @@ class PagSeguroNotificationModuleFrontController extends ModuleFrontController {
 	/**
 	 * Create Array Status Cms
 	 */
-	private function _createArrayStatusCms() {
+	private function _createArrayStatusCms()
+	{
 		$this->array_st_cms = array(0 => 'Iniciado', 1 => 'Aguardando pagamento', 2 => 'Em análise', 3 => 'Paga', 4 => 'Disponível', 5 => 'Em disputa', 6 => 'Devolvida', 7 => 'Cancelada');
 	}
 
 	/**
 	 * Create Transaction
 	 */
-	private function _createTransaction() {
+	private function _createTransaction()
+	{
 		$this->obj_transaction = PagSeguroNotificationService::checkTransaction($this->obj_credential, $this->notification_code);
 		$this->reference = ($this->_isNotNull($this->obj_transaction)) ? (int) $this->obj_transaction->getReference() : null;
 	}
@@ -105,7 +113,8 @@ class PagSeguroNotificationModuleFrontController extends ModuleFrontController {
 	/**
 	 * Update Cms
 	 */
-	private function _updateCms() {
+	private function _updateCms()
+	{
 		$id_status = ($this->_isNotNull($this->obj_transaction->getStatus()->getValue())) ? (int) $this->obj_transaction->getStatus()->getValue() : null;
 
 		if ($this->_isNotNull($id_status))
@@ -120,7 +129,8 @@ class PagSeguroNotificationModuleFrontController extends ModuleFrontController {
 	 * @param type $value
 	 * @return type
 	 */
-	private function _returnIdOrderByStatusPagSeguro($value) {
+	private function _returnIdOrderByStatusPagSeguro($value)
+	{
 		$id_order_state = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
 		SELECT distinct os.`id_order_state`
 		FROM `' . _DB_PREFIX_ . 'order_state` os
@@ -134,7 +144,8 @@ class PagSeguroNotificationModuleFrontController extends ModuleFrontController {
 	 * Create add order history
 	 * @param type $id_st_transaction
 	 */
-	private function _createAddOrderHistory($id_st_transaction) {
+	private function _createAddOrderHistory($id_st_transaction)
+	{
 		if ($this->_isNotNull($this->reference)) {
 			$this->obj_order_history = new OrderHistory();
 			$this->obj_order_history->id_order = $this->reference;
@@ -149,7 +160,8 @@ class PagSeguroNotificationModuleFrontController extends ModuleFrontController {
 	 * Update Orders
 	 * @param type $id_st_transaction
 	 */
-	private function _updateOrders($id_st_transaction) {
+	private function _updateOrders($id_st_transaction)
+	{
 		$this->obj_orders = new Order((int) $this->reference);
 		$this->obj_orders->current_state = (int) $id_st_transaction;
 		$this->obj_orders->update();
@@ -158,10 +170,14 @@ class PagSeguroNotificationModuleFrontController extends ModuleFrontController {
 	/**
 	 * Add Order History
 	 */
-	private function _addOrderHistory() {
-		try {
+	private function _addOrderHistory()
+	{
+		try
+		{
 			$this->obj_order_history->add();
-		} catch (PagSeguroServiceException $exc) {
+		}
+		catch (PagSeguroServiceException $exc)
+		{
 			echo $exc->getMessage();
 		}
 	}
@@ -171,7 +187,8 @@ class PagSeguroNotificationModuleFrontController extends ModuleFrontController {
 	 * @param type $value
 	 * @return type
 	 */
-	private function _isNotNull($value) {
+	private function _isNotNull($value)
+	{
 		return isset($value);
 	}
 }

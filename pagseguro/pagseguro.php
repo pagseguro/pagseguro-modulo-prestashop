@@ -29,23 +29,25 @@ include_once(dirname(__FILE__) . '/PagSeguroLibrary/PagSeguroLibrary.php');
 if (!defined('_PS_VERSION_'))
 	exit;
 
-class PagSeguro extends PaymentModule {
+class PagSeguro extends PaymentModule
+{
 	protected $errors = array();
 	private $_html;
 	private $_charset_options = array('1' => 'ISO-8859-1', '2' => 'UTF-8');
 	private $_active_log = array('0' => 'NÃO', '1' => 'SIM');
 	private $order_status = array(
-		'INITIATED' => array('br' => 'Iniciado', 'en' => 'Initiated'),
-		'WAITING_PAYMENT' => array('br' => 'Aguardando pagamento', 'en' => 'Waiting payment'),
-		'IN_ANALYSIS' => array('br' => 'Em análise', 'en' => 'In analysis'),
-		'PAID' => array('br' => 'Paga', 'en' => 'Paid'),
-		'AVAILABLE' => array('br' => 'Disponível', 'en' => 'Available'),
-		'IN_DISPUTE' => array('br' => 'Em disputa', 'en' => 'In dispute'),
-		'REFUNDED' => array('br' => 'Devolvida', 'en' => 'Refunded'),
-		'CANCELLED' => array('br' => 'Cancelada', 'en' => 'Cancelled'));
+		'INITIATED'			 => array('br' => 'Iniciado', 'en' => 'Initiated'),
+		'WAITING_PAYMENT'	 => array('br' => 'Aguardando pagamento', 'en' => 'Waiting payment'),
+		'IN_ANALYSIS'		 => array('br' => 'Em análise', 'en' => 'In analysis'),
+		'PAID'				 => array('br' => 'Paga', 'en' => 'Paid'),
+		'AVAILABLE'			 => array('br' => 'Disponível', 'en' => 'Available'),
+		'IN_DISPUTE'		 => array('br' => 'Em disputa', 'en' => 'In dispute'),
+		'REFUNDED'			 => array('br' => 'Devolvida', 'en' => 'Refunded'),
+		'CANCELLED'			 => array('br' => 'Cancelada', 'en' => 'Cancelled'));
 	private $list_states = array();
 
-	function __construct() {
+	function __construct()
+	{
 		$this->name = 'pagseguro';
 		$this->tab = 'payments_gateways';
 		$this->version = '1.4';
@@ -63,7 +65,8 @@ class PagSeguro extends PaymentModule {
 	 *
 	 * @return boolean
 	 */
-	public function install() {
+	public function install()
+	{
 
 		if (!parent::install() || !$this->registerHook('payment') || !$this->registerHook('paymentReturn') || !Configuration::updateValue('PAGSEGURO_EMAIL', '') || !Configuration::updateValue('PAGSEGURO_TOKEN', '') || !Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') || !Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '') || !Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset')) || !Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active')) || !Configuration::updateValue('PAGSEGURO_LOG_FILELOCATION', PagSeguroConfig::getData('log', 'fileLocation')) || !Configuration::updateValue('PS_OS_PAGSEGURO', 0) || !$this->_generatePagSeguroOrderStatus())
 			return false;
@@ -75,7 +78,8 @@ class PagSeguro extends PaymentModule {
 	 *
 	 * @return boolean
 	 */
-	public function uninstall() {
+	public function uninstall()
+	{
 		if (!Configuration::deleteByName('PAGSEGURO_EMAIL') || !Configuration::deleteByName('PAGSEGURO_TOKEN') || !Configuration::deleteByName('PAGSEGURO_URL_REDIRECT') || !Configuration::deleteByName('PAGSEGURO_NOTIFICATION_URL') || !Configuration::deleteByName('PAGSEGURO_CHARSET') || !Configuration::deleteByName('PAGSEGURO_LOG_ACTIVE') || !Configuration::deleteByName('PAGSEGURO_LOG_FILELOCATION') || !Configuration::deleteByName('PS_OS_PAGSEGURO') || !parent::uninstall())
 			return false;
 		return true;
@@ -85,7 +89,8 @@ class PagSeguro extends PaymentModule {
 	 * Gets order states saved in the bank
 	 * @return boolean
 	 */
-	private function _findOrderStates() {
+	private function _findOrderStates()
+	{
 		return (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
 			SELECT osl.`id_lang`, osl.`name`
 			FROM `' . _DB_PREFIX_ . 'order_state` os
@@ -98,7 +103,8 @@ class PagSeguro extends PaymentModule {
 	 *
 	 * @return string
 	 */
-	public function getContent() {
+	public function getContent()
+	{
 		if (Tools::isSubmit('btnSubmit')) {
 			$this->_postValidation();
 
@@ -118,7 +124,8 @@ class PagSeguro extends PaymentModule {
 	 * Realize post validations according with PagSeguro standards
 	 * case any inconsistence, an item is added to $_postErrors
 	 */
-	private function _postValidation() {
+	private function _postValidation()
+	{
 		if (Tools::isSubmit('btnSubmit')) {
 			$email = Tools::getValue('pagseguro_email');
 			$token = Tools::getValue('pagseguro_token');
@@ -162,7 +169,8 @@ class PagSeguro extends PaymentModule {
 	/**
 	 * Realize PagSeguro database keys values
 	 */
-	private function _postProcess() {
+	private function _postProcess()
+	{
 		if (Tools::isSubmit('btnSubmit')) {
 			Configuration::updateValue('PAGSEGURO_EMAIL', Tools::getValue('pagseguro_email'));
 			Configuration::updateValue('PAGSEGURO_TOKEN', Tools::getValue('pagseguro_token'));
@@ -185,7 +193,8 @@ class PagSeguro extends PaymentModule {
 	 * @param String $field
 	 * @return String
 	 */
-	private function _errorMessage($field) {
+	private function _errorMessage($field)
+	{
 		return sprintf($this->l('O campo <strong>%s</strong> deve ser informado.'), $field);
 	}
 
@@ -195,7 +204,8 @@ class PagSeguro extends PaymentModule {
 	 * @param String $field
 	 * @return String
 	 */
-	private function _invalidMailMessage($field) {
+	private function _invalidMailMessage($field)
+	{
 		return sprintf($this->l('O campo <strong>%s</strong> deve ser conter um email válido.'), $field);
 	}
 
@@ -205,7 +215,8 @@ class PagSeguro extends PaymentModule {
 	 * @param String $field
 	 * @return String
 	 */
-	private function _invalidFieldSizeMessage($field) {
+	private function _invalidFieldSizeMessage($field)
+	{
 		return sprintf($this->l('O campo <strong>%s</strong> está com um tamanho inválido'), $field);
 	}
 
@@ -215,14 +226,16 @@ class PagSeguro extends PaymentModule {
 	 * @param String $field
 	 * @return String
 	 */
-	private function _invalidValue($field) {
+	private function _invalidValue($field)
+	{
 		return sprintf($this->l('O campo <strong>%s</strong> contém um valor inválido.'), $field);
 	}
 
 	/**
 	 * Check if has the $_POST['activeslide']
 	 */
-	private function _checkActiveSlide() {
+	private function _checkActiveSlide()
+	{
 		return Tools::getValue('activeslide') ? Tools::getValue('activeslide') : 1;
 	}
 
@@ -232,14 +245,16 @@ class PagSeguro extends PaymentModule {
 	 * @param String $field
 	 * @return String
 	 */
-	private function _invalidUrl($field) {
+	private function _invalidUrl($field)
+	{
 		return sprintf($this->l('O campo <strong>%s</strong> deve conter uma url válida.'), $field);
 	}
 
 	/**
 	 *  Display configuration form
 	 */
-	private function _displayForm() {
+	private function _displayForm()
+	{
 		$this->context->controller->addCSS($this->_path . 'assets/css/styles.css');
 		$this->context->controller->addJS($this->_path . 'assets/js/behaviors.js');
 
@@ -408,14 +423,15 @@ class PagSeguro extends PaymentModule {
 	 * @param array $params
 	 * @return string
 	 */
-	public function hookPayment($params) {
+	public function hookPayment($params)
+	{
 		if (!$this->active || !$this->checkCurrency($params['cart']))
 			return;
 
 		$this->smarty->assign(array(
-			'image' => $this->getPathUri() . 'assets/images/logops_86x49.png',
-			'this_path' => $this->_path,
-			'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/'));
+			'image'			 => $this->getPathUri() . 'assets/images/logops_86x49.png',
+			'this_path'		 => $this->_path,
+			'this_path_ssl'	 => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/'));
 
 		return $this->display(__FILE__, 'payment.tpl');
 	}
@@ -426,15 +442,16 @@ class PagSeguro extends PaymentModule {
 	 * @param array $params
 	 * @return string
 	 */
-	public function hookPaymentReturn($params) {
+	public function hookPaymentReturn($params)
+	{
 		if (!$this->active)
 			return;
 
 		if (!Tools::isEmpty($params['objOrder']) && $params['objOrder']->module === $this->name) {
 			$this->smarty->assign(array(
-				'total_to_pay' => Tools::displayPrice($params['total_to_pay'], $params['currencyObj'], false),
-				'status' => 'ok',
-				'id_order' => (int) $params['objOrder']->id));
+				'total_to_pay'	 => Tools::displayPrice($params['total_to_pay'], $params['currencyObj'], false),
+				'status'		 => 'ok',
+				'id_order'		 => (int) $params['objOrder']->id));
 
 			if (isset($params['objOrder']->reference) && !empty($params['objOrder']->reference))
 				$this->smarty->assign('reference', $params['objOrder']->reference);
@@ -450,7 +467,8 @@ class PagSeguro extends PaymentModule {
 	 * @param Cart $cart
 	 * @return boolean
 	 */
-	public function checkCurrency($cart) {
+	public function checkCurrency($cart)
+	{
 		$currency_order = new Currency((int) $cart->id_currency);
 		return PagSeguroCurrencies::checkCurrencyAvailabilityByIsoCode($currency_order->iso_code);
 	}
@@ -464,7 +482,8 @@ class PagSeguro extends PaymentModule {
 	 * @param string $extra
 	 * @return string
 	 */
-	private function _generateSelectTag($id, Array $options, $selected = '', $extra = '') {
+	private function _generateSelectTag($id, Array $options, $selected = '', $extra = '')
+	{
 		$select = '<select id="' . Tools::safeOutput($id) . '" name="' . Tools::safeOutput($id) . '" ' . $extra . ' >';
 		foreach ($options as $key => $value) {
 			$selected_attr = ($selected == $key) ? 'selected="selected" ' : '';
@@ -478,11 +497,15 @@ class PagSeguro extends PaymentModule {
 	 * Case log file not exists, try create
 	 * else create PagSeguro.log into PagseguroLibrary folder into module
 	 */
-	private function _verifyLogFile($file) {
-		try {
+	private function _verifyLogFile($file)
+	{
+		try
+		{
 			$f = @fopen(_PS_ROOT_DIR_ . $file, 'a');
 			fclose($f);
-		} catch (Exception $e) {
+		}
+		catch (Exception $e)
+		{
 			die($e->getMessage());
 		}
 	}
@@ -492,7 +515,8 @@ class PagSeguro extends PaymentModule {
 	 *
 	 * @return bool $ordersAdded
 	 */
-	private function _generatePagSeguroOrderStatus() {
+	private function _generatePagSeguroOrderStatus()
+	{
 		$orders_added = true;
 		$name_state = null;
 		$this->list_states = $this->_findOrderStates();
@@ -539,7 +563,8 @@ class PagSeguro extends PaymentModule {
 	 * @param String $status
 	 * @return boolean
 	 */
-	private function _checkIfOrderStatusExists($id_lang, $status_name) {
+	private function _checkIfOrderStatusExists($id_lang, $status_name)
+	{
 		if (Tools::isEmpty($this->list_states)) {
 			return true;
 		}
@@ -558,7 +583,8 @@ class PagSeguro extends PaymentModule {
 	 * @param string $lang_iso_code
 	 * @return string
 	 */
-	private function getStatusTranslation($status, $lang_iso_code = 'br') {
+	private function getStatusTranslation($status, $lang_iso_code = 'br')
+	{
 		if (isset($this->order_status[$status][$lang_iso_code])) {
 			return $this->order_status[$status][$lang_iso_code];
 		}
@@ -571,7 +597,8 @@ class PagSeguro extends PaymentModule {
 	 * Gets notification url
 	 * @return string
 	 */
-	public function getNotificationUrl() {
+	public function getNotificationUrl()
+	{
 		return (!PagSeguroHelper::isEmpty(Configuration::get('PAGSEGURO_NOTIFICATION_URL'))) ? Configuration::get('PAGSEGURO_NOTIFICATION_URL') : $this->_notificationURL();
 	}
 
@@ -580,7 +607,8 @@ class PagSeguro extends PaymentModule {
 	 * Notification Url
 	 * @return type
 	 */
-	private function _notificationURL() {
+	private function _notificationURL()
+	{
 		return _PS_BASE_URL_ . __PS_BASE_URI__ . 'index.php?fc=module&module=pagseguro&controller=notification';
 	}
 
@@ -589,7 +617,8 @@ class PagSeguro extends PaymentModule {
 	 * @param type $value
 	 * @return type
 	 */
-	private function _returnIdOrderByStatusPagSeguro($value) {
+	private function _returnIdOrderByStatusPagSeguro($value)
+	{
 		$id_order_state = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
 		SELECT distinct os.`id_order_state`
 		FROM `' . _DB_PREFIX_ . 'order_state` os

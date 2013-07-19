@@ -24,10 +24,12 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-class PagSeguroPaymentModuleFrontController extends ModuleFrontController {
+class PagSeguroPaymentModuleFrontController extends ModuleFrontController
+{
 	public $ssl = true;
 
-	public function initContent() {
+	public function initContent()
+	{
 		$this->display_column_left = false;
 		parent::initContent();
 
@@ -35,14 +37,14 @@ class PagSeguroPaymentModuleFrontController extends ModuleFrontController {
 			Tools::redirect('index.php?controller=order');
 
 		$this->context->smarty->assign(array(
-			'image' => $this->module->getPathUri() . 'assets/images/logops_86x49.png',
-			'nbProducts' => $this->context->cart->nbProducts(),
-			'cust_currency' => $this->context->cart->id_currency,
-			'currencies' => $this->module->getCurrency((int) $this->context->cart->id_currency),
-			'total' => $this->context->cart->getOrderTotal(true, Cart::BOTH),
-			'isocode' => $this->context->language->iso_code,
-			'this_path' => $this->module->getPathUri(),
-			'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->module->name . '/'));
+			'image'			 => $this->module->getPathUri() . 'assets/images/logops_86x49.png',
+			'nbProducts'	 => $this->context->cart->nbProducts(),
+			'cust_currency'	 => $this->context->cart->id_currency,
+			'currencies'	 => $this->module->getCurrency((int) $this->context->cart->id_currency),
+			'total'			 => $this->context->cart->getOrderTotal(true, Cart::BOTH),
+			'isocode'		 => $this->context->language->iso_code,
+			'this_path'		 => $this->module->getPathUri(),
+			'this_path_ssl'	 => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->module->name . '/'));
 
 		$this->setTemplate('payment_execution.tpl');
 	}

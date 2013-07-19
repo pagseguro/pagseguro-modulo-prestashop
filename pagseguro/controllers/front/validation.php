@@ -24,13 +24,15 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-class PagSeguroValidationModuleFrontController extends ModuleFrontController {
+class PagSeguroValidationModuleFrontController extends ModuleFrontController
+{
 	private $_payment_request;
 
 	/**
 	 *  Post data process function
 	 */
-	public function postProcess() {
+	public function postProcess()
+	{
 		$this->_verifyPaymentOptionAvailability();
 		$this->_validateCart();
 		$this->_generatePagSeguroRequestData();
@@ -44,7 +46,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 	 * Set additional infos to PagSeguroPaymentRequest object
 	 * @param array $additional_infos
 	 */
-	private function _setAdditionalRequestData(Array $additional_infos) {
+	private function _setAdditionalRequestData(Array $additional_infos)
+	{
 		/* Setting reference */
 		$this->_payment_request->setReference($additional_infos['id_order']);
 
@@ -56,7 +59,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 	/**
 	 * set notification url
 	 */
-	private function _setNotificationUrl() {
+	private function _setNotificationUrl()
+	{
 		$obj_ps = new PagSeguro();
 		$this->_payment_request->setNotificationURL($obj_ps->getNotificationUrl());
 	}
@@ -64,7 +68,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 	/**
 	 *  Verify if PagSeguro payment module still available
 	 */
-	private function _verifyPaymentOptionAvailability() {
+	private function _verifyPaymentOptionAvailability()
+	{
 		$authorized = false;
 		foreach (Module::getPaymentModules() as $module)
 			if ($module['name'] == 'pagseguro') {
@@ -79,7 +84,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 	/**
 	 *  Validate Cart
 	 */
-	private function _validateCart() {
+	private function _validateCart()
+	{
 		if ($this->context->cart->id_customer == 0 || $this->context->cart->id_address_delivery == 0 || $this->context->cart->id_address_invoice == 0 || !$this->module->active)
 			Tools::redirect('index.php?controller=order&step=1');
 	}
@@ -87,7 +93,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 	/**
 	 *  Validate order
 	 */
-	private function _validateOrder() {
+	private function _validateOrder()
+	{
 		$customer = new Customer($this->context->cart->id_customer);
 		if (!Validate::isLoadedObject($customer))
 			Tools::redirect('index.php?controller=order&step=1');
@@ -104,7 +111,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 	 *
 	 * @param array $arrayData
 	 */
-	private function _generateRedirectUrl(Array $arrayData) {
+	private function _generateRedirectUrl(Array $arrayData)
+	{
 		return _PS_BASE_URL_ . __PS_BASE_URI__ . 'index.php?controller=order-confirmation&id_cart=' . $arrayData['id_cart'] . '&id_module=' . $arrayData['id_module'] . '&id_order=' . $arrayData['id_order'] . '&key=' . $arrayData['key'];
 	}
 
@@ -112,8 +120,10 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 	 *  Perform PagSeguro request and return url from PagSeguro
 	 *  if ok, $this->module->pagSeguroReturnUrl is created with url returned from Pagseguro
 	 */
-	private function _performPagSeguroRequest() {
-		try {
+	private function _performPagSeguroRequest()
+	{
+		try
+		{
 			/* Retrieving PagSeguro configurations */
 			$this->_retrievePagSeguroConfiguration();
 
@@ -130,7 +140,9 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 			/* Redirecting to PagSeguro */
 			if (Validate::isUrl($url))
 				Tools::redirectLink(Tools::truncate($url, 255, ''));
-		} catch (PagSeguroServiceException $e) {
+		}
+		catch (PagSeguroServiceException $e)
+		{
 			die($e->getMessage());
 		}
 	}
@@ -138,7 +150,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 	/**
 	 * Retrieve PagSeguro data configuration from database
 	 */
-	private function _retrievePagSeguroConfiguration() {
+	private function _retrievePagSeguroConfiguration()
+	{
 		/* Retrieving configurated default charset */
 		PagSeguroConfig::setApplicationCharset(Configuration::get('PAGSEGURO_CHARSET'));
 
@@ -150,21 +163,24 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 	/**
 	 * Set PagSeguro PrestaShop module version
 	 */
-	private function _setPagSeguroModuleVersion() {
+	private function _setPagSeguroModuleVersion()
+	{
 		PagSeguroLibrary::setModuleVersion('prestashop' . ':' . $this->module->version);
 	}
 
 	/**
 	 * Set PagSeguro CMS version
 	 */
-	private function _setPagSeguroCMSVersion() {
+	private function _setPagSeguroCMSVersion()
+	{
 		PagSeguroLibrary::setCMSVersion('prestashop' . ':' . _PS_VERSION_);
 	}
 
 	/**
 	 *  Generates PagSeguro request data
 	 */
-	private function _generatePagSeguroRequestData() {
+	private function _generatePagSeguroRequestData()
+	{
 		$payment_request = new PagSeguroPaymentRequest();
 		$payment_request->setCurrency(PagSeguroCurrencies::getIsoCodeByName('Real')); /* Currency */
 		$payment_request->setExtraAmount($this->_getExtraAmountValues()); /* Extra amount */
@@ -180,7 +196,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 	 * Gets extra amount values for order
 	 * @return float
 	 */
-	private function _getExtraAmountValues() {
+	private function _getExtraAmountValues()
+	{
 		return Tools::convertPrice($this->_getCartRulesValues() + $this->_getWrappingValues());
 	}
 
@@ -188,7 +205,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 	 * Gets cart rules values
 	 * @return float
 	 */
-	private function _getCartRulesValues() {
+	private function _getCartRulesValues()
+	{
 		$rules_values = (float) 0;
 
 		$cart_rules = $this->context->cart->getCartRules();
@@ -203,7 +221,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 	 * Gets wrapping values for order
 	 * @return float
 	 */
-	private function _getWrappingValues() {
+	private function _getWrappingValues()
+	{
 		return number_format(Tools::ps_round($this->context->cart->getOrderTotal(true, Cart::ONLY_WRAPPING), 2), 2, '.', '');
 	}
 
@@ -212,7 +231,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 	 *
 	 *  @return Array PagSeguroItem
 	 */
-	private function _generateProductsData() {
+	private function _generateProductsData()
+	{
 		$pagseguro_items = array();
 
 		$cont = 1;
@@ -239,7 +259,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 	 *
 	 *  @return PagSeguroSender
 	 */
-	private function _generateSenderData() {
+	private function _generateSenderData()
+	{
 		$sender = new PagSeguroSender();
 
 		if (isset($this->context->customer) && !is_null($this->context->customer)) {
@@ -256,7 +277,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 	 * @param type $value
 	 * @return string
 	 */
-	private function _generateName($value) {
+	private function _generateName($value)
+	{
 		$name = '';
 		$cont = 0;
 		$customer = explode(' ', $value);
@@ -277,7 +299,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 	 *
 	 *  @return PagSeguroShipping
 	 */
-	private function _generateShippingData() {
+	private function _generateShippingData()
+	{
 		$shipping = new PagSeguroShipping();
 		$shipping->setAddress($this->_generateShippingAddressData());
 		$shipping->setType($this->_generateShippingType());
@@ -291,7 +314,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 	 *
 	 *  @return PagSeguroShippingType
 	 */
-	private function _generateShippingType() {
+	private function _generateShippingType()
+	{
 		$shipping_type = new PagSeguroShippingType();
 		$shipping_type->setByType('NOT_SPECIFIED');
 
@@ -303,7 +327,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 	 *
 	 *  @return PagSeguroAddress
 	 */
-	private function _generateShippingAddressData() {
+	private function _generateShippingAddressData()
+	{
 		$address = new PagSeguroAddress();
 		$delivery_address = new Address((int) $this->context->cart->id_address_delivery);
 
