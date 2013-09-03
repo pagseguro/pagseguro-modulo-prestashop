@@ -28,8 +28,8 @@
 		{/if}
 	</p>
 	<p>
-		{l s='Aceitamos a seguinte moeda para efetuar seu pagamento via PagSeguro: ' mod='pagseguro'}&nbsp;<b>{$currencies.0.name}</b>
-                <input type="hidden" name="currency_payement" value="{$currencies.0.id_currency}" />
+		{l s='Aceitamos a seguinte moeda para efetuar seu pagamento via PagSeguro: ' mod='pagseguro'}&nbsp;<b>{$current_currency_name}</b>
+                <input type="hidden" name="currency_payement" value="{$current_currency_id}" />
 	</p>
 	<p>
 		<br /><br />
