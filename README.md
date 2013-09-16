@@ -1,5 +1,5 @@
-Módulo de integração PagSeguro para PrestaShop
-==============================================
+Módulo de integração PagSeguro para PrestaShop 1.5
+==================================================
 ---
 Descrição
 ---------
@@ -13,7 +13,7 @@ Com o módulo instalado e configurado, você pode pode oferecer o PagSeguro como
 Requisitos
 ----------
 ---
- - [PrestaShop] 1.5.3.1 ou 1.5.4.1
+ - [PrestaShop] 1.5.1.0+
  - [PHP] 5.1.6+
  - [SPL]
  - [cURL]
@@ -56,6 +56,14 @@ Para acessar e configurar o módulo acesse o menu Módulos -> Modules -> Payment
 Changelog
 ---------
 ---
+1.5
+
+ - Melhorias no tratamento de endereço;
+ - Ajustes de CSS;
+ - Não utilizar URLs de localhost para notificação/redirecionamento;
+ - Verificar se o ambiente atende os requisitos;
+ - Armazenamento do ID da transação gerada pelo PagSeguro;
+
 1.4
 
  - Compatibilidade com a versão 1.5.4.1 do PrestaShop.
@@ -134,3 +142,4 @@ Achou e corrigiu um bug ou tem alguma feature em mente e deseja contribuir?
   [cURL]: http://php.net/manual/en/book.curl.php
   [DOM]: http://php.net/manual/en/book.dom.php
   [GitHub]: https://github.com/pagseguro/prestashop
+
