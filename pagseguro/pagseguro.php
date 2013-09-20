@@ -249,6 +249,16 @@ class PagSeguro extends PaymentModule {
         return sprintf($this->l('O campo <strong>%s</strong> deve conter uma url válida.'), $field);
     }
 
+    private function returnCheckedRedirectionUrl() {
+        $url_redirect = Tools::safeOutput(Configuration::get('PAGSEGURO_URL_REDIRECT'));
+        return Tools::isEmpty($url_redirect) ? $this->getDefaultRedirectionUrl() : $url_redirect;
+    }
+
+    private function returnCheckedNotificationUrl() {
+        $url_notification = Tools::safeOutput(Configuration::get('PAGSEGURO_NOTIFICATION_URL'));
+        return Tools::isEmpty($url_notification) ? $this->_notificationURL() : $url_notification;
+    }
+
     /**
      *  Display configuration form
      */
@@ -306,10 +316,10 @@ class PagSeguro extends PaymentModule {
 							<input type="text" name="pagseguro_token" id="pagseguro_token" value="' . Tools::safeOutput(Configuration::get('PAGSEGURO_TOKEN')) . '" maxlength="32"  hint="' . $this->l('Para utilizar qualquer serviço de integração do PagSeguro, é necessário ter um token de segurança. O token é um código único, gerado pelo PagSeguro. Caso não tenha um token,') . ' <a href=\'https://pagseguro.uol.com.br/integracao/token-de-seguranca.jhtml\' target=\'_blank\'>' . $this->l('clique aqui') . '</a> ' . $this->l('para gerar.') . '" />
 							<br />
 							<label>' . $this->l('URL DE REDIRECIONAMENTO') . '</label><br />
-							<input type="text" name="pagseguro_url_redirect" id="pagseguro_url_redirect" placeholder=' . $this->getDefaultRedirectionUrl() . ' value="' . Tools::safeOutput(Configuration::get('PAGSEGURO_URL_REDIRECT')) . '" maxlength="255" hint="' . $this->l('Ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado de volta para sua loja ou para a URL que você informar neste campo. Para utilizar essa funcionalidade você deve configurar sua conta para aceitar somente requisições de pagamentos gerados via API.') . ' <a href=\'https://pagseguro.uol.com.br/integracao/pagamentos-via-api.jhtml\' target=\'_blank\'>' . $this->l('Clique aqui</a> para ativar este serviço.') . '" />
+							<input type="text" name="pagseguro_url_redirect" id="pagseguro_url_redirect" value="' . $this->returnCheckedRedirectionUrl() . '" maxlength="255" hint="' . $this->l('Ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado de volta para sua loja ou para a URL que você informar neste campo. Para utilizar essa funcionalidade você deve configurar sua conta para aceitar somente requisições de pagamentos gerados via API.') . ' <a href=\'https://pagseguro.uol.com.br/integracao/pagamentos-via-api.jhtml\' target=\'_blank\'>' . $this->l('Clique aqui</a> para ativar este serviço.') . '" />
 							<br />
 							<label>' . $this->l('URL DE NOTIFICAÇÃO') . '</label><br />
-							<input type="text" name="pagseguro_notification_url" id="pagseguro_notification_url"  placeholder=' . $this->_notificationURL() . ' value="' . Tools::safeOutput(Configuration::get('PAGSEGURO_NOTIFICATION_URL')) . '" maxlength="255" hint="' . $this->l('Sempre que uma transação mudar de status, o PagSeguro envia uma notificação para sua loja ou para a URL que você informar neste campo.') . '" />
+							<input type="text" name="pagseguro_notification_url" id="pagseguro_notification_url" value="' . $this->returnCheckedNotificationUrl() . '" maxlength="255" hint="' . $this->l('Sempre que uma transação mudar de status, o PagSeguro envia uma notificação para sua loja ou para a URL que você informar neste campo.') . '" />
 							<br />
 							<br />
 							<p class="small">* ' . $this->l('Campos obrigatórios') . '</p>
@@ -443,10 +453,10 @@ class PagSeguro extends PaymentModule {
      */
     public function hookPaymentReturn($params) {
 
-       if (!$this->active)
+        if (!$this->active)
             return;
 
-       if (!Tools::isEmpty($params['objOrder']) && $params['objOrder']->module === $this->name) {
+        if (!Tools::isEmpty($params['objOrder']) && $params['objOrder']->module === $this->name) {
 
             $this->smarty->assign(array(
                 'total_to_pay' => Tools::displayPrice($params['objOrder']->total_paid_real, $this->context->currency->id, false),
@@ -456,10 +466,6 @@ class PagSeguro extends PaymentModule {
             if (isset($params['objOrder']->reference) && !empty($params['objOrder']->reference)) {
                 $this->smarty->assign('reference', $params['objOrder']->reference);
             }
-
-            if (!Db::getInstance()->Execute(" UPDATE `" . _DB_PREFIX_ . "order_payment` SET `transaction_id` = '" . $_GET["transactionCode"] . "' 
-                                            WHERE `order_reference` = '" . $params['objOrder']->reference . "'"))
-                die(Tools::displayError('Error when updating Transaction Code from PagSeguro in database'));
         }
         else
             $this->smarty->assign('status', 'failed');

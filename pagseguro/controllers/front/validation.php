@@ -81,7 +81,7 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
             }
 
         if (!$authorized)
-            die($this->module->l('Este método de pagamento não está disponível', 'validation'));
+            die($this->module->l('Este mÃ©todo de pagamento nÃ£o estÃ¡ disponÃ­vel', 'validation'));
     }
 
     /**
@@ -330,7 +330,7 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
 
             $fullAddress = $this->_addressConfig($delivery_address->address1);
 
-            $street = $fullAddress[0] != '' ? $fullAddress[0] : $this->_addressConfig($delivery_address->address1);
+            $street = (is_null($fullAddress[0]) || empty($fullAddress[0])) ? $delivery_address->address1 : $fullAddress[0];
             $number = is_null($fullAddress[1]) ? '' : $fullAddress[1];
             $complement = is_null($fullAddress[2]) ? '' : $fullAddress[2];
 
