@@ -523,7 +523,7 @@ class PagSeguro extends PaymentModule {
             $order_state->hidden = false;
             $order_state->delivery = false;
             $order_state->logable = true;
-            $order_state->invoice = false;
+            $order_state->invoice = true;
             $order_state->name = array();
             $continue = false;
             foreach (Language::getLanguages() as $language) {
