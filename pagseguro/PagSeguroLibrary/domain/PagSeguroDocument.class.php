@@ -1,21 +1,7 @@
 <?php
 
 /*
- ************************************************************************
- Copyright [2011] [PagSeguro Internet Ltda.]
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
- http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
- ************************************************************************
+ * *********************************************************************** Copyright [2011] [PagSeguro Internet Ltda.] Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. ***********************************************************************
  */
 
 /**
@@ -30,12 +16,14 @@ class PagSeguroDocument
 
     /**
      * The type of document
+     * 
      * @var string
      */
     private $type;
 
     /**
      * The value of document
+     * 
      * @var string
      */
     private $value;
@@ -52,6 +40,7 @@ class PagSeguroDocument
 
     /**
      * Get document type
+     * 
      * @return String
      */
     public function getType()
@@ -61,7 +50,8 @@ class PagSeguroDocument
 
     /**
      * Set document type
-     * @param String $type
+     * 
+     * @param String $type            
      */
     public function setType($type)
     {
@@ -70,6 +60,7 @@ class PagSeguroDocument
 
     /**
      * Get document value
+     * 
      * @return String
      */
     public function getValue()
@@ -79,7 +70,8 @@ class PagSeguroDocument
 
     /**
      * Set document value
-     * @param String $value
+     * 
+     * @param String $value            
      */
     public function setValue($value)
     {
@@ -88,8 +80,9 @@ class PagSeguroDocument
 
     /**
      * Check if document type is available for PagSeguro
-     * @param string $documentType
-     * @return array|boolean
+     * 
+     * @param string $documentType            
+     * @return array boolean
      */
     public static function isDocumentTypeAvailable($documentType)
     {

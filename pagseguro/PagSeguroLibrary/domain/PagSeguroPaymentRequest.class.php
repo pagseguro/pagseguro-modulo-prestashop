@@ -1,21 +1,7 @@
 <?php
 
 /*
- * ***********************************************************************
- Copyright [2011] [PagSeguro Internet Ltda.]
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
- http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
- * ***********************************************************************
+ * *********************************************************************** Copyright [2011] [PagSeguro Internet Ltda.] Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. ***********************************************************************
  */
 
 /**
@@ -26,6 +12,7 @@ class PagSeguroPaymentRequest
 
     /**
      * Party that will be sending the money
+     * 
      * @var PagSeguroSender
      */
     private $sender;
@@ -43,6 +30,7 @@ class PagSeguroPaymentRequest
     /**
      * Uri to where the PagSeguro payment page should redirect the user after the payment information is processed.
      * Typically this is a confirmation page on your web site.
+     * 
      * @var String
      */
     private $redirectURL;
@@ -52,6 +40,7 @@ class PagSeguroPaymentRequest
      *
      * This value can be used to add an extra charge to the transaction
      * or provide a discount in the case ExtraAmount is a negative value.
+     * 
      * @var float
      */
     private $extraAmount;
@@ -97,6 +86,7 @@ class PagSeguroPaymentRequest
      * Extra parameters that user can add to a PagSeguro checkout request
      *
      * Optional.
+     * 
      * @var PagSeguroMetaData
      */
     private $metadata;
@@ -105,15 +95,17 @@ class PagSeguroPaymentRequest
      * Extra parameters that user can add to a PagSeguro checkout request
      *
      * Optional
+     * 
      * @var PagSeguroParameter
      */
     private $parameter;
 
     /**
-     * @return PagSeguroSender the sender
      *
-     * Party that will be sending the Uri to where the PagSeguro payment page should redirect the
-     * user after the payment information is processed.
+     * @return PagSeguroSender the sender
+     *        
+     *         Party that will be sending the Uri to where the PagSeguro payment page should redirect the
+     *         user after the payment information is processed.
      */
     public function getSender()
     {
@@ -122,21 +114,16 @@ class PagSeguroPaymentRequest
 
     /**
      * Sets the Sender, party that will be sending the money
-     * @param String $name
-     * @param String $email
-     * @param String $areaCode
-     * @param String $number
-     * @param String $documentType
-     * @param String $documentValue
+     * 
+     * @param String $name            
+     * @param String $email            
+     * @param String $areaCode            
+     * @param String $number            
+     * @param String $documentType            
+     * @param String $documentValue            
      */
-    public function setSender(
-        $name,
-        $email = null,
-        $areaCode = null,
-        $number = null,
-        $documentType = null,
-        $documentValue = null
-    ) {
+    public function setSender($name, $email = null, $areaCode = null, $number = null, $documentType = null, $documentValue = null)
+    {
         $param = $name;
         if (is_array($param)) {
             $this->sender = new PagSeguroSender($param);
@@ -154,7 +141,8 @@ class PagSeguroPaymentRequest
 
     /**
      * Sets the name of the sender, party that will be sending the money
-     * @param String $senderName
+     * 
+     * @param String $senderName            
      */
     public function setSenderName($senderName)
     {
@@ -166,7 +154,8 @@ class PagSeguroPaymentRequest
 
     /**
      * Sets the name of the sender, party that will be sending the money
-     * @param String $senderEmail
+     * 
+     * @param String $senderEmail            
      */
     public function setSenderEmail($senderEmail)
     {
@@ -179,8 +168,10 @@ class PagSeguroPaymentRequest
     /**
      * Sets the Sender phone number, phone of the party that will be sending the money
      *
-     * @param areaCode
-     * @param number
+     * @param
+     *            areaCode
+     * @param
+     *            number
      */
     public function setSenderPhone($areaCode, $number = null)
     {
@@ -196,8 +187,9 @@ class PagSeguroPaymentRequest
     }
 
     /**
+     *
      * @return String the currency
-     * Example: BRL
+     *         Example: BRL
      */
     public function getCurrency()
     {
@@ -206,7 +198,8 @@ class PagSeguroPaymentRequest
 
     /**
      * Sets the currency
-     * @param String $currency
+     * 
+     * @param String $currency            
      */
     public function setCurrency($currency)
     {
@@ -214,6 +207,7 @@ class PagSeguroPaymentRequest
     }
 
     /**
+     *
      * @return array the items/products list in this payment request
      */
     public function getItems()
@@ -223,7 +217,8 @@ class PagSeguroPaymentRequest
 
     /**
      * Sets the items/products list in this payment request
-     * @param array $items
+     * 
+     * @param array $items            
      */
     public function setItems(array $items)
     {
@@ -245,21 +240,15 @@ class PagSeguroPaymentRequest
     /**
      * Adds a new product/item in this payment request
      *
-     * @param String $id
-     * @param String $description
-     * @param String $quantity
-     * @param String $amount
-     * @param String $weight
-     * @param String $shippingCost
+     * @param String $id            
+     * @param String $description            
+     * @param String $quantity            
+     * @param String $amount            
+     * @param String $weight            
+     * @param String $shippingCost            
      */
-    public function addItem(
-        $id,
-        $description = null,
-        $quantity = null,
-        $amount = null,
-        $weight = null,
-        $shippingCost = null
-    ) {
+    public function addItem($id, $description = null, $quantity = null, $amount = null, $weight = null, $shippingCost = null)
+    {
         $param = $id;
         if ($this->items == null) {
             $this->items = array();
@@ -306,7 +295,7 @@ class PagSeguroPaymentRequest
      * Uri to where the PagSeguro payment page should redirect the user after the payment information is processed.
      * Typically this is a confirmation page on your web site.
      *
-     * @param String $redirectURL
+     * @param String $redirectURL            
      */
     public function setRedirectURL($redirectURL)
     {
@@ -329,7 +318,8 @@ class PagSeguroPaymentRequest
      * This value can be used to add an extra charge to the transaction
      * or provide a discount in the case <b>extraAmount</b> is a negative value.
      *
-     * @param extraAmount
+     * @param
+     *            extraAmount
      */
     public function setExtraAmount($extraAmount)
     {
@@ -337,6 +327,7 @@ class PagSeguroPaymentRequest
     }
 
     /**
+     *
      * @return mixed the reference of this payment request
      */
     public function getReference()
@@ -346,7 +337,9 @@ class PagSeguroPaymentRequest
 
     /**
      * Sets the reference of this payment request
-     * @param reference
+     * 
+     * @param
+     *            reference
      */
     public function setReference($reference)
     {
@@ -354,6 +347,7 @@ class PagSeguroPaymentRequest
     }
 
     /**
+     *
      * @return PagSeguroShipping the shipping information for this payment request
      * @see PagSeguroShipping
      */
@@ -364,8 +358,9 @@ class PagSeguroPaymentRequest
 
     /**
      * Sets the shipping information for this payment request
-     * @param PagSeguroShipping $address
-     * @param PagSeguroShippingType $type
+     * 
+     * @param PagSeguroShipping $address            
+     * @param PagSeguroShippingType $type            
      */
     public function setShipping($address, $type = null)
     {
@@ -394,25 +389,18 @@ class PagSeguroPaymentRequest
 
     /**
      * Sets the shipping address for this payment request
-     * @param String $postalCode
-     * @param String $street
-     * @param String $number
-     * @param String $complement
-     * @param String $district
-     * @param String $city
-     * @param String $state
-     * @param String $country
+     * 
+     * @param String $postalCode            
+     * @param String $street            
+     * @param String $number            
+     * @param String $complement            
+     * @param String $district            
+     * @param String $city            
+     * @param String $state            
+     * @param String $country            
      */
-    public function setShippingAddress(
-        $postalCode = null,
-        $street = null,
-        $number = null,
-        $complement = null,
-        $district = null,
-        $city = null,
-        $state = null,
-        $country = null
-    ) {
+    public function setShippingAddress($postalCode = null, $street = null, $number = null, $complement = null, $district = null, $city = null, $state = null, $country = null)
+    {
         $param = $postalCode;
         if ($this->shipping == null) {
             $this->shipping = new PagSeguroShipping();
@@ -437,7 +425,8 @@ class PagSeguroPaymentRequest
 
     /**
      * Sets the shipping type for this payment request
-     * @param PagSeguroShippingType $type
+     * 
+     * @param PagSeguroShippingType $type            
      */
     public function setShippingType($type)
     {
@@ -454,7 +443,8 @@ class PagSeguroPaymentRequest
 
     /**
      * Sets the shipping cost for this payment request
-     * @param float $shippingCost
+     * 
+     * @param float $shippingCost            
      */
     public function setShippingCost($shippingCost)
     {
@@ -462,15 +452,16 @@ class PagSeguroPaymentRequest
         if ($this->shipping == null) {
             $this->shipping = new PagSeguroShipping();
         }
-
+        
         $this->shipping->setCost($param);
     }
 
     /**
-     * @return integer the max age of this payment request
      *
-     * After this payment request is submitted, the payment code returned
-     * will remain valid for the period specified.
+     * @return integer the max age of this payment request
+     *        
+     *         After this payment request is submitted, the payment code returned
+     *         will remain valid for the period specified.
      */
     public function getMaxAge()
     {
@@ -482,7 +473,8 @@ class PagSeguroPaymentRequest
      * After this payment request is submitted, the payment code returned
      * will remain valid for the period specified here.
      *
-     * @param maxAge
+     * @param
+     *            maxAge
      */
     public function setMaxAge($maxAge)
     {
@@ -506,7 +498,8 @@ class PagSeguroPaymentRequest
      * After this payment request is submitted, the payment redirect uri returned by
      * the payment web service will remain valid for the number of uses specified here.
      *
-     * @param maxUses
+     * @param
+     *            maxUses
      */
     public function setMaxUses($maxUses)
     {
@@ -526,7 +519,7 @@ class PagSeguroPaymentRequest
     /**
      * Sets the url that PagSeguro will send the new notifications statuses
      *
-     * @param String $notificationURL
+     * @param String $notificationURL            
      */
     public function setNotificationURL($notificationURL)
     {
@@ -536,7 +529,7 @@ class PagSeguroPaymentRequest
     /**
      * Sets metadata for PagSeguro checkout requests
      *
-     * @param PagSeguroMetaData $metaData
+     * @param PagSeguroMetaData $metaData            
      */
     public function setMetaData($metaData)
     {
@@ -550,7 +543,6 @@ class PagSeguroPaymentRequest
      */
     public function getMetaData()
     {
-
         if ($this->metadata == null) {
             $this->metadata = new PagSeguroMetaData();
         }
@@ -560,9 +552,12 @@ class PagSeguroPaymentRequest
     /**
      * add a parameter for PagSeguro metadata checkout request
      *
-     * @param PagSeguroMetaDataItem $itemKey key
-     * @param PagSeguroMetaDataItem $itemValue value
-     * @param PagSeguroMetaDataItem $itemGroup group
+     * @param PagSeguroMetaDataItem $itemKey
+     *            key
+     * @param PagSeguroMetaDataItem $itemValue
+     *            value
+     * @param PagSeguroMetaDataItem $itemGroup
+     *            group
      */
     public function addMetaData($itemKey, $itemValue, $itemGroup = null)
     {
@@ -572,7 +567,7 @@ class PagSeguroPaymentRequest
     /**
      * Sets parameter for PagSeguro checkout requests
      *
-     * @param PagSeguroParameter $parameter
+     * @param PagSeguroParameter $parameter            
      */
     public function setParameter($parameter)
     {
@@ -595,8 +590,10 @@ class PagSeguroPaymentRequest
     /**
      * add a parameter for PagSeguro checkout request
      *
-     * @param PagSeguroParameterItem $parameterName key
-     * @param PagSeguroParameterItem $parameterValue value
+     * @param PagSeguroParameterItem $parameterName
+     *            key
+     * @param PagSeguroParameterItem $parameterValue
+     *            value
      */
     public function addParameter($parameterName, $parameterValue)
     {
@@ -606,9 +603,12 @@ class PagSeguroPaymentRequest
     /**
      * add a parameter for PagSeguro checkout request
      *
-     * @param PagSeguroParameterItem $parameterName key
-     * @param PagSeguroParameterItem $parameterValue value
-     * @param PagSeguroParameterItem $parameterIndex group
+     * @param PagSeguroParameterItem $parameterName
+     *            key
+     * @param PagSeguroParameterItem $parameterValue
+     *            value
+     * @param PagSeguroParameterItem $parameterIndex
+     *            group
      */
     public function addIndexedParameter($parameterName, $parameterValue, $parameterIndex)
     {
@@ -618,7 +618,7 @@ class PagSeguroPaymentRequest
     /**
      * Calls the PagSeguro web service and register this request for payment
      *
-     * @param PagSeguroCredentials $credentials
+     * @param PagSeguroCredentials $credentials            
      * @return String The URL to where the user needs to be redirected to in order to complete the payment process
      */
     public function register(PagSeguroCredentials $credentials)
@@ -627,22 +627,24 @@ class PagSeguroPaymentRequest
     }
 
     /**
+     *
      * @return String a string that represents the current object
      */
     public function toString()
     {
         $email = $this->sender ? $this->sender->getEmail() : "null";
-
+        
         $request = array();
         $request['Reference'] = $this->reference;
         $request['SenderEmail'] = $email;
-
+        
         return "PagSeguroPaymentRequest: " . var_export($request, true);
     }
 
     /**
      * Verify if the adress of NotificationURL or RedirectURL is for tests and return empty
-     * @param type $url
+     * 
+     * @param type $url            
      * @return type
      */
     public function verifyURLTest($url)
@@ -652,11 +654,11 @@ class PagSeguroPaymentRequest
             '127.0.0.1',
             '::1'
         );
-
+        
         $urlReturn;
         foreach ($adress as $item) {
             $find = strpos($url, $item);
-
+            
             if ($find) {
                 $urlReturn = '';
                 break;
@@ -664,7 +666,7 @@ class PagSeguroPaymentRequest
                 $urlReturn = $url;
             }
         }
-
+        
         return $urlReturn;
     }
 }

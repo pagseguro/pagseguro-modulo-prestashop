@@ -1,25 +1,12 @@
 <?php
 
 /*
- * ***********************************************************************
- Copyright [2011] [PagSeguro Internet Ltda.]
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
- http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
- * ***********************************************************************
+ * *********************************************************************** Copyright [2011] [PagSeguro Internet Ltda.] Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. ***********************************************************************
  */
 
 /**
  * Represents an address location, typically for shipping or charging purposes.
+ * 
  * @see PagSeguroShipping
  */
 class PagSeguroAddress
@@ -65,9 +52,11 @@ class PagSeguroAddress
 
     /**
      * acronyms and states brazilian
+     * 
      * @var type
      */
-    private static $acronyms = array('acre' => 'AC',
+    private static $acronyms = array(
+        'acre' => 'AC',
         'alagoas' => 'AL',
         'amapa' => 'AP',
         'amazonas' => 'AM',
@@ -97,11 +86,13 @@ class PagSeguroAddress
         'saopaulo' => 'SP',
         'sergipe' => 'SE',
         'tocantins' => 'TO',
-        'distritofederal' => 'DF');
+        'distritofederal' => 'DF'
+    );
 
     /**
      * Initializes a new instance of the Address class
-     * @param array $data
+     * 
+     * @param array $data            
      */
     public function __construct(array $data = null)
     {
@@ -132,6 +123,7 @@ class PagSeguroAddress
     }
 
     /**
+     *
      * @return string the street
      */
     public function getStreet()
@@ -140,6 +132,7 @@ class PagSeguroAddress
     }
 
     /**
+     *
      * @return string the number
      */
     public function getNumber()
@@ -148,6 +141,7 @@ class PagSeguroAddress
     }
 
     /**
+     *
      * @return string the complement
      */
     public function getComplement()
@@ -156,6 +150,7 @@ class PagSeguroAddress
     }
 
     /**
+     *
      * @return string the distrcit
      */
     public function getDistrict()
@@ -164,6 +159,7 @@ class PagSeguroAddress
     }
 
     /**
+     *
      * @return string the city
      */
     public function getCity()
@@ -172,6 +168,7 @@ class PagSeguroAddress
     }
 
     /**
+     *
      * @return string the state
      */
     public function getState()
@@ -180,6 +177,7 @@ class PagSeguroAddress
     }
 
     /**
+     *
      * @return string the postal code
      */
     public function getPostalCode()
@@ -188,6 +186,7 @@ class PagSeguroAddress
     }
 
     /**
+     *
      * @return string the country
      */
     public function getCountry()
@@ -197,7 +196,8 @@ class PagSeguroAddress
 
     /**
      * Sets the country
-     * @param String $country
+     * 
+     * @param String $country            
      */
     public function setCountry($country)
     {
@@ -206,7 +206,8 @@ class PagSeguroAddress
 
     /**
      * Sets the street
-     * @param String $street
+     * 
+     * @param String $street            
      */
     public function setStreet($street)
     {
@@ -215,7 +216,8 @@ class PagSeguroAddress
 
     /**
      * sets the numbetr
-     * @param String $number
+     * 
+     * @param String $number            
      */
     public function setNumber($number)
     {
@@ -224,7 +226,8 @@ class PagSeguroAddress
 
     /**
      * Sets the complement
-     * @param String $complement
+     * 
+     * @param String $complement            
      */
     public function setComplement($complement)
     {
@@ -233,7 +236,8 @@ class PagSeguroAddress
 
     /**
      * sets the district
-     * @param String $district
+     * 
+     * @param String $district            
      */
     public function setDistrict($district)
     {
@@ -242,7 +246,8 @@ class PagSeguroAddress
 
     /**
      * Sets the city
-     * @param String $city
+     * 
+     * @param String $city            
      */
     public function setCity($city)
     {
@@ -251,7 +256,8 @@ class PagSeguroAddress
 
     /**
      * Sets the state
-     * @param String $state
+     * 
+     * @param String $state            
      */
     public function setState($state)
     {
@@ -260,7 +266,8 @@ class PagSeguroAddress
 
     /**
      * Sets the postal code
-     * @param String $postalCode
+     * 
+     * @param String $postalCode            
      */
     public function setPostalCode($postalCode)
     {
@@ -269,12 +276,12 @@ class PagSeguroAddress
 
     /**
      * Treat the state to pass in format waited of the PagSeguro
-     * @param type $defaultState
+     * 
+     * @param type $defaultState            
      * @return string
      */
     private function treatState($defaultState)
     {
-
         if (strlen($defaultState) == 2) {
             foreach (self::$acronyms as $key => $val) {
                 if ($val == strtoupper($defaultState)) {
@@ -283,24 +290,38 @@ class PagSeguroAddress
             }
             return '';
         }
-
+        
         $state = utf8_decode($defaultState);
         $state = strtolower($state);
-
+        
         // Code ASCII of the vowel
         $ascii['a'] = range(224, 230);
         $ascii['e'] = range(232, 235);
         $ascii['i'] = range(236, 239);
-        $ascii['o'] = array_merge(range(242, 246), array(240, 248));
+        $ascii['o'] = array_merge(range(242, 246), array(
+            240,
+            248
+        ));
         $ascii['u'] = range(249, 252);
-
+        
         // Code ASCII of the others character
-        $ascii['b'] = array(223);
-        $ascii['c'] = array(231);
-        $ascii['d'] = array(208);
-        $ascii['n'] = array(241);
-        $ascii['y'] = array(253, 255);
-
+        $ascii['b'] = array(
+            223
+        );
+        $ascii['c'] = array(
+            231
+        );
+        $ascii['d'] = array(
+            208
+        );
+        $ascii['n'] = array(
+            241
+        );
+        $ascii['y'] = array(
+            253,
+            255
+        );
+        
         foreach ($ascii as $key => $item) {
             $accents = '';
             foreach ($item as $code) {
@@ -308,18 +329,18 @@ class PagSeguroAddress
             }
             $change[$key] = '/[' . $accents . ']/i';
         }
-
+        
         $state = preg_replace(array_values($change), array_keys($change), $state);
-
+        
         $state = preg_replace("/\s/", "", $state);
-
+        
         foreach (self::$acronyms as $key => $val) {
             if ($key == $state) {
                 $acronym = $val;
                 return $acronym;
             }
         }
-
+        
         return '';
     }
 }

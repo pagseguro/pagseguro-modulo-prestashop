@@ -1,21 +1,7 @@
 <?php
 
 /*
- * ***********************************************************************
- Copyright [2011] [PagSeguro Internet Ltda.]
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
- http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
- * ***********************************************************************
+ * *********************************************************************** Copyright [2011] [PagSeguro Internet Ltda.] Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. ***********************************************************************
  */
 
 /**
@@ -102,11 +88,11 @@ class PagSeguroPaymentMethodCode
          */
         'GRANDCARD_CREDIT_CARD' => 119,
         /**
-         * Bradesco - boleto -  is a form of invoicing in Brazil
+         * Bradesco - boleto - is a form of invoicing in Brazil
          */
         'BRADESCO_BOLETO' => 201,
         /**
-         * Santander - boleto -  is a form of invoicing in Brazil
+         * Santander - boleto - is a form of invoicing in Brazil
          */
         'SANTANDER_BOLETO' => 202,
         /**
@@ -179,8 +165,9 @@ class PagSeguroPaymentMethodCode
     }
 
     /**
+     *
      * @return integer the payment method code value
-     * Example: 101
+     *         Example: 101
      */
     public function getValue()
     {
@@ -188,7 +175,9 @@ class PagSeguroPaymentMethodCode
     }
 
     /**
-     * @param $value
+     *
+     * @param
+     *            $value
      * @return PagSeguroPaymentMethodCode the corresponding to the informed value
      */
     public function getTypeFromValue($value = null)

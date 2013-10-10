@@ -1,21 +1,7 @@
 <?php
 
 /*
- ************************************************************************
- Copyright [2011] [PagSeguro Internet Ltda.]
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
- http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
- ************************************************************************
+ * *********************************************************************** Copyright [2011] [PagSeguro Internet Ltda.] Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. ***********************************************************************
  */
 
 /**
@@ -27,6 +13,7 @@ class PagSeguroShippingType
 {
 
     /**
+     *
      * @var array
      */
     private static $typeList = array(
@@ -42,7 +29,8 @@ class PagSeguroShippingType
     private $value;
 
     /**
-     * @param null $value
+     *
+     * @param null $value            
      */
     public function __construct($value = null)
     {
@@ -52,7 +40,9 @@ class PagSeguroShippingType
     }
 
     /**
-     * @param $value
+     *
+     * @param
+     *            $value
      */
     public function setValue($value)
     {
@@ -60,7 +50,9 @@ class PagSeguroShippingType
     }
 
     /**
-     * @param $type
+     *
+     * @param
+     *            $type
      * @throws Exception
      */
     public function setByType($type)
@@ -73,6 +65,7 @@ class PagSeguroShippingType
     }
 
     /**
+     *
      * @return int the value of the shipping type
      */
     public function getValue()
@@ -81,7 +74,9 @@ class PagSeguroShippingType
     }
 
     /**
-     * @param value
+     *
+     * @param
+     *            value
      * @return PagSeguroShippingType the PagSeguroShippingType corresponding to the informed value
      */
     public function getTypeFromValue($value = null)
@@ -91,7 +86,9 @@ class PagSeguroShippingType
     }
 
     /**
-     * @param string
+     *
+     * @param
+     *            string
      * @return integer the code corresponding to the informed shipping type
      */
     public static function getCodeByType($type)
@@ -104,7 +101,8 @@ class PagSeguroShippingType
     }
 
     /**
-     * @param string $type
+     *
+     * @param string $type            
      * @return PagSeguroShippingType a PagSeguroShippingType object corresponding to the informed type
      */
     public static function createByType($type)

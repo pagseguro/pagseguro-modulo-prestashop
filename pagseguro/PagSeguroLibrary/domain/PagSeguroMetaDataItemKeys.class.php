@@ -1,21 +1,7 @@
 <?php
 
 /*
- ************************************************************************
- Copyright [2011] [PagSeguro Internet Ltda.]
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
- http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
- ************************************************************************
+ * *********************************************************************** Copyright [2011] [PagSeguro Internet Ltda.] Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. ***********************************************************************
  */
 
 /**
@@ -40,6 +26,7 @@ class PagSeguroMetaDataItemKeys
 
     /**
      * Get available item key list for metadata use in PagSeguro transactions
+     * 
      * @return array
      */
     public static function getAvailableItemKeysList()
@@ -49,7 +36,8 @@ class PagSeguroMetaDataItemKeys
 
     /**
      * Check if item key is available for PagSeguro
-     * @param string $itemKey
+     * 
+     * @param string $itemKey            
      * @return boolean
      */
     public static function isItemKeyAvailable($itemKey)
@@ -60,7 +48,8 @@ class PagSeguroMetaDataItemKeys
 
     /**
      * Gets item description by key
-     * @param string $itemKey
+     * 
+     * @param string $itemKey            
      * @return string
      */
     public static function getItemDescriptionByKey($itemKey)
@@ -75,7 +64,8 @@ class PagSeguroMetaDataItemKeys
 
     /**
      * Gets item key type by description
-     * @param string $itemDescription
+     * 
+     * @param string $itemDescription            
      * @return string
      */
     public static function getItemKeyByDescription($itemDescription)

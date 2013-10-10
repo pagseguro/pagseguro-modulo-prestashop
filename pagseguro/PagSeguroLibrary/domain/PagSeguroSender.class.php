@@ -1,21 +1,7 @@
 <?php
 
 /*
- * ***********************************************************************
- Copyright [2011] [PagSeguro Internet Ltda.]
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
- http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
- * ***********************************************************************
+ * *********************************************************************** Copyright [2011] [PagSeguro Internet Ltda.] Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. ***********************************************************************
  */
 
 /**
@@ -24,22 +10,30 @@
 class PagSeguroSender
 {
 
-    /** Sender name */
+    /**
+     * Sender name
+     */
     private $name;
 
-    /** Sender email */
+    /**
+     * Sender email
+     */
     private $email;
 
-    /** Sender phone */
+    /**
+     * Sender phone
+     */
     private $phone;
 
-    /** Sender documents */
+    /**
+     * Sender documents
+     */
     private $documents;
 
     /**
      * Initializes a new instance of the Sender class
      *
-     * @param array $data
+     * @param array $data            
      */
     public function __construct(array $data = null)
     {
@@ -66,7 +60,8 @@ class PagSeguroSender
 
     /**
      * Sets the sender name
-     * @param String $name
+     * 
+     * @param String $name            
      */
     public function setName($name)
     {
@@ -74,6 +69,7 @@ class PagSeguroSender
     }
 
     /**
+     *
      * @return String the sender name
      */
     public function getName()
@@ -83,7 +79,9 @@ class PagSeguroSender
 
     /**
      * Sets the Sender e-mail
-     * @param email
+     * 
+     * @param
+     *            email
      */
     public function setEmail($email)
     {
@@ -91,6 +89,7 @@ class PagSeguroSender
     }
 
     /**
+     *
      * @return String the sender e-mail
      */
     public function getEmail()
@@ -100,8 +99,9 @@ class PagSeguroSender
 
     /**
      * Sets the sender phone
-     * @param String $areaCode
-     * @param String $number
+     * 
+     * @param String $areaCode            
+     * @param String $number            
      */
     public function setPhone($areaCode, $number = null)
     {
@@ -117,6 +117,7 @@ class PagSeguroSender
     }
 
     /**
+     *
      * @return PagSeguroPhone the sender phone
      * @see PagSeguroPhone
      */
@@ -127,6 +128,7 @@ class PagSeguroSender
 
     /**
      * Get Sender documents
+     * 
      * @return array PagSeguroDocument List of PagSeguroDocument
      * @see PagSeguroDocument
      */
@@ -137,7 +139,8 @@ class PagSeguroSender
 
     /**
      * Set PagSeguro documents
-     * @param array $documents
+     * 
+     * @param array $documents            
      * @see PagSeguroDocument
      */
     public function setDocuments(array $documents)
@@ -157,8 +160,9 @@ class PagSeguroSender
 
     /**
      * Add a document for Sender object
-     * @param String $type
-     * @param String $value
+     * 
+     * @param String $type            
+     * @param String $value            
      */
     public function addDocument($type, $value)
     {

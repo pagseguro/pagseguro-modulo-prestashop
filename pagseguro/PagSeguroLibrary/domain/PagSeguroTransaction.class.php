@@ -1,28 +1,14 @@
 <?php
 
 /*
- ************************************************************************
- Copyright [2011] [PagSeguro Internet Ltda.]
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
- http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
- ************************************************************************
+ * *********************************************************************** Copyright [2011] [PagSeguro Internet Ltda.] Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. ***********************************************************************
  */
 
 /**
  * Class PagSeguroTransaction
  * Represents a PagSeguro transaction
  *
- * @property    PagSeguroSender $sender
+ * @property PagSeguroSender $sender
  *
  */
 class PagSeguroTransaction
@@ -45,14 +31,15 @@ class PagSeguroTransaction
     private $code;
 
     /**
-     *  Reference code
-     *  You can use the reference code to store an identifier so you can
-     *  associate the PagSeguro transaction to a transaction in your system.
+     * Reference code
+     * You can use the reference code to store an identifier so you can
+     * associate the PagSeguro transaction to a transaction in your system.
      */
     private $reference;
 
     /**
      * Transaction type
+     * 
      * @see PagSeguroTransactionType
      * @var PagSeguroTransactionType
      */
@@ -60,6 +47,7 @@ class PagSeguroTransaction
 
     /**
      * Transaction Status
+     * 
      * @see PagSeguroTransactionStatus
      * @var PagSeguroTransactionStatus
      */
@@ -67,6 +55,7 @@ class PagSeguroTransaction
 
     /**
      * Payment method
+     * 
      * @see PagSeguroPaymentMethod
      * @var PagSeguroPaymentMethod
      */
@@ -104,12 +93,14 @@ class PagSeguroTransaction
 
     /**
      * item/product list in this transaction
+     * 
      * @see PagSeguroItem
      */
     private $items;
 
     /**
      * Payer information, who is sending money
+     * 
      * @see PagSeguroSender
      * @var PagSeguroSender
      */
@@ -117,6 +108,7 @@ class PagSeguroTransaction
 
     /**
      * Shipping information
+     * 
      * @see PagSeguroShipping
      * @var PagSeguroShipping
      */
@@ -124,6 +116,7 @@ class PagSeguroTransaction
 
     /**
      * Date the last notification about this transaction was sent
+     * 
      * @return datetime the last event date
      */
     public function getLastEventDate()
@@ -134,7 +127,8 @@ class PagSeguroTransaction
     /**
      * Sets the last event date
      *
-     * @param lastEventDate
+     * @param
+     *            lastEventDate
      */
     public function setLastEventDate($lastEventDate)
     {
@@ -142,6 +136,7 @@ class PagSeguroTransaction
     }
 
     /**
+     *
      * @return datetime the transaction date
      */
     public function getDate()
@@ -152,7 +147,8 @@ class PagSeguroTransaction
     /**
      * Sets the transaction date
      *
-     * @param string date
+     * @param
+     *            string date
      */
     public function setDate($date)
     {
@@ -160,6 +156,7 @@ class PagSeguroTransaction
     }
 
     /**
+     *
      * @return string the transaction code
      */
     public function getCode()
@@ -170,7 +167,8 @@ class PagSeguroTransaction
     /**
      * Sets the transaction code
      *
-     * @param code
+     * @param
+     *            code
      */
     public function setCode($code)
     {
@@ -179,7 +177,7 @@ class PagSeguroTransaction
 
     /**
      * You can use the reference code to store an identifier so you can
-     *  associate the PagSeguro transaction to a transaction in your system.
+     * associate the PagSeguro transaction to a transaction in your system.
      *
      * @return string the reference code
      */
@@ -191,7 +189,8 @@ class PagSeguroTransaction
     /**
      * Sets the reference code
      *
-     * @param reference
+     * @param
+     *            reference
      */
     public function setReference($reference)
     {
@@ -199,6 +198,7 @@ class PagSeguroTransaction
     }
 
     /**
+     *
      * @return PagSeguroTransactionType the transaction type
      * @see PagSeguroTransactionType
      */
@@ -209,7 +209,8 @@ class PagSeguroTransaction
 
     /**
      * Sets the transaction type
-     * @param PagSeguroTransactionType $type
+     * 
+     * @param PagSeguroTransactionType $type            
      */
     public function setType(PagSeguroTransactionType $type)
     {
@@ -217,6 +218,7 @@ class PagSeguroTransaction
     }
 
     /**
+     *
      * @return PagSeguroTransactionStatus the transaction status
      * @see PagSeguroTransactionStatus
      */
@@ -227,7 +229,8 @@ class PagSeguroTransaction
 
     /**
      * Sets the transaction status
-     * @param PagSeguroTransactionStatus $status
+     * 
+     * @param PagSeguroTransactionStatus $status            
      */
     public function setStatus(PagSeguroTransactionStatus $status)
     {
@@ -235,6 +238,7 @@ class PagSeguroTransaction
     }
 
     /**
+     *
      * @return PagSeguroPaymentMethod the payment method used in this transaction
      * @see PagSeguroPaymentMethod
      */
@@ -245,7 +249,8 @@ class PagSeguroTransaction
 
     /**
      * Sets the payment method used in this transaction
-     * @param PagSeguroPaymentMethod $paymentMethod
+     * 
+     * @param PagSeguroPaymentMethod $paymentMethod            
      */
     public function setPaymentMethod(PagSeguroPaymentMethod $paymentMethod)
     {
@@ -253,6 +258,7 @@ class PagSeguroTransaction
     }
 
     /**
+     *
      * @return float the transaction gross amount
      */
     public function getGrossAmount()
@@ -262,7 +268,8 @@ class PagSeguroTransaction
 
     /**
      * Sets the transaction gross amount
-     * @param float $totalValue
+     * 
+     * @param float $totalValue            
      */
     public function setGrossAmount($totalValue)
     {
@@ -270,6 +277,7 @@ class PagSeguroTransaction
     }
 
     /**
+     *
      * @return float the transaction gross amount
      */
     public function getDiscountAmount()
@@ -279,7 +287,8 @@ class PagSeguroTransaction
 
     /**
      * Sets the transaction gross amount
-     * @param float $discountAmount
+     * 
+     * @param float $discountAmount            
      */
     public function setDiscountAmount($discountAmount)
     {
@@ -287,6 +296,7 @@ class PagSeguroTransaction
     }
 
     /**
+     *
      * @return float the fee amount
      */
     public function getFeeAmount()
@@ -296,7 +306,8 @@ class PagSeguroTransaction
 
     /**
      * Sets the transaction fee amount
-     * @param float $feeAmount
+     * 
+     * @param float $feeAmount            
      */
     public function setFeeAmount($feeAmount)
     {
@@ -304,6 +315,7 @@ class PagSeguroTransaction
     }
 
     /**
+     *
      * @return float the net amount
      */
     public function getNetAmount()
@@ -313,7 +325,8 @@ class PagSeguroTransaction
 
     /**
      * Sets the net amount
-     * @param float $netAmount
+     * 
+     * @param float $netAmount            
      */
     public function setNetAmount($netAmount)
     {
@@ -321,6 +334,7 @@ class PagSeguroTransaction
     }
 
     /**
+     *
      * @return float the extra amount
      */
     public function getExtraAmount()
@@ -330,7 +344,8 @@ class PagSeguroTransaction
 
     /**
      * Sets the extra amount
-     * @param float $extraAmount
+     * 
+     * @param float $extraAmount            
      */
     public function setExtraAmount($extraAmount)
     {
@@ -338,6 +353,7 @@ class PagSeguroTransaction
     }
 
     /**
+     *
      * @return integer the installment count
      */
     public function getInstallmentCount()
@@ -347,7 +363,8 @@ class PagSeguroTransaction
 
     /**
      * Sets the installment count
-     * @param integer $installmentCount
+     * 
+     * @param integer $installmentCount            
      */
     public function setInstallmentCount($installmentCount)
     {
@@ -355,6 +372,7 @@ class PagSeguroTransaction
     }
 
     /**
+     *
      * @return array PagSeguroItem the items/products list in this transaction
      * @see PagSeguroItem
      */
@@ -365,7 +383,8 @@ class PagSeguroTransaction
 
     /**
      * Sets the list of items/products in this transaction
-     * @param array $items
+     * 
+     * @param array $items            
      * @see PagSeguroItem
      */
     public function setItems(array $items)
@@ -374,6 +393,7 @@ class PagSeguroTransaction
     }
 
     /**
+     *
      * @return integer the items/products count in this transaction
      */
     public function getItemCount()
@@ -382,6 +402,7 @@ class PagSeguroTransaction
     }
 
     /**
+     *
      * @return PagSeguroSender the sender information, who is sending money in this transaction
      * @see PagSeguroSender
      */
@@ -392,7 +413,8 @@ class PagSeguroTransaction
 
     /**
      * Sets the sender information, who is sending money in this transaction
-     * @param PagSeguroSender $sender
+     * 
+     * @param PagSeguroSender $sender            
      */
     public function setSender(PagSeguroSender $sender)
     {
@@ -400,6 +422,7 @@ class PagSeguroTransaction
     }
 
     /**
+     *
      * @return PagSeguroShipping the shipping information
      * @see PagSeguroShipping
      */
@@ -410,7 +433,8 @@ class PagSeguroTransaction
 
     /**
      * sets the shipping information for this transaction
-     * @param PagSeguroShipping $shipping
+     * 
+     * @param PagSeguroShipping $shipping            
      */
     public function setShipping(PagSeguroShipping $shipping)
     {
@@ -418,11 +442,11 @@ class PagSeguroTransaction
     }
 
     /**
+     *
      * @return String a string that represents the current object
      */
     public function toString()
     {
-
         $transaction = array();
         $transaction['code'] = $this->code;
         $transaction['email'] = $this->sender ? $this->sender->getEmail() : "null";
@@ -430,10 +454,9 @@ class PagSeguroTransaction
         $transaction['reference'] = $this->reference;
         $transaction['status'] = $this->status ? $this->status->getValue() : "null";
         $transaction['itemsCount'] = is_array($this->items) ? count($this->items) : "null";
-
+        
         $transaction = "Transaction: " . var_export($transaction, true);
-
+        
         return $transaction;
-
     }
 }

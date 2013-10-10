@@ -26,6 +26,8 @@ class PagSeguroHttpConnection
 
     private $status;
     private $response;
+    
+    const LANG_DESC = 'language-engine-description: ';
 
     public function __construct()
     {
@@ -56,15 +58,15 @@ class PagSeguroHttpConnection
 
     public function post($url, array $data, $timeout = 20, $charset = 'ISO-8859-1')
     {
-        return $this->curlConnection('POST', $url, $data, $timeout, $charset);
+        return $this->curlConnection('POST', $url, $timeout, $charset, $data);
     }
 
     public function get($url, $timeout = 20, $charset = 'ISO-8859-1')
     {
-        return $this->curlConnection('GET', $url, null, $timeout, $charset);
+        return $this->curlConnection('GET', $url, $timeout, $charset, null);
     }
 
-    private function curlConnection($method, $url, array $data = NULL, $timeout, $charset)
+    private function curlConnection($method, $url, $timeout, $charset, array $data = null)
     {
 
         if (strtoupper($method) === 'POST') {
@@ -103,6 +105,11 @@ class PagSeguroHttpConnection
         // adding CMS version
         if (!is_null(PagSeguroLibrary::getCMSVersion())) {
             array_push($options[CURLOPT_HTTPHEADER], 'cms-description: ' . PagSeguroLibrary::getCMSVersion());
+        }
+        
+        // adding PHP version
+        if (!is_null(PagSeguroLibrary::getPHPVersion())) {
+            array_push($options[CURLOPT_HTTPHEADER], self::LANG_DESC . PagSeguroLibrary::getPHPVersion());
         }
 
         $options = ($options + $methodOptions);
