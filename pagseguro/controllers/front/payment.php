@@ -1,8 +1,30 @@
 <?php
 
 /*
- * 2007-2013 PrestaShop NOTICE OF LICENSE This source file is subject to the Academic Free License (AFL 3.0) that is bundled with this package in the file LICENSE.txt. It is also available through the world-wide-web at this URL: http://opensource.org/licenses/afl-3.0.php If you did not receive a copy of the license and are unable to obtain it through the world-wide-web, please send an email to license@prestashop.com so we can send you a copy immediately. DISCLAIMER Do not edit or add to this file if you wish to upgrade PrestaShop to newer versions in the future. If you wish to customize PrestaShop for your needs please refer to http://www.prestashop.com for more information. @author PrestaShop SA <contact@prestashop.com> @copyright 2007-2013 PrestaShop SA @license http://opensource.org/licenses/afl-3.0.php Academic Free License (AFL 3.0) International Registered Trademark & Property of PrestaShop SA
+ * 2007-2013 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author PrestaShop SA <contact@prestashop.com>
+ *  @copyright  2007-2013 PrestaShop SA
+ *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  International Registered Trademark & Property of PrestaShop SA
  */
+
 include_once (dirname(__FILE__) . '/../../../../config/config.inc.php');
 include_once (dirname(__FILE__) . '/../../../../init.php');
 include_once (dirname(__FILE__) . '/../../pagseguro.php');
@@ -31,25 +53,30 @@ function setVariablesPaymentExecutionView($context)
     
     if ($context->cart->id_currency != $id_currency && ! is_null($id_currency)) {
         
-        $smarty->assign(array(
-            'total_real' => convertPriceFull($context->cart->getOrderTotal(true, Cart::BOTH), new Currency($context->cart->id_currency), new Currency($id_currency)),
-            'currency_real' => $id_currency
-        ));
+        $smarty->assign(
+            array(
+                'total_real' => convertPriceFull($context->cart->getOrderTotal(true, Cart::BOTH), 
+                    new Currency($context->cart->id_currency), new Currency($id_currency)),
+                'currency_real' => $id_currency
+            ));
     }
     
-    $smarty->assign(array(
-        'version' => _PS_VERSION_,
-        'image' => __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png',
-        'nbProducts' => $context->cart->nbProducts(),
-        'current_currency_id' => $context->currency->id,
-        'current_currency_name' => $context->currency->name,
-        'cust_currency' => $context->cart->id_currency,
-        'total' => $context->cart->getOrderTotal(true, Cart::BOTH),
-        'isocode' => $context->language->iso_code,
-        'this_path' => __PS_BASE_URI__,
-        'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/',
-        'action_url' => _PS_VERSION_ < '1.5' ? _PS_BASE_URL_ . __PS_BASE_URI__ . 'modules/pagseguro/controllers/front/validation.php"' : _PS_BASE_URL_ . __PS_BASE_URI__ . 'index.php?fc=module&module=pagseguro&controller=validation'
-    ));
+    $smarty->assign(
+        array(
+            'version' => _PS_VERSION_,
+            'image' => __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png',
+            'nbProducts' => $context->cart->nbProducts(),
+            'current_currency_id' => $context->currency->id,
+            'current_currency_name' => $context->currency->name,
+            'cust_currency' => $context->cart->id_currency,
+            'total' => $context->cart->getOrderTotal(true, Cart::BOTH),
+            'isocode' => $context->language->iso_code,
+            'this_path' => __PS_BASE_URI__,
+            'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/',
+            'action_url' => _PS_VERSION_ < '1.5' ? _PS_BASE_URL_ . __PS_BASE_URI__ .
+                 'modules/pagseguro/controllers/front/validation.php"' : _PS_BASE_URL_ . __PS_BASE_URI__ .
+                 'index.php?fc=module&module=pagseguro&controller=validation'
+        ));
     
     $pagseguro = new PagSeguro();
     
@@ -94,5 +121,3 @@ class PagSeguroPaymentModuleFrontController extends ModuleFrontController
         $this->setTemplate('payment_execution.tpl');
     }
 }
-
-?>
