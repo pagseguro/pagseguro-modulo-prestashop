@@ -25,33 +25,31 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-include_once ('../PagSeguroLibrary/PagSeguroLibrary.php');
 include_once ('pagseguro_controller.php');
-include_once ('../backward_compatibility/Context.php');
 
-class PagSeguroController_14 extends PagSeguroController
+class PagSeguroControllerVersion14 extends PagSeguroController
 {
 
     public function configPayment($params)
     {
+        $this->includeDependence();
+
         global $smarty;
         
-        if (! $this->payment_module->active) {
-            die('fail');
+        if (!$this->payment_module->active) {
             return;
         }
         
         $smarty->assign(
             array(
-                'version_module' => _PS_VERSION_,
-                'action_url' => _PS_BASE_URL_ . __PS_BASE_URI__ . 'modules/pagseguro/controllers/front/payment.php',
-                'image' => __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png',
-                'this_path' => __PS_BASE_URI__ . 'modules/pagseguro/',
-                'this_path_ssl' => Tools::getShopDomainSsl(true, true) . v . 'modules/' . $this->payment_module->name .
-                     '/'
+                'version_module' =>_PS_VERSION_,
+                'action_url' =>_PS_BASE_URL_.__PS_BASE_URI__.'modules/pagseguro/controllers/front/payment.php',
+                'image' =>__PS_BASE_URI__.'modules/pagseguro/assets/images/logops_86x49.png',
+                'this_path' =>__PS_BASE_URI__.'modules/pagseguro/',
+                'this_path_ssl' =>Tools::getShopDomainSsl(true, true).v.'modules/'.$this->payment_module->name.'/'
             ));
         
-        return $this->payment_module->display(__PS_BASE_URI__ . 'modules/pagseguro', 
+        return $this->payment_module->display(__PS_BASE_URI__.'modules/pagseguro',
             '/views/templates/hook/payment.tpl');
     }
 
@@ -59,38 +57,38 @@ class PagSeguroController_14 extends PagSeguroController
     {
         global $smarty;
         
-        if (! $this->payment_module->active) {
+        if (!$this->payment_module->active) {
             return;
         }
-        
         if (! Tools::isEmpty($params['objOrder']) && $params['objOrder']->module === $this->payment_modulename) {
             
             $smarty->assign(
                 array(
-                    'total_to_pay' => Tools::displayPrice($params['objOrder']->total_paid_real, 
+                    'total_to_pay' =>Tools::displayPrice($params['objOrder']->total_paid_real, 
                         $this->context->currency->id, false),
                     'status' => 'ok',
-                    'id_order' => (int) $params['objOrder']->id
+                    'id_order' =>(int) $params['objOrder']->id
                 ));
-            
+
             if (isset($params['objOrder']->reference) && ! empty($params['objOrder']->reference)) {
                 $smarty->assign('reference', $params['objOrder']->reference);
             }
-        } else
+
+        } else {
             $smarty->assign('status', 'failed');
-        
-        return $this->payment_module->display(__PS_BASE_URI__, 
+        }
+        return $this->payment_module->display(__PS_BASE_URI__,
             'modules/pagseguro/views/templates/hook/payment_return.tpl');
     }
 
     public function doInstall()
     {
-        if (! PagSeguroLibrary::getVersion() < '2.1.8') {
-            if (! $this->validatePagSeguroRequirements())
+        if (!PagSeguroLibrary::getVersion() < '2.1.8') {
+            if (!$this->validatePagSeguroRequirements())
                 return false;
         }
         
-        if (! $this->generatePagSeguroOrderStatus()) {
+        if (!$this->generatePagSeguroOrderStatus()) {
             return false;
         }
         
@@ -109,13 +107,14 @@ class PagSeguroController_14 extends PagSeguroController
             'PS_OS_PAYPAL' => 11,
             'PS_OS_WS_PAYMENT' => 12
         );
-        
         foreach ($updateConfig as $u => $v) {
-            if (! Configuration::get($u) || (int) Configuration::get($u) < 1) {
-                if (defined('_' . $u . '_') && (int) constant('_' . $u . '_') > 0)
+            if (!Configuration::get($u) || (int) Configuration::get($u) < 1) {
+                
+                if (defined('_' . $u . '_') && (int) constant('_' . $u . '_') > 0) {
                     Configuration::updateValue($u, constant('_' . $u . '_'));
-                else
+                } else {
                     Configuration::updateValue($u, $v);
+                }
             }
         }
         
@@ -131,5 +130,11 @@ class PagSeguroController_14 extends PagSeguroController
     {
         $this->payment_module = $module;
         $this->payment_module->context = Context::getContext();
+    }
+
+    private function includeDependence()
+    {
+        include_once ('../PagSeguroLibrary/PagSeguroLibrary.php');
+        include_once ('../backward_compatibility/Context.php');
     }
 }

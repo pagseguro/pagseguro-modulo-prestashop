@@ -25,10 +25,10 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-class addressConfig
+class AddressConfig
 {
 
-    static function dados($v)
+    public static function dados($v)
     {
         $dados = array();
         $dados['complementos'] = array(
@@ -75,18 +75,20 @@ class addressConfig
             "n"
         );
         $dados['semnumeros'] = array();
-        foreach ($dados['numeros'] as $n)
-            foreach ($dados['sems'] as $s)
+        foreach ($dados['numeros'] as $n) {
+            foreach ($dados['sems'] as $s) {
                 $dados['semnumeros'][] = "$s$n";
-        return $dados[$v];
+            }
+        }
+            return $dados[$v];
     }
 
-    static function endtrim($e)
+    public static function endtrim($e)
     {
         return preg_replace('/^\W+|\W+$/', '', $e);
     }
 
-    static function trataEndereco($end)
+    public static function trataEndereco($end)
     {
         $endereco = $end;
         $numero = 's/nº';
@@ -113,7 +115,7 @@ class addressConfig
         );
     }
 
-    static function ordenaDados($texto)
+    public static function ordenaDados($texto)
     {
         $quebrado = preg_split('/[-,\\n]/', $texto);
         

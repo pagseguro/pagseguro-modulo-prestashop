@@ -8,24 +8,19 @@ class PagSeguroSenderDocument
 
     /**
      * The type of document
-     * 
      * @var string
      */
     private $type;
 
     /**
      * The value of document
-     * 
      * @var string
      */
     private $value;
 
     /**
-     *
-     * @param
-     *            $type
-     * @param
-     *            $value
+     * @param $type
+     * @param $value
      */
     public function __construct($type, $value)
     {
@@ -37,7 +32,6 @@ class PagSeguroSenderDocument
 
     /**
      * Get document type
-     * 
      * @return string
      */
     public function getType()
@@ -47,8 +41,7 @@ class PagSeguroSenderDocument
 
     /**
      * Set document type
-     * 
-     * @param string $type            
+     * @param string $type
      */
     public function setType($type)
     {
@@ -57,7 +50,6 @@ class PagSeguroSenderDocument
 
     /**
      * Get document value
-     * 
      * @return string
      */
     public function getValue()
@@ -67,8 +59,7 @@ class PagSeguroSenderDocument
 
     /**
      * Set document value
-     * 
-     * @param string $value            
+     * @param string $value
      */
     public function setValue($value)
     {
@@ -77,7 +68,6 @@ class PagSeguroSenderDocument
 
     /**
      * Gets toString class
-     * 
      * @return string
      */
     public function toString()
@@ -85,7 +75,7 @@ class PagSeguroSenderDocument
         $document = array();
         $document['type'] = $this->type;
         $document['value'] = $this->value;
-        
+
         return "PagSeguroSenderDocument: " . var_export($document, true);
     }
 }

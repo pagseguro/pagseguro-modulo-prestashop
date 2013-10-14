@@ -1,7 +1,21 @@
 <?php
 
 /*
- * *********************************************************************** Copyright [2011] [PagSeguro Internet Ltda.] Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. ***********************************************************************
+ ************************************************************************
+ Copyright [2011] [PagSeguro Internet Ltda.]
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ ************************************************************************
  */
 
 /**
@@ -11,75 +25,52 @@ class PagSeguroConnectionData
 {
 
     /**
-     *
      * @var
-     *
      */
     private $serviceName;
-
     /**
-     *
      * @var PagSeguroCredentials
      */
     private $credentials;
-
     /**
-     *
      * @var
-     *
      */
     private $resources;
-
     /**
-     *
      * @var
-     *
      */
     private $environment;
-
     /**
-     *
      * @var
-     *
      */
     private $webserviceUrl;
-
     /**
-     *
      * @var
-     *
      */
     private $servicePath;
-
     /**
-     *
      * @var
-     *
      */
     private $serviceTimeout;
-
     /**
-     *
      * @var
-     *
      */
     private $charset;
 
     /**
-     *
-     * @param PagSeguroCredentials $credentials            
-     * @param
-     *            $serviceName
+     * @param PagSeguroCredentials $credentials
+     * @param $serviceName
      */
     public function __construct(PagSeguroCredentials $credentials, $serviceName)
     {
+
         $this->credentials = $credentials;
         $this->serviceName = $serviceName;
-        
+
         $this->setEnvironment(PagSeguroConfig::getEnvironment());
         $this->setWebserviceUrl(PagSeguroResources::getWebserviceUrl($this->getEnvironment()));
         $this->setCharset(PagSeguroConfig::getApplicationCharset());
-        
+
         $this->resources = PagSeguroResources::getData($this->serviceName);
         if (isset($this->resources['servicePath'])) {
             $this->setServicePath($this->resources['servicePath']);
@@ -87,10 +78,10 @@ class PagSeguroConnectionData
         if (isset($this->resources['serviceTimeout'])) {
             $this->setServiceTimeout($this->resources['serviceTimeout']);
         }
+
     }
 
     /**
-     *
      * @return PagSeguroCredentials
      */
     public function getCredentials()
@@ -99,8 +90,7 @@ class PagSeguroConnectionData
     }
 
     /**
-     *
-     * @param PagSeguroCredentials $credentials            
+     * @param PagSeguroCredentials $credentials
      */
     public function setCredentials(PagSeguroCredentials $credentials)
     {
@@ -108,7 +98,6 @@ class PagSeguroConnectionData
     }
 
     /**
-     *
      * @return string
      */
     public function getCredentialsUrlQuery()
@@ -117,7 +106,6 @@ class PagSeguroConnectionData
     }
 
     /**
-     *
      * @return mixed
      */
     public function getEnvironment()
@@ -126,9 +114,7 @@ class PagSeguroConnectionData
     }
 
     /**
-     *
-     * @param
-     *            $environment
+     * @param $environment
      */
     public function setEnvironment($environment)
     {
@@ -136,7 +122,6 @@ class PagSeguroConnectionData
     }
 
     /**
-     *
      * @return mixed
      */
     public function getWebserviceUrl()
@@ -145,9 +130,7 @@ class PagSeguroConnectionData
     }
 
     /**
-     *
-     * @param
-     *            $webserviceUrl
+     * @param $webserviceUrl
      */
     public function setWebserviceUrl($webserviceUrl)
     {
@@ -155,7 +138,6 @@ class PagSeguroConnectionData
     }
 
     /**
-     *
      * @return mixed
      */
     public function getServicePath()
@@ -164,9 +146,7 @@ class PagSeguroConnectionData
     }
 
     /**
-     *
-     * @param
-     *            $servicePath
+     * @param $servicePath
      */
     public function setServicePath($servicePath)
     {
@@ -174,7 +154,6 @@ class PagSeguroConnectionData
     }
 
     /**
-     *
      * @return mixed
      */
     public function getServiceTimeout()
@@ -183,9 +162,7 @@ class PagSeguroConnectionData
     }
 
     /**
-     *
-     * @param
-     *            $serviceTimeout
+     * @param $serviceTimeout
      */
     public function setServiceTimeout($serviceTimeout)
     {
@@ -193,7 +170,6 @@ class PagSeguroConnectionData
     }
 
     /**
-     *
      * @return string
      */
     public function getServiceUrl()
@@ -202,9 +178,7 @@ class PagSeguroConnectionData
     }
 
     /**
-     *
-     * @param
-     *            $resource
+     * @param $resource
      * @return mixed
      */
     public function getResource($resource)
@@ -213,7 +187,6 @@ class PagSeguroConnectionData
     }
 
     /**
-     *
      * @return mixed
      */
     public function getCharset()
@@ -222,9 +195,7 @@ class PagSeguroConnectionData
     }
 
     /**
-     *
-     * @param
-     *            $charset
+     * @param $charset
      */
     public function setCharset($charset)
     {

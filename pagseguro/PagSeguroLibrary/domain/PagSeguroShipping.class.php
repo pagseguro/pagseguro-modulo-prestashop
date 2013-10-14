@@ -1,7 +1,21 @@
 <?php
 
 /*
- * *********************************************************************** Copyright [2011] [PagSeguro Internet Ltda.] Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. ***********************************************************************
+ ************************************************************************
+ Copyright [2011] [PagSeguro Internet Ltda.]
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ ************************************************************************
  */
 
 /**
@@ -12,15 +26,12 @@ class PagSeguroShipping
 
     /**
      * Shipping address
-     * 
      * @see PagSeguroAddress
      */
     private $address;
 
     /**
-     * Shipping type.
-     * See the PagSeguroShippingType class for a list of known shipping types.
-     * 
+     * Shipping type. See the PagSeguroShippingType class for a list of known shipping types.
      * @see PagSeguroShippingType
      */
     private $type;
@@ -32,8 +43,7 @@ class PagSeguroShipping
 
     /**
      * Initializes a new instance of the PagSeguroShipping class
-     * 
-     * @param array $data            
+     * @param array $data
      */
     public function __construct(array $data = null)
     {
@@ -52,9 +62,8 @@ class PagSeguroShipping
 
     /**
      * Sets the shipping address
-     * 
      * @see PagSeguroAddress
-     * @param PagSeguroAddress $address            
+     * @param PagSeguroAddress $address
      */
     public function setAddress(PagSeguroAddress $address)
     {
@@ -62,7 +71,6 @@ class PagSeguroShipping
     }
 
     /**
-     *
      * @return PagSeguroAddress the shipping Address
      * @see PagSeguroAddress
      */
@@ -73,8 +81,7 @@ class PagSeguroShipping
 
     /**
      * Sets the shipping type
-     * 
-     * @param PagSeguroShippingType $type            
+     * @param PagSeguroShippingType $type
      * @see PagSeguroShippingType
      */
     public function setType(PagSeguroShippingType $type)
@@ -83,7 +90,6 @@ class PagSeguroShipping
     }
 
     /**
-     *
      * @return PagSeguroShippingType the shipping type
      * @see PagSeguroShippingType
      */
@@ -93,8 +99,7 @@ class PagSeguroShipping
     }
 
     /**
-     *
-     * @param $cost float            
+     * @param $cost float
      */
     public function setCost($cost)
     {
@@ -102,7 +107,6 @@ class PagSeguroShipping
     }
 
     /**
-     *
      * @return float the shipping cost
      */
     public function getCost()

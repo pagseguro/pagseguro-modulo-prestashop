@@ -73,42 +73,50 @@ class ModuleNotificationPagSeguro
      */
     public function postProcess($_POST)
     {
-        $this->_createNotification($_POST);
-        $this->_createCredential();
-        $this->_inicializeObjects();
+        $this->createNotification($_POST);
+        $this->createCredential();
+        $this->inicializeObjects();
         
-        if ($this->obj_notification_type->getValue() == $this->notification_type)
-            $this->_createTransaction();
+        if ($this->obj_notification_type->getValue() == $this->notification_type) {
+            $this->createTransaction();
+        }
         
-        if ($this->obj_transaction)
-            $this->_updateCms();
+        if ($this->obj_transaction) {
+            $this->updateCms();
+        }
     }
 
     /**
      *
      * @param array $post            
      */
-    private function _createNotification(Array $post)
+    private function createNotification(Array $post)
     {
-        $this->notification_type = (isset($post['notificationType']) && trim($post['notificationType']) !== '' ? trim(
-            $post['notificationType']) : null);
-        $this->notification_code = (isset($post['notificationCode']) && trim($post['notificationCode']) !== '' ? trim(
-            $post['notificationCode']) : null);
+        $this->notification_type = (
+            isset($post['notificationType']) && 
+            trim($post['notificationType']) !== '' ? 
+            trim($post['notificationType']) : null);
+        
+        $this->notification_code = (
+            isset($post['notificationCode']) && 
+            trim($post['notificationCode']) !== '' ? 
+            trim($post['notificationCode']) : null);
     }
 
     /**
      * Create Credential
      */
-    private function _createCredential()
+    private function createCredential()
     {
-        $this->obj_credential = new PagSeguroAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), 
+        $this->obj_credential = new PagSeguroAccountCredentials(
+            Configuration::get('PAGSEGURO_EMAIL'), 
             Configuration::get('PAGSEGURO_TOKEN'));
     }
 
     /**
      * Inicialize Objects
      */
-    private function _inicializeObjects()
+    private function inicializeObjects()
     {
         $this->_createNotificationType();
         $this->_createArrayStatusCms();
@@ -117,7 +125,7 @@ class ModuleNotificationPagSeguro
     /**
      * Create Notification Type
      */
-    private function _createNotificationType()
+    private function createNotificationType()
     {
         $this->obj_notification_type = new PagSeguroNotificationType();
         $this->obj_notification_type->setByType('TRANSACTION');
@@ -126,7 +134,7 @@ class ModuleNotificationPagSeguro
     /**
      * Create Array Status Cms
      */
-    private function _createArrayStatusCms()
+    private function createArrayStatusCms()
     {
         $this->array_st_cms = array(
             0 => 'Iniciado',
@@ -136,34 +144,38 @@ class ModuleNotificationPagSeguro
             4 => 'Dispon�vel',
             5 => 'Em disputa',
             6 => 'Devolvida',
-            7 => 'Cancelada'
-        );
+            7 => 'Cancelada');
     }
 
     /**
      * Create Transaction
      */
-    private function _createTransaction()
+    private function createTransaction()
     {
-        $this->obj_transaction = PagSeguroNotificationService::checkTransaction($this->obj_credential, 
+        $this->obj_transaction = PagSeguroNotificationService::checkTransaction(
+            $this->obj_credential, 
             $this->notification_code);
-        $this->reference = ($this->_isNotNull($this->obj_transaction)) ? (int) $this->obj_transaction->getReference() : null;
+
+        $this->reference = ($this->_isNotNull($this->obj_transaction)) ? 
+            (int) $this->obj_transaction->getReference() : 
+            null;
     }
 
     /**
      * Update Cms
      */
-    private function _updateCms()
+    private function updateCms()
     {
-        $id_status = ($this->_isNotNull($this->obj_transaction->getStatus()
-            ->getValue())) ? (int) $this->obj_transaction->getStatus()->getValue() : null;
+        $id_status = ($this->_isNotNull($this->obj_transaction->getStatus()->getValue())) ? 
+            (int) $this->obj_transaction->getStatus()->getValue() : 
+            null;
         
-        if ($this->_isNotNull($id_status))
+        if ($this->_isNotNull($id_status)){
             $id_st_transaction = (int) $this->_returnIdOrderByStatusPagSeguro($this->array_st_cms[$id_status]);
-        
-        if ($this->_isNotNull($id_st_transaction))
-            $this->_createAddOrderHistory($id_st_transaction);
-        
+        }        
+        if ($this->_isNotNull($id_st_transaction)){
+            $this->createAddOrderHistory($id_st_transaction);
+        }
         $this->saveTransactionId($this->obj_transaction->getCode(), $this->obj_transaction->getReference());
     }
 
@@ -173,17 +185,15 @@ class ModuleNotificationPagSeguro
      * @param type $value            
      * @return type
      */
-    private function _returnIdOrderByStatusPagSeguro($value)
+    private function returnIdOrderByStatusPagSeguro($value)
     {
         $isDeleted = _PS_VERSION_ >= '1.5' ? ' WHERE deleted = 0' : '';
         $id_order_state = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-            '
-		SELECT distinct os.`id_order_state`
-		FROM `' . _DB_PREFIX_ .
-                 'order_state` os
-		INNER JOIN `' .
-                 _DB_PREFIX_ . 'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`name` = \'' .
-                 pSQL($value) . '\')' . $isDeleted));
+            'SELECT distinct os.`id_order_state`
+            FROM `' . _DB_PREFIX_ .'order_state` os
+            INNER JOIN `' ._DB_PREFIX_ . 
+            'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`name` = \''
+            . pSQL($value) . '\')' . $isDeleted));
         
         return $id_order_state[0]['id_order_state'];
     }
@@ -193,7 +203,7 @@ class ModuleNotificationPagSeguro
      *
      * @param type $id_st_transaction            
      */
-    private function _createAddOrderHistory($id_st_transaction)
+    private function createAddOrderHistory($id_st_transaction)
     {
         if ($this->_isNotNull($this->reference)) {
             $this->obj_order_history = new OrderHistory();
@@ -210,7 +220,7 @@ class ModuleNotificationPagSeguro
      *
      * @param type $id_st_transaction            
      */
-    private function _updateOrders($id_st_transaction)
+    private function updateOrders($id_st_transaction)
     {
         $this->obj_orders = new Order((int) $this->reference);
         $this->obj_orders->current_state = (int) $id_st_transaction;
@@ -220,7 +230,7 @@ class ModuleNotificationPagSeguro
     /**
      * Add Order History
      */
-    private function _addOrderHistory()
+    private function addOrderHistory()
     {
         try {
             $this->obj_order_history->add();
@@ -235,7 +245,7 @@ class ModuleNotificationPagSeguro
      * @param type $value            
      * @return type
      */
-    private function _isNotNull($value)
+    private function isNotNull($value)
     {
         return isset($value);
     }

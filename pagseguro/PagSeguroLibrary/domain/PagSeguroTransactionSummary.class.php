@@ -1,7 +1,21 @@
 <?php
 
 /*
- * *********************************************************************** Copyright [2011] [PagSeguro Internet Ltda.] Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. ***********************************************************************
+ ************************************************************************
+ Copyright [2011] [PagSeguro Internet Ltda.]
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ ************************************************************************
  */
 
 /**
@@ -27,9 +41,9 @@ class PagSeguroTransactionSummary
     private $code;
 
     /**
-     * Reference code
-     * You can use the reference code to store an identifier so you can
-     * associate the PagSeguro transaction to a transaction in your system.
+     *  Reference code
+     *  You can use the reference code to store an identifier so you can
+     *  associate the PagSeguro transaction to a transaction in your system.
      */
     private $reference;
 
@@ -40,14 +54,12 @@ class PagSeguroTransactionSummary
 
     /**
      * Transaction type
-     * 
      * @see PagSeguroTransactionType
      */
     private $type;
 
     /**
      * Transaction status
-     * 
      * @see PagSeguroTransactionStatus
      */
     private $status;
@@ -74,13 +86,11 @@ class PagSeguroTransactionSummary
 
     /**
      * Payment method
-     * 
      * @see PagSeguroPaymentMethod
      */
     private $paymentMethod;
 
     /**
-     *
      * @return the transaction date
      */
     public function getDate()
@@ -90,8 +100,7 @@ class PagSeguroTransactionSummary
 
     /**
      * Sets the transaction date
-     * 
-     * @param String $date            
+     * @param String $date
      */
     public function setDate($date)
     {
@@ -99,7 +108,6 @@ class PagSeguroTransactionSummary
     }
 
     /**
-     *
      * @return the transaction code
      */
     public function getCode()
@@ -109,8 +117,7 @@ class PagSeguroTransactionSummary
 
     /**
      * Sets transaction code
-     * 
-     * @param String $code            
+     * @param String $code
      */
     public function setCode($code)
     {
@@ -119,7 +126,7 @@ class PagSeguroTransactionSummary
 
     /**
      * You can use the reference code to store an identifier so you can
-     * associate the PagSeguro transaction to a transaction in your system.
+     *  associate the PagSeguro transaction to a transaction in your system.
      *
      * @return the reference code
      */
@@ -131,8 +138,7 @@ class PagSeguroTransactionSummary
     /**
      * Sets the reference code
      *
-     * @param
-     *            reference
+     * @param reference
      */
     public function setReference($reference)
     {
@@ -140,7 +146,6 @@ class PagSeguroTransactionSummary
     }
 
     /**
-     *
      * @return the transaction gross amount
      */
     public function getGrossAmount()
@@ -150,8 +155,7 @@ class PagSeguroTransactionSummary
 
     /**
      * Sets the gorss amount
-     * 
-     * @param float $grossAmount            
+     * @param float $grossAmount
      */
     public function setGrossAmount($grossAmount)
     {
@@ -159,7 +163,6 @@ class PagSeguroTransactionSummary
     }
 
     /**
-     *
      * @return the transaction type
      * @see PagSeguroTransactionType
      */
@@ -170,8 +173,7 @@ class PagSeguroTransactionSummary
 
     /**
      * Sets the transaction sype
-     * 
-     * @param PagSeguroTransactionType $type            
+     * @param PagSeguroTransactionType $type
      */
     public function setType(PagSeguroTransactionType $type)
     {
@@ -180,7 +182,6 @@ class PagSeguroTransactionSummary
 
     /**
      * Date the last notification about this transaction was sent
-     * 
      * @return the last event date
      */
     public function getLastEventDate()
@@ -190,8 +191,7 @@ class PagSeguroTransactionSummary
 
     /**
      * Sets the last event date
-     * 
-     * @param String $lastEventDate            
+     * @param String $lastEventDate
      */
     public function setLastEventDate($lastEventDate)
     {
@@ -199,7 +199,6 @@ class PagSeguroTransactionSummary
     }
 
     /**
-     *
      * @return the transaction status
      * @see PagSeguroTransactionStatus
      */
@@ -210,8 +209,7 @@ class PagSeguroTransactionSummary
 
     /**
      * Sets the transaction status
-     * 
-     * @param PagSeguroTransactionStatus $status            
+     * @param PagSeguroTransactionStatus $status
      */
     public function setStatus(PagSeguroTransactionStatus $status)
     {
@@ -219,7 +217,6 @@ class PagSeguroTransactionSummary
     }
 
     /**
-     *
      * @return the net amount
      */
     public function getNetAmount()
@@ -229,8 +226,7 @@ class PagSeguroTransactionSummary
 
     /**
      * Sets the net amount
-     * 
-     * @param float $netAmount            
+     * @param float $netAmount
      */
     public function setNetAmount($netAmount)
     {
@@ -238,7 +234,6 @@ class PagSeguroTransactionSummary
     }
 
     /**
-     *
      * @return the discount amount
      */
     public function getDiscountAmount()
@@ -248,8 +243,7 @@ class PagSeguroTransactionSummary
 
     /**
      * Sets the discount amount
-     * 
-     * @param float $discountAmount            
+     * @param float $discountAmount
      */
     public function setDiscountAmount($discountAmount)
     {
@@ -257,7 +251,6 @@ class PagSeguroTransactionSummary
     }
 
     /**
-     *
      * @return the fee amount
      */
     public function getFeeAmount()
@@ -267,8 +260,7 @@ class PagSeguroTransactionSummary
 
     /**
      * Sets the fee amount
-     * 
-     * @param float $feeAmount            
+     * @param float $feeAmount
      */
     public function setFeeAmount($feeAmount)
     {
@@ -276,7 +268,6 @@ class PagSeguroTransactionSummary
     }
 
     /**
-     *
      * @return the extra amount
      */
     public function getExtraAmount()
@@ -286,8 +277,7 @@ class PagSeguroTransactionSummary
 
     /**
      * Sets the extra amount
-     * 
-     * @param float $extraAmount            
+     * @param float $extraAmount
      */
     public function setExtraAmount($extraAmount)
     {
@@ -296,8 +286,7 @@ class PagSeguroTransactionSummary
 
     /**
      * Sets the payment method
-     * 
-     * @param PagSeguroPaymentMethod $paymentMethod            
+     * @param PagSeguroPaymentMethod $paymentMethod
      */
     public function setPaymentMethod(PagSeguroPaymentMethod $paymentMethod)
     {
@@ -305,7 +294,6 @@ class PagSeguroTransactionSummary
     }
 
     /**
-     *
      * @return the payment method
      * @see PagSeguroPaymentMethod
      */

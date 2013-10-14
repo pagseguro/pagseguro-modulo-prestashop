@@ -1,7 +1,21 @@
 <?php
 
 /*
- * *********************************************************************** Copyright [2011] [PagSeguro Internet Ltda.] Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. ***********************************************************************
+ * ***********************************************************************
+ Copyright [2011] [PagSeguro Internet Ltda.]
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ * ***********************************************************************
  */
 
 /*
@@ -13,7 +27,6 @@ class PagSeguroConfig
 {
 
     private static $config;
-
     private static $data;
 
     const VARNAME = 'PagSeguroConfig';
@@ -21,10 +34,11 @@ class PagSeguroConfig
     private function __construct()
     {
         define('ALLOW_PAGSEGURO_CONFIG', true);
-        
-        require_once PagSeguroLibrary::getPath() . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "PagSeguroConfig.php";
+
+        require_once PagSeguroLibrary::getPath() .
+            DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "PagSeguroConfig.php";
         $varName = self::VARNAME;
-        
+
         if (isset($$varName)) {
             self::$data = $$varName;
             unset($$varName);
@@ -38,7 +52,7 @@ class PagSeguroConfig
         if (self::$config == null) {
             self::$config = new PagSeguroConfig();
         }
-        
+
         return self::$config;
     }
 
@@ -70,8 +84,14 @@ class PagSeguroConfig
 
     public static function getAccountCredentials()
     {
-        if (isset(self::$data['credentials']) && isset(self::$data['credentials']['email']) && isset(self::$data['credentials']['token'])) {
-            return new PagSeguroAccountCredentials(self::$data['credentials']['email'], self::$data['credentials']['token']);
+        if (isset(self::$data['credentials']) &&
+            isset(self::$data['credentials']['email']) &&
+            isset(self::$data['credentials']['token'])
+        ) {
+            return new PagSeguroAccountCredentials(
+                self::$data['credentials']['email'],
+                self::$data['credentials']['token']
+            );
         } else {
             throw new Exception("Credentials not set.");
         }
@@ -127,36 +147,36 @@ class PagSeguroConfig
 
     /**
      * Validate if the requirements are enable for use correct of the PagSeguro
-     * 
      * @return array
      */
     public static function validateRequirements()
     {
+
         $requirements = array(
             'version' => '',
             'spl' => '',
             'curl' => '',
             'dom' => ''
         );
-        
+
         $version = str_replace('.', '', phpversion());
-        
+
         if ($version < 516) {
             $requirements['version'] = 'PagSeguroLibrary: PHP version 5.1.6 or greater is required.';
         }
-        
-        if (! function_exists('spl_autoload_register')) {
+
+        if (!function_exists('spl_autoload_register')) {
             $requirements['spl'] = 'PagSeguroLibrary: Standard PHP Library (SPL) is required.';
         }
-        
-        if (! function_exists('curl_init')) {
+
+        if (!function_exists('curl_init')) {
             $requirements['curl'] = 'PagSeguroLibrary: cURL library is required.';
         }
-        
-        if (! class_exists('DOMDocument')) {
+
+        if (!class_exists('DOMDocument')) {
             $requirements['dom'] = 'PagSeguroLibrary: DOM XML extension is required.';
         }
-        
+
         return $requirements;
     }
 }

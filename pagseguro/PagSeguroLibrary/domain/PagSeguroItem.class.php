@@ -1,7 +1,21 @@
 <?php
 
 /*
- * *********************************************************************** Copyright [2011] [PagSeguro Internet Ltda.] Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. ***********************************************************************
+ ************************************************************************
+ Copyright [2011] [PagSeguro Internet Ltda.]
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ ************************************************************************
  */
 
 /**
@@ -42,10 +56,8 @@ class PagSeguroItem
 
     /**
      *
-     *
      * Initializes a new instance of the Item class
-     * 
-     * @param array $data            
+     * @param array $data
      */
     public function __construct(array $data = null)
     {
@@ -72,7 +84,6 @@ class PagSeguroItem
     }
 
     /**
-     *
      * @return integer the product identifier
      */
     public function getId()
@@ -82,8 +93,7 @@ class PagSeguroItem
 
     /**
      * Sets the product identifier
-     * 
-     * @param String $id            
+     * @param String $id
      */
     public function setId($id)
     {
@@ -91,7 +101,6 @@ class PagSeguroItem
     }
 
     /**
-     *
      * @return String the product description
      */
     public function getDescription()
@@ -101,8 +110,7 @@ class PagSeguroItem
 
     /**
      * Sets the product description
-     * 
-     * @param String $description            
+     * @param String $description
      */
     public function setDescription($description)
     {
@@ -110,7 +118,6 @@ class PagSeguroItem
     }
 
     /**
-     *
      * @return integer the quantity
      */
     public function getQuantity()
@@ -120,8 +127,7 @@ class PagSeguroItem
 
     /**
      * Sets the quantity
-     * 
-     * @param String $quantity            
+     * @param String $quantity
      */
     public function setQuantity($quantity)
     {
@@ -129,7 +135,6 @@ class PagSeguroItem
     }
 
     /**
-     *
      * @return the unit amount for this item
      */
     public function getAmount()
@@ -139,8 +144,7 @@ class PagSeguroItem
 
     /**
      * sets the unit amount fot this item
-     * 
-     * @param String $amount            
+     * @param String $amount
      */
     public function setAmount($amount)
     {
@@ -148,7 +152,6 @@ class PagSeguroItem
     }
 
     /**
-     *
      * @return float the weight
      */
     public function getWeight()
@@ -158,8 +161,7 @@ class PagSeguroItem
 
     /**
      * Sets the single unit weight
-     * 
-     * @param String $weight            
+     * @param String $weight
      */
     public function setWeight($weight)
     {
@@ -167,7 +169,6 @@ class PagSeguroItem
     }
 
     /**
-     *
      * @return float the unit shipping cost for this item
      */
     public function getShippingCost()
@@ -177,8 +178,7 @@ class PagSeguroItem
 
     /**
      * Sets the unit shipping cost for this item
-     * 
-     * @param String $shippingCost            
+     * @param String $shippingCost
      */
     public function setShippingCost($shippingCost)
     {

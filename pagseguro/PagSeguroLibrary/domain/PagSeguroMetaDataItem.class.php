@@ -1,7 +1,21 @@
 <?php
 
 /*
- * *********************************************************************** Copyright [2011] [PagSeguro Internet Ltda.] Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. ***********************************************************************
+ * ***********************************************************************
+ Copyright [2011] [PagSeguro Internet Ltda.]
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ * ***********************************************************************
  */
 
 /**
@@ -26,27 +40,26 @@ class PagSeguroMetaDataItem
 
     /**
      * Used for grouping values of metadata items
-     * 
      * @var mixed
      */
     private $group;
 
     public function __construct($key = null, $value = null, $group = null)
     {
-        if (isset($key) && ! PagSeguroHelper::isEmpty($key)) {
+
+        if (isset($key) && !PagSeguroHelper::isEmpty($key)) {
             $this->setKey($key);
         }
-        if (isset($value) && ! PagSeguroHelper::isEmpty($value)) {
+        if (isset($value) && !PagSeguroHelper::isEmpty($value)) {
             $this->setValue($value);
         }
-        if (isset($group) && ! PagSeguroHelper::isEmpty($group)) {
+        if (isset($group) && !PagSeguroHelper::isEmpty($group)) {
             $this->setGroup($group);
         }
     }
 
     /**
      * Gets the metadata item key
-     * 
      * @return string
      */
     public function getKey()
@@ -57,7 +70,7 @@ class PagSeguroMetaDataItem
     /**
      * Sets the metadata item key
      *
-     * @param string $key            
+     * @param string $key
      */
     public function setKey($key)
     {
@@ -66,7 +79,6 @@ class PagSeguroMetaDataItem
 
     /**
      * Gets metadata item value
-     * 
      * @return string
      */
     public function getValue()
@@ -77,7 +89,7 @@ class PagSeguroMetaDataItem
     /**
      * Sets metadata item value
      *
-     * @param string $value            
+     * @param string $value
      */
     public function setValue($value)
     {
@@ -97,7 +109,7 @@ class PagSeguroMetaDataItem
     /**
      * Sets metadata item group
      *
-     * @param int $group            
+     * @param int $group
      */
     public function setGroup($group)
     {
@@ -106,14 +118,14 @@ class PagSeguroMetaDataItem
 
     /**
      * Normalize metadata item value
-     * 
-     * @param string $parameterValue            
+     * @param string $parameterValue
      * @return string
      */
     private function normalizeParameter($parameterValue)
     {
+
         $parameterValue = PagSeguroHelper::formatString($parameterValue, 100, '');
-        
+
         switch ($this->getKey()) {
             case PagSeguroMetaDataItemKeys::getItemKeyByDescription('CPF do passageiro'):
                 $parameterValue = PagSeguroHelper::getOnlyNumbers($parameterValue);
