@@ -25,7 +25,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-class addressConfig
+class AddressConfig
 {
 
     public static function dados($v)
@@ -115,7 +115,7 @@ class addressConfig
         );
     }
 
-    static function ordenaDados($texto)
+    public static function ordenaDados($texto)
     {
         $quebrado = preg_split('/[-,\\n]/', $texto);
         

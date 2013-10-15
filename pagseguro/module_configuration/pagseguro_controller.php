@@ -73,7 +73,7 @@ abstract class PagSeguroController
             "Paga","Disponível","Em disputa","Devolvida","Cancelada")'));
     }
 
-    protected function _checkActiveSlide()
+    protected function checkActiveSlide()
     {
         return Tools::getValue('activeslide') ? Tools::getValue('activeslide') : 1;
     }
@@ -111,7 +111,7 @@ abstract class PagSeguroController
             
             foreach (Language::getLanguages() as $language) {
                 
-                $continue = $this->_checkIfOrderStatusExists($language['id_lang'], $value, $list_states);
+                $continue = $this->checkIfOrderStatusExists($language['id_lang'], $value, $list_states);
                 
                 if ($continue) {
                     $order_state->name[$language['id_lang']] = $value;
@@ -127,7 +127,7 @@ abstract class PagSeguroController
             }
         }
         
-        Configuration::updateValue('PS_OS_PAGSEGURO', $this->_returnIdOrderByStatusPagSeguro($name_state));
+        Configuration::updateValue('PS_OS_PAGSEGURO', $this->returnIdOrderByStatusPagSeguro($name_state));
         
         return $orders_added;
     }
@@ -138,7 +138,7 @@ abstract class PagSeguroController
      * @param String $status            
      * @return boolean
      */
-    private function _checkIfOrderStatusExists($id_lang, $status_name, $list_states)
+    private function checkIfOrderStatusExists($id_lang, $status_name, $list_states)
     {
         if (Tools::isEmpty($list_states)) {
             return true;
@@ -165,7 +165,7 @@ abstract class PagSeguroController
         return $this->order_status[$status]['br'];
     }
 
-    private function _returnIdOrderByStatusPagSeguro($value)
+    private function returnIdOrderByStatusPagSeguro($value)
     {
         $id_order_state = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
             'SELECT distinct os.`id_order_state`
@@ -224,7 +224,7 @@ abstract class PagSeguroController
         $smarty->assign('active_log', $this->_active_log);
         $smarty->assign('log_selected', Configuration::get('PAGSEGURO_LOG_ACTIVE'));
         $smarty->assign('diretorio_log', Tools::safeOutput(Configuration::get('PAGSEGURO_LOG_FILELOCATION')));
-        $smarty->assign('checkActiveSlide', Tools::safeOutput($this->_checkActiveSlide()));
+        $smarty->assign('checkActiveSlide', Tools::safeOutput($this->checkActiveSlide()));
         
         return $this->payment_module->display(__PS_BASE_URI__ . 'modules/pagseguro', 'admin_pagseguro.tpl');
     }
@@ -237,7 +237,7 @@ abstract class PagSeguroController
     public function getNotificationUrl()
     {
         return (! PagSeguroHelper::isEmpty(Configuration::get('PAGSEGURO_NOTIFICATION_URL'))) ? Configuration::get(
-            'PAGSEGURO_NOTIFICATION_URL') : $this->_notificationURL();
+            'PAGSEGURO_NOTIFICATION_URL') : $this->notificationURL();
     }
 
     /**
@@ -245,7 +245,7 @@ abstract class PagSeguroController
      * 
      * @return type
      */
-    private function _notificationURL()
+    private function notificationURL()
     {
         $url_base = _PS_BASE_URL_ . __PS_BASE_URI__;
         return $this->validationVersion() ? 

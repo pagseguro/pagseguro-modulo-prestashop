@@ -40,7 +40,8 @@ if (version_compare(_PS_VERSION_, '1.4', '<')) {
         public $id_shop_group = 1;
 
         public function __construct()
-        {}
+        {
+        }
 
         public static function getShops()
         {
@@ -202,16 +203,19 @@ class Context
             if ($this->checkMobileContext()) {
                 switch ((int) Configuration::get('PS_MOBILE_DEVICE')) {
                     case 0: // Only for mobile device
-                        if ($this->mobile_detect->isMobile() && ! $this->mobile_detect->isTablet())
+                        if ($this->mobile_detect->isMobile() && ! $this->mobile_detect->isTablet()) {
                             $this->mobile_device = true;
+                        }
                         break;
                     case 1: // Only for touchpads
-                        if ($this->mobile_detect->isTablet() && ! $this->mobile_detect->isMobile())
+                        if ($this->mobile_detect->isTablet() && ! $this->mobile_detect->isMobile()) {
                             $this->mobile_device = true;
+                        }
                         break;
                     case 2: // For touchpad or mobile devices
-                        if ($this->mobile_detect->isMobile() || $this->mobile_detect->isTablet())
+                        if ($this->mobile_detect->isMobile() || $this->mobile_detect->isTablet()) {
                             $this->mobile_device = true;
+                        }
                         break;
                 }
             }

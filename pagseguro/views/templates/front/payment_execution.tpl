@@ -8,7 +8,7 @@
 {include file="$tpl_dir./breadcrumb.tpl"}
 
 <h2>{l s='Resumo da compra' mod='pagseguro'}</h2>
-teste 1
+
 {assign var='current_step' value='payment'}
 {include file="$tpl_dir./order-steps.tpl"}
 
@@ -19,7 +19,7 @@ teste 1
 <h3>{l s='Pagamento via PagSeguro' mod='pagseguro'}</h3>
 <form action="{$action_url}" method="post">
 	<p>
-		<img src="{$image}" alt="{l s='pagseguro' mod='pagseguro'}" width="86" height="49" style="float:left; margin: 0px 10px 5px 0px;" />
+		<img src="{$image_payment}" alt="{l s='pagseguro' mod='pagseguro'}" width="86" height="49" style="float:left; margin: 0px 10px 5px 0px;" />
 		{l s='Você escolheu efetuar o pagamento via PagSeguro' mod='pagseguro'}
 		<br/><br />
 		{l s='Breve resumo da sua compra:' mod='pagseguro'}
@@ -34,12 +34,12 @@ teste 1
     {if $current_currency_name != "Real"}
         <p>
 		{l s='Moeda atual: ' mod='pagseguro'}&nbsp;<b>{$current_currency_name}</b>
-                <input type="hidden" name="currency_payement" value="{$current_currency_id}" />
+                <input type="hidden" name="currency_payment" value="{$current_currency_id}" />
 	</p>
         {/if}
 	<p style="margin-top:20px;">
             {l s='Aceitamos a seguinte moeda para efetuar seu pagamento via PagSeguro: ' mod='pagseguro'}&nbsp;<b>Real</b>
-                <input type="hidden" name="currency_payement" />
+                <input type="hidden" name="currency_payment" />
 	</p>
         {if $current_currency_name != "Real" && $total_real > 0.00}
 	<p>

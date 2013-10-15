@@ -45,7 +45,7 @@ class PagSeguro extends PaymentModule
 
     public $context;
 
-    function __construct()
+    public function __construct()
     {
         $this->name = 'pagseguro';
         $this->tab = 'payments_gateways';
@@ -135,10 +135,10 @@ class PagSeguro extends PaymentModule
     {
         if (Tools::isSubmit('btnSubmit')) {
 
-            $this->_postValidation();
+            $this->postValidation();
 
             if (! count($this->errors)) {
-                $this->_postProcess();
+                $this->postProcess();
             } else {
                 foreach ($this->errors as $error) {
                     $this->html .= '<div class="alert error">' . $error . '</div>';
@@ -150,7 +150,7 @@ class PagSeguro extends PaymentModule
 
         /* Currency validation */
         if (! $currency) {
-            $this->html .= '<div class="alert warn">' . $this->_missedCurrencyMessage() . '</div>';
+            $this->html .= '<div class="alert warn">' . $this->missedCurrencyMessage() . '</div>';
         }
         
         $this->html .= $this->module_config->displayForm();
@@ -161,7 +161,7 @@ class PagSeguro extends PaymentModule
      * Realize post validations according with PagSeguro standards
      * case any inconsistence, an item is added to $_postErrors
      */
-    private function _postValidation()
+    private function postValidation()
     {
         if (Tools::isSubmit('btnSubmit')) {
             
@@ -174,38 +174,38 @@ class PagSeguro extends PaymentModule
             
             /* E-mail validation */
             if (! $email) {
-                $this->errors[] = $this->_errorMessage('E-MAIL');
+                $this->errors[] = $this->errorMessage('E-MAIL');
             } elseif (strlen($email) > 60) {
-                $this->errors[] = $this->_invalidFieldSizeMessage('E-MAIL');
+                $this->errors[] = $this->invalidFieldSizeMessage('E-MAIL');
             } elseif (! Validate::isEmail($email)) {
-                $this->errors[] = $this->_invalidMailMessage('E-MAIL');
+                $this->errors[] = $this->invalidMailMessage('E-MAIL');
             }
             
             /* Token validation */
             if (! $token) {
-                $this->errors[] = $this->_errorMessage('TOKEN');
+                $this->errors[] = $this->errorMessage('TOKEN');
             } elseif (strlen($token) != 32) {
-                $this->errors[] = $this->_invalidFieldSizeMessage('TOKEN');
+                $this->errors[] = $this->invalidFieldSizeMessage('TOKEN');
             }
             
             /* URL redirect validation */
             if ($pagseguro_url_redirect && ! filter_var($pagseguro_url_redirect, FILTER_VALIDATE_URL)) {
-                $this->errors[] = $this->_invalidUrl('URL DE REDIRECIONAMENTO');
+                $this->errors[] = $this->invalidUrl('URL DE REDIRECIONAMENTO');
             }
             
             /* Notification url validation */
             if ($pagseguro_notification_url && ! filter_var($pagseguro_notification_url, FILTER_VALIDATE_URL)) {
-                $this->errors[] = $this->_invalidUrl('URL DE NOTIFICAÃ‡ÃƒO');
+                $this->errors[] = $this->invalidUrl('URL DE NOTIFICAÃ‡ÃƒO');
             }
             
             /* Charset validation */
             if (! array_key_exists($charset, $this->module_config->_charset_options)) {
-                $this->errors[] = $this->_invalidValue('CHARSET');
+                $this->errors[] = $this->invalidValue('CHARSET');
             }
             
             /* Log validation */
             if (! array_key_exists($pagseguro_log, $this->module_config->_active_log)) {
-                $this->errors[] = $this->_invalidValue('LOG');
+                $this->errors[] = $this->invalidValue('LOG');
             }
         }
     }
@@ -213,7 +213,7 @@ class PagSeguro extends PaymentModule
     /**
      * Realize PagSeguro database keys values
      */
-    private function _postProcess()
+    private function postProcess()
     {
         if (Tools::isSubmit('btnSubmit')) {
             
@@ -228,7 +228,7 @@ class PagSeguro extends PaymentModule
             
             /* Verify if log file exists, case not try create */
             if (Tools::getValue('pagseguro_log')) {
-                $this->_verifyLogFile(Tools::getValue('pagseguro_log_dir'));
+                $this->verifyLogFile(Tools::getValue('pagseguro_log_dir'));
             }
         }
         $this->html .= '<div class="conf confirm">' . $this->l('Dados atualizados com sucesso') . '</div>';
@@ -240,7 +240,7 @@ class PagSeguro extends PaymentModule
      * @param String $field            
      * @return String
      */
-    private function _errorMessage($field)
+    private function errorMessage($field)
     {
         return sprintf($this->l('O campo <strong>%s</strong> deve ser informado.'), $field);
     }
@@ -250,7 +250,7 @@ class PagSeguro extends PaymentModule
      *
      * @return String
      */
-    private function _missedCurrencyMessage()
+    private function missedCurrencyMessage()
     {
         return sprintf(
             $this->l(
@@ -267,7 +267,7 @@ class PagSeguro extends PaymentModule
      * @param String $field            
      * @return String
      */
-    private function _invalidMailMessage($field)
+    private function invalidMailMessage($field)
     {
         return sprintf($this->l('O campo <strong>%s</strong> deve ser conter um email válido.'), $field);
     }
@@ -278,7 +278,7 @@ class PagSeguro extends PaymentModule
      * @param String $field            
      * @return String
      */
-    private function _invalidFieldSizeMessage($field)
+    private function invalidFieldSizeMessage($field)
     {
         return sprintf($this->l('O campo <strong>%s</strong> está com um tamanho inválido'), $field);
     }
@@ -289,7 +289,7 @@ class PagSeguro extends PaymentModule
      * @param String $field            
      * @return String
      */
-    private function _invalidValue($field)
+    private function invalidValue($field)
     {
         return sprintf($this->l('O campo <strong>%s</strong> contém um valor inválido.'), $field);
     }
@@ -300,7 +300,7 @@ class PagSeguro extends PaymentModule
      * @param String $field            
      * @return String
      */
-    private function _invalidUrl($field)
+    private function invalidUrl($field)
     {
         return sprintf($this->l('O campo <strong>%s</strong> deve conter uma url válida.'), $field);
     }
@@ -341,7 +341,7 @@ class PagSeguro extends PaymentModule
      */
     public function hookPaymentReturn($params)
     {
-        return $this->module_config->configPayment($params);
+        return $this->module_config->configReturnPayment($params);
     }
 
     /**
@@ -349,7 +349,7 @@ class PagSeguro extends PaymentModule
      * Case log file not exists, try create
      * else create PagSeguro.log into PagseguroLibrary folder into module
      */
-    private function _verifyLogFile($file)
+    private function verifyLogFile($file)
     {
         try {
             $f = @fopen(_PS_ROOT_DIR_ . $file, 'a');

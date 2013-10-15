@@ -55,8 +55,10 @@ function setVariablesPaymentExecutionView($context)
         
         $smarty->assign(
             array(
-                'total_real' => convertPriceFull($context->cart->getOrderTotal(true, Cart::BOTH), 
-                    new Currency($context->cart->id_currency), new Currency($id_currency)),
+                'total_real' => convertPriceFull(
+                                    $context->cart->getOrderTotal(true, Cart::BOTH),
+                                    new Currency($context->cart->id_currency), new Currency($id_currency)
+                                ),
                 'currency_real' => $id_currency
             ));
     }
@@ -64,7 +66,7 @@ function setVariablesPaymentExecutionView($context)
     $smarty->assign(
         array(
             'version' => _PS_VERSION_,
-            'image' => __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png',
+            'image_payment' => __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png',
             'nbProducts' => $context->cart->nbProducts(),
             'current_currency_id' => $context->currency->id,
             'current_currency_name' => $context->currency->name,

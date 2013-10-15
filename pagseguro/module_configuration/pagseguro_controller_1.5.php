@@ -61,7 +61,7 @@ class PagSeguroController_15 extends PagSeguroController
             return;
         }
         
-        if (! Tools::isEmpty($params['objOrder']) && $params['objOrder']->module === $this->payment_modulename) {
+        if (! Tools::isEmpty($params['objOrder']) && $params['objOrder']->module === $this->payment_module->name) {
             
             $smarty->assign(
                 array(
@@ -77,8 +77,8 @@ class PagSeguroController_15 extends PagSeguroController
         } else
             $smarty->assign('status', 'failed');
         
-        return $this->payment_module->display(__PS_BASE_URI__, 
-            'modules/pagseguro/views/templates/hook/payment_return.tpl');
+        return $this->payment_module->display(__PS_BASE_URI__ . 'modules/pagseguro', 
+            '/views/templates/hook/payment_return.tpl');
     }
 
     public function doInstall()
