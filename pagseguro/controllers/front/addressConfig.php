@@ -25,7 +25,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-class AddressConfig
+class addressConfig
 {
 
     public static function dados($v)
@@ -80,7 +80,7 @@ class AddressConfig
                 $dados['semnumeros'][] = "$s$n";
             }
         }
-            return $dados[$v];
+        return $dados[$v];
     }
 
     public static function endtrim($e)
@@ -115,7 +115,7 @@ class AddressConfig
         );
     }
 
-    public static function ordenaDados($texto)
+    static function ordenaDados($texto)
     {
         $quebrado = preg_split('/[-,\\n]/', $texto);
         

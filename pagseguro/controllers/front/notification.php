@@ -92,14 +92,10 @@ class ModuleNotificationPagSeguro
      */
     private function createNotification(Array $post)
     {
-        $this->notification_type = (
-            isset($post['notificationType']) && 
-            trim($post['notificationType']) !== '' ? 
+        $this->notification_type = (isset($post['notificationType']) && trim($post['notificationType']) !== '' ? 
             trim($post['notificationType']) : null);
         
-        $this->notification_code = (
-            isset($post['notificationCode']) && 
-            trim($post['notificationCode']) !== '' ? 
+        $this->notification_code = (isset($post['notificationCode']) && trim($post['notificationCode']) !== '' ? 
             trim($post['notificationCode']) : null);
     }
 
@@ -108,8 +104,7 @@ class ModuleNotificationPagSeguro
      */
     private function createCredential()
     {
-        $this->obj_credential = new PagSeguroAccountCredentials(
-            Configuration::get('PAGSEGURO_EMAIL'), 
+        $this->obj_credential = new PagSeguroAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), 
             Configuration::get('PAGSEGURO_TOKEN'));
     }
 
@@ -144,7 +139,8 @@ class ModuleNotificationPagSeguro
             4 => 'Dispon�vel',
             5 => 'Em disputa',
             6 => 'Devolvida',
-            7 => 'Cancelada');
+            7 => 'Cancelada'
+        );
     }
 
     /**
@@ -152,13 +148,11 @@ class ModuleNotificationPagSeguro
      */
     private function createTransaction()
     {
-        $this->obj_transaction = PagSeguroNotificationService::checkTransaction(
-            $this->obj_credential, 
+        $this->obj_transaction = PagSeguroNotificationService::checkTransaction($this->obj_credential, 
             $this->notification_code);
-
-        $this->reference = ($this->_isNotNull($this->obj_transaction)) ? 
-            (int) $this->obj_transaction->getReference() : 
-            null;
+        
+        $this->reference = ($this->_isNotNull($this->obj_transaction)) ?
+            (int) $this->obj_transaction->getReference() : null;
     }
 
     /**
@@ -166,14 +160,13 @@ class ModuleNotificationPagSeguro
      */
     private function updateCms()
     {
-        $id_status = ($this->_isNotNull($this->obj_transaction->getStatus()->getValue())) ? 
-            (int) $this->obj_transaction->getStatus()->getValue() : 
-            null;
+        $id_status = ($this->_isNotNull($this->obj_transaction->getStatus()
+            ->getValue())) ? (int) $this->obj_transaction->getStatus()->getValue() : null;
         
-        if ($this->_isNotNull($id_status)){
+        if ($this->_isNotNull($id_status)) {
             $id_st_transaction = (int) $this->_returnIdOrderByStatusPagSeguro($this->array_st_cms[$id_status]);
-        }        
-        if ($this->_isNotNull($id_st_transaction)){
+        }
+        if ($this->_isNotNull($id_st_transaction)) {
             $this->createAddOrderHistory($id_st_transaction);
         }
         $this->saveTransactionId($this->obj_transaction->getCode(), $this->obj_transaction->getReference());
@@ -190,11 +183,11 @@ class ModuleNotificationPagSeguro
         $isDeleted = _PS_VERSION_ >= '1.5' ? ' WHERE deleted = 0' : '';
         $id_order_state = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
             'SELECT distinct os.`id_order_state`
-            FROM `' . _DB_PREFIX_ .'order_state` os
-            INNER JOIN `' ._DB_PREFIX_ . 
-            'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`name` = \''
-            . pSQL($value) . '\')' . $isDeleted));
-        
+            FROM `' . _DB_PREFIX_ . 'order_state` os
+            INNER JOIN `' . _DB_PREFIX_ .
+            'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`name` = \'' .
+            pSQL($value) . '\')' . $isDeleted));
+
         return $id_order_state[0]['id_order_state'];
     }
 
@@ -253,10 +246,9 @@ class ModuleNotificationPagSeguro
     private function saveTransactionId($transaction, $reference)
     {
         $pagseguro_order = Db::getInstance()->getRow(
-            "
-		SELECT `id` FROM `" . _DB_PREFIX_ . "pagseguro_order`
-		WHERE `id_order` = $reference");
-        
+            "SELECT `id` FROM `" . _DB_PREFIX_ . "pagseguro_order`
+            WHERE `id_order` = $reference");
+
         if ($pagseguro_order['id']) {
             $this->updateOrder($reference, $transaction, $pagseguro_order['id']);
         } else {
@@ -267,21 +259,19 @@ class ModuleNotificationPagSeguro
     private function saveOrder($id_order, $transaction)
     {
         if (! Db::getInstance(_PS_USE_SQL_SLAVE_)->Execute(
-            '
-			INSERT INTO `' . _DB_PREFIX_ . 'pagseguro_order`
-                        (`id_transaction`, `id_order`) 
-			VALUES (\'' . pSQL($transaction) . '\', \'' .
-                 (int) $id_order . '\')'))
+            'INSERT INTO `' . _DB_PREFIX_ . 'pagseguro_order`
+            (`id_transaction`, `id_order`) 
+            VALUES (\'' . pSQL($transaction) . '\', \'' . (int) $id_order . '\')'))
             die(Tools::displayError('Error when updating Transaction Code from PagSeguro in database'));
     }
 
     private function updateOrder($id_order, $transaction, $pagseguro_order)
     {
         $sql = 'UPDATE `' . _DB_PREFIX_ . 'pagseguro_order`
-			SET `id_transaction` = \'' . pSQL($transaction) . '\',
-                            `id_order` = \'' . (int) $id_order . '\'
-			WHERE `id` = \'' . (int) $pagseguro_order . '\';';
-        
+        SET `id_transaction` = \'' . pSQL($transaction) . '\',
+        `id_order` = \'' . (int) $id_order . '\'
+        WHERE `id` = \'' . (int) $pagseguro_order . '\';';
+
         if (! Db::getInstance(_PS_USE_SQL_SLAVE_)->Execute($sql))
             die(Tools::displayError('Error when updating Transaction Code from PagSeguro in database'));
     }

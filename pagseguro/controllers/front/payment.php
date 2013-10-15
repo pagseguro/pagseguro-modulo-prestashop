@@ -52,13 +52,13 @@ function setVariablesPaymentExecutionView($context)
     $id_currency = PagSeguro::returnIdCurrency();
     
     if ($context->cart->id_currency != $id_currency && ! is_null($id_currency)) {
+        
         $smarty->assign(
-            array('total_real' =>
-                    convertPriceFull($context->cart->getOrderTotal(true, Cart::BOTH),
-                    new Currency($context->cart->id_currency),
-                    new Currency($id_currency)),
+            array(
+                'total_real' => convertPriceFull($context->cart->getOrderTotal(true, Cart::BOTH), 
+                    new Currency($context->cart->id_currency), new Currency($id_currency)),
                 'currency_real' => $id_currency
-        ));
+            ));
     }
     
     $smarty->assign(
@@ -73,16 +73,10 @@ function setVariablesPaymentExecutionView($context)
             'isocode' => $context->language->iso_code,
             'this_path' => __PS_BASE_URI__,
             'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/',
-            'action_url' => _PS_VERSION_ < '1.5' ? 
-            _PS_BASE_URL_.__PS_BASE_URI__.'modules/pagseguro/controllers/front/validation.php"'
-            : _PS_BASE_URL_.__PS_BASE_URI__.'index.php?fc=module&module=pagseguro&controller=validation'
+            'action_url' => _PS_VERSION_ < '1.5' ? _PS_BASE_URL_ . __PS_BASE_URI__ .
+                 'modules/pagseguro/controllers/front/validation.php"' : _PS_BASE_URL_ . __PS_BASE_URI__ .
+                 'index.php?fc=module&module=pagseguro&controller=validation'
         ));
-    
-    $pagseguro = new PagSeguro();
-    
-    include_once (dirname(__FILE__) . '/../../../../header.php');
-    echo $pagseguro->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/front/payment_execution.tpl');
-    include_once (dirname(__FILE__) . '/../../../../footer.php');
 }
 
 function convertPriceFull($amount, Currency $currency_from = null, Currency $currency_to = null)
@@ -90,25 +84,23 @@ function convertPriceFull($amount, Currency $currency_from = null, Currency $cur
     if ($currency_from === $currency_to) {
         return $amount;
     }
-    
     if ($currency_from === null) {
         $currency_from = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
     }
-    
     if ($currency_to === null) {
         $currency_to = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
     }
-    
     if ($currency_from->id == Configuration::get('PS_CURRENCY_DEFAULT')) {
         $amount *= $currency_to->conversion_rate;
     } else {
         $conversion_rate = ($currency_from->conversion_rate == 0 ? 1 : $currency_from->conversion_rate);
+        
         // Convert amount to default currency (using the old currency rate)
         $amount = Tools::ps_round($amount / $conversion_rate, 2);
+        
         // Convert to new currency
         $amount *= $currency_to->conversion_rate;
     }
-    
     return Tools::ps_round($amount, 2);
 }
 

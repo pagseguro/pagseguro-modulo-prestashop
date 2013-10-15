@@ -1,5 +1,4 @@
 <?php
-
 /*
  * 2007-2013 PrestaShop
  *
@@ -25,6 +24,9 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
+/**
+ * Class PagSeguro Search Transaction
+ */
 class PagSeguroSearchTransaction
 {
 
@@ -39,30 +41,27 @@ class PagSeguroSearchTransaction
      */
     public function __construct()
     {
-        $this->transaction_code = (isset($_POST['notificationCode']) 
-            && trim($_POST['notificationCode']) !== '' ? 
+        $this->transaction_code = (isset($_POST['notificationCode']) && trim($_POST['notificationCode']) !== '' ?
             trim($_POST['notificationCode']) : null);
-        $this->createCredential();
-        $this->createTransaction();
+        $this->_createCredential();
+        $this->_createTransaction();
     }
 
     /**
      * Create Credential
      */
-    private function createCredential()
+    private function _createCredential()
     {
-        $this->obj_credential = new PagSeguroAccountCredentials(
-            Configuration::get('PAGSEGURO_EMAIL'), 
+        $this->obj_credential = new PagSeguroAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), 
             Configuration::get('PAGSEGURO_TOKEN'));
     }
 
     /**
      * Create Transaction
      */
-    private function createTransaction()
+    private function _createTransaction()
     {
-        $this->obj_transaction = PagSeguroTransactionSearchService::searchByCode(
-            $this->obj_credential, 
+        $this->obj_transaction = PagSeguroTransactionSearchService::searchByCode($this->obj_credential, 
             $this->transaction_code);
     }
 }

@@ -1,29 +1,28 @@
 <?php
-
 /*
- * 2007-2013 PrestaShop
- *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Academic Free License (AFL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/afl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to license@prestashop.com so we can send you a copy immediately.
- *
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
- * versions in the future. If you wish to customize PrestaShop for your
- * needs please refer to http://www.prestashop.com for more information.
- *
- *  @author PrestaShop SA <contact@prestashop.com>
- *  @copyright  2007-2013 PrestaShop SA
- *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
- *  International Registered Trademark & Property of PrestaShop SA
- */
+* 2007-2013 PrestaShop
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License (OSL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/osl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to license@prestashop.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+* versions in the future. If you wish to customize PrestaShop for your
+* needs please refer to http://www.prestashop.com for more information.
+*
+*  @author PrestaShop SA <contact@prestashop.com>
+*  @copyright  2007-2013 PrestaShop SA
+*  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+*  International Registered Trademark & Property of PrestaShop SA
+*/
 
 if ((bool) Configuration::get('PS_MOBILE_DEVICE')) {
     require_once (_PS_MODULE_DIR_ . '/mobile_theme/Mobile_Detect.php');
@@ -31,6 +30,7 @@ if ((bool) Configuration::get('PS_MOBILE_DEVICE')) {
 
 // Retro 1.3, 'class_exists' cause problem with autoload...
 if (version_compare(_PS_VERSION_, '1.4', '<')) {
+
     // Not exist for 1.3
     class Shop extends ObjectModel
     {
@@ -40,8 +40,7 @@ if (version_compare(_PS_VERSION_, '1.4', '<')) {
         public $id_shop_group = 1;
 
         public function __construct()
-        {
-        }
+        {}
 
         public static function getShops()
         {
@@ -191,7 +190,6 @@ class Context
         }
         
         $this->shop = new ShopBackwardModule();
-        
         if ((bool) Configuration::get('PS_MOBILE_DEVICE')) {
             $this->mobile_detect = new Mobile_Detect();
         }
@@ -204,24 +202,20 @@ class Context
             if ($this->checkMobileContext()) {
                 switch ((int) Configuration::get('PS_MOBILE_DEVICE')) {
                     case 0: // Only for mobile device
-                        if ($this->mobile_detect->isMobile() && ! $this->mobile_detect->isTablet()) {
+                        if ($this->mobile_detect->isMobile() && ! $this->mobile_detect->isTablet())
                             $this->mobile_device = true;
-                        }
                         break;
                     case 1: // Only for touchpads
-                        if ($this->mobile_detect->isTablet() && ! $this->mobile_detect->isMobile()) {
+                        if ($this->mobile_detect->isTablet() && ! $this->mobile_detect->isMobile())
                             $this->mobile_device = true;
-                        }
                         break;
                     case 2: // For touchpad or mobile devices
-                        if ($this->mobile_detect->isMobile() || $this->mobile_detect->isTablet()) {
+                        if ($this->mobile_detect->isMobile() || $this->mobile_detect->isTablet())
                             $this->mobile_device = true;
-                        }
                         break;
                 }
             }
         }
-        
         return $this->mobile_device;
     }
 
@@ -238,7 +232,7 @@ class Context
      */
     public static function getContext()
     {
-        if (! isset(self::$instance)){
+        if (! isset(self::$instance)) {
             self::$instance = new Context();
         }
         return self::$instance;
@@ -367,7 +361,6 @@ class CustomerBackwardModule extends Customer
         if (! $with_guest && $this->is_guest == 1) {
             return false;
         }
-        
         /* Customer is valid only if it can be load and if object password is the same as database one */
         if ($this->logged == 1 && $this->id && Validate::isUnsignedId($this->id) &&
              Customer::checkPassword($this->id, $this->passwd)) {
