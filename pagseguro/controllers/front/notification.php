@@ -162,7 +162,7 @@ class ModuleNotificationPagSeguro
      */
     private function updateCms()
     {
-        $id_status = ($this->isNotNull($this->obj_transaction->getStatus()->getValue())) 
+        $id_status = ($this->isNotNull($this->obj_transaction->getStatus()->getValue()))
             ? (int) $this->obj_transaction->getStatus()->getValue() : null;
         
         if ($this->isNotNull($id_status)) {

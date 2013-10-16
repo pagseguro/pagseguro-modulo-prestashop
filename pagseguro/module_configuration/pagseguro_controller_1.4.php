@@ -50,8 +50,10 @@ class PagSeguroController14 extends PagSeguroController
                     'modules/' . $this->payment_module->name . '/')
         );
 
-        return $this->payment_module->display(__PS_BASE_URI__ . 'modules/pagseguro',
-            '/views/templates/hook/payment.tpl');
+        return $this->payment_module->display(
+            __PS_BASE_URI__ . 'modules/pagseguro',
+            '/views/templates/hook/payment.tpl'
+        );
     }
 
     public function configReturnPayment($params)
@@ -66,11 +68,14 @@ class PagSeguroController14 extends PagSeguroController
             
             $smarty->assign(
                 array(
-                    'total_to_pay' => Tools::displayPrice($params['objOrder']->total_paid_real,
-                        $this->context->currency->id, false),
+                    'total_to_pay' => Tools::displayPrice(
+                        $params['objOrder']->total_paid_real,
+                        $this->context->currency->id, false
+                    ),
                     'status' => 'ok',
                     'id_order' => (int) $params['objOrder']->id
-            ));
+                )
+            );
             if (isset($params['objOrder']->reference) && ! empty($params['objOrder']->reference)) {
                 $smarty->assign('reference', $params['objOrder']->reference);
             }
@@ -117,7 +122,9 @@ class PagSeguroController14 extends PagSeguroController
                 }
             }
         }
-        Configuration::updateValue('PS_OS_PAGSEGURO',13);
+        
+        Configuration::updateValue('PS_OS_PAGSEGURO', 13);
+        
         return $this->createTables();
     }
 

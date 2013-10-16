@@ -79,19 +79,23 @@ class PagSeguro extends PaymentModule
             return false;
         }
         
-        if (! parent::install()
-            || ! $this->registerHook('payment')
-            || ! $this->registerHook('paymentReturn')
-            || ! Configuration::updateValue('PAGSEGURO_EMAIL', '')
-            || ! Configuration::updateValue('PAGSEGURO_TOKEN', '')
-            || ! Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '')
-            || ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '')
-            || ! Configuration::updateValue('PAGSEGURO_CHARSET',
-                PagSeguroConfig::getData('application', 'charset'))
-            || ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE',
-                PagSeguroConfig::getData('log', 'active'))
-            || ! Configuration::updateValue('PAGSEGURO_LOG_FILELOCATION',
-                PagSeguroConfig::getData('log', 'fileLocation'))) {
+        if (! parent::install() ||
+            ! $this->registerHook('payment') ||
+            ! $this->registerHook('paymentReturn') ||
+            ! Configuration::updateValue('PAGSEGURO_EMAIL', '') ||
+            ! Configuration::updateValue('PAGSEGURO_TOKEN', '') ||
+            ! Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') ||
+            ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '') ||
+            ! Configuration::updateValue(
+                'PAGSEGURO_CHARSET',
+                PagSeguroConfig::getData('application', 'charset')
+            ) ||
+            ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active')) ||
+            ! Configuration::updateValue(
+                'PAGSEGURO_LOG_FILELOCATION',
+                PagSeguroConfig::getData('log', 'fileLocation')
+            )
+        ) {
             return false;
         }
         
@@ -214,13 +218,14 @@ class PagSeguro extends PaymentModule
     private function postProcess()
     {
         if (Tools::isSubmit('btnSubmit')) {
-            
             Configuration::updateValue('PAGSEGURO_EMAIL', Tools::getValue('pagseguro_email'));
             Configuration::updateValue('PAGSEGURO_TOKEN', Tools::getValue('pagseguro_token'));
             Configuration::updateValue('PAGSEGURO_URL_REDIRECT', Tools::getValue('pagseguro_url_redirect'));
             Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', Tools::getValue('pagseguro_notification_url'));
-            Configuration::updateValue('PAGSEGURO_CHARSET',
-            $this->module_config->charset_options[Tools::getValue('pagseguro_charset')]);
+            Configuration::updateValue(
+                'PAGSEGURO_CHARSET',
+                $this->module_config->charset_options[Tools::getValue('pagseguro_charset')]
+            );
             Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', Tools::getValue('pagseguro_log'));
             Configuration::updateValue('PAGSEGURO_LOG_FILELOCATION', Tools::getValue('pagseguro_log_dir'));
             
@@ -251,12 +256,12 @@ class PagSeguro extends PaymentModule
     private function missedCurrencyMessage()
     {
         return sprintf(
-            $this->l(
-                'Verifique se a moeda <strong>REAL</strong> esta instalada e ativada.
-            Para importar a moeda vá em Localização e importe "Brazil" no Pacote de Localização, 
-            após isso, vá em localização, moedas, e habilite o <strong>REAL</strong>.<br>
-            Lembre-se, o pagseguro só aceita REAL, se essa moeda não estiver habilitada, 
-            não garatimos que o valor dos produtos será pago corretamente.')
+            $this->l('Verifique se a moeda <strong>REAL</strong> esta instalada e ativada.
+                Para importar a moeda vá em Localização e importe "Brazil" no Pacote de Localização, 
+                após isso, vá em localização, moedas, e habilite o <strong>REAL</strong>.<br>
+                Lembre-se, o pagseguro só aceita REAL, se essa moeda não estiver habilitada, 
+                não garatimos que o valor dos produtos será pago corretamente.'
+            )
         );
     }
 

@@ -144,7 +144,8 @@ class ModuleValidationPagSeguro
             Tools::redirect('index.php?controller=order&step=1');
         }
 
-        $this->module->validateOrder((int) $this->context->cart->id,
+        $this->module->validateOrder(
+            (int) $this->context->cart->id,
             Configuration::get('PS_OS_PAGSEGURO'),
             (float) $this->context->cart->getOrderTotal(true, Cart::BOTH),
             $this->module->displayName,
@@ -152,7 +153,8 @@ class ModuleValidationPagSeguro
             null,
             (int) $this->context->currency->id,
             false,
-            $customer->secure_key);
+            $customer->secure_key
+        );
         
         return array(
             'id_cart' => (int) $this->context->cart->id,
@@ -204,8 +206,9 @@ class ModuleValidationPagSeguro
             
             /* Performing request */
             $credentials = new PagSeguroAccountCredentials(
-                Configuration::get('PAGSEGURO_EMAIL'), 
-                Configuration::get('PAGSEGURO_TOKEN'));
+                Configuration::get('PAGSEGURO_EMAIL'),
+                Configuration::get('PAGSEGURO_TOKEN')
+            );
 
             $url = $this->payment_request->register($credentials);
 
@@ -291,7 +294,7 @@ class ModuleValidationPagSeguro
         return Tools::convertPrice($discounts + $this->getWrappingValues());
     }
 
-    function getCartDiscounts()
+    private function getCartDiscounts()
     {
         $discounts_values = (float) 0;
         
@@ -360,7 +363,8 @@ class ModuleValidationPagSeguro
                     $this->convertPriceFull(
                         $product['price_wt'],
                         new Currency($this->context->cart->id_currency),
-                        new Currency($id_currency))
+                        new Currency($id_currency)
+                    )
                 );
             } else {
                 $pagSeguro_item->setAmount($product['price_wt']);
@@ -482,10 +486,10 @@ class ModuleValidationPagSeguro
         $delivery_address = new Address((int) $this->context->cart->id_address_delivery);
         
         if (! is_null($delivery_address)) {
-            
+
             $fullAddress = $this->addressConfig($delivery_address->address1);
             
-            $street = (is_null($fullAddress[0]) || empty($fullAddress[0])) ? 
+            $street = (is_null($fullAddress[0]) || empty($fullAddress[0])) ?
                 $delivery_address->address1 : $fullAddress[0];
             
             $number = is_null($fullAddress[1]) ? '' : $fullAddress[1];
