@@ -37,12 +37,12 @@ abstract class PagSeguroController
 
     protected $payment_module;
 
-    public $_charset_options = array(
+    public $charset_options = array(
         '1' => 'ISO-8859-1',
         '2' => 'UTF-8'
     );
 
-    public $_active_log = array(
+    public $active_log = array(
         '0' => 'NÃO',
         '1' => 'SIM'
     );
@@ -60,17 +60,18 @@ abstract class PagSeguroController
 
     public static function instaceVersionPreConfig($version)
     {
-        return $version >= '1.5' ? new PagSeguroController_15() : new PagSeguroController_14();
+        return $version >= '1.5' ? new PagSeguroController15() : new PagSeguroController14();
     }
 
     private function findOrderStates()
     {
-        return (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-            'SELECT osl.`id_lang`, osl.`name` 
+        $sql = 'SELECT osl.`id_lang`, osl.`name` 
             FROM `' . _DB_PREFIX_ . 'order_state` os
             INNER JOIN `' . _DB_PREFIX_ . 'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state`)
             WHERE osl.`name` in ("Iniciado","Aguardando pagamento","Em análise",
-            "Paga","Disponível","Em disputa","Devolvida","Cancelada")'));
+            "Paga","Disponível","Em disputa","Devolvida","Cancelada")';
+
+        return (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql));
     }
 
     protected function checkActiveSlide()
@@ -87,7 +88,7 @@ abstract class PagSeguroController
     protected function returnCheckedNotificationUrl()
     {
         $url_notification = Tools::safeOutput(Configuration::get('PAGSEGURO_NOTIFICATION_URL'));
-        return Tools::isEmpty($url_notification) ? $this->_notificationURL() : $url_notification;
+        return Tools::isEmpty($url_notification) ? $this->notificationURL() : $url_notification;
     }
 
     protected function generatePagSeguroOrderStatus()
@@ -95,6 +96,7 @@ abstract class PagSeguroController
         $orders_added = true;
         $name_state = null;
         $list_states = $this->findOrderStates();
+        $image = _PS_ROOT_DIR_ . '/modules/pagseguro/logo.gif';
         
         foreach ($this->order_status as $key => $value) {
             
@@ -116,8 +118,8 @@ abstract class PagSeguroController
                 if ($continue) {
                     $order_state->name[$language['id_lang']] = $value;
                     if ($order_state->add()) {
-                        copy(_PS_ROOT_DIR_ . '/modules/pagseguro/logo.gif',
-                            _PS_ROOT_DIR_ . '/img/os/' . (int) $order_state->id . '.gif');
+                        $file = _PS_ROOT_DIR_ . '/img/os/' . (int) $order_state->id . '.gif';
+                        copy($image, $file);
                     }
                 }
             }
@@ -167,12 +169,13 @@ abstract class PagSeguroController
 
     private function returnIdOrderByStatusPagSeguro($value)
     {
-        $id_order_state = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-            'SELECT distinct os.`id_order_state`
+        $sql = 'SELECT distinct os.`id_order_state`
             FROM `' . _DB_PREFIX_ . 'order_state` os
             INNER JOIN `' ._DB_PREFIX_ . 'order_state_lang` osl 
             ON (os.`id_order_state` = osl.`id_order_state` AND osl.`name` = \'' . pSQL($value) . '\')
-            WHERE deleted = 0'));
+            WHERE deleted = 0';
+
+        $id_order_state = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql));
 
         return $id_order_state[0]['id_order_state'];
     }
@@ -196,13 +199,14 @@ abstract class PagSeguroController
 
     protected function createTables()
     {
-        if (! Db::getInstance()->Execute(
-            'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'pagseguro_order` (
+        $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'pagseguro_order` (
             `id` int(11) unsigned NOT NULL auto_increment,
             `id_transaction` varchar(255) NOT NULL,
             `id_order` int(10) unsigned NOT NULL ,
             PRIMARY KEY  (`id`)
-            ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8  auto_increment=1;')) {
+            ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8  auto_increment=1;';
+
+        if (! Db::getInstance()->Execute($sql)) {
             return false;
         }
         return true;
@@ -218,10 +222,10 @@ abstract class PagSeguroController
         $smarty->assign('token_user', Tools::safeOutput(Configuration::get('PAGSEGURO_TOKEN')));
         $smarty->assign('redirect_url', $this->returnCheckedRedirectionUrl());
         $smarty->assign('notification_url', $this->returnCheckedNotificationUrl());
-        $smarty->assign('charset_options', $this->_charset_options);
-        $smarty->assign('charset_selected', 
-            array_search(Configuration::get('PAGSEGURO_CHARSET'), $this->_charset_options));
-        $smarty->assign('active_log', $this->_active_log);
+        $smarty->assign('charset_options', $this->charset_options);
+        $smarty->assign('charset_selected', array_search(Configuration::get('PAGSEGURO_CHARSET'),
+            $this->charset_options));
+        $smarty->assign('active_log', $this->active_log);
         $smarty->assign('log_selected', Configuration::get('PAGSEGURO_LOG_ACTIVE'));
         $smarty->assign('diretorio_log', Tools::safeOutput(Configuration::get('PAGSEGURO_LOG_FILELOCATION')));
         $smarty->assign('checkActiveSlide', Tools::safeOutput($this->checkActiveSlide()));
@@ -231,13 +235,13 @@ abstract class PagSeguroController
 
     /**
      * Gets notification url
-     * 
+     *
      * @return string
      */
     public function getNotificationUrl()
     {
-        return (! PagSeguroHelper::isEmpty(Configuration::get('PAGSEGURO_NOTIFICATION_URL'))) ? Configuration::get(
-            'PAGSEGURO_NOTIFICATION_URL') : $this->notificationURL();
+        $notificationUrl = Configuration::get('PAGSEGURO_NOTIFICATION_URL');
+        return (! PagSeguroHelper::isEmpty($notificationUrl)) ? $notificationUrl : $this->notificationURL();
     }
 
     /**
@@ -248,8 +252,8 @@ abstract class PagSeguroController
     private function notificationURL()
     {
         $url_base = _PS_BASE_URL_ . __PS_BASE_URI__;
-        return $this->validationVersion() ? 
-            $url_base . 'index.php?fc=module&module=pagseguro&controller=notification' : 
+        return $this->validationVersion() ?
+            $url_base . 'index.php?fc=module&module=pagseguro&controller=notification' :
             $url_base . 'modules/pagseguro/controllers/front/notification.php';
     }
 

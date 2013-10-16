@@ -56,11 +56,10 @@ function setVariablesPaymentExecutionView($context)
         $smarty->assign(
             array(
                 'total_real' => convertPriceFull(
-                                    $context->cart->getOrderTotal(true, Cart::BOTH),
-                                    new Currency($context->cart->id_currency), new Currency($id_currency)
-                                ),
-                'currency_real' => $id_currency
-            ));
+                    $context->cart->getOrderTotal(true, Cart::BOTH),
+                    new Currency($context->cart->id_currency),
+                    new Currency($id_currency)),
+                'currency_real' => $id_currency));
     }
     
     $smarty->assign(
@@ -77,8 +76,7 @@ function setVariablesPaymentExecutionView($context)
             'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/',
             'action_url' => _PS_VERSION_ < '1.5' ? _PS_BASE_URL_ . __PS_BASE_URI__ .
                  'modules/pagseguro/controllers/front/validation.php"' : _PS_BASE_URL_ . __PS_BASE_URI__ .
-                 'index.php?fc=module&module=pagseguro&controller=validation'
-        ));
+                 'index.php?fc=module&module=pagseguro&controller=validation'));
 }
 
 function convertPriceFull($amount, Currency $currency_from = null, Currency $currency_to = null)

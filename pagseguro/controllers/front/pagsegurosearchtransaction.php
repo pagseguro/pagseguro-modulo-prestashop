@@ -1,4 +1,5 @@
 <?php
+
 /*
  * 2007-2013 PrestaShop
  *
@@ -63,6 +64,8 @@ class PagSeguroSearchTransaction
     private function createTransaction()
     {
         $this->obj_transaction = PagSeguroTransactionSearchService::searchByCode(
-            $this->obj_credential, $this->transaction_code);
+            $this->obj_credential,
+            $this->transaction_code
+        );
     }
 }

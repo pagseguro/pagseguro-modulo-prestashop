@@ -79,21 +79,19 @@ class PagSeguro extends PaymentModule
             return false;
         }
         
-        if (! parent::install() 
-            || ! $this->registerHook('payment') 
-            || ! $this->registerHook('paymentReturn') 
-            || ! Configuration::updateValue('PAGSEGURO_EMAIL', '') 
-            || ! Configuration::updateValue('PAGSEGURO_TOKEN', '') 
-            || ! Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') 
-            || ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '') 
+        if (! parent::install()
+            || ! $this->registerHook('payment')
+            || ! $this->registerHook('paymentReturn')
+            || ! Configuration::updateValue('PAGSEGURO_EMAIL', '')
+            || ! Configuration::updateValue('PAGSEGURO_TOKEN', '')
+            || ! Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '')
+            || ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '')
             || ! Configuration::updateValue('PAGSEGURO_CHARSET',
-                    PagSeguroConfig::getData('application', 'charset')) 
+                PagSeguroConfig::getData('application', 'charset'))
             || ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE',
-                    PagSeguroConfig::getData('log', 'active')) 
+                PagSeguroConfig::getData('log', 'active'))
             || ! Configuration::updateValue('PAGSEGURO_LOG_FILELOCATION',
-                    PagSeguroConfig::getData('log', 'fileLocation'))
-            || ! Configuration::updateValue('PS_OS_PAGSEGURO',
-                    _PS_VERSION_ >= '1.5'? 0 : 13)) {
+                PagSeguroConfig::getData('log', 'fileLocation'))) {
             return false;
         }
         
@@ -111,14 +109,14 @@ class PagSeguro extends PaymentModule
             return false;
         }
 
-        if (! Configuration::deleteByName('PAGSEGURO_EMAIL') 
-            || ! Configuration::deleteByName('PAGSEGURO_TOKEN') 
-            || ! Configuration::deleteByName('PAGSEGURO_URL_REDIRECT') 
-            || ! Configuration::deleteByName('PAGSEGURO_NOTIFICATION_URL') 
-            || ! Configuration::deleteByName('PAGSEGURO_CHARSET') 
-            || ! Configuration::deleteByName('PAGSEGURO_LOG_ACTIVE') 
-            || ! Configuration::deleteByName('PAGSEGURO_LOG_FILELOCATION') 
-            || ! Configuration::deleteByName('PS_OS_PAGSEGURO') 
+        if (! Configuration::deleteByName('PAGSEGURO_EMAIL')
+            || ! Configuration::deleteByName('PAGSEGURO_TOKEN')
+            || ! Configuration::deleteByName('PAGSEGURO_URL_REDIRECT')
+            || ! Configuration::deleteByName('PAGSEGURO_NOTIFICATION_URL')
+            || ! Configuration::deleteByName('PAGSEGURO_CHARSET')
+            || ! Configuration::deleteByName('PAGSEGURO_LOG_ACTIVE')
+            || ! Configuration::deleteByName('PAGSEGURO_LOG_FILELOCATION')
+            || ! Configuration::deleteByName('PS_OS_PAGSEGURO')
             || ! parent::uninstall()) {
             return false;
         }
@@ -199,12 +197,12 @@ class PagSeguro extends PaymentModule
             }
             
             /* Charset validation */
-            if (! array_key_exists($charset, $this->module_config->_charset_options)) {
+            if (! array_key_exists($charset, $this->module_config->charset_options)) {
                 $this->errors[] = $this->invalidValue('CHARSET');
             }
             
             /* Log validation */
-            if (! array_key_exists($pagseguro_log, $this->module_config->_active_log)) {
+            if (! array_key_exists($pagseguro_log, $this->module_config->active_log)) {
                 $this->errors[] = $this->invalidValue('LOG');
             }
         }
@@ -221,8 +219,8 @@ class PagSeguro extends PaymentModule
             Configuration::updateValue('PAGSEGURO_TOKEN', Tools::getValue('pagseguro_token'));
             Configuration::updateValue('PAGSEGURO_URL_REDIRECT', Tools::getValue('pagseguro_url_redirect'));
             Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', Tools::getValue('pagseguro_notification_url'));
-            Configuration::updateValue('PAGSEGURO_CHARSET', 
-                $this->module_config->_charset_options[Tools::getValue('pagseguro_charset')]);
+            Configuration::updateValue('PAGSEGURO_CHARSET',
+            $this->module_config->charset_options[Tools::getValue('pagseguro_charset')]);
             Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', Tools::getValue('pagseguro_log'));
             Configuration::updateValue('PAGSEGURO_LOG_FILELOCATION', Tools::getValue('pagseguro_log_dir'));
             
@@ -258,7 +256,8 @@ class PagSeguro extends PaymentModule
             Para importar a moeda vá em Localização e importe "Brazil" no Pacote de Localização, 
             após isso, vá em localização, moedas, e habilite o <strong>REAL</strong>.<br>
             Lembre-se, o pagseguro só aceita REAL, se essa moeda não estiver habilitada, 
-            não garatimos que o valor dos produtos será pago corretamente.'));
+            não garatimos que o valor dos produtos será pago corretamente.')
+        );
     }
 
     /**
@@ -313,11 +312,12 @@ class PagSeguro extends PaymentModule
      */
     public static function returnIdCurrency($value = 'BRL')
     {
-        $id_currency = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-        'SELECT `id_currency`
+        $sql = 'SELECT `id_currency`
         FROM `' . _DB_PREFIX_ . 'currency`
         WHERE `deleted` = 0 
-        AND `iso_code` = "' . $value . '"'));
+        AND `iso_code` = "' . $value . '"';
+        
+        $id_currency = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql));
         
         return $id_currency[0]['id_currency'];
     }

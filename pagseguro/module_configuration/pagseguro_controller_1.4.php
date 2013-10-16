@@ -29,7 +29,7 @@ include_once ('../PagSeguroLibrary/PagSeguroLibrary.php');
 include_once ('pagseguro_controller.php');
 include_once ('../backward_compatibility/Context.php');
 
-class PagSeguroController_14 extends PagSeguroController
+class PagSeguroController14 extends PagSeguroController
 {
 
     public function configPayment($params)
@@ -46,11 +46,11 @@ class PagSeguroController_14 extends PagSeguroController
                 'action_url' => _PS_BASE_URL_ . __PS_BASE_URI__ . 'modules/pagseguro/controllers/front/payment.php',
                 'image' => __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png',
                 'this_path' => __PS_BASE_URI__ . 'modules/pagseguro/',
-                'this_path_ssl' => Tools::getShopDomainSsl(true, true) . v . 
-                    'modules/' . $this->payment_module->name . '/'
-        ));
+                'this_path_ssl' => Tools::getShopDomainSsl(true, true) . v .
+                    'modules/' . $this->payment_module->name . '/')
+        );
 
-        return $this->payment_module->display(__PS_BASE_URI__ . 'modules/pagseguro', 
+        return $this->payment_module->display(__PS_BASE_URI__ . 'modules/pagseguro',
             '/views/templates/hook/payment.tpl');
     }
 
@@ -66,8 +66,8 @@ class PagSeguroController_14 extends PagSeguroController
             
             $smarty->assign(
                 array(
-                    'total_to_pay' => Tools::displayPrice($params['objOrder']->total_paid_real, 
-                    $this->context->currency->id, false),
+                    'total_to_pay' => Tools::displayPrice($params['objOrder']->total_paid_real,
+                        $this->context->currency->id, false),
                     'status' => 'ok',
                     'id_order' => (int) $params['objOrder']->id
             ));
@@ -77,7 +77,8 @@ class PagSeguroController_14 extends PagSeguroController
         } else {
             $smarty->assign('status', 'failed');
         }
-        return $this->payment_module->display(__PS_BASE_URI__ . 'modules/pagseguro', 
+        return $this->payment_module->display(
+            __PS_BASE_URI__ . 'modules/pagseguro',
             '/views/templates/hook/payment_return.tpl');
     }
 
@@ -116,6 +117,7 @@ class PagSeguroController_14 extends PagSeguroController
                 }
             }
         }
+        Configuration::updateValue('PS_OS_PAGSEGURO',13);
         return $this->createTables();
     }
 
