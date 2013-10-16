@@ -1,7 +1,7 @@
 <?php
 
 /*
- * 2007-2013 PrestaShop
+* 2007-2013 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -59,7 +59,8 @@ function setVariablesPaymentExecutionView($context)
             array(
                 'total_real' => convertPriceFull($totalOrder, $current_currency, $new_currency),
                 'currency_real' => $id_currency
-            ));
+            )
+        );
     }
     
     $older_url = _PS_BASE_URL_ . __PS_BASE_URI__ . 'modules/pagseguro/controllers/front/validation.php"';
@@ -78,7 +79,8 @@ function setVariablesPaymentExecutionView($context)
             'this_path' => __PS_BASE_URI__,
             'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/',
             'action_url' => _PS_VERSION_ < '1.5' ? $older_url : $new_url
-        ));
+        )
+    );
 }
 
 function convertPriceFull($amount, Currency $currency_from = null, Currency $currency_to = null)

@@ -223,8 +223,9 @@ abstract class PagSeguroController
         $smarty->assign('redirect_url', $this->returnCheckedRedirectionUrl());
         $smarty->assign('notification_url', $this->returnCheckedNotificationUrl());
         $smarty->assign('charset_options', $this->charset_options);
-        $smarty->assign('charset_selected', array_search(Configuration::get('PAGSEGURO_CHARSET'),
-            $this->charset_options)
+        $smarty->assign(
+            'charset_selected',
+            array_search(Configuration::get('PAGSEGURO_CHARSET'), $this->charset_options)
         );
         $smarty->assign('active_log', $this->active_log);
         $smarty->assign('log_selected', Configuration::get('PAGSEGURO_LOG_ACTIVE'));

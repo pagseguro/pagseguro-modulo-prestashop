@@ -67,11 +67,13 @@ class PagSeguroController15 extends PagSeguroController
             $smarty->assign(
                 array(
                     'total_to_pay' => Tools::displayPrice(
-                        $params['objOrder']->total_paid_real,
-                        $this->context->currency->id, false
-                    ),
+                            $params['objOrder']->total_paid_real,
+                            $this->context->currency->id,
+                            false
+                        ),
                     'status' => 'ok',
-                    'id_order' => (int) $params['objOrder']->id)
+                    'id_order' => (int) $params['objOrder']->id
+                )
             );
             if (isset($params['objOrder']->reference) && ! empty($params['objOrder']->reference)) {
                 $smarty->assign('reference', $params['objOrder']->reference);

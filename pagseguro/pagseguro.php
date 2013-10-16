@@ -255,13 +255,13 @@ class PagSeguro extends PaymentModule
      */
     private function missedCurrencyMessage()
     {
-        return sprintf(
-            $this->l('Verifique se a moeda <strong>REAL</strong> esta instalada e ativada.
-                Para importar a moeda vá em Localização e importe "Brazil" no Pacote de Localização, 
-                após isso, vá em localização, moedas, e habilite o <strong>REAL</strong>.<br>
-                Lembre-se, o pagseguro só aceita REAL, se essa moeda não estiver habilitada, 
-                não garatimos que o valor dos produtos será pago corretamente.'
-            )
+        return sprintf($this->l(
+                    'Verifique se a moeda <strong>REAL</strong> esta instalada e ativada.
+                    Para importar a moeda vá em Localização e importe "Brazil" no Pacote de Localização, 
+                    após isso, vá em localização, moedas, e habilite o <strong>REAL</strong>.<br>
+                    Lembre-se, o pagseguro só aceita REAL, se essa moeda não estiver habilitada, 
+                    não garatimos que o valor dos produtos será pago corretamente.'
+                )
         );
     }
 

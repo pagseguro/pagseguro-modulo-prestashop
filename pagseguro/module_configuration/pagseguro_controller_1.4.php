@@ -70,7 +70,8 @@ class PagSeguroController14 extends PagSeguroController
                 array(
                     'total_to_pay' => Tools::displayPrice(
                         $params['objOrder']->total_paid_real,
-                        $this->context->currency->id, false
+                        $this->context->currency->id,
+                        false
                     ),
                     'status' => 'ok',
                     'id_order' => (int) $params['objOrder']->id
@@ -83,8 +84,9 @@ class PagSeguroController14 extends PagSeguroController
             $smarty->assign('status', 'failed');
         }
         return $this->payment_module->display(
-            __PS_BASE_URI__ . 'modules/pagseguro',
-            '/views/templates/hook/payment_return.tpl');
+                    __PS_BASE_URI__ . 'modules/pagseguro',
+                    '/views/templates/hook/payment_return.tpl'
+                );
     }
 
     public function doInstall()
