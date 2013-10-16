@@ -84,9 +84,9 @@ class PagSeguroController14 extends PagSeguroController
             $smarty->assign('status', 'failed');
         }
         return $this->payment_module->display(
-                    __PS_BASE_URI__ . 'modules/pagseguro',
-                    '/views/templates/hook/payment_return.tpl'
-                );
+            __PS_BASE_URI__ . 'modules/pagseguro',
+            '/views/templates/hook/payment_return.tpl'
+        );
     }
 
     public function doInstall()
