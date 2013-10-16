@@ -56,6 +56,15 @@ Para acessar e configurar o módulo acesse o menu Módulos -> Modules -> Payment
 Changelog
 ---------
 ---
+1.6
+
+- Atualização da lib. PHP no módulo;
+- Compatibilidade com a versão 1.4.5.1+ do PrestaShop;
+- Verificar se a moeda Real esta ativa, para envio ao PagSeguro;
+- Conclusão de pagamento em qualquer moeda;
+- Cancelamento do carrinho caso ocorra erro durante checkout;
+- Conformidade com PSR-2;
+
 1.5
 
  - Melhorias no tratamento de endereço;
