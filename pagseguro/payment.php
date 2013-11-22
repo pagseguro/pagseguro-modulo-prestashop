@@ -32,11 +32,11 @@ include_once(dirname(__FILE__).'/backward_compatibility/backward.php');
 
 $useSSL = true;
 
-if (!$cookie->isLogged(true)) {
+if (! $cookie->isLogged(true)) {
     Tools::redirect('authentication.php?back=order.php');
 }
 
 $pagseguro = new PagSeguroModulo14();
 echo $pagseguro->execPayment();
 
-include_once(dirname(__FILE__).'/../../footer.php');
+include_once(dirname(__FILE__) . '/../../footer.php');

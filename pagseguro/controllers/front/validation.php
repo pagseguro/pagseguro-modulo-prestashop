@@ -105,7 +105,6 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
      */
     private function validateCart()
     {
-        
         if ($this->context->cart->id_customer == 0 || $this->context->cart->id_address_delivery == 0 ||
              $this->context->cart->id_address_invoice == 0 || ! $this->module->active) {
             Tools::redirect('index.php?controller=order&step=1');
@@ -123,9 +122,9 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
             Tools::redirect('index.php?controller=order&step=1');
         }
         
-        $this->module->validateOrder((int) $this->context->cart->id, Configuration::get('PS_OS_PAGSEGURO'), 
-            (float) $this->context->cart->getOrderTotal(true, Cart::BOTH), $this->module->displayName, null, null, 
-            (int) $this->context->currency->id, false, $customer->secure_key);
+        $this->module->validateOrder((int) $this->context->cart->id, Configuration::get('PS_OS_PAGSEGURO'),
+            (float) $this->context->cart->getOrderTotal(true, Cart::BOTH), $this->module->displayName,
+            null, null, (int) $this->context->currency->id, false, $customer->secure_key);
         
         return array(
             'id_cart' => (int) $this->context->cart->id,
@@ -140,11 +139,10 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
      * client will be redirected to order confirmation view with a button that
      * allows client to access PagSeguro and perform him order payment
      *
-     * @param array $arrayData            
+     * @param array $arrayData
      */
     private function generateRedirectUrl(Array $arrayData, $url)
     {
-        
         $redirection_url_version = '?controller=order-confirmation&id_cart=';
         
         if (Tools::isEmpty($url)) {
@@ -152,9 +150,9 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
         }
         
         return $url . $redirection_url_version . $arrayData['id_cart'] . '&id_module=' . $arrayData['id_module'] .
-        '&id_order=' . $arrayData['id_order'] . '&key=' . $arrayData['key'];
+             '&id_order=' . $arrayData['id_order'] . '&key=' . $arrayData['key'];
     }
-    
+
     /**
      * Perform PagSeguro request and return url from PagSeguro
      * if ok, $this->module->pagSeguroReturnUrl is created with url returned from Pagseguro
@@ -173,7 +171,7 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
             $this->setPagSeguroCMSVersion();
             
             /* Performing request */
-            $credentials = new PagSeguroAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), 
+            $credentials = new PagSeguroAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'),
                 Configuration::get('PAGSEGURO_TOKEN'));
             
             $url = $this->payment_request->register($credentials);
@@ -310,7 +308,7 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
             
             if ($this->context->cart->id_currency != $id_currency && ! is_null($id_currency)) {
                 $pagSeguro_item->setAmount(
-                    $this->convertPriceFull($product['price_wt'], new Currency($this->context->cart->id_currency), 
+                    $this->convertPriceFull($product['price_wt'], new Currency($this->context->cart->id_currency),
                         new Currency($id_currency)));
             } else {
                 $pagSeguro_item->setAmount($product['price_wt']);
@@ -355,7 +353,7 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
     /**
      * Generate name
      *
-     * @param type $value            
+     * @param type $value
      * @return string
      */
     private function generateName($value)
@@ -434,7 +432,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
             
             $fullAddress = $this->addressConfig($delivery_address->address1);
             
-            $street = (is_null($fullAddress[0]) || empty($fullAddress[0])) ? $delivery_address->address1 : $fullAddress[0];
+            $street = (is_null($fullAddress[0]) || empty($fullAddress[0])) ?
+            $delivery_address->address1 : $fullAddress[0];
             
             $number = is_null($fullAddress[1]) ? '' : $fullAddress[1];
             $complement = is_null($fullAddress[2]) ? '' : $fullAddress[2];
@@ -462,11 +461,10 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
      */
     private function redirectToErroPage()
     {
-        
         $this->display_column_left = false;
         
-        $this->module->context->smarty->assign('erro_image', __PS_BASE_URI__ .
-                'modules/pagseguro/assets/images/logops_86x49.png');
+        $this->module->context->smarty->assign('erro_image', 
+            __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png');
         $this->module->context->smarty->assign('version', _PS_VERSION_);
         
         $this->setTemplate('error.tpl');
@@ -479,9 +477,6 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
     }
 
     /**
-     *
-     *
-     *
      *
      * Convert amount from a currency to an other currency automatically
      *
@@ -518,14 +513,9 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
 
     private function canceledOrderForErro()
     {
-        
         $history = new OrderHistory();
-        $history->id_order = (int)($this->module->currentOrder);
-        $history->changeIdOrderState(6, (int)($this->module->currentOrder));
+        $history->id_order = (int) ($this->module->currentOrder);
+        $history->changeIdOrderState(6, (int) ($this->module->currentOrder));
         $history->save();
-        
-//        $obj_orders = new Order($this->module->currentOrder);
-//        $obj_orders->setCurrentState(6, $cart->id_customer);
-//        $obj_orders->update();
     }
 }

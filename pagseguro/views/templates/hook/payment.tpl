@@ -30,4 +30,3 @@
             {l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}
     </a>
 </p> 
-

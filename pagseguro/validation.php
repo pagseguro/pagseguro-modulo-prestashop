@@ -25,13 +25,10 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-include_once(dirname(__FILE__).'/../../config/config.inc.php');
-include_once(dirname(__FILE__).'/../../header.php');
-include_once(dirname(__FILE__).'/pagseguro.php');
-include_once(dirname(__FILE__).'/backward_compatibility/backward.php');
-//include_once(dirname(__FILE__).'/module_configuration/module_validation_pagseguro.php');
-
-//global $pag_seguro, $payment_request, $cart, $customer;
+include_once(dirname(__FILE__) . '/../../config/config.inc.php');
+include_once(dirname(__FILE__) . '/../../header.php');
+include_once(dirname(__FILE__) . '/pagseguro.php');
+include_once(dirname(__FILE__) . '/backward_compatibility/backward.php');
 
 $pag_seguro = new PagSeguro();
 $pag_seguro->setModulo(new PagSeguroModulo14());
@@ -43,12 +40,13 @@ $customer = new Customer((int) $cart->id_customer);
 
 postProcess();
 
-include_once(dirname(__FILE__) . '/../../footer.php');
+include_once (dirname(__FILE__) . '/../../footer.php');
 
 /**
- *  Post data process function
-*/
-function postProcess() {
+ * Post data process function
+ */
+function postProcess()
+{
     try {
         verifyPaymentOptionAvailability();
         validateCart();
@@ -67,28 +65,32 @@ function postProcess() {
 
 /**
  * Set additional infos to PagSeguroPaymentRequest object
+ * 
  * @param array $additional_infos
  */
-function setAdditionalRequestData(Array $additional_infos) {
+function setAdditionalRequestData(Array $additional_infos)
+{
     global $payment_request;
     /* Setting reference */
     $payment_request->setReference($additional_infos['id_order']);
-    $payment_request->setRedirectURL(generateRedirectUrl($additional_infos, $payment_request->getRedirectURL()));
+    $payment_request->setRedirectURL(generateRedirectUrl($additional_infos,
+        $payment_request->getRedirectURL()));
 }
 
 /**
  * set notification url
  */
-function setNotificationUrl() {
+function setNotificationUrl()
+{
     global $payment_request, $pag_seguro;
     $payment_request->setNotificationURL($pag_seguro->getNotificationUrl());
 }
 
 /**
- *  Verify if PagSeguro payment module still available
+ * Verify if PagSeguro payment module still available
  */
-function verifyPaymentOptionAvailability() {
-    
+function verifyPaymentOptionAvailability()
+{
     global $pag_seguro;
     
     $authorized = false;
@@ -104,42 +106,34 @@ function verifyPaymentOptionAvailability() {
 }
 
 /**
- *  Validate Cart
+ * Validate Cart
  */
-function validateCart() {
-    
+function validateCart()
+{
     global $pag_seguro, $cart;
     
     if ($cart->id_customer == 0
-        OR $cart->id_address_delivery == 0
-        OR $cart->id_address_invoice == 0
-        OR ! $pag_seguro->active) {
-            Tools::redirect('order.php?step=1');
+    or $cart->id_address_delivery == 0
+    or $cart->id_address_invoice == 0
+    or ! $pag_seguro->active) {
+        Tools::redirect('order.php?step=1');
     }
 }
 
 /**
- *  Validate order
+ * Validate order
  */
-function validateOrder() {
-    
+function validateOrder()
+{
     global $pag_seguro, $cart, $customer;
     
     if (! Validate::isLoadedObject($customer)) {
         Tools::redirect('order.php?step=1');
     }
     
-    $pag_seguro->validateOrder(
-        (int) $cart->id,
-        Configuration::get('PS_OS_PAGSEGURO'),
-        (float) $cart->getOrderTotal(true, Cart::BOTH),
-        $pag_seguro->displayName,
-        null,
-        null,
-        (int) $cart->id_currency,
-        false,
-        $customer->secure_key
-    );
+    $pag_seguro->validateOrder((int) $cart->id, Configuration::get('PS_OS_PAGSEGURO'),
+        (float) $cart->getOrderTotal(true, Cart::BOTH), $pag_seguro->displayName, null, null,
+        (int) $cart->id_currency, false, $customer->secure_key);
     return array(
         'id_cart' => (int) $cart->id,
         'id_module' => (int) $pag_seguro->id,
@@ -149,14 +143,14 @@ function validateOrder() {
 }
 
 /**
- *  After system and PagSeguro validations and notification about order,
- *  client will be redirected to order confirmation view with a button that
- *  allows client to access PagSeguro and perform him order payment
+ * After system and PagSeguro validations and notification about order,
+ * client will be redirected to order confirmation view with a button that
+ * allows client to access PagSeguro and perform him order payment
  *
- * @param array $arrayData
+ * @param array $arrayData            
  */
-function generateRedirectUrl(Array $arrayData, $url) {
-    
+function generateRedirectUrl(Array $arrayData, $url)
+{
     global $pag_seguro;
     
     if (Tools::isEmpty($url)) {
@@ -168,11 +162,11 @@ function generateRedirectUrl(Array $arrayData, $url) {
 }
 
 /**
- *  Perform PagSeguro request and return url from PagSeguro
- *  if ok, $pag_seguro->pagSeguroReturnUrl is created with url returned from Pagseguro
+ * Perform PagSeguro request and return url from PagSeguro
+ * if ok, $pag_seguro->pagSeguroReturnUrl is created with url returned from Pagseguro
  */
-function performPagSeguroRequest() {
-    
+function performPagSeguroRequest()
+{
     global $payment_request;
     
     try {
@@ -186,10 +180,8 @@ function performPagSeguroRequest() {
         setPagSeguroCMSVersion();
         
         /* Performing request */
-        $credentials = new PagSeguroAccountCredentials(
-            Configuration::get('PAGSEGURO_EMAIL'),
-            Configuration::get('PAGSEGURO_TOKEN')
-        );
+        $credentials = new PagSeguroAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'),
+            Configuration::get('PAGSEGURO_TOKEN'));
         
         $url = $payment_request->register($credentials);
         
@@ -207,7 +199,8 @@ function performPagSeguroRequest() {
 /**
  * Retrieve PagSeguro data configuration from database
  */
-function retrievePagSeguroConfiguration() {
+function retrievePagSeguroConfiguration()
+{
     /* Retrieving configurated default charset */
     PagSeguroConfig::setApplicationCharset(Configuration::get('PAGSEGURO_CHARSET'));
     
@@ -220,7 +213,8 @@ function retrievePagSeguroConfiguration() {
 /**
  * Set PagSeguro PrestaShop module version
  */
-function setPagSeguroModuleVersion() {
+function setPagSeguroModuleVersion()
+{
     global $pag_seguro;
     PagSeguroLibrary::setModuleVersion('prestashop' . ':' . $pag_seguro->version);
 }
@@ -228,15 +222,16 @@ function setPagSeguroModuleVersion() {
 /**
  * Set PagSeguro CMS version
  */
-function setPagSeguroCMSVersion() {
+function setPagSeguroCMSVersion()
+{
     PagSeguroLibrary::setCMSVersion('prestashop' . ':' . _PS_VERSION_);
 }
 
 /**
- *  Generates PagSeguro request data
+ * Generates PagSeguro request data
  */
-function generatePagSeguroRequestData() {
-    
+function generatePagSeguroRequestData()
+{
     global $payment_request;
     
     /* Currency */
@@ -262,18 +257,21 @@ function generatePagSeguroRequestData() {
 
 /**
  * Gets extra amount values for order
+ * 
  * @return float
  */
-function getExtraAmountValues() {
+function getExtraAmountValues()
+{
     return Tools::convertPrice(getCartDiscounts() + getWrappingValues());
 }
 
 /**
  * Gets cart discounts values
+ * 
  * @return float
  */
-function getCartDiscounts() {
-    
+function getCartDiscounts()
+{
     global $cart;
     
     $discounts_values = (float) 0;
@@ -291,21 +289,23 @@ function getCartDiscounts() {
 
 /**
  * Gets wrapping values for order
+ * 
  * @return float
  */
-function getWrappingValues() {
+function getWrappingValues()
+{
     global $cart;
     $value = $cart->getOrderTotal(true, Cart::ONLY_WRAPPING);
     return number_format(Tools::ps_round($value, 2), 2, '.', '');
 }
 
 /**
- *  Generates products data to PagSeguro transaction
+ * Generates products data to PagSeguro transaction
  *
- *  @return Array PagSeguroItem
+ * @return Array PagSeguroItem
  */
-function generateProductsData() {
-    
+function generateProductsData()
+{
     global $cart;
     
     $pagseguro_items = array();
@@ -315,27 +315,23 @@ function generateProductsData() {
     $id_currency = PagSeguro::returnIdCurrency();
     
     foreach ($cart->getProducts() as $product) {
-    
+        
         $pagSeguro_item = new PagSeguroItem();
         $pagSeguro_item->setId($cont ++);
         $pagSeguro_item->setDescription(Tools::truncate($product['name'], 255));
         $pagSeguro_item->setQuantity($product['quantity']);
-    
+        
         if ($cart->id_currency != $id_currency && ! is_null($id_currency)) {
             $pagSeguro_item->setAmount(
-                convertPriceFull(
-                    $product['price_wt'],
-                    new Currency($cart->id_currency),
-                    new Currency($id_currency)
-                )
-            );
+                convertPriceFull($product['price_wt'],
+                    new Currency($cart->id_currency), new Currency($id_currency)));
         } else {
             $pagSeguro_item->setAmount($product['price_wt']);
         }
-    
+        
         /* Defines weight in grams */
         $pagSeguro_item->setWeight($product['weight'] * 1000);
-    
+        
         if ($product['additional_shipping_cost'] > 0) {
             $pagSeguro_item->setShippingCost($product['additional_shipping_cost']);
         }
@@ -346,23 +342,24 @@ function generateProductsData() {
 }
 
 /**
- *  Generates sender data to PagSeguro transaction
+ * Generates sender data to PagSeguro transaction
  *
- *  @return PagSeguroSender
+ * @return PagSeguroSender
  */
-function generateSenderData() {
+function generateSenderData()
+{
     global $customer;
     $sender = new PagSeguroSender();
     
     if (isset($customer) && ! is_null($customer)) {
-    
+        
         $sender->setEmail($customer->email);
-    
+        
         $firstName = generateName($customer->firstname);
         $lastName = generateName($customer->lastname);
-    
-        $name = $firstName. ' ' . $lastName;
-    
+        
+        $name = $firstName . ' ' . $lastName;
+        
         $sender->setName(Tools::truncate($name, 50));
     }
     
@@ -371,17 +368,19 @@ function generateSenderData() {
 
 /**
  * Generate name
+ * 
  * @param type $value
  * @return string
  */
-function generateName($value) {
+function generateName($value)
+{
     $name = '';
     $cont = 0;
     $customer = explode(' ', $value);
     foreach ($customer as $first) {
-    
+        
         if (! Tools::isEmpty($first)) {
-    
+            
             if ($cont == 0) {
                 $name .= ($first);
                 $cont ++;
@@ -394,12 +393,12 @@ function generateName($value) {
 }
 
 /**
- *  Generates shipping data to PagSeguro transaction
+ * Generates shipping data to PagSeguro transaction
  *
- *  @return PagSeguroShipping
+ * @return PagSeguroShipping
  */
-function generateShippingData() {
-    
+function generateShippingData()
+{
     global $cart;
     
     $cost = 00.00;
@@ -416,7 +415,6 @@ function generateShippingData() {
         $new_currency = new Currency($id_currency);
         
         $cost = convertPriceFull($totalOrder, $current_currency, $new_currency);
-        
     } else {
         $cost = $cart->getOrderTotal(true, Cart::ONLY_SHIPPING);
     }
@@ -426,12 +424,12 @@ function generateShippingData() {
 }
 
 /**
- *  Generate shipping type data to PagSeguro transaction
+ * Generate shipping type data to PagSeguro transaction
  *
- *  @return PagSeguroShippingType
+ * @return PagSeguroShippingType
  */
-function generateShippingType() {
-    
+function generateShippingType()
+{
     $shipping_type = new PagSeguroShippingType();
     $shipping_type->setByType('NOT_SPECIFIED');
     
@@ -439,27 +437,27 @@ function generateShippingType() {
 }
 
 /**
- *  Generates shipping address data to PagSeguro transaction
+ * Generates shipping address data to PagSeguro transaction
  *
- *  @return PagSeguroAddress
+ * @return PagSeguroAddress
  */
-function generateShippingAddressData() {
-    
+function generateShippingAddressData()
+{
     global $cart;
     
     $address = new PagSeguroAddress();
     $delivery_address = new Address((int) $cart->id_address_delivery);
     
     if (! is_null($delivery_address)) {
-    
+        
         $fullAddress = addressConfig($delivery_address->address1);
-    
+        
         $street = (is_null($fullAddress[0]) || empty($fullAddress[0])) ?
         $delivery_address->address1 : $fullAddress[0];
-    
+        
         $number = is_null($fullAddress[1]) ? '' : $fullAddress[1];
         $complement = is_null($fullAddress[2]) ? '' : $fullAddress[2];
-    
+        
         $address->setCity($delivery_address->city);
         $address->setPostalCode($delivery_address->postcode);
         $address->setStreet($street);
@@ -467,10 +465,10 @@ function generateShippingAddressData() {
         $address->setNumber($number);
         $address->setDistrict($delivery_address->address2);
         $address->setCity($delivery_address->city);
-    
+        
         $country = new Country((int) $delivery_address->id_country);
         $address->setCountry($country->iso_code);
-    
+        
         $state = new State((int) $delivery_address->id_state);
         $address->setState($state->iso_code);
     }
@@ -478,8 +476,8 @@ function generateShippingAddressData() {
     return $address;
 }
 
-function redirectToErroPage() {
-    
+function redirectToErroPage()
+{
     global $smarty, $pag_seguro;
     
     $pag_seguro->display_column_left = false;
@@ -488,27 +486,20 @@ function redirectToErroPage() {
     $smarty->assign('version', _PS_VERSION_);
     
     echo $pag_seguro->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/front/error.tpl');
-    
-//    include_once(dirname(__FILE__) . '/../../../header.php');
-//    echo $this->module->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/front/error.tpl');
-//    include_once(dirname(__FILE__) . '/../../../footer.php');
-    
-//    echo $pag_seguro->execPagError();
-//    include_once(dirname(__FILE__) . '/../../../../footer.php');
 }
 
-function addressConfig($fullAddress) {
-    require_once(dirname(__FILE__) . '/controllers/front/addressConfig.php');
+function addressConfig($fullAddress)
+{
+    require_once (dirname(__FILE__) . '/controllers/front/addressConfig.php');
     return AddressConfig::trataEndereco($fullAddress);
 }
 
 /**
  *
  *
- *
  * Convert amount from a currency to an other currency automatically
  *
- * @param float $amount
+ * @param float $amount            
  * @param Currency $currency_from
  *            if null we used the default currency
  * @param Currency $currency_to
@@ -544,12 +535,7 @@ function canceledOrderForErro()
     global $pag_seguro;
     
     $history = new OrderHistory();
-    $history->id_order = (int)($pag_seguro->currentOrder);
-    $history->changeIdOrderState(6, (int)($pag_seguro->currentOrder));
+    $history->id_order = (int) ($pag_seguro->currentOrder);
+    $history->changeIdOrderState(6, (int) ($pag_seguro->currentOrder));
     $history->save();
-    
-//    $obj_orders = new Order($pag_seguro->currentOrder);
-//    $obj_orders->setCurrentState(6, $cart->id_customer);
-//    $obj_orders->update();
 }
-
