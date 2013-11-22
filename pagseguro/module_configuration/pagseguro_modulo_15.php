@@ -39,7 +39,7 @@ class PagSeguroModulo15 extends PaymentModule
 
     public $context;
 
-    function __construct()
+    public function __construct()
     {
         parent::__construct();
     }
@@ -80,12 +80,11 @@ class PagSeguroModulo15 extends PaymentModule
                 'index.php?fc=module&module=pagseguro&controller=payment',
                 'image' => __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png',
                 'this_path' => __PS_BASE_URI__ . 'modules/pagseguro/',
-                'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/'
-            ));
+                'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/'));
         
         $pag_mater = new PagSeguro();
         
-        return $pag_mater->display('modules/pagseguro', '/views/templates/hook/payment.tpl'); 
+        return $pag_mater->display('modules/pagseguro', '/views/templates/hook/payment.tpl');
     }
 
     /**
@@ -102,12 +101,13 @@ class PagSeguroModulo15 extends PaymentModule
             
             $smarty->assign(
                 array(
-                    'total_to_pay' => Tools::displayPrice($params['objOrder']->total_paid,
+                    'total_to_pay' => Tools::displayPrice(
+                        $params['objOrder']->total_paid,
                         $this->context->currency->id,
                         false),
                     'status' => 'ok',
-                    'id_order' => (int) $params['objOrder']->id
-                ));
+                    'id_order' => (int) $params['objOrder']->id));
+            
             if (isset($params['objOrder']->reference) && ! empty($params['objOrder']->reference)) {
                 $smarty->assign('reference', $params['objOrder']->reference);
             }

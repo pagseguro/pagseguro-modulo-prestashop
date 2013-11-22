@@ -42,8 +42,11 @@ class PagSeguroSearchTransaction
      */
     public function __construct()
     {
-        $this->transaction_code = (isset($_POST['notificationCode']) && trim($_POST['notificationCode']) !== '' ? trim(
-            $_POST['notificationCode']) : null);
+        $this->transaction_code = (
+            isset($_POST['notificationCode']) &&
+            trim($_POST['notificationCode']) !== '' ?
+            trim($_POST['notificationCode']) : null);
+        
         $this->createCredential();
         $this->createTransaction();
     }
@@ -63,7 +66,8 @@ class PagSeguroSearchTransaction
      */
     private function createTransaction()
     {
-        $this->obj_transaction = PagSeguroTransactionSearchService::searchByCode($this->obj_credential, 
+        $this->obj_transaction = PagSeguroTransactionSearchService::searchByCode(
+            $this->obj_credential,
             $this->transaction_code);
     }
 }

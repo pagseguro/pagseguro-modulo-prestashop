@@ -109,8 +109,7 @@ class PagSeguroModulo14 extends PaymentModule
                 'action_url' => _PS_BASE_URL_ . __PS_BASE_URI__ . 'modules/pagseguro/payment.php',
                 'image' => __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png',
                 'this_path' => __PS_BASE_URI__ . 'modules/pagseguro/',
-                'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/'
-            ));
+                'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/'));
         
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/hook/payment.tpl');
     }
@@ -129,11 +128,12 @@ class PagSeguroModulo14 extends PaymentModule
             
             $smarty->assign(
                 array(
-                    'total_to_pay' => Tools::displayPrice($params['objOrder']->total_paid_real, 
+                    'total_to_pay' => Tools::displayPrice(
+                        $params['objOrder']->total_paid_real,
                         $this->context->currency->id, false),
                     'status' => 'ok',
-                    'id_order' => (int) $params['objOrder']->id
-                ));
+                    'id_order' => (int) $params['objOrder']->id));
+            
             if (isset($params['objOrder']->reference) && ! empty($params['objOrder']->reference)) {
                 $smarty->assign('reference', $params['objOrder']->reference);
             }
@@ -161,9 +161,7 @@ class PagSeguroModulo14 extends PaymentModule
         $this->display_column_left = false;
         
         $this->context->smarty->assign(
-            array(
-                '$erro_image' => $this->_path . 'assets/images/logops_86x49.png'
-            ));
+            array('$erro_image' => $this->_path . 'assets/images/logops_86x49.png'));
         
         return $this->display(__FILE__, 'views/templates/front/error.tpl');
     }

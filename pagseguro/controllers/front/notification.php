@@ -153,7 +153,8 @@ class ModuleNotificationPagSeguro
      */
     private function createTransaction()
     {
-        $this->obj_transaction = PagSeguroNotificationService::checkTransaction($this->obj_credential,
+        $this->obj_transaction = PagSeguroNotificationService::checkTransaction(
+            $this->obj_credential,
             $this->notification_code);
         
         $transaction = $this->isNotNull($this->obj_transaction);
@@ -165,8 +166,8 @@ class ModuleNotificationPagSeguro
      */
     private function updateCms()
     {
-        $id_status = ($this->isNotNull($this->obj_transaction->getStatus()
-            ->getValue())) ? (int) $this->obj_transaction->getStatus()->getValue() : null;
+        $id_status = ($this->isNotNull($this->obj_transaction->getStatus()->getValue())) ?
+            (int) $this->obj_transaction->getStatus()->getValue() : null;
         
         if ($this->isNotNull($id_status)) {
             $id_st_transaction = (int) $this->returnIdOrderByStatusPagSeguro($this->array_st_cms[$id_status]);

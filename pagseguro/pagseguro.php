@@ -64,7 +64,9 @@ class PagSeguro extends PaymentModule
         }
         
         $this->setModulo(
-            version_compare(_PS_VERSION_, '1.5.0.3', '<') ? new PagSeguroModulo14() : new PagSeguroModulo15());
+            version_compare(_PS_VERSION_, '1.5.0.3', '<') ?
+            new PagSeguroModulo14() :
+            new PagSeguroModulo15());
     }
 
     /**
@@ -99,13 +101,11 @@ class PagSeguro extends PaymentModule
         or ! Configuration::updateValue('PAGSEGURO_TOKEN', '')
         or ! Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '')
         or ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '')
-        or ! Configuration::updateValue(
-                'PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset'))
+        or ! Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset'))
         or ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active'))
         or ! Configuration::updateValue(
-                'PAGSEGURO_LOG_FILELOCATION', PagSeguroConfig::getData('log', 'fileLocation')))
-        {
-            return false;
+                'PAGSEGURO_LOG_FILELOCATION', PagSeguroConfig::getData('log', 'fileLocation'))) {
+                return false;
         }
         return true;
     }
@@ -129,8 +129,7 @@ class PagSeguro extends PaymentModule
         or ! Configuration::deleteByName('PAGSEGURO_LOG_ACTIVE')
         or ! Configuration::deleteByName('PAGSEGURO_LOG_FILELOCATION')
         or ! Configuration::deleteByName('PS_OS_PAGSEGURO')
-        or ! parent::uninstall())
-        {
+        or ! parent::uninstall()) {
             return false;
         }
         
@@ -180,8 +179,10 @@ class PagSeguro extends PaymentModule
         $smarty->assign('redirect_url', $this->getDefaultRedirectionUrl());
         $smarty->assign('notification_url', $this->getNotificationUrl());
         $smarty->assign('charset_options', PagSeguroModuloUtil::getCharsetOptions());
-        $smarty->assign('charset_selected', 
-            array_search(Configuration::get('PAGSEGURO_CHARSET'), PagSeguroModuloUtil::getCharsetOptions()));
+        $smarty->assign('charset_selected',
+            array_search(
+                Configuration::get('PAGSEGURO_CHARSET'),
+                PagSeguroModuloUtil::getCharsetOptions()));
         $smarty->assign('active_log', PagSeguroModuloUtil::getActiveLog());
         $smarty->assign('log_selected', Configuration::get('PAGSEGURO_LOG_ACTIVE'));
         $smarty->assign('diretorio_log', Tools::safeOutput(Configuration::get('PAGSEGURO_LOG_FILELOCATION')));
@@ -290,11 +291,10 @@ class PagSeguro extends PaymentModule
     private function missedCurrencyMessage()
     {
         return sprintf(
-            $this->l(
-                'Verifique se a moeda <strong>REAL</strong> esta instalada e ativada.
-                    Para importar a moeda vá em Localização e importe "Brazil" no Pacote de Localização, 
-                    após isso, vá em localização, moedas, e habilite o <strong>REAL</strong>.<br>
-                    O PagSeguro aceita apenas BRL (Real) como moeda de pagamento.'));
+            $this->l('Verifique se a moeda <strong>REAL</strong> esta instalada e ativada.
+                Para importar a moeda vá em Localização e importe "Brazil" no Pacote de Localização,
+                após isso, vá em localização, moedas, e habilite o <strong>REAL</strong>.
+                <br> O PagSeguro aceita apenas BRL (Real) como moeda de pagamento.'));
     }
 
     /**
@@ -454,7 +454,9 @@ class PagSeguro extends PaymentModule
                 
                 $list_states = $this->findOrderStates($language['id_lang']);
                 
-                $continue = $this->checkIfOrderStatusExists($language['id_lang'], $statusPagSeguro['name'],
+                $continue = $this->checkIfOrderStatusExists(
+                    $language['id_lang'],
+                    $statusPagSeguro['name'],
                     $list_states);
                 
                 if ($continue) {

@@ -73,7 +73,8 @@ function setAdditionalRequestData(Array $additional_infos)
     global $payment_request;
     /* Setting reference */
     $payment_request->setReference($additional_infos['id_order']);
-    $payment_request->setRedirectURL(generateRedirectUrl($additional_infos,
+    $payment_request->setRedirectURL(
+        generateRedirectUrl($additional_infos,
         $payment_request->getRedirectURL()));
 }
 
@@ -131,9 +132,17 @@ function validateOrder()
         Tools::redirect('order.php?step=1');
     }
     
-    $pag_seguro->validateOrder((int) $cart->id, Configuration::get('PS_OS_PAGSEGURO'),
-        (float) $cart->getOrderTotal(true, Cart::BOTH), $pag_seguro->displayName, null, null,
-        (int) $cart->id_currency, false, $customer->secure_key);
+    $pag_seguro->validateOrder(
+        (int) $cart->id,
+        Configuration::get('PS_OS_PAGSEGURO'),
+        (float) $cart->getOrderTotal(true, Cart::BOTH),
+        $pag_seguro->displayName,
+        null,
+        null,
+        (int) $cart->id_currency,
+        false,
+        $customer->secure_key);
+    
     return array(
         'id_cart' => (int) $cart->id,
         'id_module' => (int) $pag_seguro->id,
@@ -180,7 +189,8 @@ function performPagSeguroRequest()
         setPagSeguroCMSVersion();
         
         /* Performing request */
-        $credentials = new PagSeguroAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'),
+        $credentials = new PagSeguroAccountCredentials(
+            Configuration::get('PAGSEGURO_EMAIL'),
             Configuration::get('PAGSEGURO_TOKEN'));
         
         $url = $payment_request->register($credentials);
@@ -322,9 +332,13 @@ function generateProductsData()
         $pagSeguro_item->setQuantity($product['quantity']);
         
         if ($cart->id_currency != $id_currency && ! is_null($id_currency)) {
+            
             $pagSeguro_item->setAmount(
-                convertPriceFull($product['price_wt'],
-                    new Currency($cart->id_currency), new Currency($id_currency)));
+                convertPriceFull(
+                    $product['price_wt'],
+                    new Currency($cart->id_currency),
+                    new Currency($id_currency)));
+            
         } else {
             $pagSeguro_item->setAmount($product['price_wt']);
         }

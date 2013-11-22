@@ -122,9 +122,16 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
             Tools::redirect('index.php?controller=order&step=1');
         }
         
-        $this->module->validateOrder((int) $this->context->cart->id, Configuration::get('PS_OS_PAGSEGURO'),
-            (float) $this->context->cart->getOrderTotal(true, Cart::BOTH), $this->module->displayName,
-            null, null, (int) $this->context->currency->id, false, $customer->secure_key);
+        $this->module->validateOrder(
+            (int) $this->context->cart->id,
+            Configuration::get('PS_OS_PAGSEGURO'),
+            (float) $this->context->cart->getOrderTotal(true, Cart::BOTH),
+            $this->module->displayName,
+            null,
+            null,
+            (int) $this->context->currency->id,
+            false,
+            $customer->secure_key);
         
         return array(
             'id_cart' => (int) $this->context->cart->id,
@@ -171,7 +178,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
             $this->setPagSeguroCMSVersion();
             
             /* Performing request */
-            $credentials = new PagSeguroAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'),
+            $credentials = new PagSeguroAccountCredentials(
+                Configuration::get('PAGSEGURO_EMAIL'),
                 Configuration::get('PAGSEGURO_TOKEN'));
             
             $url = $this->payment_request->register($credentials);
@@ -308,7 +316,9 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
             
             if ($this->context->cart->id_currency != $id_currency && ! is_null($id_currency)) {
                 $pagSeguro_item->setAmount(
-                    $this->convertPriceFull($product['price_wt'], new Currency($this->context->cart->id_currency),
+                    $this->convertPriceFull(
+                        $product['price_wt'],
+                        new Currency($this->context->cart->id_currency),
                         new Currency($id_currency)));
             } else {
                 $pagSeguro_item->setAmount($product['price_wt']);
@@ -463,8 +473,10 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
     {
         $this->display_column_left = false;
         
-        $this->module->context->smarty->assign('erro_image', 
+        $this->module->context->smarty->assign(
+            'erro_image',
             __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png');
+
         $this->module->context->smarty->assign('version', _PS_VERSION_);
         
         $this->setTemplate('error.tpl');

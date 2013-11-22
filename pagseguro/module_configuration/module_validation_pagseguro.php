@@ -130,9 +130,17 @@ class ModuleValidationPagSeguro
             Tools::redirect('index.php?controller=order&step=1');
         }
         
-        $this->module->validateOrder((int) $this->context->cart->id, Configuration::get('PS_OS_PAGSEGURO'),
-            (float) $this->context->cart->getOrderTotal(true, Cart::BOTH), $this->module->displayName, null, null,
-            (int) $this->context->currency->id, false, $customer->secure_key);
+        $this->module->validateOrder(
+            (int) $this->context->cart->id,
+            Configuration::get('PS_OS_PAGSEGURO'),
+            (float) $this->context->cart->getOrderTotal(true, Cart::BOTH),
+            $this->module->displayName,
+            null,
+            null,
+            (int) $this->context->currency->id,
+            false,
+            $customer->secure_key);
+        
         return array(
             'id_cart' => (int) $this->context->cart->id,
             'id_module' => (int) $this->module->id,
@@ -181,7 +189,8 @@ class ModuleValidationPagSeguro
             $this->setPagSeguroCMSVersion();
             
             /* Performing request */
-            $credentials = new PagSeguroAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'),
+            $credentials = new PagSeguroAccountCredentials(
+                Configuration::get('PAGSEGURO_EMAIL'),
                 Configuration::get('PAGSEGURO_TOKEN'));
             
             $url = $this->payment_request->register($credentials);
@@ -336,7 +345,9 @@ class ModuleValidationPagSeguro
             
             if ($this->context->cart->id_currency != $id_currency && ! is_null($id_currency)) {
                 $pagSeguro_item->setAmount(
-                    $this->convertPriceFull($product['price_wt'], new Currency($this->context->cart->id_currency),
+                    $this->convertPriceFull(
+                        $product['price_wt'],
+                        new Currency($this->context->cart->id_currency),
                         new Currency($id_currency)));
             } else {
                 $pagSeguro_item->setAmount($product['price_wt']);
