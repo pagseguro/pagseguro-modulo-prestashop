@@ -110,7 +110,7 @@ class PagSeguroModulo14 extends PaymentModule
                 'image' => __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png',
                 'this_path' => __PS_BASE_URI__ . 'modules/pagseguro/',
                 'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/')
-            );
+        );
         
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/hook/payment.tpl');
     }
@@ -131,7 +131,8 @@ class PagSeguroModulo14 extends PaymentModule
                 array(
                     'total_to_pay' => Tools::displayPrice(
                         $params['objOrder']->total_paid_real,
-                        $this->context->currency->id, false
+                        $this->context->currency->id,
+                        false
                     ),
                     'status' => 'ok',
                     'id_order' => (int) $params['objOrder']->id

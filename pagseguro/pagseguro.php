@@ -105,9 +105,9 @@ class PagSeguro extends PaymentModule
         or ! Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset'))
         or ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active'))
         or ! Configuration::updateValue(
-                'PAGSEGURO_LOG_FILELOCATION',
-                PagSeguroConfig::getData('log', 'fileLocation')
-            )
+            'PAGSEGURO_LOG_FILELOCATION',
+            PagSeguroConfig::getData('log', 'fileLocation')
+        )
         ) {
                 return false;
         }
@@ -183,7 +183,8 @@ class PagSeguro extends PaymentModule
         $smarty->assign('redirect_url', $this->getDefaultRedirectionUrl());
         $smarty->assign('notification_url', $this->getNotificationUrl());
         $smarty->assign('charset_options', PagSeguroModuloUtil::getCharsetOptions());
-        $smarty->assign('charset_selected',
+        $smarty->assign(
+            'charset_selected',
             array_search(
                 Configuration::get('PAGSEGURO_CHARSET'),
                 PagSeguroModuloUtil::getCharsetOptions()
@@ -297,7 +298,8 @@ class PagSeguro extends PaymentModule
     private function missedCurrencyMessage()
     {
         return sprintf(
-            $this->l('Verifique se a moeda <strong>REAL</strong> esta instalada e ativada.
+            $this->l(
+                'Verifique se a moeda <strong>REAL</strong> esta instalada e ativada.
                 Para importar a moeda vá em Localização e importe "Brazil" no Pacote de Localização,
                 após isso, vá em localização, moedas, e habilite o <strong>REAL</strong>.
                 <br> O PagSeguro aceita apenas BRL (Real) como moeda de pagamento.'

@@ -80,7 +80,8 @@ class PagSeguroModulo15 extends PaymentModule
                 'index.php?fc=module&module=pagseguro&controller=payment',
                 'image' => __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png',
                 'this_path' => __PS_BASE_URI__ . 'modules/pagseguro/',
-                'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/'));
+                'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/')
+            );
         
         $pag_mater = new PagSeguro();
         

@@ -47,7 +47,7 @@ class ModulePaymentPagSeguro
                 array(
                     'total_real' => $this->convertPriceFull($totalOrder, $current_currency, $new_currency),
                     'currency_real' => $id_currency)
-                );
+            );
         }
         
         $older_url = _PS_BASE_URL_ . __PS_BASE_URI__ . 'modules/pagseguro/validation.php"';
@@ -66,7 +66,7 @@ class ModulePaymentPagSeguro
                 'this_path' => __PS_BASE_URI__,
                 'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/',
                 'action_url' => version_compare(_PS_VERSION_, '1.5.0.3', '<=') ? $older_url : $new_url)
-            );
+        );
     }
 
     private function convertPriceFull($amount, Currency $currency_from = null, Currency $currency_to = null)
