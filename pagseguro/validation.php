@@ -74,8 +74,11 @@ function setAdditionalRequestData(Array $additional_infos)
     /* Setting reference */
     $payment_request->setReference($additional_infos['id_order']);
     $payment_request->setRedirectURL(
-        generateRedirectUrl($additional_infos,
-        $payment_request->getRedirectURL()));
+        generateRedirectUrl(
+            $additional_infos,
+            $payment_request->getRedirectURL()
+        )
+    );
 }
 
 /**
@@ -141,7 +144,8 @@ function validateOrder()
         null,
         (int) $cart->id_currency,
         false,
-        $customer->secure_key);
+        $customer->secure_key
+    );
     
     return array(
         'id_cart' => (int) $cart->id,
@@ -191,7 +195,8 @@ function performPagSeguroRequest()
         /* Performing request */
         $credentials = new PagSeguroAccountCredentials(
             Configuration::get('PAGSEGURO_EMAIL'),
-            Configuration::get('PAGSEGURO_TOKEN'));
+            Configuration::get('PAGSEGURO_TOKEN')
+        );
         
         $url = $payment_request->register($credentials);
         
@@ -337,7 +342,9 @@ function generateProductsData()
                 convertPriceFull(
                     $product['price_wt'],
                     new Currency($cart->id_currency),
-                    new Currency($id_currency)));
+                    new Currency($id_currency)
+                )
+            );
             
         } else {
             $pagSeguro_item->setAmount($product['price_wt']);

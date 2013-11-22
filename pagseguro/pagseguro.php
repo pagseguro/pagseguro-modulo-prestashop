@@ -66,7 +66,8 @@ class PagSeguro extends PaymentModule
         $this->setModulo(
             version_compare(_PS_VERSION_, '1.5.0.3', '<') ?
             new PagSeguroModulo14() :
-            new PagSeguroModulo15());
+            new PagSeguroModulo15()
+        );
     }
 
     /**
@@ -104,7 +105,10 @@ class PagSeguro extends PaymentModule
         or ! Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset'))
         or ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active'))
         or ! Configuration::updateValue(
-                'PAGSEGURO_LOG_FILELOCATION', PagSeguroConfig::getData('log', 'fileLocation'))) {
+                'PAGSEGURO_LOG_FILELOCATION',
+                PagSeguroConfig::getData('log', 'fileLocation')
+            )
+        ) {
                 return false;
         }
         return true;
@@ -182,7 +186,9 @@ class PagSeguro extends PaymentModule
         $smarty->assign('charset_selected',
             array_search(
                 Configuration::get('PAGSEGURO_CHARSET'),
-                PagSeguroModuloUtil::getCharsetOptions()));
+                PagSeguroModuloUtil::getCharsetOptions()
+            )
+        );
         $smarty->assign('active_log', PagSeguroModuloUtil::getActiveLog());
         $smarty->assign('log_selected', Configuration::get('PAGSEGURO_LOG_ACTIVE'));
         $smarty->assign('diretorio_log', Tools::safeOutput(Configuration::get('PAGSEGURO_LOG_FILELOCATION')));
@@ -294,7 +300,9 @@ class PagSeguro extends PaymentModule
             $this->l('Verifique se a moeda <strong>REAL</strong> esta instalada e ativada.
                 Para importar a moeda vá em Localização e importe "Brazil" no Pacote de Localização,
                 após isso, vá em localização, moedas, e habilite o <strong>REAL</strong>.
-                <br> O PagSeguro aceita apenas BRL (Real) como moeda de pagamento.'));
+                <br> O PagSeguro aceita apenas BRL (Real) como moeda de pagamento.'
+            )
+        );
     }
 
     /**
@@ -457,7 +465,8 @@ class PagSeguro extends PaymentModule
                 $continue = $this->checkIfOrderStatusExists(
                     $language['id_lang'],
                     $statusPagSeguro['name'],
-                    $list_states);
+                    $list_states
+                );
                 
                 if ($continue) {
                     $order_state->name[(int) $language['id_lang']] = $statusPagSeguro['name'];

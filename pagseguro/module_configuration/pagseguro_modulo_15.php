@@ -104,9 +104,12 @@ class PagSeguroModulo15 extends PaymentModule
                     'total_to_pay' => Tools::displayPrice(
                         $params['objOrder']->total_paid,
                         $this->context->currency->id,
-                        false),
+                        false
+                    ),
                     'status' => 'ok',
-                    'id_order' => (int) $params['objOrder']->id));
+                    'id_order' => (int) $params['objOrder']->id
+                )
+            );
             
             if (isset($params['objOrder']->reference) && ! empty($params['objOrder']->reference)) {
                 $smarty->assign('reference', $params['objOrder']->reference);

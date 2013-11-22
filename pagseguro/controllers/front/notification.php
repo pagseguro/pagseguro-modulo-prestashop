@@ -155,7 +155,8 @@ class ModuleNotificationPagSeguro
     {
         $this->obj_transaction = PagSeguroNotificationService::checkTransaction(
             $this->obj_credential,
-            $this->notification_code);
+            $this->notification_code
+        );
         
         $transaction = $this->isNotNull($this->obj_transaction);
         $this->reference = $transaction ? (int) $this->obj_transaction->getReference() : null;

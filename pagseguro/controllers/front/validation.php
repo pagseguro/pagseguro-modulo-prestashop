@@ -131,7 +131,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
             null,
             (int) $this->context->currency->id,
             false,
-            $customer->secure_key);
+            $customer->secure_key
+        );
         
         return array(
             'id_cart' => (int) $this->context->cart->id,
@@ -180,7 +181,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
             /* Performing request */
             $credentials = new PagSeguroAccountCredentials(
                 Configuration::get('PAGSEGURO_EMAIL'),
-                Configuration::get('PAGSEGURO_TOKEN'));
+                Configuration::get('PAGSEGURO_TOKEN')
+            );
             
             $url = $this->payment_request->register($credentials);
             
@@ -319,7 +321,9 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
                     $this->convertPriceFull(
                         $product['price_wt'],
                         new Currency($this->context->cart->id_currency),
-                        new Currency($id_currency)));
+                        new Currency($id_currency)
+                    )
+                );
             } else {
                 $pagSeguro_item->setAmount($product['price_wt']);
             }
@@ -475,7 +479,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
         
         $this->module->context->smarty->assign(
             'erro_image',
-            __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png');
+            __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png'
+        );
 
         $this->module->context->smarty->assign('version', _PS_VERSION_);
         

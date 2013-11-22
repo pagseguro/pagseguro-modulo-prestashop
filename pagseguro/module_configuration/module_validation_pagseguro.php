@@ -139,7 +139,8 @@ class ModuleValidationPagSeguro
             null,
             (int) $this->context->currency->id,
             false,
-            $customer->secure_key);
+            $customer->secure_key
+        );
         
         return array(
             'id_cart' => (int) $this->context->cart->id,
@@ -191,7 +192,8 @@ class ModuleValidationPagSeguro
             /* Performing request */
             $credentials = new PagSeguroAccountCredentials(
                 Configuration::get('PAGSEGURO_EMAIL'),
-                Configuration::get('PAGSEGURO_TOKEN'));
+                Configuration::get('PAGSEGURO_TOKEN')
+            );
             
             $url = $this->payment_request->register($credentials);
             
@@ -348,7 +350,9 @@ class ModuleValidationPagSeguro
                     $this->convertPriceFull(
                         $product['price_wt'],
                         new Currency($this->context->cart->id_currency),
-                        new Currency($id_currency)));
+                        new Currency($id_currency)
+                    )
+                );
             } else {
                 $pagSeguro_item->setAmount($product['price_wt']);
             }

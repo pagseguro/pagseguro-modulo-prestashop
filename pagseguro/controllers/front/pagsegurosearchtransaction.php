@@ -68,6 +68,7 @@ class PagSeguroSearchTransaction
     {
         $this->obj_transaction = PagSeguroTransactionSearchService::searchByCode(
             $this->obj_credential,
-            $this->transaction_code);
+            $this->transaction_code
+        );
     }
 }
