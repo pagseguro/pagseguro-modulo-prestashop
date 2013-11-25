@@ -1,63 +1,70 @@
 <?php
-
 /*
- * 2007-2013 PrestaShop
- *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Academic Free License (AFL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/afl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to license@prestashop.com so we can send you a copy immediately.
- *
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
- * versions in the future. If you wish to customize PrestaShop for your
- * needs please refer to http://www.prestashop.com for more information.
- *
- *  @author PrestaShop SA <contact@prestashop.com>
- *  @copyright  2007-2013 PrestaShop SA
- *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
- *  International Registered Trademark & Property of PrestaShop SA
- */
+* 2007-2013 PrestaShop
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Academic Free License (AFL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/afl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to license@prestashop.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+* versions in the future. If you wish to customize PrestaShop for your
+* needs please refer to http://www.prestashop.com for more information.
+*
+*  @author PrestaShop SA <contact@prestashop.com>
+*  @copyright  2007-2013 PrestaShop SA
+*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  International Registered Trademark & Property of PrestaShop SA
+*/
 
-class PagSeguroValidationModuleFrontController extends ModuleFrontController
+include_once(dirname(__FILE__).'/../../../config/config.inc.php');
+include_once(dirname(__FILE__).'/../../../init.php');
+include_once(dirname(__FILE__).'/../pagseguro.php');
+include_once(dirname(__FILE__).'/backward_compatibility/backward.php');
+include_once(dirname(__FILE__).'/../module_configuration/pagseguro_controller.php');
+include_once(dirname(__FILE__).'/../module_configuration/pagseguro_controller_1.4.php');
+include_once(dirname(__FILE__).'/../module_configuration/pagseguro_controller_1.5.php');
+
+class ModuleValidationPagSeguro
 {
 
     private $payment_request;
 
-    protected $context;
+    private $context;
 
-    public $module;
+    private $module;
 
     /**
      * Post data process function
      */
-    public function postProcess()
+    public function postProcess(PaymentModule $module)
     {
         $this->module = new PagSeguro();
-        $this->module->setModulo(new PagSeguroModulo15());
+        $this->module->setModulo($module);
         
-        $this->context = $this->module->context;
+        $this->context = $this->module->getModulo()->context;
         
-        try {
-            $this->verifyPaymentOptionAvailability();
-            $this->validateCart();
-            $this->generatePagSeguroRequestData();
-            $additional_infos = $this->validateOrder();
-            $this->setAdditionalRequestData($additional_infos);
-            $this->setNotificationUrl();
-            $this->performPagSeguroRequest();
-        } catch (PagSeguroServiceException $exc) {
-            $this->canceledOrderForErro();
-            $this->redirectToErroPage();
-        } catch (Exception $e) {
-            $this->redirectToErroPage();
-        }
+        $this->verifyPaymentOptionAvailability();
+        echo '1';
+        $this->validateCart();
+        echo '2';
+        $this->generatePagSeguroRequestData();
+        echo '3';
+        $additional_infos = $this->validateOrder();
+        echo '4';
+        $this->setAdditionalRequestData($additional_infos);
+        echo '5';
+        $this->setNotificationUrl();
+        echo '6';
+        $this->performPagSeguroRequest();
+        echo '7';
     }
 
     /**
@@ -80,7 +87,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
      */
     private function setNotificationUrl()
     {
-        $this->payment_request->setNotificationURL($this->module->getNotificationUrl());
+        $obj_ps = PagSeguroController::instaceVersionPreConfig(_PS_VERSION_);
+        $this->payment_request->setNotificationURL($obj_ps->getNotificationUrl());
     }
 
     /**
@@ -147,14 +155,17 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
      * client will be redirected to order confirmation view with a button that
      * allows client to access PagSeguro and perform him order payment
      *
-     * @param array $arrayData
+     * @param array $arrayData            
      */
     private function generateRedirectUrl(Array $arrayData, $url)
     {
-        $redirection_url_version = '?controller=order-confirmation&id_cart=';
+        $obj_ps = PagSeguroController::instaceVersionPreConfig();
+        
+        $redirection_url_version = version_compare(_PS_VERSION_, '1.5.0.3', '<') ?
+        'order-confirmation.php?id_cart=' : '?controller=order-confirmation&id_cart=';
         
         if (Tools::isEmpty($url)) {
-            $url = $this->module->getDefaultRedirectionUrl();
+            $url = $obj_ps->getDefaultRedirectionUrl();
         }
         
         return $url . $redirection_url_version . $arrayData['id_cart'] . '&id_module=' . $arrayData['id_module'] .
@@ -264,7 +275,25 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
      */
     private function getExtraAmountValues()
     {
-        return Tools::convertPrice($this->getCartRulesValues() + $this->getWrappingValues());
+        $discounts = version_compare(_PS_VERSION_, '1.5.0.3', '<=') ? $this->getCartDiscounts() :
+        $this->getCartRulesValues();
+        
+        return Tools::convertPrice($discounts + $this->getWrappingValues());
+    }
+
+    private function getCartDiscounts()
+    {
+        $discounts_values = (float) 0;
+        
+        $cart_discounts = $this->context->cart->getDiscounts();
+        
+        if (count($cart_discounts) > 0) {
+            foreach ($cart_discounts as $discount) {
+                $discounts_values += $discount['value_real'];
+            }
+        }
+        
+        return number_format(Tools::ps_round($discounts_values, 2), 2, '.', '') * - 1;
     }
 
     /**
@@ -475,21 +504,23 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
      */
     private function redirectToErroPage()
     {
-        $this->display_column_left = false;
+        global $smarty;
         
-        $this->module->context->smarty->assign(
-            'erro_image',
-            __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png'
-        );
-
-        $this->module->context->smarty->assign('version', _PS_VERSION_);
+        $this->canceledOrderForErro($this->module->currentOrder);
         
-        $this->setTemplate('error.tpl');
+        $this->module->display_column_left = false;
+        
+        $smarty->assign('erro_image', __PS_BASE_URI__ . 'modules/pagseguro/images/logops_86x49.png');
+        $smarty->assign('version', _PS_VERSION_);
+        
+        include_once (dirname(__FILE__) . '/../../../header.php');
+        echo $this->module->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/front/error.tpl');
+        include_once (dirname(__FILE__) . '/../../../footer.php');
     }
 
     private function addressConfig($fullAddress)
     {
-        require_once (dirname(__FILE__) . '/addressConfig.php');
+        require_once (dirname(__FILE__) . '/../controllers/front/addressConfig.php');
         return AddressConfig::trataEndereco($fullAddress);
     }
 
@@ -528,11 +559,17 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
         return Tools::ps_round($amount, 2);
     }
 
-    private function canceledOrderForErro()
+    private function canceledOrderForErro($id_order)
     {
-        $history = new OrderHistory();
-        $history->id_order = (int) ($this->module->currentOrder);
-        $history->changeIdOrderState(6, (int) ($this->module->currentOrder));
-        $history->save();
+        $obj_orders = new Order($id_order);
+        $obj_orders->current_state = 6;
+        $obj_orders->update();
+        
+        $obj_order_history = new OrderHistory();
+        $obj_order_history->id_order = $id_order;
+        $obj_order_history->id_employee = 0;
+        $obj_order_history->id_order_state = (int) 6;
+        
+        $obj_order_history->add();
     }
 }

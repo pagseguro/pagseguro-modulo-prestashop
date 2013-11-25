@@ -24,9 +24,9 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-<link type="text/css" rel="stylesheet" href="{$module_dir}assets/css/styles.css" />
-<script type="text/javascript" src="{$module_dir}assets/js/jquery.min.js"></script>                   
-<script type="text/javascript" src="{$module_dir}assets/js/behaviors.js"></script>
+<link type="text/css" rel="stylesheet" href="{$css_version}" />
+<script type="text/javascript" src="{$module_dir}assets/js/jquery.min.js"></script>
+<script type="text/javascript" src="{$js_behavior_version}"></script>
 
 <form class="psplugin" id="psplugin" action="{$action_post}" method="POST">
     <h1>
@@ -94,21 +94,21 @@
                     <label>{l s='E-MAIL' mod='pagseguro'}*</label>
                     <br />
                         <input type="text" name="pagseguro_email" id="pagseguro_email" value="{$email_user}" maxlength="60"  
-                               hint="{l s='Para oferecer o PagSeguro em sua loja é preciso ter uma conta do tipo vendedor ou empresarial. Se você ainda não tem uma conta PagSeguro <a href="https://pagseguro.uol.com.br/registration/registration.jhtml?ep=5&tipo=cadastro#!vendedor" target="_blank"> clique aqui </a>, caso contrário informe neste campo o e-mail associado à sua conta PagSeguro.' mod='pagseguro'}" />
+                               hint='Para oferecer o PagSeguro em sua loja é preciso ter uma conta do tipo vendedor ou empresarial. Se você ainda não tem uma conta PagSeguro <a href="https://pagseguro.uol.com.br/registration/registration.jhtml?ep=5&tipo=cadastro#!vendedor" target="_blank"> clique aqui </a>, caso contrário informe neste campo o e-mail associado à sua conta PagSeguro.' />
                     <br/>
                     <label>{l s='TOKEN' mod='pagseguro'}*</label>
                     <br />
                         <input type="text" name="pagseguro_token" id="pagseguro_token" value="{$token_user}" maxlength="32"  
-                               hint="{l s='Para utilizar qualquer serviço de integração do PagSeguro, é necessário ter um token de segurança. O token é um código único, gerado pelo PagSeguro. Caso não tenha um token <a href="https://pagseguro.uol.com.br/integracao/token-de-seguranca.jhtml" target="_blank"> clique aqui </a>, para gerar.' mod='pagseguro'}"/>
+                               hint='Para utilizar qualquer serviço de integração do PagSeguro, é necessário ter um token de segurança. O token é um código único, gerado pelo PagSeguro. Caso não tenha um token <a href="https://pagseguro.uol.com.br/integracao/token-de-seguranca.jhtml" target="_blank"> clique aqui </a>, para gerar.' />
                     <br />
                     <label>{l s='URL DE REDIRECIONAMENTO' mod='pagseguro'}</label>
                     <br />
                     <input type="text" name="pagseguro_url_redirect" id="pagseguro_url_redirect" value="{$redirect_url}" maxlength="255" 
-                           hint="{l s='Ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado de volta para sua loja ou para a URL que você informar neste campo. Para utilizar essa funcionalidade você deve configurar sua conta para aceitar somente requisições de pagamentos gerados via API. <a href="https://pagseguro.uol.com.br/integracao/pagamentos-via-api.jhtml" target="_blank"> Clique aqui </a> para ativar este serviço.' mod='pagseguro'}"/>
+                           hint='Ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado de volta para sua loja ou para a URL que você informar neste campo. Para utilizar essa funcionalidade você deve configurar sua conta para aceitar somente requisições de pagamentos gerados via API. <a href="https://pagseguro.uol.com.br/integracao/pagamentos-via-api.jhtml" target="_blank"> Clique aqui </a> para ativar este serviço.' />
                     <br />
                     <label>{l s='URL DE NOTIFICAÇÃO' mod='pagseguro'}</label>
                     <br />
-                    <input type="text" name="pagseguro_notification_url" id="pagseguro_notification_url" value="{$notification_url}" maxlength="255" hint="{l s='Sempre que uma transação mudar de status, o PagSeguro envia uma notificação para sua loja ou para a URL que você informar neste campo.' mod='pagseguro'}" />
+                    <input type="text" name="pagseguro_notification_url" id="pagseguro_notification_url" value="{$notification_url}" maxlength="255" hint='Sempre que uma transação mudar de status, o PagSeguro envia uma notificação para sua loja ou para a URL que você informar neste campo.' />
                     <br />
                     <br />
                     <p class="small">* {l s='Campos obrigatórios' mod='pagseguro'}</p>
@@ -119,17 +119,17 @@
                 <h2><span>{l s='Extras' mod='pagseguro'}</span></h2>
                 <div>
                     <label>{l s='CHARSET' mod='pagseguro'}</label><br />
-                    <select id="pagseguro_charset" name="pagseguro_charset" class="select" hint="{l s='Informe a codificação utilizada pelo seu sistema. Isso irá prevenir que as transações gerem possíveis erros ou quebras ou ainda que caracteres especiais possam ser apresentados de maneira diferente do habitual.' mod='pagseguro'}">
+                    <select id="pagseguro_charset" name="pagseguro_charset" class="select" hint='Informe a codificação utilizada pelo seu sistema. Isso irá prevenir que as transações gerem possíveis erros ou quebras ou ainda que caracteres especiais possam ser apresentados de maneira diferente do habitual.' >
                         {html_options options=$charset_options selected=$charset_selected}
                     </select>
                     <label>{l s='LOG' mod='pagseguro'}</label><br />
-                    <select id="pagseguro_log" name="pagseguro_log" class="select" hint="{l s='Deseja habilitar a geração de log?' mod='pagseguro'}">
+                    <select id="pagseguro_log" name="pagseguro_log" class="select" hint= 'Deseja habilitar a geração de log?' >
                         {html_options options=$active_log selected=$log_selected}
                     </select>
                     <br />
                     <span id="directory-log">
                         <label>{l s='DIRETÓRIO' mod='pagseguro'}</label><br />
-                        <input type="text" id="pagseguro_log_dir" name="pagseguro_log_dir" value="{$diretorio_log}" hint="{l s='Diretório a partir da raíz de instalação do PrestaShop onde se deseja criar o arquivo de log. Ex.: /logs/log_ps.log' mod='pagseguro'}" />
+                        <input type="text" id="pagseguro_log_dir" name="pagseguro_log_dir" value="{$diretorio_log}" hint= 'Diretório a partir da raíz de instalação do PrestaShop onde se deseja criar o arquivo de log. Ex.: /logs/log_ps.log' />
                     </span>
                     <div class="hintps _extras"></div>
                 </div>
