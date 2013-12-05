@@ -302,7 +302,7 @@ class PagSeguro extends PaymentModule
                 'Verifique se a moeda <strong>REAL</strong> esta instalada e ativada.
                 Para importar a moeda vá em Localização e importe "Brazil" no Pacote de Localização,
                 após isso, vá em localização, moedas, e habilite o <strong>REAL</strong>.
-                <br> O PagSeguro aceita apenas BRL (Real) como moeda de pagamento.'
+                <br>O PagSeguro aceita apenas BRL (Real) como moeda de pagamento.'
             )
         );
     }

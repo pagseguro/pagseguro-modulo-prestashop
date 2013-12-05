@@ -1,5 +1,5 @@
-Módulo de integração PagSeguro para PrestaShop 1.5
-==================================================
+Módulo de integração PagSeguro para PrestaShop 1.4 e 1.5
+========================================================
 ---
 Descrição
 ---------
@@ -13,7 +13,7 @@ Com o módulo instalado e configurado, você pode pode oferecer o PagSeguro como
 Requisitos
 ----------
 ---
- - [PrestaShop] 1.5.1.0+
+ - [PrestaShop] 1.4.5.1 a 1.5.6.0
  - [PHP] 5.1.6+
  - [SPL]
  - [cURL]
@@ -23,8 +23,6 @@ Requisitos
 Instalação
 ----------
 ---
-O PagSeguro vem instalado nativamente no PrestaShop desde a versão 1.5.4.1, sendo assim, só é preciso fazer sua configuração. Siga os passos abaixo, se, e somente se, você utilizar uma versão do PrestaShop anterior a 1.5.4.1:
-
 - Certifique-se de que não há instalação de outros módulos para o PagSeguro em seu sistema;
 - Baixe o repositório como arquivo zip ou faça um clone;
 - Na área administrativa do seu sistema, acesse o menu Módulos -> Modules -> Add new module, aponte para o caminho do arquivo pagseguro.zip e faça o upload;
@@ -58,20 +56,20 @@ Changelog
 ---
 1.6
 
-- Atualização da lib. PHP no módulo;
-- Compatibilidade com a versão 1.4.5.1+ do PrestaShop;
-- Verificar se a moeda Real esta ativa, para envio ao PagSeguro;
-- Conclusão de pagamento em qualquer moeda;
-- Cancelamento do carrinho caso ocorra erro durante checkout;
-- Conformidade com PSR-2;
+- Atualização da lib PHP no módulo.
+- Compatibilidade com a versão 1.4.5.1+ do PrestaShop.
+- Verificar se a moeda Real esta ativa, para envio ao PagSeguro.
+- Conclusão de pagamento em qualquer moeda.
+- Cancelamento do carrinho caso ocorra erro durante checkout.
+- Conformidade com PSR-2.
 
 1.5
 
- - Melhorias no tratamento de endereço;
- - Ajustes de CSS;
- - Não utilizar URLs de localhost para notificação/redirecionamento;
- - Verificar se o ambiente atende os requisitos;
- - Armazenamento do ID da transação gerada pelo PagSeguro;
+ - Melhorias no tratamento de endereço.
+ - Ajustes de CSS.
+ - Não utilizar URLs de localhost para notificação/redirecionamento.
+ - Verificar se o ambiente atende os requisitos.
+ - Armazenamento do ID da transação gerada pelo PagSeguro.
 
 1.4
 
