@@ -170,7 +170,7 @@ class PagSeguroModulo14 extends PaymentModule
 
     public function execPayment()
     {
-	 include_once(dirname(__FILE__) . '/../module_configuration/module_payment_pagseguro.php');
+        include_once(dirname(__FILE__) . '/../module_configuration/module_payment_pagseguro.php');
         $payment = new ModulePaymentPagSeguro();
         $payment->setVariablesPaymentExecutionView($this->context);
 
