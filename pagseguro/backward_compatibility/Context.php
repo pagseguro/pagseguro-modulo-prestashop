@@ -189,7 +189,7 @@ class Context
             $this->customer = null;
             $this->employee = null;
         }
-        
+
         $this->shop = new ShopBackwardModule();
         if ((bool) Configuration::get('PS_MOBILE_DEVICE')) {
             $this->mobile_detect = new Mobile_Detect();

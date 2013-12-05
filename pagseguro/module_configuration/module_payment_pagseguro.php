@@ -36,7 +36,7 @@ class ModulePaymentPagSeguro
     public function setVariablesPaymentExecutionView($context)
     {
         global $smarty;
-        
+
         $id_currency = PagSeguro::returnIdCurrency();
         if ($context->cart->id_currency != $id_currency && ! is_null($id_currency)) {
             

@@ -90,7 +90,7 @@ class PagSeguroModuloUtil
             'name' => 'Paga',
             'send_email' => true,
             'template' => 'payment',
-            'hidden' => true,
+            'hidden' => false,
             'delivery' => false,
             'logable' => true,
             'invoice' => true,

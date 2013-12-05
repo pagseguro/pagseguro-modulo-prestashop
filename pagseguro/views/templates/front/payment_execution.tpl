@@ -24,7 +24,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{if $version >= '1.5'}
+{if $version >= '1.5.0.2'}
     <style type="text/css" media="all">{literal}div#center_column{ width: 757px; }{/literal}</style>
 {else}
     <style type="text/css" media="all">{literal}div#center_column{ width: 535px; }{/literal}</style>

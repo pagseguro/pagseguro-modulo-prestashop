@@ -29,6 +29,7 @@ include_once(dirname(__FILE__) . '/../../config/config.inc.php');
 include_once(dirname(__FILE__) . '/../../header.php');
 include_once(dirname(__FILE__) . '/pagseguro.php');
 include_once(dirname(__FILE__) . '/backward_compatibility/backward.php');
+include_once(dirname(__FILE__) . '/module_configuration/pagseguro_modulo_14.php');
 
 $pag_seguro = new PagSeguro();
 $pag_seguro->setModulo(new PagSeguroModulo14());
@@ -503,7 +504,6 @@ function redirectToErroPage()
     
     $pag_seguro->display_column_left = false;
     
-    $smarty->assign('erro_image', __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png');
     $smarty->assign('version', _PS_VERSION_);
     
     echo $pag_seguro->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/front/error.tpl');

@@ -25,10 +25,10 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-include_once(dirname(__FILE__).'/../../../config/config.inc.php');
-include_once(dirname(__FILE__).'/../../../init.php');
+//include_once(dirname(__FILE__).'/../../../config/config.inc.php');
+//include_once(dirname(__FILE__).'/../../../init.php');
 include_once(dirname(__FILE__) . '/../PagSeguroLibrary/PagSeguroLibrary.php');
-include_once(dirname(__FILE__) . '/../module_configuration/module_payment_pagseguro.php');
+
 
 if (! defined('_PS_VERSION_')) {
     exit();
@@ -165,18 +165,15 @@ class PagSeguroModulo14 extends PaymentModule
     {
         $this->display_column_left = false;
         
-        $this->context->smarty->assign(
-            array('$erro_image' => $this->_path . 'assets/images/logops_86x49.png')
-        );
-        
         return $this->display(__FILE__, 'views/templates/front/error.tpl');
     }
 
     public function execPayment()
     {
+	 include_once(dirname(__FILE__) . '/../module_configuration/module_payment_pagseguro.php');
         $payment = new ModulePaymentPagSeguro();
         $payment->setVariablesPaymentExecutionView($this->context);
-        
+
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/front/payment_execution.tpl');
     }
 

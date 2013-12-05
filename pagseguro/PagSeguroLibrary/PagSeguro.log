@@ -3,3 +3,8 @@
   'SenderEmail' => 'comprador@s2it.com.br',
 )) - begin 
 {2013/10/29 11:58:26} [Error] Exception: CURL can't connect: couldn't connect to host 
+{2013/12/03 09:20:47} [Info] PagSeguroPaymentService.Register(PagSeguroPaymentRequest: array (
+  'Reference' => 3,
+  'SenderEmail' => 'comprador@s2it.com.br',
+)) - begin 
+{2013/12/03 09:21:08} [Error] Exception: CURL can't connect: connect() timed out! 

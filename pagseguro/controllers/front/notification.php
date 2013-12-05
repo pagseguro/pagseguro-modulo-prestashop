@@ -92,7 +92,7 @@ class ModuleNotificationPagSeguro
 
     /**
      *
-     * @param array $post            
+     * @param array $post
      */
     private function createNotification(Array $post)
     {

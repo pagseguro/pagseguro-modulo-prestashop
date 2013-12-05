@@ -477,11 +477,6 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
     {
         $this->display_column_left = false;
         
-        $this->module->context->smarty->assign(
-            'erro_image',
-            __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png'
-        );
-
         $this->module->context->smarty->assign('version', _PS_VERSION_);
         
         $this->setTemplate('error.tpl');

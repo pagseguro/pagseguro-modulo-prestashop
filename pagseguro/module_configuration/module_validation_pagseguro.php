@@ -510,7 +510,6 @@ class ModuleValidationPagSeguro
         
         $this->module->display_column_left = false;
         
-        $smarty->assign('erro_image', __PS_BASE_URI__ . 'modules/pagseguro/images/logops_86x49.png');
         $smarty->assign('version', _PS_VERSION_);
         
         include_once (dirname(__FILE__) . '/../../../header.php');

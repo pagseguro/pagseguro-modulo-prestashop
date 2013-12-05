@@ -29,10 +29,13 @@ include_once(dirname(__FILE__).'/../../config/config.inc.php');
 include_once(dirname(__FILE__).'/../../header.php');
 include_once(dirname(__FILE__).'/pagseguro.php');
 include_once(dirname(__FILE__).'/backward_compatibility/backward.php');
+include_once(dirname(__FILE__).'/module_configuration/pagseguro_modulo_14.php');
 
 $useSSL = true;
 
-if (! $cookie->isLogged(true)) {
+$pagseguro = new PagSeguroModulo14();
+
+if (! $pagseguro->context->cookie->isLogged(true)) {
     Tools::redirect('authentication.php?back=order.php');
 }
 

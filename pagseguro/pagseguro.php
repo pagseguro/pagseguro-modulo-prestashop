@@ -1,4 +1,5 @@
 <?php
+
 /*
  * 2007-2013 PrestaShop
  *
@@ -26,8 +27,6 @@
 
 include_once (dirname(__FILE__) . '/PagSeguroLibrary/PagSeguroLibrary.php');
 include_once (dirname(__FILE__) . '/module_configuration/pagseguro_modulo_util.php');
-include_once (dirname(__FILE__) . '/module_configuration/pagseguro_modulo_14.php');
-include_once (dirname(__FILE__) . '/module_configuration/pagseguro_modulo_15.php');
 
 if (! defined('_PS_VERSION_')) {
     exit();
@@ -56,18 +55,18 @@ class PagSeguro extends PaymentModule
         parent::__construct();
         
         $this->displayName = $this->l('PagSeguro');
-        $this->description = $this->l('Receba pagamentos por cartão de crédito, transferência bancária e boleto.');
+        $this->description = $this->l('Receba pagamentos por cartÃµo de crédito, transferência bancária e boleto.');
         $this->confirmUninstall = $this->l('Tem certeza que deseja remover este módulo ?');
-        
-        if (version_compare(_PS_VERSION_, '1.5.0.3', '<=')) {
-            include_once (dirname(__FILE__) . '/backward_compatibility/backward.php');
-        }
-        
-        $this->setModulo(
-            version_compare(_PS_VERSION_, '1.5.0.3', '<') ?
-            new PagSeguroModulo14() :
-            new PagSeguroModulo15()
-        );
+
+		if(version_compare(_PS_VERSION_, '1.5.0.2', '<')) {
+			include_once (dirname(__FILE__) . '/backward_compatibility/backward.php');
+			include_once (dirname(__FILE__) . '/module_configuration/pagseguro_modulo_14.php');
+			$this->setModulo(new PagSeguroModulo14());
+		} else {
+			include_once (dirname(__FILE__) . '/module_configuration/pagseguro_modulo_15.php');
+			$this->setModulo(new PagSeguroModulo15());
+		}
+
     }
 
     /**
@@ -95,21 +94,14 @@ class PagSeguro extends PaymentModule
             return false;
         }
         
-        if (! parent::install()
-        or ! $this->registerHook('payment')
-        or ! $this->registerHook('paymentReturn')
-        or ! Configuration::updateValue('PAGSEGURO_EMAIL', '')
-        or ! Configuration::updateValue('PAGSEGURO_TOKEN', '')
-        or ! Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '')
-        or ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '')
-        or ! Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset'))
-        or ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active'))
-        or ! Configuration::updateValue(
-            'PAGSEGURO_LOG_FILELOCATION',
-            PagSeguroConfig::getData('log', 'fileLocation')
-        )
-        ) {
-                return false;
+        if (! parent::install() or ! $this->registerHook('payment') or ! $this->registerHook('paymentReturn') or
+             ! Configuration::updateValue('PAGSEGURO_EMAIL', '') or ! Configuration::updateValue('PAGSEGURO_TOKEN', '') or
+             ! Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') or
+             ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '') or ! Configuration::updateValue(
+                'PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset')) or
+             ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active')) or ! Configuration::updateValue(
+                'PAGSEGURO_LOG_FILELOCATION', PagSeguroConfig::getData('log', 'fileLocation'))) {
+            return false;
         }
         return true;
     }
@@ -155,7 +147,8 @@ class PagSeguro extends PaymentModule
                 $this->postProcess();
             } else {
                 foreach ($this->errors as $error) {
-                    $this->html .= '<div class="alert error">' . $error . '</div>';
+                    $this->html .= '<div class="module_error alert error" '.$this->getWidthVersion(_PS_VERSION_).'">'
+                        . $error . '</div>';
                 }
             }
         }
@@ -164,7 +157,8 @@ class PagSeguro extends PaymentModule
         
         /* Currency validation */
         if (! $currency) {
-            $this->html .= '<div class="alert warn">' . $this->missedCurrencyMessage() . '</div>';
+            $this->html .= '<div class="alert warn" '.$this->getWidthVersion(_PS_VERSION_).' ">'
+                . $this->missedCurrencyMessage() . '</div>';
         }
         
         $this->html .= $this->displayForm();
@@ -183,19 +177,17 @@ class PagSeguro extends PaymentModule
         $smarty->assign('redirect_url', $this->getDefaultRedirectionUrl());
         $smarty->assign('notification_url', $this->getNotificationUrl());
         $smarty->assign('charset_options', PagSeguroModuloUtil::getCharsetOptions());
-        $smarty->assign(
-            'charset_selected',
-            array_search(
-                Configuration::get('PAGSEGURO_CHARSET'),
-                PagSeguroModuloUtil::getCharsetOptions()
-            )
-        );
+        $smarty->assign('charset_selected', 
+            array_search(Configuration::get('PAGSEGURO_CHARSET'), PagSeguroModuloUtil::getCharsetOptions()));
         $smarty->assign('active_log', PagSeguroModuloUtil::getActiveLog());
+        $smarty->assign('checkout_selected', Configuration::get('PAGSEGURO_CHECKOUT'));
         $smarty->assign('log_selected', Configuration::get('PAGSEGURO_LOG_ACTIVE'));
         $smarty->assign('diretorio_log', Tools::safeOutput(Configuration::get('PAGSEGURO_LOG_FILELOCATION')));
         $smarty->assign('checkActiveSlide', Tools::safeOutput($this->checkActiveSlide()));
-        $smarty->assign('css_version', $this->getCssDisplay());
-        $smarty->assign('js_behavior_version', $this->getJsBehavior());
+        $smarty->assign('css_version', (_PS_VERSION_ == '1.5.0.1') ?
+            __PS_BASE_URI__ . 'modules/pagseguro/assets/css/styles-version-14.css' : $this->getCssDisplay());
+        $smarty->assign('js_behavior_version', (_PS_VERSION_ == '1.5.0.1') ?
+            __PS_BASE_URI__ . 'modules/pagseguro/assets/js/behaviors-version-14.js' : $this->getJsBehavior());
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', 'admin_pagseguro.tpl');
     }
 
@@ -231,14 +223,12 @@ class PagSeguro extends PaymentModule
             }
             
             /* URL redirect validation */
-            if ($pagseguro_url_redirect && !
-            filter_var($pagseguro_url_redirect, FILTER_VALIDATE_URL)) {
+            if ($pagseguro_url_redirect && ! filter_var($pagseguro_url_redirect, FILTER_VALIDATE_URL)) {
                 $this->errors[] = $this->invalidUrl('URL DE REDIRECIONAMENTO');
             }
             
             /* Notification url validation */
-            if ($pagseguro_notification_url && !
-            filter_var($pagseguro_notification_url, FILTER_VALIDATE_URL)) {
+            if ($pagseguro_notification_url && ! filter_var($pagseguro_notification_url, FILTER_VALIDATE_URL)) {
                 $this->errors[] = $this->invalidUrl('URL DE NOTIFICAÇÃO');
             }
             
@@ -276,13 +266,19 @@ class PagSeguro extends PaymentModule
                 $this->verifyLogFile(Tools::getValue('pagseguro_log_dir'));
             }
         }
-        $this->html .= '<div class="conf confirm">' . $this->l('Dados atualizados com sucesso') . '</div>';
+        $this->html .= '<div class="module_confirmation conf confirm" '.$this->getWidthVersion(_PS_VERSION_).' ">'
+            . $this->l('Dados atualizados com sucesso') . '</div>';
     }
+    
+    private function getWidthVersion($module_version) {
+        return version_compare($module_version, '1.5', '<') ? 'style="width: 911px;' : 'style="width: 935px;';
+    }
+    
 
     /**
      * Create error messages
      *
-     * @param String $field            
+     * @param String $field
      * @return String
      */
     private function errorMessage($field)
@@ -299,12 +295,10 @@ class PagSeguro extends PaymentModule
     {
         return sprintf(
             $this->l(
-                'Verifique se a moeda <strong>REAL</strong> esta instalada e ativada.
-                Para importar a moeda vá em Localização e importe "Brazil" no Pacote de Localização,
-                após isso, vá em localização, moedas, e habilite o <strong>REAL</strong>.
-                <br>O PagSeguro aceita apenas BRL (Real) como moeda de pagamento.'
-            )
-        );
+                    'Verifique se a moeda <strong>REAL</strong> esta instalada e ativada.
+                    Para importar a moeda vá em Localização e importe "Brazil" no Pacote de Localização, 
+                    após isso, vá em localização, moedas, e habilite o <strong>REAL</strong>.<br>
+                    O PagSeguro aceita apenas BRL (Real) como moeda de pagamento.'));
     }
 
     /**
@@ -450,7 +444,7 @@ class PagSeguro extends PaymentModule
             $order_state->logable = $statusPagSeguro['logable'];
             $order_state->invoice = $statusPagSeguro['invoice'];
             
-            if (version_compare(_PS_VERSION_, '1.5', '>=')) {
+            if (version_compare(_PS_VERSION_, '1.5', '>')) {
                 $order_state->unremovable = $statusPagSeguro['unremovable'];
                 $order_state->shipped = $statusPagSeguro['shipped'];
                 $order_state->paid = $statusPagSeguro['paid'];
@@ -464,11 +458,8 @@ class PagSeguro extends PaymentModule
                 
                 $list_states = $this->findOrderStates($language['id_lang']);
                 
-                $continue = $this->checkIfOrderStatusExists(
-                    $language['id_lang'],
-                    $statusPagSeguro['name'],
-                    $list_states
-                );
+                $continue = $this->checkIfOrderStatusExists($language['id_lang'], $statusPagSeguro['name'], 
+                    $list_states);
                 
                 if ($continue) {
                     $order_state->name[(int) $language['id_lang']] = $statusPagSeguro['name'];
@@ -476,9 +467,11 @@ class PagSeguro extends PaymentModule
                 }
                 
                 if ($key == 'WAITING_PAYMENT' or $key == 'IN_ANALYSIS') {
+                    
                     $this->copyMailTo($statusPagSeguro['template'], $language['iso_code'], 'html');
                     $this->copyMailTo($statusPagSeguro['template'], $language['iso_code'], 'txt');
                 }
+                
             }
             
             if ($continue) {
@@ -487,10 +480,11 @@ class PagSeguro extends PaymentModule
                     
                     $file = _PS_ROOT_DIR_ . '/img/os/' . (int) $order_state->id . '.gif';
                     copy($image, $file);
+                    
                 }
             }
             
-            if ($key == 'WAITING_PAYMENT') {
+            if ($key == 'INITIATED') {
                 $name_state = $statusPagSeguro['name'];
             }
         }
@@ -499,24 +493,26 @@ class PagSeguro extends PaymentModule
         
         return $orders_added;
     }
-
-    private function copyMailTo($name, $lang, $ext)
-    {
-        $template = _PS_MAIL_DIR_ . $lang . '/' . $name . '.' . $ext;
+    
+    private function copyMailTo($name, $lang, $ext){
         
-        if (! file_exists($template)) {
-            $templateToCopy = _PS_ROOT_DIR_ . '/modules/pagseguro/mails/' . $name . '.' . $ext;
+        $template = _PS_MAIL_DIR_.$lang.'/'.$name.'.'.$ext;
+        
+        if(! file_exists($template)) {
+            
+            $templateToCopy = _PS_ROOT_DIR_ . '/modules/pagseguro/mails/' . $name .'.'. $ext;
             copy($templateToCopy, $template);
+            
         }
     }
-
+    
     private function findOrderStates($lang_id)
     {
         $sql = 'SELECT DISTINCT osl.`id_lang`, osl.`name`
             FROM `' . _DB_PREFIX_ . 'order_state` os
             INNER JOIN `' .
              _DB_PREFIX_ . 'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state`)
-            WHERE osl.`id_lang` = ' . "$lang_id" . ' AND osl.`name` in ("Iniciado","Aguardando pagamento",
+            WHERE osl.`id_lang` = '."$lang_id".' AND osl.`name` in ("Iniciado","Aguardando pagamento",
             "Em análise", "Paga","Disponível","Em disputa","Devolvida","Cancelada") AND os.`id_order_state` <> 6';
         
         return (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql));
@@ -524,7 +520,8 @@ class PagSeguro extends PaymentModule
 
     private function returnIdOrderByStatusPagSeguro($nome_status)
     {
-        $isDeleted = version_compare(_PS_VERSION_, '1.5.0.3', '<=') ? '' : 'WHERE deleted = 0';
+        
+        $isDeleted = version_compare(_PS_VERSION_, '1.5', '<') ? '' : 'WHERE deleted = 0';
         
         $sql = 'SELECT distinct os.`id_order_state`
             FROM `' . _DB_PREFIX_ . 'order_state` os
@@ -540,11 +537,12 @@ class PagSeguro extends PaymentModule
     /**
      * Check if PagSeguro order status already exists on database
      *
-     * @param String $status            
+     * @param String $status
      * @return boolean
      */
     private function checkIfOrderStatusExists($id_lang, $status_name, $list_states)
     {
+        
         if (Tools::isEmpty($list_states) or empty($list_states) or ! isset($list_states)) {
             return true;
         }
@@ -557,7 +555,7 @@ class PagSeguro extends PaymentModule
                 break;
             }
         }
-        
+
         return $save;
     }
 
@@ -568,7 +566,7 @@ class PagSeguro extends PaymentModule
 
     /**
      * Gets a default redirection url
-     *
+     * 
      * @return string
      */
     public function getDefaultRedirectionUrl()

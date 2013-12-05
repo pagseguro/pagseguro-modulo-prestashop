@@ -302,7 +302,7 @@ form.psplugin { position : relative !important; width : 910px; left : -470px !im
 }
 .psplugin input[type=option] {}
 .psplugin input[type=submit] {}
-.psplugin label { font: 'Helvetica Neue', Verdana, Arial, sans-serif !important; color : #57AD29; font-weight : bold; text-align : left; }
+.psplugin label { font: 'Helvetica Neue', Verdana, Arial, sans-serif !important; color : #57AD29; font-weight : bold; text-align : left; width: 250px !important; }
 .psplugin p { font-size : 12pt !important; line-height : 14pt; text-indent : 2em; font-weight : normal; color: #666666; text-align : justify; }
 .psplugin ol { color: #666666; line-height: 26px; }
 .psplugin ol li { list-style-type : disc !important; list-style-position : inside; }
@@ -481,12 +481,4 @@ h2, .psplugin > h1 span { border: medium none; color: #5B9028; font-family: "Cor
 .pagseguro-button.icon-right.plus:after, .pagseguro-button.icon-left.plus:before {content : '+';}
 .pagseguro-button.icon-right:after {content : attr(iconright);}
 .pagseguro-button.icon-left:before {content : attr(iconleft);}
-
-
-
-
-
-
-
-
 
