@@ -102,9 +102,10 @@ class PagSeguro extends PaymentModule
             ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '') or
             ! Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset')) or
             ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active')) or
-            ! Configuration::updateValue('PAGSEGURO_LOG_FILELOCATION',
+            ! Configuration::updateValue(
+                'PAGSEGURO_LOG_FILELOCATION',
                 PagSeguroConfig::getData('log', 'fileLocation')
-			)) {
+            )) {
             return false;
         }
         return true;
@@ -186,7 +187,7 @@ class PagSeguro extends PaymentModule
             array_search(
                 Configuration::get('PAGSEGURO_CHARSET'),
                 PagSeguroModuloUtil::getCharsetOptions()
-			)
+            )
         );
         $smarty->assign('active_log', PagSeguroModuloUtil::getActiveLog());
         $smarty->assign('checkout_selected', Configuration::get('PAGSEGURO_CHECKOUT'));
