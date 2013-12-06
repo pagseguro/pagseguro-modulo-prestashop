@@ -20,13 +20,13 @@
 
 /*
  * PagSeguro Library Class
- * Version: 2.1.8
- * Date: 21/08/2013
+ * Version: 2.1.9
+ * Date: 22/10/2013
  */
 class PagSeguroLibrary
 {
 
-    const VERSION = "2.1.8";
+    const VERSION = "2.2.0";
     public static $resources;
     public static $config;
     public static $log;
