@@ -95,15 +95,15 @@ class PagSeguro extends PaymentModule
         }
         
         if (! parent::install() or ! $this->registerHook('payment') or
-			! $this->registerHook('paymentReturn') or
+            ! $this->registerHook('paymentReturn') or
             ! Configuration::updateValue('PAGSEGURO_EMAIL', '') or
-			! Configuration::updateValue('PAGSEGURO_TOKEN', '') or
+            ! Configuration::updateValue('PAGSEGURO_TOKEN', '') or
             ! Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') or
             ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '') or
-			! Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset')) or
+            ! Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset')) or
             ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active')) or
-			! Configuration::updateValue('PAGSEGURO_LOG_FILELOCATION',
-		        PagSeguroConfig::getData('log', 'fileLocation'))) {
+            ! Configuration::updateValue('PAGSEGURO_LOG_FILELOCATION',
+                PagSeguroConfig::getData('log', 'fileLocation'))) {
             return false;
         }
         return true;
@@ -181,23 +181,25 @@ class PagSeguro extends PaymentModule
         $smarty->assign('notification_url', $this->getNotificationUrl());
         $smarty->assign('charset_options', PagSeguroModuloUtil::getCharsetOptions());
         $smarty->assign(
-	        'charset_selected',
+            'charset_selected',
             array_search(Configuration::get('PAGSEGURO_CHARSET'),
-			PagSeguroModuloUtil::getCharsetOptions())
-		);
+            PagSeguroModuloUtil::getCharsetOptions())
+        );
         $smarty->assign('active_log', PagSeguroModuloUtil::getActiveLog());
         $smarty->assign('checkout_selected', Configuration::get('PAGSEGURO_CHECKOUT'));
         $smarty->assign('log_selected', Configuration::get('PAGSEGURO_LOG_ACTIVE'));
         $smarty->assign('diretorio_log', Tools::safeOutput(Configuration::get('PAGSEGURO_LOG_FILELOCATION')));
         $smarty->assign('checkActiveSlide', Tools::safeOutput($this->checkActiveSlide()));
         $smarty->assign(
-		    'css_version',
-			(_PS_VERSION_ == '1.5.0.1')
-			? __PS_BASE_URI__ . 'modules/pagseguro/assets/css/styles-version-14.css' : $this->getCssDisplay());
+            'css_version',
+            (_PS_VERSION_ == '1.5.0.1')
+            ? __PS_BASE_URI__ . 'modules/pagseguro/assets/css/styles-version-14.css' : $this->getCssDisplay()
+        );
         $smarty->assign(
-		    'js_behavior_version',
-			(_PS_VERSION_ == '1.5.0.1')
-			? __PS_BASE_URI__ . 'modules/pagseguro/assets/js/behaviors-version-14.js' : $this->getJsBehavior());
+            'js_behavior_version',
+            (_PS_VERSION_ == '1.5.0.1')
+            ? __PS_BASE_URI__ . 'modules/pagseguro/assets/js/behaviors-version-14.js' : $this->getJsBehavior()
+        );
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', 'admin_pagseguro.tpl');
     }
 
@@ -281,7 +283,7 @@ class PagSeguro extends PaymentModule
     }
     
     private function getWidthVersion($module_version)
-	{
+    {
         return version_compare($module_version, '1.5', '<') ? 'style="width: 911px;' : 'style="width: 935px;';
     }
     
@@ -310,8 +312,8 @@ class PagSeguro extends PaymentModule
                 Para importar a moeda vá em Localização e importe "Brazil" no Pacote de Localização, 
                 após isso, vá em localização, moedas, e habilite o <strong>REAL</strong>.<br>
                 O PagSeguro aceita apenas BRL (Real) como moeda de pagamento.'
-			)
-		);
+            )
+        );
     }
 
     /**
@@ -472,10 +474,10 @@ class PagSeguro extends PaymentModule
                 $list_states = $this->findOrderStates($language['id_lang']);
                 
                 $continue = $this->checkIfOrderStatusExists(
-				    $language['id_lang'],
-					$statusPagSeguro['name'],
+                    $language['id_lang'],
+                    $statusPagSeguro['name'],
                     $list_states
-				);
+                );
                 
                 if ($continue) {
                     $order_state->name[(int) $language['id_lang']] = $statusPagSeguro['name'];
@@ -511,7 +513,7 @@ class PagSeguro extends PaymentModule
     }
     
     private function copyMailTo($name, $lang, $ext)
-	{
+    {
         
         $template = _PS_MAIL_DIR_.$lang.'/'.$name.'.'.$ext;
         
