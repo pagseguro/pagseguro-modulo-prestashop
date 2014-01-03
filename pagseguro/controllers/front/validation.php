@@ -33,18 +33,22 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
     protected $context;
 
     public $module;
-
+    
+    private $user_url_redirect;
+    
     /**
      * Post data process function
      */
     public function postProcess()
     {
+		global $checkout;
+		
         $this->module = new PagSeguro();
         $this->module->setModulo(new PagSeguroModulo15());
         
         $this->context = $this->module->context;
-        
-        try {
+		
+		try {
             $this->verifyPaymentOptionAvailability();
             $this->validateCart();
             $this->generatePagSeguroRequestData();
@@ -54,9 +58,9 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
             $this->performPagSeguroRequest();
         } catch (PagSeguroServiceException $exc) {
             $this->canceledOrderForErro();
-            $this->redirectToErroPage();
+            Tools::redirect('modules/pagseguro/controllers/front/error.php');
         } catch (Exception $e) {
-            $this->redirectToErroPage();
+            Tools::redirect('modules/pagseguro/controllers/front/error.php');
         }
     }
 
@@ -71,8 +75,9 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
         /* Setting reference */
         $this->payment_request->setReference($additional_infos['id_order']);
         
-        $redirectUrl = $this->payment_request->getRedirectURL();
-        $this->payment_request->setRedirectURL($this->generateRedirectUrl($additional_infos, $redirectUrl));
+        $this->user_url_redirect = $this->generateRedirectUrl($additional_infos, $this->payment_request->getRedirectURL());
+       
+        $this->payment_request->setRedirectURL($this->user_url_redirect);
     }
 
     /**
@@ -167,6 +172,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
      */
     private function performPagSeguroRequest()
     {
+        $checkout = Configuration::get('PAGSEGURO_CHECKOUT');
+        
         try {
             
             /* Retrieving PagSeguro configurations */
@@ -184,12 +191,16 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
                 Configuration::get('PAGSEGURO_TOKEN')
             );
             
-            $url = $this->payment_request->register($credentials);
+            $url = $this->payment_request->register($credentials,$checkout);
             
+            if($checkout) {
+                die(Tools::jsonEncode(array('code'=>$url,'redirect'=> $this->user_url_redirect)));
+            }
             /* Redirecting to PagSeguro */
             if (Validate::isUrl($url)) {
                 Tools::redirectLink(Tools::truncate($url, 255, ''));
             }
+            
         } catch (PagSeguroServiceException $e) {
             throw $e;
         } catch (Exception $e) {
@@ -473,14 +484,12 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
     /**
      * Redirects to the error page if an error occurs in request at PagSeguro
      */
-    private function redirectToErroPage()
-    {
-        $this->display_column_left = false;
-        
-        $this->module->context->smarty->assign('version', _PS_VERSION_);
-        
-        $this->setTemplate('error.tpl');
-    }
+//     public function redirectToErroPage()
+//     {
+//         $this->display_column_left = false;
+//         $this->module->context->smarty->assign('version', _PS_VERSION_);
+//         $this->setTemplate('error.tpl');
+//     }
 
     private function addressConfig($fullAddress)
     {

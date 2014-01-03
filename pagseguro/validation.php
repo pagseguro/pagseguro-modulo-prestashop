@@ -26,10 +26,20 @@
  */
 
 include_once(dirname(__FILE__) . '/../../config/config.inc.php');
-include_once(dirname(__FILE__) . '/../../header.php');
+
+
+$checkout = Configuration::get('PAGSEGURO_CHECKOUT');
+
+if (!$checkout) {
+    include_once(dirname(__FILE__) . '/../../header.php');
+}
+
 include_once(dirname(__FILE__) . '/pagseguro.php');
 include_once(dirname(__FILE__) . '/backward_compatibility/backward.php');
 include_once(dirname(__FILE__) . '/module_configuration/pagseguro_modulo_14.php');
+
+
+$user_url_redirect;
 
 $pag_seguro = new PagSeguro();
 $pag_seguro->setModulo(new PagSeguroModulo14());
@@ -39,15 +49,20 @@ $payment_request = new PagSeguroPaymentRequest();
 
 $customer = new Customer((int) $cart->id_customer);
 
-postProcess();
-
-include_once (dirname(__FILE__) . '/../../footer.php');
+if (!$checkout) {
+    postProcess();
+    include_once (dirname(__FILE__) . '/../../footer.php');
+} else {
+     postProcess();
+}
 
 /**
  * Post data process function
  */
 function postProcess()
 {
+    global $checkout;
+    
     try {
         verifyPaymentOptionAvailability();
         validateCart();
@@ -55,12 +70,15 @@ function postProcess()
         $additional_infos = validateOrder();
         setAdditionalRequestData($additional_infos);
         setNotificationUrl();
+        if($checkout) {
+            die(performPagSeguroRequest());
+        }
         performPagSeguroRequest();
     } catch (PagSeguroServiceException $exc) {
         canceledOrderForErro();
-        redirectToErroPage();
+        Tools::redirect('modules/pagseguro/controllers/front/error.php');
     } catch (Exception $e) {
-        redirectToErroPage();
+        Tools::redirect('modules/pagseguro/controllers/front/error.php');
     }
 }
 
@@ -71,15 +89,14 @@ function postProcess()
  */
 function setAdditionalRequestData(Array $additional_infos)
 {
-    global $payment_request;
+    global $payment_request, $user_url_redirect;
+    
     /* Setting reference */
     $payment_request->setReference($additional_infos['id_order']);
-    $payment_request->setRedirectURL(
-        generateRedirectUrl(
-            $additional_infos,
-            $payment_request->getRedirectURL()
-        )
-    );
+    
+    $user_url_redirect = generateRedirectUrl($additional_infos, $payment_request->getRedirectURL());
+    
+    $payment_request->setRedirectURL($user_url_redirect);
 }
 
 /**
@@ -181,7 +198,7 @@ function generateRedirectUrl(Array $arrayData, $url)
  */
 function performPagSeguroRequest()
 {
-    global $payment_request;
+    global $payment_request, $checkout, $user_url_redirect;
     
     try {
         /* Retrieving PagSeguro configurations */
@@ -199,8 +216,11 @@ function performPagSeguroRequest()
             Configuration::get('PAGSEGURO_TOKEN')
         );
         
-        $url = $payment_request->register($credentials);
+        $url = $payment_request->register($credentials,$checkout);
         
+        if($checkout) {
+            return Tools::jsonEncode(array('code'=>$url,'redirect'=> $user_url_redirect));
+        }
         /* Redirecting to PagSeguro */
         if (Validate::isUrl($url)) {
             Tools::redirectLink(Tools::truncate($url, 255, ''));
@@ -473,7 +493,7 @@ function generateShippingAddressData()
     if (! is_null($delivery_address)) {
         
         $fullAddress = addressConfig($delivery_address->address1);
-        
+
         $street = (is_null($fullAddress[0]) || empty($fullAddress[0])) ?
         $delivery_address->address1 : $fullAddress[0];
         
@@ -498,16 +518,16 @@ function generateShippingAddressData()
     return $address;
 }
 
-function redirectToErroPage()
-{
-    global $smarty, $pag_seguro;
+// function redirectToErroPage()
+// {
+//     global $smarty, $pag_seguro;
     
-    $pag_seguro->display_column_left = false;
+//     $pag_seguro->display_column_left = false;
     
-    $smarty->assign('version', _PS_VERSION_);
+//     $smarty->assign('version', _PS_VERSION_);
     
-    echo $pag_seguro->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/front/error.tpl');
-}
+//     echo $pag_seguro->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/front/error.tpl');
+// }
 
 function addressConfig($fullAddress)
 {

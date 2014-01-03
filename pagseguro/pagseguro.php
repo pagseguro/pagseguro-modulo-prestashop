@@ -102,6 +102,7 @@ class PagSeguro extends PaymentModule
             ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '') or
             ! Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset')) or
             ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active')) or
+            ! Configuration::updateValue('PAGSEGURO_CHECKOUT', false) or			
             ! Configuration::updateValue(
                 'PAGSEGURO_LOG_FILELOCATION',
                 PagSeguroConfig::getData('log', 'fileLocation')
@@ -130,6 +131,7 @@ class PagSeguro extends PaymentModule
         or ! Configuration::deleteByName('PAGSEGURO_LOG_ACTIVE')
         or ! Configuration::deleteByName('PAGSEGURO_LOG_FILELOCATION')
         or ! Configuration::deleteByName('PS_OS_PAGSEGURO')
+		or ! Configuration::deleteByName('PAGSEGURO_CHECKOUT')		
         or ! parent::uninstall()) {
             return false;
         }
@@ -190,6 +192,7 @@ class PagSeguro extends PaymentModule
             )
         );
         $smarty->assign('active_log', PagSeguroModuloUtil::getActiveLog());
+        $smarty->assign('type_checkout', PagSeguroModuloUtil::getTypeCheckout());		
         $smarty->assign('checkout_selected', Configuration::get('PAGSEGURO_CHECKOUT'));
         $smarty->assign('log_selected', Configuration::get('PAGSEGURO_LOG_ACTIVE'));
         $smarty->assign('diretorio_log', Tools::safeOutput(Configuration::get('PAGSEGURO_LOG_FILELOCATION')));
@@ -221,6 +224,7 @@ class PagSeguro extends PaymentModule
             $pagseguro_notification_url = Tools::getValue('pagseguro_notification_url');
             $charset = Tools::getValue('pagseguro_charset');
             $pagseguro_log = Tools::getValue('pagseguro_log');
+            $pagseguro_checkout = Tools::getValue('pagseguro_checkout');			
             
             /* E-mail validation */
             if (! $email) {
@@ -275,6 +279,7 @@ class PagSeguro extends PaymentModule
             Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', Tools::getValue('pagseguro_notification_url'));
             Configuration::updateValue('PAGSEGURO_CHARSET', $charsets[Tools::getValue('pagseguro_charset')]);
             Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', Tools::getValue('pagseguro_log'));
+            Configuration::updateValue('PAGSEGURO_CHECKOUT', Tools::getValue('pagseguro_checkout'));			
             Configuration::updateValue('PAGSEGURO_LOG_FILELOCATION', Tools::getValue('pagseguro_log_dir'));
             
             /* Verify if log file exists, case not try create */

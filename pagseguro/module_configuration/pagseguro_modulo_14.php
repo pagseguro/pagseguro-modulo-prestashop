@@ -25,8 +25,8 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-//include_once(dirname(__FILE__).'/../../../config/config.inc.php');
-//include_once(dirname(__FILE__).'/../../../init.php');
+include_once(dirname(__FILE__).'/../../../config/config.inc.php');
+include_once(dirname(__FILE__).'/../../../init.php');
 include_once(dirname(__FILE__) . '/../PagSeguroLibrary/PagSeguroLibrary.php');
 
 
@@ -101,8 +101,6 @@ class PagSeguroModulo14 extends PaymentModule
     {
         global $smarty;
         
-        $link = new Link();
-        
         $smarty->assign(
             array(
                 'version_module' => _PS_VERSION_,
@@ -170,36 +168,11 @@ class PagSeguroModulo14 extends PaymentModule
 
     public function execPayment()
     {
-        include_once(dirname(__FILE__) . '/../module_configuration/module_payment_pagseguro.php');
+	 include_once(dirname(__FILE__) . '/../module_configuration/module_payment_pagseguro.php');
         $payment = new ModulePaymentPagSeguro();
         $payment->setVariablesPaymentExecutionView($this->context);
 
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/front/payment_execution.tpl');
-    }
-
-    private function convertPriceFull($amount, Currency $currency_from = null, Currency $currency_to = null)
-    {
-        if ($currency_from === $currency_to) {
-            return $amount;
-        }
-        if ($currency_from === null) {
-            $currency_from = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-        }
-        if ($currency_to === null) {
-            $currency_to = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-        }
-        if ($currency_from->id == Configuration::get('PS_CURRENCY_DEFAULT')) {
-            $amount *= $currency_to->conversion_rate;
-        } else {
-            $conversion_rate = ($currency_from->conversion_rate == 0 ? 1 : $currency_from->conversion_rate);
-            
-            // Convert amount to default currency (using the old currency rate)
-            $amount = Tools::ps_round($amount / $conversion_rate, 2);
-            
-            // Convert to new currency
-            $amount *= $currency_to->conversion_rate;
-        }
-        return Tools::ps_round($amount, 2);
     }
 
     private function notificationURL()

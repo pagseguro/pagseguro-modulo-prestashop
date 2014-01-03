@@ -38,6 +38,11 @@ class PagSeguroModuloUtil
         '1' => 'SIM'
     );
 
+    private static $type_checkout = array(
+        '0' => 'PADRÃO',
+        '1' => 'LIGHTBOX'
+    );
+
     private static $order_status = array(
         'INITIATED' => 'Iniciado',
         'WAITING_PAYMENT' => 'Aguardando pagamento',
@@ -171,6 +176,11 @@ class PagSeguroModuloUtil
     public static function getActiveLog()
     {
         return self::$active_log;
+    }
+    
+    public static function getTypeCheckout()
+    {
+        return self::$type_checkout;
     }
 
     public static function getOrderStatus()

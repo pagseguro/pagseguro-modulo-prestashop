@@ -122,6 +122,10 @@
                     <select id="pagseguro_charset" name="pagseguro_charset" class="select" hint='Informe a codificação utilizada pelo seu sistema. Isso irá prevenir que as transações gerem possíveis erros ou quebras ou ainda que caracteres especiais possam ser apresentados de maneira diferente do habitual.' >
                         {html_options options=$charset_options selected=$charset_selected}
                     </select>
+                    <label>{l s='CHECKOUT' mod='pagseguro'}</label><br />
+                    <select id="pagseguro_checkout" name="pagseguro_checkout" class="select" hint= 'No checkout padrão o comprador, após escolher os produtos e/ou serviços, é redirecionado para fazer o pagamento no PagSeguro.' >
+                        {html_options options=$type_checkout selected=$checkout_selected}
+                    </select>
                     <label>{l s='LOG' mod='pagseguro'}</label><br />
                     <select id="pagseguro_log" name="pagseguro_log" class="select" hint= 'Deseja habilitar a geração de log?' >
                         {html_options options=$active_log selected=$log_selected}
@@ -168,7 +172,18 @@
                 $('#directory-log').toggle(300);
             }
         );
-
+        
+        $('#pagseguro_checkout').live('change',
+            function(e) {
+                if($('option:selected', this).attr('value') == 0) {
+                    $('#pagseguro_checkout').attr('hint','No checkout padrão o comprador, após escolher os produtos e/ou serviços, é redirecionado para fazer o pagamento no PagSeguro.');
+                } else {          
+                    $('#pagseguro_checkout').attr('hint','No checkout lightbox o comprador, após escolher os produtos e/ou serviços, fará o pagamento em uma janela que se sobrepõe a sua loja.');
+                }
+                $('#pagseguro_checkout').focus();
+            }
+        );
+        
         $('input, select').on('focus',
             function(e) {
                 _$this = $(this);
@@ -176,6 +191,7 @@
                 $(this).parent().parent().find('.hintps').fadeOut(210, function() {
                     $(this).html(_$this.attr('hint')).fadeIn(210);
                 });
+                
             }
         );
 

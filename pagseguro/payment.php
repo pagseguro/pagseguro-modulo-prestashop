@@ -39,7 +39,6 @@ if (! $pagseguro->context->cookie->isLogged(true)) {
     Tools::redirect('authentication.php?back=order.php');
 }
 
-$pagseguro = new PagSeguroModulo14();
 echo $pagseguro->execPayment();
 
 include_once(dirname(__FILE__) . '/../../footer.php');

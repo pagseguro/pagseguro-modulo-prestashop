@@ -24,6 +24,36 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
+<script type="text/javascript" src="https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.lightbox.js"></script>
+<script type="text/javascript">
+function checkout()
+{
+    var query = $.ajax({
+        type: 'POST',
+        url: "{$action_url}",
+        success: function(response) {
+		var json = $.parseJSON(response);
+            PagSeguroLightbox(
+            json.code,{
+                success: function(token){
+                    window.location.href = json.redirect;
+                },
+                abort: function(){
+                    redirecToPageError();
+                }
+            });
+        },
+        error: function() {
+            redirecToPageError();
+        }
+    });
+}
+function redirecToPageError(){
+    window.location.href = baseDir + 'modules/pagseguro/controllers/front/error.php';
+}
+</script>
+   
+
 {if $version >= '1.5.0.2'}
     <style type="text/css" media="all">{literal}div#center_column{ width: 757px; }{/literal}</style>
 {else}
@@ -78,10 +108,14 @@
         {/if}
 	<p>
 		<br /><br />
-		<b>{l s='Por favor, confirme sua compra clicando no botão \'Confirmo minha compra\'' mod='pagseguro'}.</b>
+		<b>{l s='Por favor, confirme sua compra clicando no botão \'Confirmo minha compra\'' mod='pagseguro'}</b>
 	</p>
 	<p class="cart_navigation">
-		<input type="submit" name="submit" value="{l s='Confirmo minha compra' mod='pagseguro'}" class="exclusive_large" />
+    	{if ($checkout)}
+            <input type="button " value="{l s='Confirmo minha compra' mod='pagseguro'}" class="exclusive_large" onclick="checkout()" />
+        {else}
+		    <input type="submit" name="submit" value="{l s='Confirmo minha compra' mod='pagseguro'}" class="exclusive_large" />
+        {/if}
 		<a href="{$link->getPageLink('order', true, NULL, "step=3")}" class="button_large">{l s='Outros formas de pagamento' mod='pagseguro'}</a>
 	</p>
 </form>
