@@ -199,7 +199,7 @@ function generateRedirectUrl(Array $arrayData, $url)
 function performPagSeguroRequest()
 {
     global $payment_request, $checkout, $user_url_redirect;
-    
+
     try {
         /* Retrieving PagSeguro configurations */
         retrievePagSeguroConfiguration();
@@ -216,10 +216,12 @@ function performPagSeguroRequest()
             Configuration::get('PAGSEGURO_TOKEN')
         );
         
-        $url = $payment_request->register($credentials,$checkout);
+        $url = $payment_request->register($credentials);
         
         if($checkout) {
-            return Tools::jsonEncode(array('code'=>$url,'redirect'=> $user_url_redirect));
+	        $resultado = parse_url($url);
+	        parse_str($resultado['query']);
+            return Tools::jsonEncode(array('code'=>$code,'redirect'=> $user_url_redirect,'urlCompleta' => $url));
         }
         /* Redirecting to PagSeguro */
         if (Validate::isUrl($url)) {
