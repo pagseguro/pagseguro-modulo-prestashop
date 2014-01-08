@@ -39,12 +39,12 @@ function checkout()
                     window.location.href = json.redirect;
                 },
                 abort: function(){
-                    redirecToPageError();
+                	window.location.href = json.urlCompleta;
                 }
             });
         },
         error: function() {
-            redirecToPageError();
+            redirecToPageError();            
         }
     });
 }
@@ -112,7 +112,7 @@ function redirecToPageError(){
 	</p>
 	<p class="cart_navigation">
     	{if ($checkout)}
-            <input type="button " value="{l s='Confirmo minha compra' mod='pagseguro'}" class="exclusive_large" onclick="checkout()" />
+            <input type="button" name="submit" value="{l s='Confirmo minha compra' mod='pagseguro'}" class="exclusive_large" onclick="checkout()" />
         {else}
 		    <input type="submit" name="submit" value="{l s='Confirmo minha compra' mod='pagseguro'}" class="exclusive_large" />
         {/if}

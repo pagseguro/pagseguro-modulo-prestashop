@@ -191,10 +191,12 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
                 Configuration::get('PAGSEGURO_TOKEN')
             );
             
-            $url = $this->payment_request->register($credentials,$checkout);
+            $url = $this->payment_request->register($credentials);
             
             if($checkout) {
-                die(Tools::jsonEncode(array('code'=>$url,'redirect'=> $this->user_url_redirect)));
+				$resultado = parse_url($url);
+				parse_str($resultado['query']);
+				die(Tools::jsonEncode(array('code'=>$code,'redirect'=> $user_url_redirect,'urlCompleta' => $url)));
             }
             /* Redirecting to PagSeguro */
             if (Validate::isUrl($url)) {
