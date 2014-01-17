@@ -76,10 +76,22 @@ function postProcess()
         performPagSeguroRequest();
     } catch (PagSeguroServiceException $exc) {
         canceledOrderForErro();
+        if($checkout) {
+        	returnErrorAjax();
+        }
         Tools::redirect('modules/pagseguro/controllers/front/error.php');
     } catch (Exception $e) {
+    	if($checkout) {
+    		returnErrorAjax();
+    	}
         Tools::redirect('modules/pagseguro/controllers/front/error.php');
     }
+}
+
+function returnErrorAjax() {
+	header('HTTP/1.1 500 Internal Error');
+	header('Content-Type: application/json');
+	die('ERROR');
 }
 
 /**
