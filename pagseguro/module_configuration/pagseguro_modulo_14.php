@@ -26,7 +26,6 @@
  */
 
 include_once(dirname(__FILE__).'/../../../config/config.inc.php');
-include_once(dirname(__FILE__).'/../../../init.php');
 include_once(dirname(__FILE__) . '/../PagSeguroLibrary/PagSeguroLibrary.php');
 
 
@@ -41,6 +40,11 @@ class PagSeguroModulo14 extends PaymentModule
 
     public function __construct()
     {
+		//Se deixar o include sem essa verificação ele bloqueia a aba payment no admin
+		if(! $_REQUEST['tab']) {
+    		include_once(dirname(__FILE__).'/../../../init.php');
+		}
+		
         parent::__construct();
         $this->initContext();
     }
@@ -52,7 +56,8 @@ class PagSeguroModulo14 extends PaymentModule
      */
     public function install()
     {
-        
+        include_once(dirname(__FILE__).'/../../../init.php');
+		
         /* For 1.4.3 and less compatibility */
         $updateConfig = array(
             'PS_OS_CHEQUE' => 1,

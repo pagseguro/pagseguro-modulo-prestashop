@@ -196,7 +196,7 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
             if($checkout) {
 				$resultado = parse_url($url);
 				parse_str($resultado['query']);
-				die(Tools::jsonEncode(array('code'=>$code,'redirect'=> $user_url_redirect,'urlCompleta' => $url)));
+				die(Tools::jsonEncode(array('code'=>$code,'redirect'=> $this->user_url_redirect,'urlCompleta' => $url)));
             }
             /* Redirecting to PagSeguro */
             if (Validate::isUrl($url)) {
