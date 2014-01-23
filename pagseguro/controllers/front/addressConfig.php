@@ -90,6 +90,7 @@ class AddressConfig
 
     public static function trataEndereco($end)
     {
+
         $endereco = $end;
         $numero = 's/nº';
         $complemento = '';
@@ -101,7 +102,7 @@ class AddressConfig
             list ($endereco, $numero, $complemento, $bairro) = $quebrado;
         } elseif (sizeof($quebrado) == 3) {
             list ($endereco, $numero, $complemento) = $quebrado;
-        } elseif (sizeof($quebrado) == 2 || sizeof($quebrado) == 1) {
+        } elseif (sizeof($quebrado) == 2) {
             list ($endereco, $numero, $complemento) = self::ordenaDados($end);
         } else {
             $endereco = $end;
@@ -118,7 +119,7 @@ class AddressConfig
     public static function ordenaDados($texto)
     {
         $quebrado = preg_split('/[-,\\n]/', $texto);
-        
+
         for ($i = 0; $i < strlen($quebrado[0]); $i ++) {
             if (is_numeric(substr($quebrado[0], $i, 1))) {
                 return array(
