@@ -35,7 +35,8 @@ class ModulePaymentPagSeguro
 
     public function setVariablesPaymentExecutionView($context)
     {
-        global $smarty;
+        global $smarty, $pag_seguro;
+		$link = new Link();
 
         $id_currency = PagSeguro::returnIdCurrency();
         if ($context->cart->id_currency != $id_currency && ! is_null($id_currency)) {
@@ -50,7 +51,7 @@ class ModulePaymentPagSeguro
             );
         }
         
-        $older_url = _PS_BASE_URL_ . __PS_BASE_URI__ . 'modules/pagseguro/validation.php"';
+        $older_url = _PS_BASE_URL_ . __PS_BASE_URI__ . 'modules/pagseguro/validation.php';
         $new_url = _PS_BASE_URL_ . __PS_BASE_URI__ . 'index.php?fc=module&module=pagseguro&controller=validation';
         
         $smarty->assign(
@@ -65,7 +66,8 @@ class ModulePaymentPagSeguro
                 'isocode' => $context->language->iso_code,
                 'this_path' => __PS_BASE_URI__,
                 'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/',
-                'action_url' => version_compare(_PS_VERSION_, '1.5.0.3', '<=') ? $older_url : $new_url)
+                'action_url' => version_compare(_PS_VERSION_, '1.5.0.3', '<=') ? $older_url : $new_url,
+                'checkout' => Configuration::get('PAGSEGURO_CHECKOUT'))
         );
     }
 
