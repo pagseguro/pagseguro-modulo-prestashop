@@ -28,6 +28,12 @@ local.properties
 # PDT-specific
 .buildpath
 
+#################
+## Sonar
+#################
+.sonar/
+sonar-project.properties
+
 
 #################
 ## Visual Studio
