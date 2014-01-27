@@ -47,7 +47,7 @@ class PagSeguro extends PaymentModule
     {
         $this->name = 'pagseguro';
         $this->tab = 'payments_gateways';
-        $this->version = '1.6';
+        $this->version = '1.7';
         $this->author = 'PagSeguro Internet LTDA.';
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';

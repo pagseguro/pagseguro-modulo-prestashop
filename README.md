@@ -54,6 +54,10 @@ Para acessar e configurar o módulo acesse o menu Módulos -> Modules -> Payment
 Changelog
 ---------
 ---
+1.7
+
+- Adicionando opção para utilização de checkout light box.
+
 1.6
 
 - Atualização da lib PHP no módulo.
