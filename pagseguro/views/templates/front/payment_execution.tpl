@@ -32,16 +32,20 @@ function checkout()
         type: 'POST',
         url: "{$action_url}",
         success: function(response) {
-		var json = $.parseJSON(response);
-            PagSeguroLightbox(
-            json.code,{
-                success: function(token){
-                    window.location.href = json.redirect;
-                },
-                abort: function(){
-                	window.location.href = json.urlCompleta;
-                }
-            });
+			try {
+				var json = $.parseJSON(response);
+	            PagSeguroLightbox(
+	            json.code,{
+	                success: function(token){
+	                    window.location.href = json.redirect;
+	                },
+	                abort: function(){
+	                	window.location.href = json.urlCompleta;
+	                }
+	            });
+			} catch(err) {
+				redirecToPageError();
+			}
         },
         error: function() {
             redirecToPageError();            
