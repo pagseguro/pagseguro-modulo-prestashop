@@ -56,7 +56,7 @@ Changelog
 ---
 1.7
 
-- Adicionando opção para utilização de checkout light box.
+- Adicionando opção para utilização do Checkout Lightbox. Obs.: Recomenda-se limpar o cache do PrestaShop antes da instalação desta versão.
 
 1.6
 
