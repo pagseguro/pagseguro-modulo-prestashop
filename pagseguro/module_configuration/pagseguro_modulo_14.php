@@ -41,7 +41,8 @@ class PagSeguroModulo14 extends PaymentModule
     public function __construct()
     {
 		//Se deixar o include sem essa verificação ele bloqueia a aba payment no admin
-		if(! $_REQUEST['tab']) {
+		//Há comparação de versão pq algumas versões do 1.5 adotam algumas funcionalidade da versão 1.4
+		if(! $_REQUEST['tab'] && version_compare(_PS_VERSION_, '1.5', '<')) {
     		include_once(dirname(__FILE__).'/../../../init.php');
 		}
 		

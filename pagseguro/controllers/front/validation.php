@@ -47,7 +47,7 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
         $this->module->setModulo(new PagSeguroModulo15());
         
         $this->context = $this->module->context;
-		
+
 		try {
             $this->verifyPaymentOptionAvailability();
             $this->validateCart();
@@ -58,10 +58,19 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
             $this->performPagSeguroRequest();
         } catch (PagSeguroServiceException $exc) {
             $this->canceledOrderForErro();
-            Tools::redirect('modules/pagseguro/controllers/front/error.php');
+            $this->redirectErrorPage();
         } catch (Exception $e) {
-            Tools::redirect('modules/pagseguro/controllers/front/error.php');
+            $this->redirectErrorPage();
         }
+    }
+    
+    private function redirectErrorPage()
+    {
+    	global $link;
+    	
+    	$urlErro = $link->getPageLink('');
+    	
+    	header('Location:'.$urlErro.'modules/pagseguro/controllers/front/error.php');
     }
 
     /**
