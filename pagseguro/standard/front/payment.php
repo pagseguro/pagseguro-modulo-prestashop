@@ -25,20 +25,24 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-include_once(dirname(__FILE__).'/../../config/config.inc.php');
-include_once(dirname(__FILE__).'/../../header.php');
-include_once(dirname(__FILE__).'/pagseguro.php');
-include_once(dirname(__FILE__).'/backward_compatibility/backward.php');
-include_once(dirname(__FILE__).'/module_configuration/pagseguro_modulo_14.php');
+include_once dirname(__FILE__).'/../../../../config/config.inc.php';
+include_once dirname(__FILE__).'/../../../../init.php';
+include_once dirname(__FILE__).'/../../pagseguro.php';
+include_once dirname(__FILE__).'/../../backward_compatibility/backward.php';
+include_once dirname(__FILE__).'/../../features/payment/pagseguropaymentorderprestashop.php';
 
 $useSSL = true;
 
-$pagseguro = new PagSeguroModulo14();
+$showView = new BWDisplay();
 
-if (! $pagseguro->context->cookie->isLogged(true)) {
+$context = Context::getContext();
+
+if (! $context->cookie->isLogged(true)) {
     Tools::redirect('authentication.php?back=order.php');
 }
 
-echo $pagseguro->execPayment();
+$payment = new PagSeguroPaymentOrderPrestashop();
+$payment->setVariablesPaymentExecutionView();
 
-include_once(dirname(__FILE__) . '/../../footer.php');
+$showView->setTemplate(_PS_MODULE_DIR_.'pagseguro/views/templates/front/payment_execution.tpl');
+$showView->run();

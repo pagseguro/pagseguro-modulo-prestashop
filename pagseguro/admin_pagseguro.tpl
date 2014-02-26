@@ -26,154 +26,222 @@
 
 <link type="text/css" rel="stylesheet" href="{$css_version}" />
 <script type="text/javascript" src="{$module_dir}assets/js/jquery.min.js"></script>
-<script type="text/javascript" src="{$js_behavior_version}"></script>
 
 <form class="psplugin" id="psplugin" action="{$action_post}" method="POST">
     <h1>
         <img src="{$module_dir}assets/images/logops_228x56.png" />
-        <span>
-            {l s='Mais de 23 milhões de brasileiros já utilizam o PagSeguro.' mod='pagseguro'}
-            <br />
-            {l s='Faça parte você também!' mod='pagseguro'}
+        <span style="margin-left : 60px; width : 480px">
+        	<div>
+            {l s='Mais de 23 milhões de brasileiros já utilizam o PagSeguro. Faça parte você também!' mod='pagseguro'}
+        	</div>
         </span>
-    </h1>
-    <div id="mainps">
-        <ol>
-            <li class="ps-slide1">
-                <h2>
-                    <span>{l s='Como funciona' mod='pagseguro'}</span>
-                </h2>
-                <div>
-                    <h2>
-                        {l s='Sem convênios. Sem taxa mínima, adesão ou mensalidade.' mod='pagseguro'}
-                    </h2>
-                    <br />
-                    <p>
-                        {l s='PagSeguro é a solução completa para pagamentos online, que garante a segurança de quem compra e de quem vende na web. Quem compra com PagSeguro tem a garantia de produto ou serviço entregue ou seu dinheiro de volta. Quem vende utilizando o serviço do PagSeguro tem o gerenciamento de risco de suas transações*. Quem integra lojas ao PagSeguro tem ferramentas, comissão e publicidade gratuita.' mod='pagseguro'}
-                    </p>
-
-                    <p>
-                        {l s='Não é necessário fazer convênios com operadoras. O PagSeguro é a única empresa no Brasil a oferecer todas as opções em um só pacote. O PagSeguro não cobra nenhuma taxa para você abrir sua conta, não cobra taxas mensais, não cobra multa caso você queira parar de usar os serviços.' mod='pagseguro'}
-                    </p>
-
-                    <p>
-                        {l s='Use PagSeguro para receber pagamentos de modo fácil e seguro. Comece a aceitar em alguns minutos, pagamentos por cartões de crédito, boletos e transferências bancárias online e alcance milhares de compradores. Mesmo que você já ofereça outros meios de pagamento, adicione o PagSeguro e ofereça a opção Carteira Eletrônica PagSeguro. Milhões de usuários já usam o Saldo PagSeguro para compras online, e compram com segurança, rapidez e comodidade.' mod='pagseguro'}
-                    </p>
-                    <p class="small">{l s='* Gerenciamento de risco de acordo com nossas' mod='pagseguro'} 
-                        <a href="https://pagseguro.uol.com.br/regras-de-uso.jhtml" target="_blank">{l s='Regras de uso.' mod='pagseguro'}</a>
-                    </p>
-                </div>
-            </li>
-            <li class="ps-slide2">
-                <h2>
-                    <span>{l s='Crie sua conta' mod='pagseguro'}</span>
-                </h2>
-                <div>
-                    <h2>
-                        {l s='A forma mais fácil de vender' mod='pagseguro'}
-                    </h2>
-                    <br />
-                    <ul>
-                        <li>{l s='Comece hoje a vender pela internet' mod='pagseguro'}</li>
-                        <li>{l s='Venda pela internet sem pagar mensalidade' mod='pagseguro'}</li>
-                        <li>{l s='Ofereça parcelamento com ou sem acréscimo' mod='pagseguro'}</li>
-                        <li>{l s='Venda parcelado e receba de uma única vez' mod='pagseguro'}</li>
-                        <li>{l s='Proteção total contra fraudes' mod='pagseguro'}</li>
-                    </ul>
-                    <br />
-                    <a href="https://pagseguro.uol.com.br/registration/registration.jhtml?ep=5&tipo=cadastro#!vendedor" target="_blank" class="pagseguro-button green-theme normal">
-                        {l s='Faça seu cadastro' mod='pagseguro'}
-                    </a>
-                </div>
-            </li>
-            <li class="ps-slide3">
-                <h2>
-                    <span>{l s='Configurações' mod='pagseguro'}</span>
-                </h2>
-                <div>
-                    <label>{l s='E-MAIL' mod='pagseguro'}*</label>
-                    <br />
-                        <input type="text" name="pagseguro_email" id="pagseguro_email" value="{$email_user}" maxlength="60"  
-                               hint='Para oferecer o PagSeguro em sua loja é preciso ter uma conta do tipo vendedor ou empresarial. Se você ainda não tem uma conta PagSeguro <a href="https://pagseguro.uol.com.br/registration/registration.jhtml?ep=5&tipo=cadastro#!vendedor" target="_blank"> clique aqui </a>, caso contrário informe neste campo o e-mail associado à sua conta PagSeguro.' />
-                    <br/>
-                    <label>{l s='TOKEN' mod='pagseguro'}*</label>
-                    <br />
-                        <input type="text" name="pagseguro_token" id="pagseguro_token" value="{$token_user}" maxlength="32"  
-                               hint='Para utilizar qualquer serviço de integração do PagSeguro, é necessário ter um token de segurança. O token é um código único, gerado pelo PagSeguro. Caso não tenha um token <a href="https://pagseguro.uol.com.br/integracao/token-de-seguranca.jhtml" target="_blank"> clique aqui </a>, para gerar.' />
-                    <br />
-                    <label>{l s='URL DE REDIRECIONAMENTO' mod='pagseguro'}</label>
-                    <br />
-                    <input type="text" name="pagseguro_url_redirect" id="pagseguro_url_redirect" value="{$redirect_url}" maxlength="255" 
-                           hint='Ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado de volta para sua loja ou para a URL que você informar neste campo. Para utilizar essa funcionalidade você deve configurar sua conta para aceitar somente requisições de pagamentos gerados via API. <a href="https://pagseguro.uol.com.br/integracao/pagamentos-via-api.jhtml" target="_blank"> Clique aqui </a> para ativar este serviço.' />
-                    <br />
-                    <label>{l s='URL DE NOTIFICAÇÃO' mod='pagseguro'}</label>
-                    <br />
-                    <input type="text" name="pagseguro_notification_url" id="pagseguro_notification_url" value="{$notification_url}" maxlength="255" hint='Sempre que uma transação mudar de status, o PagSeguro envia uma notificação para sua loja ou para a URL que você informar neste campo.' />
-                    <br />
-                    <br />
-                    <p class="small">* {l s='Campos obrigatórios' mod='pagseguro'}</p>
-                    <div class="hintps _config"></div>
-                </div>
-            </li>
-            <li class="ps-slide4">
-                <h2><span>{l s='Extras' mod='pagseguro'}</span></h2>
-                <div>
-                    <label>{l s='CHARSET' mod='pagseguro'}</label><br />
-                    <select id="pagseguro_charset" name="pagseguro_charset" class="select" hint='Informe a codificação utilizada pelo seu sistema. Isso irá prevenir que as transações gerem possíveis erros ou quebras ou ainda que caracteres especiais possam ser apresentados de maneira diferente do habitual.' >
-                        {html_options options=$charset_options selected=$charset_selected}
-                    </select>
-                    <label>{l s='CHECKOUT' mod='pagseguro'}</label><br />
-                    <select id="pagseguro_checkout" name="pagseguro_checkout" class="select" hint= 'No checkout padrão o comprador, após escolher os produtos e/ou serviços, é redirecionado para fazer o pagamento no PagSeguro.' >
-                        {html_options options=$type_checkout selected=$checkout_selected}
-                    </select>
-                    <label>{l s='LOG' mod='pagseguro'}</label><br />
-                    <select id="pagseguro_log" name="pagseguro_log" class="select" hint= 'Deseja habilitar a geração de log?' >
-                        {html_options options=$active_log selected=$log_selected}
-                    </select>
-                    <br />
-                    <span id="directory-log">
-                        <label>{l s='DIRETÓRIO' mod='pagseguro'}</label><br />
-                        <input type="text" id="pagseguro_log_dir" name="pagseguro_log_dir" value="{$diretorio_log}" hint= 'Diretório a partir da raíz de instalação do PrestaShop onde se deseja criar o arquivo de log. Ex.: /logs/log_ps.log' />
-                    </span>
-                    <div class="hintps _extras"></div>
-                </div>
-            </li>
-        </ol>
-        <noscript>
-        <p>{l s='Please enable JavaScript to get the full experience.' mod='pagseguro'}</p>
-        </noscript>
+        <span style="right : 0px">
+            <a href="https://pagseguro.uol.com.br/registration/registration.jhtml?ep=5&tipo=cadastro#!vendedor" target="_blank" class="pagseguro-button green-theme normal">
+                {l s='Faça seu cadastro' mod='pagseguro'}
+            </a>
+        </span>
+    </h1>    
+    <ul id="menuTab">
+    {foreach from=$tab item=li}
+        <li id="menuTab{$li.tab|escape:'htmlall':'UTF-8'}" class="menuTabButton {if $li.selected}selected{/if}">{if $li.icon != ''}<img src="{$li.icon|escape:'htmlall':'UTF-8'}" alt="{$li.title|escape:'htmlall':'UTF-8'}"/>{/if} {$li.title|escape:'htmlall':'UTF-8'}</li>
+    {/foreach}
+    </ul>
+    <div id="tabList">
+    {foreach from=$tab item=div}
+        <div id="menuTab{$div.tab|escape:'htmlall':'UTF-8'}Sheet" class="tabItem {if $div.selected}selected{/if}">
+            {$div.content}
+        </div>
+    {/foreach}
     </div>
-    <br />
-    <input type="hidden" name="activeslide" id="activeslide" value="{$checkActiveSlide}" />
-    <button id="update" class="pagseguro-button green-theme normal" name="btnSubmit">{l s='Atualizar' mod='pagseguro'}</button>
+    <p class="center"><button id="update" class="pagseguro-button green-theme normal" name="btnSubmit" />Atualizar</button></p>
 </form>
 <br>
 <script type="text/javascript">
     {literal}
-        $('#mainps').liteAccordion({
-            theme : 'ps',
-            rounded : true,
-            firstSlide : parseInt($('#activeslide').val()),
-            containerHeight : 400,
-            onTriggerSlide : function() {
-                $('.hintps').fadeOut(400);
-            }
+        var url = location.href;  
+        var baseURL = url.substring(0, url.indexOf('/', 18));
+
+        $('.menuTabButton').live('click',
+            function () {
+                $('.menuTabButton.selected').removeClass('selected');
+                $(this).addClass('selected');
+                $('.tabItem.selected').removeClass('selected');
+                $('#' + this.id + 'Sheet').addClass('selected');
+
+                hideInput(this.id);
         });
-
-        $('li[class*=ps-slide] h2').on('click',
-            function(e) {
-                var active = /ps-slide(d)/;
-                $('#activeslide').val( active.exec($(this).parent().attr('class'))[1] );
+        
+        function hideInput(menuTab) {
+            if (menuTab == 'menuTab2') {
+                if ($('select#pagseguro_log').val() == '0') {
+                    if($('#directory-log').is(':visible')) {
+                         $('#directory-log').hide();
+                     }
+                }
+                if ($('select#pagseguro_recovery').val() == '0') {
+                    if($('#directory-val-link').is(':visible')) {
+                        $('#directory-val-link').hide();
+                    }
+                }
             }
-        );
+        }
 
-        $('#pagseguro_log').on('change',
+        $('#pagseguro_log').live('change',
             function(e) {
                 $('#directory-log').toggle(300);
             }
         );
+
+        $('#pagseguro_recovery').live('change',
+            function(e) {
+                $('#directory-val-link').toggle(300);
+            }
+        );
+
+        $.fn.pageMe = function(opts){
+            var $this = this,
+                defaults = {
+                    perPage: 10,
+                    paginationPerPage: 10,
+                    showPrevNext: false,
+                    hidePageNumbers: false
+                },
+                settings = $.extend(defaults, opts);
+
+            var listElement = $('#resultTable');
+            var perPage = settings.perPage;
+            var paginationPerPage = parseInt(settings.paginationPerPage) - 1;
+            var children = listElement.children();
+            var pager = $('.pager');
+
+            if (typeof settings.childSelector!="undefined") {
+                children = listElement.find(settings.childSelector);
+            }
+
+            if (typeof settings.pagerSelector!="undefined") {
+                pager = $(settings.pagerSelector);
+            }
+
+            var numItems = children.size();
+            var numPages = Math.ceil(numItems/perPage);
+
+            pager.data("curr",0);
+
+            if (settings.showPrevNext){
+                $('<li><a href="#" class="prev_link">«</a></li>').appendTo(pager);
+            }
+
+            var curr = 0;
+            var i = 0;
+            while(numPages > curr && (settings.hidePageNumbers==false)){
+                if(i > paginationPerPage) {
+                    $('<li class="li'+i+'"><a href="#" id='+i+' class="page_link">'+(curr+1)+'</a></li>').appendTo(pager);
+                    $('li.li'+i).hide();
+                } else {
+                    $('<li class="li'+i+' ativo"><a href="#" id='+i+' class="page_link">'+(curr+1)+'</a></li>').appendTo(pager);
+                }
+                i++;
+                curr++;
+            }
+
+          	$('.page_link').click(
+                function(){
+                    click(this.id);
+                }
+            );
+
+            function click(id){
+                var atual = parseInt(id);
+                if($('li.li'+(atual-(paginationPerPage - 1))).hasClass("ativo") && atual < (numPages-1)) {
+                    $('li.li'+(atual-paginationPerPage)).hide();
+                    $('li.li'+(atual+1)).show();
+                    $('li.li'+(atual-paginationPerPage)).removeClass("ativo");
+                    $('li.li'+(atual+1)).addClass("ativo");
+                } else if($('li.li'+(atual+(paginationPerPage - 1))).hasClass("ativo") && atual >= 1) {
+                    $('li.li'+(atual+paginationPerPage)).hide();
+                    $('li.li'+(atual-1)).show();
+                    $('li.li'+(atual+paginationPerPage)).removeClass("ativo");
+                    $('li.li'+(atual-1)).addClass("ativo");
+                }
+            }
+
+            if (settings.showPrevNext){
+                $('<li><a href="#" class="next_link">»</a></li>').appendTo(pager);
+            }
+
+            pager.find('.page_link:first').addClass('active');
+            pager.find('.prev_link').hide();
+            if (numPages<=1) {
+                pager.find('.next_link').hide();
+            }
+          	pager.children().eq(1).addClass("active");
+
+            children.hide();
+            children.slice(0, perPage).show();
+
+            pager.find('li .page_link').click(function(){
+                var clickedPage = $(this).html().valueOf()-1;
+                goTo(clickedPage,perPage);
+                return false;
+            });
+            pager.find('li .prev_link').click(function(){
+                previous();
+                return false;
+            });
+            pager.find('li .next_link').click(function(){
+                next();
+                return false;
+            });
+
+            function previous(){
+                click(parseInt(pager.data("curr")) - 1);
+                var goToPage = parseInt(pager.data("curr")) - 1;
+                goTo(goToPage);
+            }
+
+            function next(){
+                click(parseInt(pager.data("curr")) + 1);
+                goToPage = parseInt(pager.data("curr")) + 1;
+                goTo(goToPage);
+            }
+            
+            function goTo(page){
+                var startAt = page * perPage,
+                    endOn = startAt + perPage;
+
+                children.css('display','none').slice(startAt, endOn).show();
+
+                if (page>=1) {
+                    pager.find('.prev_link').show();
+                }
+                else {
+                    pager.find('.prev_link').hide();
+                }
+                
+                if (page<(numPages-1)) {
+                    pager.find('.next_link').show();
+                }
+                else {
+                    pager.find('.next_link').hide();
+                }
+
+                pager.data("curr",page);
+                pager.children().removeClass("active");
+                pager.children().eq(page+1).addClass("active");
+
+            }
+        };
         
-        $('#pagseguro_checkout').live('change',
+        window.onload = function() {
+            $('table.gridConciliacao').pageMe({pagerSelector:'#myPager',showPrevNext:true});
+        };	
+        
+        function editRedirect(rowId){
+            var token = adminToken.value;
+            window.location.href = baseURL + '/admin-loja/index.php?tab=AdminOrders&id_order='+rowId+'&vieworder&token='+token;
+        }
+
+		$('#pagseguro_checkout').live('change',
             function(e) {
                 if($('option:selected', this).attr('value') == 0) {
                     $('#pagseguro_checkout').attr('hint','No checkout padrão o comprador, após escolher os produtos e/ou serviços, é redirecionado para fazer o pagamento no PagSeguro.');
@@ -183,37 +251,31 @@
                 $('#pagseguro_checkout').focus();
             }
         );
-        
-        $('input, select').on('focus',
+
+		$('input, select').live('focus',
             function(e) {
                 _$this = $(this);
                 $(this).addClass('focus');
                 $(this).parent().parent().find('.hintps').fadeOut(210, function() {
                     $(this).html(_$this.attr('hint')).fadeIn(210);
                 });
-                
             }
         );
 
-        $('input, select').on('blur',
+        $('input, select').live('blur',
             function(e) {
                 $(this).removeClass('focus');
             }
         );
-
-        $('#psplugin').on('submit',
-            function(e) {
-                //$('#mainps ol li:nth-child(3) h2').trigger('click');
-            }
-        );
-
-        if ($('select#pagseguro_log').val() == '0'){
-            $('#directory-log').hide();
-        }
+        
+        $(".tab").live('click',
+            function(e){
+                $(this).parent().parent().find('.hintps').fadeOut(5);
+        });
 
         $('.alert, .conf').insertBefore('#mainps');
 
-        $('.alert, .conf').on('click',
+        $('.alert, .conf').live('click',
             function() {
                     $(this).fadeOut(450);
             }
@@ -222,5 +284,6 @@
         setTimeout(function() {
             $('.conf').fadeOut(450);
         }, 3000);
+
     {/literal}
-</script>    
+</script>

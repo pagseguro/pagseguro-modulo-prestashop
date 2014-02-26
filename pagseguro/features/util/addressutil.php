@@ -25,13 +25,13 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-class AddressConfig
+class AddressUtil
 {
 
-    public static function dados($v)
+    public static function data($v)
     {
-        $dados = array();
-        $dados['complementos'] = array(
+        $data = array();
+        $data['complementos'] = array(
             "casa",
             "ap",
             "apto",
@@ -41,13 +41,13 @@ class AddressConfig
             "sala",
             "cj"
         );
-        $dados['brasilias'] = array(
+        $data['brasilias'] = array(
             "bloco",
             "setor",
             "quadra",
             "lote"
         );
-        $dados['naobrasilias'] = array(
+        $data['naobrasilias'] = array(
             "av",
             "avenida",
             "rua",
@@ -58,14 +58,14 @@ class AddressConfig
             "praça",
             "praca"
         );
-        $dados['sems'] = array(
+        $data['sems'] = array(
             "sem ",
             "s.",
             "s/",
             "s. ",
             "s/ "
         );
-        $dados['numeros'] = array(
+        $data['numeros'] = array(
             'n.º',
             'nº',
             "numero",
@@ -74,13 +74,13 @@ class AddressConfig
             "núm",
             "n"
         );
-        $dados['semnumeros'] = array();
-        foreach ($dados['numeros'] as $n) {
-            foreach ($dados['sems'] as $s) {
-                $dados['semnumeros'][] = "$s$n";
+        $data['semnumeros'] = array();
+        foreach ($data['numeros'] as $n) {
+            foreach ($data['sems'] as $s) {
+                $data['semnumeros'][] = "$s$n";
             }
         }
-        return $dados[$v];
+        return $data[$v];
     }
 
     public static function endtrim($e)
@@ -88,55 +88,55 @@ class AddressConfig
         return preg_replace('/^\W+|\W+$/', '', $e);
     }
 
-    public static function trataEndereco($end)
+    public static function treatAddress($end)
     {
 
-        $endereco = $end;
-        $numero = 's/nº';
-        $complemento = '';
-        $bairro = '';
+        $address = $end;
+        $number = 's/nº';
+        $complement = '';
+        $district = '';
         
-        $quebrado = preg_split("/[-,\\n]/", $end);
+        $token = preg_split("/[-,\\n]/", $end);
         
-        if (sizeof($quebrado) == 4) {
-            list ($endereco, $numero, $complemento, $bairro) = $quebrado;
-        } elseif (sizeof($quebrado) == 3) {
-            list ($endereco, $numero, $complemento) = $quebrado;
-        } elseif (sizeof($quebrado) == 2) {
-            list ($endereco, $numero, $complemento) = self::ordenaDados($end);
+        if (sizeof($token) == 4) {
+            list ($address, $number, $complement, $district) = $token;
+        } elseif (sizeof($token) == 3) {
+            list ($address, $number, $complement) = $token;
+        } elseif (sizeof($token) == 2) {
+            list ($address, $number, $complement) = self::sortData($end);
         } else {
-            $endereco = $end;
+            $address = $end;
         }
         
         return array(
-            self::endtrim(substr($endereco, 0, 69)),
-            self::endtrim($numero),
-            self::endtrim($complemento),
-            self::endtrim($bairro)
+            self::endtrim(substr($address, 0, 69)),
+            self::endtrim($number),
+            self::endtrim($complement),
+            self::endtrim($district)
         );
     }
 
-    public static function ordenaDados($texto)
+    public static function sortData($text)
     {
-        $quebrado = preg_split('/[-,\\n]/', $texto);
+        $token = preg_split('/[-,\\n]/', $text);
 
-        for ($i = 0; $i < strlen($quebrado[0]); $i ++) {
-            if (is_numeric(substr($quebrado[0], $i, 1))) {
+        for ($i = 0; $i < strlen($token[0]); $i ++) {
+            if (is_numeric(substr($token[0], $i, 1))) {
                 return array(
-                    substr($quebrado[0], 0, $i),
-                    substr($quebrado[0], $i),
-                    $quebrado[1]
+                    substr($token[0], 0, $i),
+                    substr($token[0], $i),
+                    $token[1]
                 );
             }
         }
         
-        $texto = preg_replace('/\s/', ' ', $texto);
-        $encontrar = substr($texto, - strlen($texto));
-        for ($i = 0; $i < strlen($texto); $i ++) {
-            if (is_numeric(substr($encontrar, $i, 1))) {
+        $text = preg_replace('/\s/', ' ', $text);
+        $find = substr($text, - strlen($text));
+        for ($i = 0; $i < strlen($text); $i ++) {
+            if (is_numeric(substr($find, $i, 1))) {
                 return array(
-                    substr($texto, 0, - strlen($texto) + $i),
-                    substr($texto, - strlen($texto) + $i),
+                    substr($text, 0, - strlen($text) + $i),
+                    substr($text, - strlen($text) + $i),
                     ''
                 );
             }

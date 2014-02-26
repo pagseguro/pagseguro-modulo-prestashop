@@ -26,17 +26,44 @@
  */
 
 include_once dirname(__FILE__) . '/../../../../config/config.inc.php';
-include_once dirname(__FILE__) . '/../../../../init.php';
+
+$checkout = Configuration::get('PAGSEGURO_CHECKOUT');
+
 include_once dirname(__FILE__) . '/../../pagseguro.php';
-include_once(dirname(__FILE__) . '/../../features/notification/pagseguronotificationorderprestashop.php');
+include_once dirname(__FILE__) . '/../../backward_compatibility/backward.php';
+include_once dirname(__FILE__) . '/../../features/validation/pagsegurovalidateorderprestashop.php';
 
-class PagSeguroNotificationModuleFrontController extends ModuleFrontController
-{
+$pag_seguro = new PagSeguro();
+$validate = new PagSeguroValidateOrderPrestashop($pag_seguro);
 
-    public function postProcess()
-    {
-        parent::postProcess();
-        $pagNotification = new PagSeguroNotificationOrderPrestashop();
-        $pagNotification->postProcess($_POST);
+try {
+    $validate->validate();
+    if ($checkout) {
+        die($validate->request($checkout));
     }
+    Tools::redirectLink($validate->request($checkout));
+} catch (PagSeguroServiceException $exc) {
+    canceledOrderForErro();
+    displayErroPage();
+} catch (Exception $e) {
+    displayErroPage();
+}
+    
+function displayErroPage()
+{
+    $showView = new BWDisplay();
+    $showView->setTemplate(_PS_MODULE_DIR_.'pagseguro/views/templates/front/error.tpl');
+    $showView->run();
+}
+
+function canceledOrderForErro()
+{
+    global $pag_seguro;
+    
+    $currentOrder = (int) ($pag_seguro->currentOrder);
+    
+    $history = new OrderHistory();
+    $history->id_order = $currentOrder;
+    $history->changeIdOrderState(6, $currentOrder);
+    $history->save();
 }

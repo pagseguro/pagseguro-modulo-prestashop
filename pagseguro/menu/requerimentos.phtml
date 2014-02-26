@@ -1,0 +1,36 @@
+<?php
+
+$titulo = $this->l('Requisitos');
+$requirements = "
+    <tr>
+        <td><img src='". $error['curl'][0] ."'></td>
+        <td>".(is_null($error['curl'][1]) ? "Biblioteca cURL instalada." : $error['curl'][1])."</td>
+    </tr>
+    <tr>
+        <td><img src='". $error['dom'][0] ."'></td>
+       	<td>".(is_null($error['dom'][1]) ? "DOM XML instalado." : $error['dom'][1])."</td>
+    </tr>
+    <tr>
+        <td><img src='". $error['spl'][0] ."'></td>
+        <td>".(is_null($error['spl'][1]) ? "Biblioteca padrão do PHP(SPL) instalada." : $error['spl'][1])."</td>
+    </tr>
+    <tr>
+        <td><img src='". $error['version'][0] ."'></td>
+        <td>".(is_null($error['version'][1]) ? "Versão do PHP superior à 5.1.6." : $error['version'][1])."</td>
+    </tr>
+    <tr>
+        <td><img src='". $error['moeda'][0] ."'></td>
+        <td>".(is_null($error['moeda'][1]) ? "Moeda REAL instalada." : $error['moeda'][1])."</td>
+    </tr>
+";
+
+$result = <<<EOF
+    <h2>$titulo</h2>
+    <br>
+    <table>
+        $requirements
+    </table>
+EOF;
+
+return $result;
+?>

@@ -25,9 +25,6 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-/**
- * Class PagSeguro Search Transaction
- */
 class PagSeguroSearchTransaction
 {
 
@@ -37,9 +34,6 @@ class PagSeguroSearchTransaction
 
     private $obj_transaction;
 
-    /**
-     * Construct
-     */
     public function __construct()
     {
         $this->transaction_code = (
@@ -51,9 +45,6 @@ class PagSeguroSearchTransaction
         $this->createTransaction();
     }
 
-    /**
-     * Create Credential
-     */
     private function createCredential()
     {
         $email = Configuration::get('PAGSEGURO_EMAIL');
@@ -61,9 +52,6 @@ class PagSeguroSearchTransaction
         $this->obj_credential = new PagSeguroAccountCredentials($email, $token);
     }
 
-    /**
-     * Create Transaction
-     */
     private function createTransaction()
     {
         $this->obj_transaction = PagSeguroTransactionSearchService::searchByCode(

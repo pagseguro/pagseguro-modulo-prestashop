@@ -1,0 +1,5 @@
+{2013/10/29 11:58:03} [Info] PagSeguroPaymentService.Register(PagSeguroPaymentRequest: array (
+  'Reference' => 2,
+  'SenderEmail' => 'comprador@s2it.com.br',
+)) - begin 
+{2013/10/29 11:58:26} [Error] Exception: CURL can't connect: couldn't connect to host 

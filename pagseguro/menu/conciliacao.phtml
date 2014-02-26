@@ -1,0 +1,68 @@
+<?php
+
+$titulo = $this->l('Conciliação');
+$botaoPesquisar = $this->l('Pesquisar');
+$adminToken = Tools::getAdminTokenLite('AdminOrders');
+
+//SELECT * FROM core_config_data
+$sql = 'SELECT * FROM '._DB_PREFIX_.'orders ORDER BY id_order';
+$tableResult = "";
+
+if ($results = Db::getInstance()->executeS($sql)) {
+    foreach ($results as $key => $row) {
+        $tableResult .=  "
+        <tr class='tabela' id='" .$row['id_order']."'>
+        <td>" .$row['date_add']."</td>
+        <td>" .$row['id_cart']."</td>
+        <td>" .$row['id_order']."</td>
+        <td>" .$row['total_paid_real']."</td>
+        <td>". $row['total_products']."</td>
+        <td id='editar'>
+            <a onclick='editRedirect(" . $row['id_order'] . ")' id='"
+                . $row['id_order'] . "' style='cursor:pointer'>
+            <img src='../modules/pagseguro/assets/images/edit.png' border='0' alt='edit' title='Editar'/>
+            </a>
+        </td>
+        <td id='editar'><a onclick=alert('modificar') style='cursor:pointer'>
+            <img src='../modules/pagseguro/assets/images/refresh.png' border='0' alt='edit' title='Modificar'/>
+        </td>
+        </tr>";
+    }
+}
+
+$result = <<<EOF
+    <h2>$titulo</h2>
+    <br>
+    <label>DIAS</label>
+    <br>
+        <select id='pagseguro_dias' name='pagseguro_dias' class='select' style='width:100px !important'>
+        $dias
+       	</select>
+    <input class="pagseguro-button green-theme normal" type='button' name='search' value='$botaoPesquisar'/>
+    <br>
+    <br>
+    <table id='htmlgrid' class='gridConciliacao' width='100%'>
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>ID PrestaShop</th>
+                <th>ID PagSeguro</th>
+                <th>Status PrestaShop</th>
+                <th>Status PagSeguro</th>
+                <th>Editar</th>
+                <th>Modificar</th>
+            </tr>
+        </thead>
+        <tbody id="resultTable">
+            $tableResult
+        </tbody>
+    </table>
+    <input type='hidden' id='adminToken' value='$adminToken'>
+    <br>
+    <div class="col-md-12 text-center">
+        <ul class="pagination pagination-lg pager" id="myPager"></ul>
+    </div>
+EOF;
+
+return $result;
+?>

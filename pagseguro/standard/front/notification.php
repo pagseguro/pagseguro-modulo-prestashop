@@ -25,18 +25,15 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-include_once dirname(__FILE__) . '/../../../../config/config.inc.php';
-include_once dirname(__FILE__) . '/../../../../init.php';
-include_once dirname(__FILE__) . '/../../pagseguro.php';
+include_once(dirname(__FILE__) . '/../../../../config/config.inc.php');
+include_once(dirname(__FILE__) . '/../../pagseguro.php');
+include_once(dirname(__FILE__) . '/../../backward_compatibility/backward.php');
 include_once(dirname(__FILE__) . '/../../features/notification/pagseguronotificationorderprestashop.php');
 
-class PagSeguroNotificationModuleFrontController extends ModuleFrontController
-{
+$pagNotification = new PagSeguroNotificationOrderPrestashop();
+$pagNotification->postProcess($_POST);
 
-    public function postProcess()
-    {
-        parent::postProcess();
-        $pagNotification = new PagSeguroNotificationOrderPrestashop();
-        $pagNotification->postProcess($_POST);
-    }
-}
+$showView = new BWDisplay();
+
+$showView->displayHeader();
+$showView->displayFooter();

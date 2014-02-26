@@ -25,18 +25,23 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-include_once dirname(__FILE__) . '/../../../../config/config.inc.php';
-include_once dirname(__FILE__) . '/../../../../init.php';
-include_once dirname(__FILE__) . '/../../pagseguro.php';
-include_once(dirname(__FILE__) . '/../../features/notification/pagseguronotificationorderprestashop.php');
+include_once dirname(__FILE__) . '/pagseguroPS14.php';
+include_once dirname(__FILE__) . '/pagseguroPS15.php';
+include_once dirname(__FILE__) . '/pagseguroPS1501toPS1503.php';
 
-class PagSeguroNotificationModuleFrontController extends ModuleFrontController
+class PagSeguroFactoryInstallModule
 {
-
-    public function postProcess()
+        
+    public static function createModule($version)
     {
-        parent::postProcess();
-        $pagNotification = new PagSeguroNotificationOrderPrestashop();
-        $pagNotification->postProcess($_POST);
+        
+        switch ($version) {
+            case version_compare($version, '1.5.0.1', '<'):
+                return new PagSeguroPS14($context);
+            case version_compare($version, '1.5.0.1', '>=') && version_compare($version, '1.5.0.3', '<='):
+                return new PagSeguroPS1501ToPS1503();
+            case version_compare($version, '1.5.0.3', '>'):
+                return new PagSeguroPS15();
+        }
     }
 }

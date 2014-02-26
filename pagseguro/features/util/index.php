@@ -1,5 +1,4 @@
 <?php
-
 /*
  * 2007-2013 PrestaShop
  *
@@ -25,18 +24,12 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-include_once dirname(__FILE__) . '/../../../../config/config.inc.php';
-include_once dirname(__FILE__) . '/../../../../init.php';
-include_once dirname(__FILE__) . '/../../pagseguro.php';
-include_once(dirname(__FILE__) . '/../../features/notification/pagseguronotificationorderprestashop.php');
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 
-class PagSeguroNotificationModuleFrontController extends ModuleFrontController
-{
+header("Cache-Control: no-store, no-cache, must-revalidate");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 
-    public function postProcess()
-    {
-        parent::postProcess();
-        $pagNotification = new PagSeguroNotificationOrderPrestashop();
-        $pagNotification->postProcess($_POST);
-    }
-}
+header("Location: ../");
+exit();

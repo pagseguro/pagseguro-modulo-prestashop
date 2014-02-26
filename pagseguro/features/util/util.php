@@ -25,7 +25,9 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-class PagSeguroModuloUtil
+include_once dirname(__FILE__).'/../../../../config/config.inc.php';
+
+class Util
 {
 
     private static $charset_options = array(
@@ -33,7 +35,7 @@ class PagSeguroModuloUtil
         '2' => 'UTF-8'
     );
 
-    private static $active_log = array(
+    private static $active = array(
         '0' => 'NÃO',
         '1' => 'SIM'
     );
@@ -167,15 +169,35 @@ class PagSeguroModuloUtil
         'PS_OS_PAYPAL' => 11,
         'PS_OS_WS_PAYMENT' => 12
     );
-
+    
+    private static $days_recovery = array(
+        0 => 1, 1 => 2, 2 => 3, 3 => 4, 4 => 5,
+        5 => 6, 6 => 7, 7 => 8, 8 => 9, 9 => 10
+    );
+    
+    private static $days_search = array(
+        0 => 5,  1 => 10, 2 => 15,
+        3 => 20, 4 => 25, 5 => 30
+    );
+    
+    public static function getDaysSearch()
+    {
+        return self::$days_search;
+    }
+    
+    public static function getDaysRecovery()
+    {
+        return self::$days_recovery;
+    }
+    
     public static function getCharsetOptions()
     {
         return self::$charset_options;
     }
 
-    public static function getActiveLog()
+    public static function getActive()
     {
-        return self::$active_log;
+        return self::$active;
     }
     
     public static function getTypeCheckout()
@@ -196,5 +218,128 @@ class PagSeguroModuloUtil
     public static function getUpdateConfigVersion14()
     {
         return self::$update_config_versio_14;
+    }
+    
+    public static function getJsBehaviorPS14()
+    {
+        return __PS_BASE_URI__ . 'modules/pagseguro/assets/js/behaviors-version-14.js';
+    }
+    
+    public static function getJsBehaviorPS15()
+    {
+        return __PS_BASE_URI__ . 'modules/pagseguro/assets/js/behaviors-version-15.js';
+    }
+    
+    public static function getCssDisplayPS14()
+    {
+        return __PS_BASE_URI__ . 'modules/pagseguro/assets/css/styles-version-14.css';
+    }
+    
+    public static function getCssDisplayPS15()
+    {
+        return __PS_BASE_URI__ . 'modules/pagseguro/assets/css/styles-version-15.css';
+    }
+    
+    private static function getBaseDefaultUrl()
+    {
+        return _PS_BASE_URL_ . __PS_BASE_URI__;
+    }
+    
+    public static function getDefaultRedirectUrlPS14()
+    {
+        return self::getBaseDefaultUrl();
+    }
+    
+    public static function getDefaultRedirectUrlPS15()
+    {
+        $index = version_compare(_PS_VERSION_, '1.5.0.3', '<=') ? '' : 'index.php';
+        return self::getBaseDefaultUrl() . $index;
+    }
+    
+    public static function getDefaultNotificationUrlPS14()
+    {
+        return self::getBaseDefaultUrl() . 'modules/pagseguro/standard/front/notification.php';
+    }
+    
+    public static function getDefaultNotificationUrlPS15()
+    {
+        return self::getBaseDefaultUrl() . 'index.php?fc=module&module=pagseguro&controller=notification';
+    }
+    
+    public static function urlToRedirectPS14 (Array $data)
+    {
+        
+        $urlToCompose = self::getRedirectUrl();
+        if (Tools::isEmpty($urlToCompose)) {
+            $urlToCompose = self::getDefaultRedirectUrlPS14();
+        }
+        
+        return $urlToCompose . 'order-confirmation.php?id_cart=' . $data['id_cart'] . '&id_module=' .
+            $data['id_module'] . '&id_order=' . $data['id_order'] . '&key=' . $data['key'];
+    }
+    
+    public static function urlToRedirectPS15 (Array $data)
+    {
+
+        $urlToCompose = self::getRedirectUrl();
+        if (Tools::isEmpty($urlToCompose)) {
+            $urlToCompose = self::getDefaultRedirectUrlPS15();
+        }
+
+        return $urlToCompose . '?controller=order-confirmation&id_cart=' . $data['id_cart'] .
+        '&id_module=' . $data['id_module'] . '&id_order=' . $data['id_order'] . '&key=' . $data['key'];
+    }
+    
+    public static function urlToNotificationPS14 ()
+    {
+        $urlToNotification = self::getNotificationUrl();
+        return Tools::isEmpty($urlToNotification) ? self::getDefaultNotificationUrlPS14() : $urlToNotification;
+    }
+    
+    public static function urlToNotificationPS15 ()
+    {
+        $urlToNotification = self::getNotificationUrl();
+        return Tools::isEmpty($urlToNotification) ? self::getDefaultNotificationUrlPS15() : $urlToNotification;
+    }
+    
+    public static function getNotificationUrl()
+    {
+        return Configuration::get('PAGSEGURO_NOTIFICATION_URL');
+    }
+    
+    public static function getRedirectUrl()
+    {
+        return Configuration::get('PAGSEGURO_URL_REDIRECT');
+    }
+    
+    public static function convertPriceFull($amount, $currency_from = null, $currency_to = null)
+    {
+        
+        if (version_compare(_PS_VERSION_, '1.5', '>')) {
+            return Tools::convertPriceFull($amount, $currency_from, $currency_to);
+        } else {
+            
+            if ($currency_from === $currency_to) {
+                return $amount;
+            }
+            if ($currency_from === null) {
+                $currency_from = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
+            }
+            if ($currency_to === null) {
+                $currency_to = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
+            }
+            if ($currency_from->id == Configuration::get('PS_CURRENCY_DEFAULT')) {
+                $amount *= $currency_to->conversion_rate;
+            } else {
+                $conversion_rate = ($currency_from->conversion_rate == 0 ? 1 : $currency_from->conversion_rate);
+
+                // Convert amount to default currency (using the old currency rate)
+                $amount = Tools::ps_round($amount / $conversion_rate, 2);
+
+                // Convert to new currency
+                $amount *= $currency_to->conversion_rate;
+            }
+            return Tools::ps_round($amount, 2);
+        }
     }
 }
