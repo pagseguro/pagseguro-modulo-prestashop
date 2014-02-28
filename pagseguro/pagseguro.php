@@ -306,24 +306,28 @@ class PagSeguro extends PaymentModule
                 'config' => array(
                     'title' => $this->l('Configuração'),
                     'content' => $this->getConfigurationTabHtml(),
+					'icon' => '',
                     'tab' => 1,
                     'selected' => true,
                 ),
                 'extras' => array(
                     'title' => $this->l('Extras'),
                     'content' => $this->getExtrasTabHtml(),
+					'icon' => '',
                     'tab' => 2,
                     'selected' => false,
                 ),
                 'conciliation' => array(
                     'title' => $this->l('Conciliação'),
                     'content' => $this->getConciliationTabHtml(),
+					'icon' => '',
                     'tab' => 3,
                     'selected' => false,
                 ),
                 'requirements' => array(
                     'title' => $this->l('Requisitos'),
                     'content' => $this->getRequirementsTabHtml(),
+					'icon' => '',
                     'tab' => 4,
                     'selected' => false,
                 ),
