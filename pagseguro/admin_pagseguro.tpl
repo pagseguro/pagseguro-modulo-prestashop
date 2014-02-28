@@ -30,11 +30,6 @@
 <form class="psplugin" id="psplugin" action="{$action_post}" method="POST">
     <h1>
         <img src="{$module_dir}assets/images/logops_228x56.png" />
-        <span style="margin-left : 60px; width : 480px">
-        	<div>
-            {l s='Mais de 23 milhões de brasileiros já utilizam o PagSeguro. Faça parte você também!' mod='pagseguro'}
-        	</div>
-        </span>
         <span style="right : 0px">
             <a href="https://pagseguro.uol.com.br/registration/registration.jhtml?ep=5&tipo=cadastro#!vendedor" target="_blank" class="pagseguro-button green-theme normal">
                 {l s='Faça seu cadastro' mod='pagseguro'}
@@ -53,7 +48,7 @@
         </div>
     {/foreach}
     </div>
-    <p class="center"><button id="update" class="pagseguro-button green-theme normal" name="btnSubmit" />Atualizar</button></p>
+    <p class="center"><button id="update" class="pagseguro-button green-theme normal" name="btnSubmit" />Salvar</button></p>
 </form>
 <br>
 <script type="text/javascript">
