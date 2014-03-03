@@ -153,6 +153,8 @@ class PagSeguro extends PaymentModule
     
     private function getConfigurationTabHtml()
     {
+        global $smarty;
+        
         $charset = Util::getCharsetOptions();
         $optionCharset = "";
         $selection = array_search(
@@ -179,14 +181,23 @@ class PagSeguro extends PaymentModule
                 $optionCheckout .= "<option value='" . $key . "'>" . $value . "</option>";
             }
         }
+        
+        $smarty->assign('optionCharset', $optionCharset);
+        $smarty->assign('optionCheckout', $optionCheckout);
+        $smarty->assign('email', Tools::safeOutput(Configuration::get('PAGSEGURO_EMAIL')));
+        $smarty->assign('token', Tools::safeOutput(Configuration::get('PAGSEGURO_TOKEN')));
+        $smarty->assign('titulo', $this->l('Configuração'));
+        
         $conteudo = '';
-        $conteudo .= include(dirname(__FILE__) . '\menu\configuracoes.phtml');
+        $conteudo = $this->display(__FILE__, '\menu\configuracoes.tpl');
         return $conteudo;
     
     }
     
     private function getExtrasTabHtml()
     {
+        global $smarty;
+        
         $active = Util::getActive();
         $optionLog = "";
         $selection = Configuration::get('PAGSEGURO_LOG_ACTIVE');
@@ -220,29 +231,74 @@ class PagSeguro extends PaymentModule
                 $validLink .= "<option value='" . $key . "'>" . $value . "</option>";
             }
         }
-    
+
+        $smarty->assign('optionLog', $optionLog);
+        $smarty->assign('optionRecovery', $optionRecovery);
+        $smarty->assign('validLink', $validLink);
+        $smarty->assign('urlNotification', $this->getNotificationUrl());
+        $smarty->assign('urlRedirection', $this->getDefaultRedirectionUrl());
+        $smarty->assign('fileLocation', Tools::safeOutput(Configuration::get('PAGSEGURO_LOG_FILELOCATION')));
+        $smarty->assign('titulo', $this->l('Extras'));
+
         $conteudo = "";
-        $conteudo .= include(dirname(__FILE__) . '\menu\extras.phtml');
+        $conteudo = $this->display(__FILE__, '\menu\extras.tpl');
         return $conteudo;
     }
     
     private function getConciliationTabHtml()
     {
+        global $smarty;
+        
         $dias = "";
         $image = '../modules/pagseguro/assets/images/';
          
         foreach (Util::getDaysSearch() as $value ) {
             $dias .= "<option value='" . $value . "'>" . $value . "</option>";
         }
-    
+        
+        $adminToken = Tools::getAdminTokenLite('AdminOrders');
+        
+        //SELECT * FROM core_config_data
+        $sql = 'SELECT * FROM '._DB_PREFIX_.'orders ORDER BY id_order';
+        $tableResult = "";
+        
+        if ($results = Db::getInstance()->executeS($sql)) {
+            foreach ($results as $key => $row) {
+                $tableResult .=  "
+        <tr class='tabela' id='" .$row['id_order']."'>
+        <td>" .$row['date_add']."</td>
+        <td>" .$row['id_cart']."</td>
+        <td>" .$row['id_order']."</td>
+        <td>" .$row['total_paid_real']."</td>
+        <td>". $row['total_products']."</td>
+        <td id='editar'>
+            <a onclick='editRedirect(" . $row['id_order'] . ")' id='"
+                            . $row['id_order'] . "' style='cursor:pointer'>
+            <img src='../modules/pagseguro/assets/images/edit.png' border='0' alt='edit' title='Editar'/>
+            </a>
+        </td>
+        <td id='editar'><a onclick=alert('modificar') style='cursor:pointer'>
+            <img src='../modules/pagseguro/assets/images/refresh.png' border='0' alt='edit' title='Modificar'/>
+        </td>
+        </tr>";
+            }
+        }
+        
+
+        $smarty->assign('dias', $dias);
+        $smarty->assign('adminToken', $adminToken);
+        $smarty->assign('tableResult', $tableResult);
+        $smarty->assign('titulo', $this->l('Conciliação'));
+
         $conteudo = "";
-        $conteudo .= include(dirname(__FILE__) . '\menu\conciliacao.phtml');
+        $conteudo = $this->display(__FILE__, '\menu\conciliacao.tpl');
         return $conteudo;
-    
     }
     
     private function getRequirementsTabHtml()
     {
+        global $smarty;
+        
         $image = '../modules/pagseguro/assets/images/';
         $error = array();
     
@@ -264,13 +320,20 @@ class PagSeguro extends PaymentModule
             $error['moeda'][1] = $this->missedCurrencyMessage();
         } else {
             $error['moeda'][0] = $image.'ok.png';
-            $error['moeda'][1] = null;
+            $error['moeda'][1] = "Moeda REAL instalada.";
         }
-    
+
+        $error['curl'][1] = (is_null($error['curl'][1]) ? "Biblioteca cURL instalada." : $error['curl'][1]);
+        $error['dom'][1] = (is_null($error['dom'][1]) ? "DOM XML instalado." : $error['dom'][1]);
+        $error['spl'][1] = (is_null($error['spl'][1]) ? "Biblioteca padrão do PHP(SPL) instalada." : $error['spl'][1]);
+        $error['version'][1] = (is_null($error['version'][1]) ? "Versão do PHP superior à 5.1.6." : $error['version'][1]);
+
+        $smarty->assign('error', $error);
+        $smarty->assign('titulo', $this->l('Requisitos'));
+
         $conteudo = "";
-        $conteudo .= include(dirname(__FILE__) . '\menu\requerimentos.phtml');
+        $conteudo = $this->display(__FILE__, '\menu\requerimentos.tpl');
         return $conteudo;
-    
     }
     
     private function displayForm()
@@ -306,28 +369,28 @@ class PagSeguro extends PaymentModule
                 'config' => array(
                     'title' => $this->l('Configuração'),
                     'content' => $this->getConfigurationTabHtml(),
-					'icon' => '',
+                    'icon' => '',
                     'tab' => 1,
                     'selected' => true,
                 ),
                 'extras' => array(
                     'title' => $this->l('Extras'),
                     'content' => $this->getExtrasTabHtml(),
-					'icon' => '',
+                    'icon' => '',
                     'tab' => 2,
                     'selected' => false,
                 ),
                 'conciliation' => array(
                     'title' => $this->l('Conciliação'),
                     'content' => $this->getConciliationTabHtml(),
-					'icon' => '',
+                    'icon' => '',
                     'tab' => 3,
                     'selected' => false,
                 ),
                 'requirements' => array(
                     'title' => $this->l('Requisitos'),
                     'content' => $this->getRequirementsTabHtml(),
-					'icon' => '',
+                    'icon' => '',
                     'tab' => 4,
                     'selected' => false,
                 ),
