@@ -55,6 +55,11 @@ Para acessar e configurar o módulo acesse o menu Módulos -> Modules -> Payment
 Changelog
 ---------
 ---
+1.8
+
+- Mudanças no layout do painel de configuração.
+- Possibilidade de consultar transações no PagSeguro para conciliar os status com a base local.
+
 1.7
 
 - Adicionando opção para utilização do Checkout Lightbox. Obs.: Recomenda-se limpar o cache do PrestaShop antes da instalação desta versão.
