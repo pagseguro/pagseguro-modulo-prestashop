@@ -34,8 +34,6 @@ class PagSeguroNotificationOrderPrestashop
 
     private $obj_notification_type;
 
-    private $array_st_cms;
-
     private $obj_credential;
 
     private $notification_type;
@@ -87,27 +85,12 @@ class PagSeguroNotificationOrderPrestashop
     private function inicializeObjects()
     {
         $this->createNotificationType();
-        $this->createArrayStatusCms();
     }
 
     private function createNotificationType()
     {
         $this->obj_notification_type = new PagSeguroNotificationType();
         $this->obj_notification_type->setByType('TRANSACTION');
-    }
-
-    private function createArrayStatusCms()
-    {
-        $this->array_st_cms = array(
-            0 => 'Iniciado',
-            1 => 'Aguardando pagamento',
-            2 => 'Em análise',
-            3 => 'Paga',
-            4 => 'Disponível',
-            5 => 'Em disputa',
-            6 => 'Devolvida',
-            7 => 'Cancelada'
-        );
     }
 
     private function createTransaction()
@@ -130,11 +113,11 @@ class PagSeguroNotificationOrderPrestashop
         (int) $this->obj_transaction->getStatus()->getValue() : null;
 
         if ($this->isNotNull($id_status)) {
-            $id_st_transaction = (int) $this->returnIdOrderByStatusPagSeguro($this->array_st_cms[$id_status]);
+            $id_st_transaction = (int) $this->returnIdOrderByStatusPagSeguro(Util::getStatusCMS($id_status));
         }
         
         if ($this->isNotNull($id_st_transaction)) {
-            $this->createAddOrderHistory($id_st_transaction);
+            Util::createAddOrderHistory((int)$this->reference,$id_st_transaction);
         }
         
         $this->saveTransactionId($this->obj_transaction->getCode(), $this->obj_transaction->getReference());
@@ -154,17 +137,6 @@ class PagSeguroNotificationOrderPrestashop
         $id_order_state = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql));
 
         return $id_order_state[0]['id_order_state'];
-    }
-
-    private function createAddOrderHistory($id_st_transaction)
-    {
-        if ($this->isNotNull($this->reference)) {
-
-            $order_history = new OrderHistory();
-            $order_history->id_order = (int) $this->reference;
-            $order_history->changeIdOrderState((int) $id_st_transaction, $order_history->id_order);
-            $order_history->addWithemail();
-        }
     }
 
     private function isNotNull($value)

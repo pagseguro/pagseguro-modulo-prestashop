@@ -24,9 +24,9 @@
  *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
-
 include_once dirname(__FILE__) . '/features/PagSeguroLibrary/PagSeguroLibrary.php';
 include_once dirname(__FILE__) . '/features/modules/pagsegurofactoryinstallmodule.php';
+// include_once dirname(__FILE__) . '/menu/conciliacao.php';
 
 if (! defined('_PS_VERSION_')) {
     exit();
@@ -34,7 +34,6 @@ if (! defined('_PS_VERSION_')) {
 
 class PagSeguro extends PaymentModule
 {
-
     private $modulo;
 
     protected $errors = array();
@@ -163,6 +162,7 @@ class PagSeguro extends PaymentModule
         );
     
         foreach ($charset as $key => $value){
+            
             if ($key == $selection) {
                 $optionCharset .= "<option value='" . $key . "' selected='selected' >" . $value . "</option>";
             } else {
@@ -189,7 +189,7 @@ class PagSeguro extends PaymentModule
         $smarty->assign('titulo', $this->l('Configuração'));
         
         $conteudo = '';
-        $conteudo = $this->display(__FILE__, '\menu\configuracoes.tpl');
+        $conteudo = $this->display(dirname(__FILE__), '/menu/configuracoes.tpl');
         return $conteudo;
     
     }
@@ -241,7 +241,7 @@ class PagSeguro extends PaymentModule
         $smarty->assign('titulo', $this->l('Extras'));
 
         $conteudo = "";
-        $conteudo = $this->display(__FILE__, '\menu\extras.tpl');
+        $conteudo = $this->display(dirname(__FILE__), '/menu/extras.tpl');
         return $conteudo;
     }
     
@@ -257,44 +257,24 @@ class PagSeguro extends PaymentModule
         }
         
         $adminToken = Tools::getAdminTokenLite('AdminOrders');
-        
-        //SELECT * FROM core_config_data
-        $sql = 'SELECT * FROM '._DB_PREFIX_.'orders ORDER BY id_order';
-        $tableResult = "";
-        
-        if ($results = Db::getInstance()->executeS($sql)) {
-            foreach ($results as $key => $row) {
-                $tableResult .=  "
-        <tr class='tabela' id='" .$row['id_order']."'>
-        <td>" .$row['date_add']."</td>
-        <td>" .$row['id_cart']."</td>
-        <td>" .$row['id_order']."</td>
-        <td>" .$row['total_paid_real']."</td>
-        <td>". $row['total_products']."</td>
-        <td id='editar'>
-            <a onclick='editRedirect(" . $row['id_order'] . ")' id='"
-                            . $row['id_order'] . "' style='cursor:pointer'>
-            <img src='../modules/pagseguro/assets/images/edit.png' border='0' alt='edit' title='Editar'/>
-            </a>
-        </td>
-        <td id='editar'><a onclick=alert('modificar') style='cursor:pointer'>
-            <img src='../modules/pagseguro/assets/images/refresh.png' border='0' alt='edit' title='Modificar'/>
-        </td>
-        </tr>";
-            }
-        }
-        
+
+        $tableResult = include_once(dirname(__FILE__) . '\menu\conciliacao.php');
 
         $smarty->assign('dias', $dias);
+        $smarty->assign('urlAdminOrder', $_SERVER['SCRIPT_NAME'].'?tab=AdminOrders');
         $smarty->assign('adminToken', $adminToken);
-        $smarty->assign('tableResult', $tableResult);
+        $smarty->assign('tableResult', $tableResult['tabela']);
         $smarty->assign('titulo', $this->l('Conciliação'));
+        $smarty->assign('errorMsg', $tableResult['errorMsg']);
 
         $conteudo = "";
-        $conteudo = $this->display(__FILE__, '\menu\conciliacao.tpl');
+//         $conteudo .= include(dirname(__FILE__) . '\menu\conciliacao.phtml');
+//         $conteudo .= include(dirname(__FILE__) . '\menu\conciliacao.tpl');
+        $conteudo = $this->display(dirname(__FILE__), '/menu/conciliacao.tpl');
         return $conteudo;
-    }
     
+    }
+
     private function getRequirementsTabHtml()
     {
         global $smarty;
@@ -332,14 +312,15 @@ class PagSeguro extends PaymentModule
         $smarty->assign('titulo', $this->l('Requisitos'));
 
         $conteudo = "";
-        $conteudo = $this->display(__FILE__, '\menu\requerimentos.tpl');
+        $conteudo = $this->display(dirname(__FILE__), '/menu/requerimentos.tpl');
         return $conteudo;
+    
     }
     
     private function displayForm()
     {
         global $smarty;
-    
+        
         $smarty->assign('module_dir', _PS_MODULE_DIR_ . 'pagseguro/');
         $smarty->assign('action_post', Tools::htmlentitiesUTF8($_SERVER['REQUEST_URI']));
         $smarty->assign('email_user', Tools::safeOutput(Configuration::get('PAGSEGURO_EMAIL')));

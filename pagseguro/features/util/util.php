@@ -170,6 +170,17 @@ class Util
         'PS_OS_WS_PAYMENT' => 12
     );
     
+    private static $array_st_cms = array(
+        0 => 'Iniciado',
+        1 => 'Aguardando pagamento',
+        2 => 'Em análise',
+        3 => 'Paga',
+        4 => 'Disponível',
+        5 => 'Em disputa',
+        6 => 'Devolvida',
+        7 => 'Cancelada'
+    );
+    
     private static $days_recovery = array(
         0 => 1, 1 => 2, 2 => 3, 3 => 4, 4 => 5,
         5 => 6, 6 => 7, 7 => 8, 8 => 9, 9 => 10
@@ -179,6 +190,11 @@ class Util
         0 => 5,  1 => 10, 2 => 15,
         3 => 20, 4 => 25, 5 => 30
     );
+    
+    public static function getStatusCMS($id_status)
+    {
+        return self::$array_st_cms[$id_status];
+    }
     
     public static function getDaysSearch()
     {
@@ -341,5 +357,15 @@ class Util
             }
             return Tools::ps_round($amount, 2);
         }
+    }
+    
+    public static function createAddOrderHistory($idOrder,$status)
+    {
+        $order_history = new OrderHistory();
+        $order_history->id_order = $idOrder;
+        $order_history->changeIdOrderState($status, $idOrder);
+        $order_history->addWithemail();
+    
+        return true;
     }
 }

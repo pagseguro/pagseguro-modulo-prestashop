@@ -24,8 +24,29 @@
         {$tableResult}
     </tbody>
 </table>
+{if ($errorMsg)}
+<div class="error-message">
+	<p class="small text-center">*Obs: Os Status do Pagseguro só aparecerá após registrar um email e token válidos.
+</div>
+{/if}
 <input type='hidden' id='adminToken' value='{$adminToken}'>
+<input type='hidden' id='urlAdminOrder' value='{$urlAdminOrder}'>
 <br>
 <div class="col-md-12 text-center">
     <ul class="pagination pagination-lg pager" id="myPager"></ul>
 </div>
+<script type="text/javascript">
+    {literal}
+        $(document).ready(function() {
+            $('#htmlgrid').pbTable({
+                selectable:false,
+                sortable:true,
+                toolbar:{
+                    enabled:false,
+                    filterBox:false,
+                    tags:false
+                }
+                });
+        });
+    {/literal}
+</script>
