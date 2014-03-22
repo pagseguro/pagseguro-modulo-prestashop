@@ -171,18 +171,17 @@ class PagSeguroConciliacao {
 
     private function getAbandoned() {
         $dataInicial = mktime(0, 0, 0, date("m"), date("d")-(isset($_POST['dias']) ? $_POST['dias'] : '5'), date("Y"));
-        $dataFinal = mktime(0, 0, 0, date("m"), date("d"), date("Y"));
         $idAbandoned = array();
 
         try {
             $obj_transaction = PagSeguroTransactionSearchService::searchAbandoned(
-                    $this->obj_credential,1,1000,$dataInicial,$dataFinal
+                    $this->obj_credential,1,1000,$dataInicial
             );
             if($obj_transaction->getTotalPages() >= 1) {
                 for ($i = 1; $i <= $obj_transaction->getTotalPages(); $i++) {
                     if ($i > 1) {
                         $obj_transaction = PagSeguroTransactionSearchService::searchAbandoned(
-                                $this->obj_credential,$i,1,$dataInicial,$dataFinal
+                                $this->obj_credential,$i,1,$dataInicial
                         );
                     }
                     foreach ($obj_transaction->getTransactions() as $row) {
