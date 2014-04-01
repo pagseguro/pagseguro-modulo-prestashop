@@ -170,7 +170,7 @@ class PagSeguroConciliacao {
     }
 
     private function getAbandoned() {
-        $dataInicial = mktime(0, 0, 0, date("m"), date("d")-(isset($_POST['dias']) ? $_POST['dias'] : '5'), date("Y"));
+        $dataInicial = mktime(1, 0, 0, date("m"), date("d")-(isset($_POST['dias']) ? $_POST['dias'] : '5'), date("Y"));
         $idAbandoned = array();
 
         try {
