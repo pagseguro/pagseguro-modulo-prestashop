@@ -51,6 +51,7 @@
     {/foreach}
     </div>
     <p class="center"><button id="update" class="pagseguro-button green-theme normal" name="btnSubmit" />Salvar</button></p>
+	<input type='hidden' id='menuTab' name='menuTab' value='menuTab1'>
 </form>
 <br>
 <script type="text/javascript">
@@ -58,6 +59,7 @@
         var url = location.href;  
         var baseURL = url.substring(0, url.indexOf('/', 18));
         var paginaAtual = 0;
+		var menuTab = 'menuTab1';
 
         $('.menuTabButton').live('click',
             function () {
@@ -65,7 +67,9 @@
                 $(this).addClass('selected');
                 $('.tabItem.selected').removeClass('selected');
                 $('#' + this.id + 'Sheet').addClass('selected');
-
+				menuTab = this.id;
+                
+                $("input[name=menuTab]").val(menuTab);
                 hideInput(this.id);
         });
         

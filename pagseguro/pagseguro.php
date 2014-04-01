@@ -41,6 +41,8 @@ class PagSeguro extends PaymentModule
     private $html;
 
     public $context;
+	
+	private $menuTab = 'menuTab1';
 
     public function __construct()
     {
@@ -352,28 +354,28 @@ class PagSeguro extends PaymentModule
                     'content' => $this->getConfigurationTabHtml(),
                     'icon' => '',
                     'tab' => 1,
-                    'selected' => true,
+                    'selected' => ($this->menuTab == 'menuTab1') ? true : false,
                 ),
                 'extras' => array(
                     'title' => $this->l('Extras'),
                     'content' => $this->getExtrasTabHtml(),
                     'icon' => '',
                     'tab' => 2,
-                    'selected' => false,
+                    'selected' => ($this->menuTab == 'menuTab2') ? true : false,
                 ),
                 'conciliation' => array(
                     'title' => $this->l('Conciliação'),
                     'content' => $this->getConciliationTabHtml(),
                     'icon' => '',
                     'tab' => 3,
-                    'selected' => false,
+                    'selected' => ($this->menuTab == 'menuTab3') ? true : false,
                 ),
                 'requirements' => array(
                     'title' => $this->l('Requisitos'),
                     'content' => $this->getRequirementsTabHtml(),
                     'icon' => '',
                     'tab' => 4,
-                    'selected' => false,
+                    'selected' => ($this->menuTab == 'menuTab4') ? true : false,
                 ),
             )
         ));
@@ -389,6 +391,7 @@ class PagSeguro extends PaymentModule
     {
         if (Tools::isSubmit('btnSubmit')) {
             
+			$this->menuTab = Tools::getValue('menuTab');
             $email = Tools::getValue('pagseguro_email');
             $token = Tools::getValue('pagseguro_token');
             $pagseguro_url_redirect = Tools::getValue('pagseguro_url_redirect');
