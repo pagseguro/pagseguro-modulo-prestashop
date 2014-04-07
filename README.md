@@ -14,7 +14,7 @@ Requisitos
 ----------
 ---
  - [PrestaShop] 1.4.5.1 a 1.5.6.0
- - [PHP] 5.1.6+
+ - [PHP] 5.3.3+
  - [SPL]
  - [cURL]
  - [DOM]
