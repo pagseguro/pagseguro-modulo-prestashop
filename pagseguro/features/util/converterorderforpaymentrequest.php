@@ -27,6 +27,7 @@
 
 include_once dirname(__FILE__) . '/../../../../config/config.inc.php';
 include_once dirname(__FILE__) . '/../../features/util/util.php';
+include_once dirname(__FILE__) . '/../../features/util/encryptionIdPagSeguro.php';
 include_once dirname(__FILE__) . '/../PagSeguroLibrary/PagSeguroLibrary.php';
 
 class ConverterOrderForPaymentRequest
@@ -284,7 +285,7 @@ class ConverterOrderForPaymentRequest
     {
         $this->urlToRedirect = $this->setRedirectUrl($additionalInfos);
         
-        $this->paymentRequest->setReference($additionalInfos['id_order']);
+        $this->setReference($additionalInfos['id_order']);
         
         $this->paymentRequest->setRedirectURL($this->urlToRedirect);
         
@@ -305,6 +306,12 @@ class ConverterOrderForPaymentRequest
             Util::urlToRedirectPS15($additional_infos);
     }
 
+    private function setReference($reference)
+    {
+         $referenceToPagSeguro = EncryptionIdPagSeguro::encrypt($reference);
+         $this->paymentRequest->setReference($referenceToPagSeguro);
+    }
+    
     private function performPagSeguroRequest($isLightBox)
     {
         try {

@@ -72,6 +72,7 @@
                 $("input[name=menuTab]").val(menuTab);
                 hideInput(this.id);
         });
+
         
         function hideInput(menuTab) {
             if (menuTab == 'menuTab2') {
@@ -278,9 +279,9 @@
         });
 
         function reloadTable() {
-                $.ajax({
+            $.ajax({
                     type: 'POST',
-                    url: '../modules/pagseguro/menu/conciliacao.php',
+                    url: '../modules/pagseguro/features/conciliation/conciliation.php',
                     dataType : "json",
                     data: {dias: $('#pagseguro_dias').val()},
                     success: function(result) {
@@ -302,16 +303,18 @@
             var token = $('#adminToken').val();
             var url = $('#urlAdminOrder').val();
 
-            window.location.href = url + '&id_order='+rowId+'&vieworder&token='+token;
+            window.open(url + '&id_order='+rowId+'&vieworder&token='+token);
+            
         }
         
-        function duplicateStatus(rowId,rowIdStatusPagSeg,rowIdStatusPreShop,statusPagSeg){
+        function duplicateStatus(rowId,rowIdStatusPagSeg,rowIdStatusPreShop){
+
             if(rowIdStatusPagSeg != rowIdStatusPreShop && rowIdStatusPagSeg != ""){
                 blockModal(1);
                 $.ajax({
                     type: 'POST',
-                    url: '../modules/pagseguro/menu/conciliacao.php',
-                    data: {idOrder: rowId, newIdStatus: rowIdStatusPagSeg, newStatus: statusPagSeg},
+                    url: '../modules/pagseguro/features/conciliation/conciliation.php',
+                    data: {idOrder: rowId, newIdStatus: rowIdStatusPagSeg },
                     success: function(result) {
                         reloadTable();
                     },

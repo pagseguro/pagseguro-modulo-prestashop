@@ -90,6 +90,8 @@ class PagSeguroTransactionSummary
      */
     private $paymentMethod;
 
+    private $recoveryCode;
+    
     /**
      * @return the transaction date
      */
@@ -300,5 +302,15 @@ class PagSeguroTransactionSummary
     public function getPaymentMethod()
     {
         return $this->paymentMethod;
+    }
+    
+    public function getRecoveryCode()
+    {
+        return $this->recoveryCode;
+    }
+    
+    public function setRecoveryCode($recoverycode)
+    {
+        $this->recoveryCode = $recoverycode;
     }
 }

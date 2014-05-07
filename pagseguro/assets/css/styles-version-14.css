@@ -23,7 +23,7 @@
 legend {text-align: center; width: 99%; margin-bottom: 10px;}
 
 table.gridConciliacao { border-collapse: collapse; border: 1px solid #E5E5E5; align:center }
-table.gridConciliacao td, table.gridConciliacao th { padding: 5px; border: 1px solid #E5E5E5; }
+table.gridConciliacao td, table.gridConciliacao th tfoot { padding: 5px; border: 1px solid #E5E5E5; }
 td#editar, td#duplicar { text-align:center; }
 table.gridConciliacao th { text-align: left;
 	background-image : -webkit-linear-gradient(top, #87cd74, #64bc4c);

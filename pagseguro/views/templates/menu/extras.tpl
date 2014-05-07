@@ -12,7 +12,7 @@
     <label>LOG</label>
     <br>
         <select id="pagseguro_log" name="pagseguro_log" class="select" hint="Deseja habilitar a geração de log?" >
-        {$optionLog}
+            {html_options values=$keylogactive output=$valueslogactive selected=$escolhalogactive}
         </select>
     <br>
     <div id="directory-log" name="directory-log">
@@ -24,14 +24,14 @@
     <label>RECUPERAR CARRINHO</label>
     <br>
         <select id="pagseguro_recovery" name="pagseguro_recovery" class="select" hint="Deseja habilitar a recuperação de carrinho?" >
-            {$optionRecovery}
+            {html_options values=$keyrecoveryactive output=$valuesrecoveryactive selected=$escolharecoveryactive}
         </select>
     <br>
     <div id="directory-val-link" name="directory-val-link">
     <label>VALIDADE DO LINK</label>
     <br>
         <select id="pagseguro_days_recovery" name="pagseguro_days_recovery" class="select" hint="Quantidade de dias que o link de recuperação será válido." >
-            {$validLink}
+            {html_options values=$keydaystorecovery output=$valuesdaystorecovery selected=$escolhadaystorecovery}
         </select>
     <br>
     </div>

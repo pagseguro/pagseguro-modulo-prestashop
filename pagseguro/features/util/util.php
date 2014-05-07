@@ -182,8 +182,8 @@ class Util
     );
     
     private static $days_recovery = array(
-        0 => 1, 1 => 2, 2 => 3, 3 => 4, 4 => 5,
-        5 => 6, 6 => 7, 7 => 8, 8 => 9, 9 => 10
+        1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5,
+        6 => 6, 7 => 7, 8 => 8, 9 => 9, 10=> 10
     );
     
     private static $days_search = array(
@@ -327,7 +327,12 @@ class Util
     {
         return Configuration::get('PAGSEGURO_URL_REDIRECT');
     }
-    
+
+    public static function getWidthVersion($module_version)
+    {
+        return version_compare($module_version, '1.5', '<') ? 'style="width: 896px;' : 'style="width: 935px;';
+    }
+
     public static function convertPriceFull($amount, $currency_from = null, $currency_to = null)
     {
         
@@ -359,7 +364,7 @@ class Util
         }
     }
     
-    public static function createAddOrderHistory($idOrder,$status)
+    public static function createAddOrderHistory($idOrder, $status)
     {
         $order_history = new OrderHistory();
         $order_history->id_order = $idOrder;

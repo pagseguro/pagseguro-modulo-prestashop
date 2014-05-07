@@ -11,13 +11,13 @@
 <label>CHARSET</label>
 <br>
     <select id="pagseguro_charset" name="pagseguro_charset" class="select" hint="Informe a codificação utilizada pelo seu sistema. Isso irá prevenir que as transações gerem possíveis erros ou quebras ou ainda que caracteres especiais possam ser apresentados de maneira diferente do habitual.">
-        {$optionCharset}
+            {html_options values=$keychartset output=$valueschartset selected=$escolhacharset}
     </select>
 <br>
 <label>CHECKOUT</label>
 <br>
     <select id="pagseguro_checkout" name="pagseguro_checkout" class="select" hint="No checkout padrão o comprador, após escolher os produtos e/ou serviços, é redirecionado para fazer o pagamento no PagSeguro.">
-        {$optionCheckout}
+            {html_options values=$keycheckout output=$valuescheckout selected=$escolhacheckout}
     </select>
 <br>
 <p class="small">* Campos obrigatórios</p>
