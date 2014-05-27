@@ -29,6 +29,8 @@
 <script type="text/javascript" src="{$module_dir}assets/js/jquery.blockUI.js"></script>
 <script type="text/javascript" src="{$module_dir}assets/js/pbTable.min.js"></script>
 
+{$hook_teste}
+
 <form class="psplugin" id="psplugin" action="{$action_post}" method="POST">
     <h1>
         <img src="{$module_dir}assets/images/logops_228x56.png" />
@@ -59,7 +61,7 @@
         var url = location.href;  
         var baseURL = url.substring(0, url.indexOf('/', 18));
         var paginaAtual = 0;
-		var menuTab = 'menuTab1';
+        var menuTab = 'menuTab1';
 
         $('.menuTabButton').live('click',
             function () {
@@ -67,7 +69,7 @@
                 $(this).addClass('selected');
                 $('.tabItem.selected').removeClass('selected');
                 $('#' + this.id + 'Sheet').addClass('selected');
-				menuTab = this.id;
+                menuTab = this.id;
                 
                 $("input[name=menuTab]").val(menuTab);
                 hideInput(this.id);
@@ -326,7 +328,7 @@
             }
         }
 
-		$('#pagseguro_checkout').live('change',
+        $('#pagseguro_checkout').live('change',
             function(e) {
                 if($('option:selected', this).attr('value') == 0) {
                     $('#pagseguro_checkout').attr('hint','No checkout padrão o comprador, após escolher os produtos e/ou serviços, é redirecionado para fazer o pagamento no PagSeguro.');
@@ -337,7 +339,7 @@
             }
         );
 
-		$('input, select').live('focus',
+        $('input, select').live('focus',
             function(e) {
                 _$this = $(this);
                 $(this).addClass('focus');

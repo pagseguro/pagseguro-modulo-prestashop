@@ -48,7 +48,7 @@ class PagSeguroConciliation
 
 
     /**
-    * 
+    *
     * Getters and Setter
     */
 
@@ -136,7 +136,7 @@ class PagSeguroConciliation
     }
 
     /**
-    * 
+    *
     * Set credentials account(e-mail) and token.
     */
     private function setObjCredential()
@@ -152,10 +152,10 @@ class PagSeguroConciliation
 
 
     /**
-    * 
+    *
     * Get a list of payments.
     * Methods: getPagSeguroPaymentsList(); getToken(); decrypt(); validateRef();
-    * 
+    *
     */
     private function getPagSeguroPaymentsList()
     {
@@ -163,8 +163,8 @@ class PagSeguroConciliation
         $pageNumber = 1;
         $maxPageResults = 20;
 
-        $timeZone = date_default_timezone_get ();
-        date_default_timezone_set ('America/Sao_Paulo');
+        $timeZone = date_default_timezone_get();
+        date_default_timezone_set('America/Sao_Paulo');
 
         $finalDate = date("Y-m-d")."T".date("H:i");
 
@@ -205,7 +205,7 @@ class PagSeguroConciliation
     }
 
     /**
-    * 
+    *
     * checks if the PAGSEGURO_ID is the same and returns the related transactions
     * @param PagSeguroTransactionSearchResult $result
     * @param counter $n
@@ -238,7 +238,7 @@ class PagSeguroConciliation
     }
 
     /**
-    * 
+    *
     * Grab a PAGSEGURO_ID and decrypts
     * @param string $reference
     */
@@ -250,7 +250,7 @@ class PagSeguroConciliation
     }
 
     /**
-    * 
+    *
     * Return PagSeguro ID
     */
     private function getToken()
@@ -267,9 +267,9 @@ class PagSeguroConciliation
     }
 
         /**
-        * 
+        *
         *  Return Prestashop payment list
-        * 
+        *
         */
     private function getPrestashopPaymentList()
     {
@@ -296,7 +296,7 @@ class PagSeguroConciliation
                      WHERE oh.`id_order_history` = (SELECT MAX(`id_order_history`) FROM `'._DB_PREFIX_
                             .'order_history` moh
                         WHERE moh.`id_order` = psord.`id_order`
-                        GROUP BY moh.`id_order`)                    
+                        GROUP BY moh.`id_order`)
                         AND psord.payment = "PagSeguro"
                         AND osl.`id_lang` = psord.id_lang
                         AND psord.date_add >= DATE_SUB(CURDATE(),INTERVAL \''
@@ -325,7 +325,7 @@ class PagSeguroConciliation
                      WHERE oh.`id_order_history` = (SELECT MAX(`id_order_history`) FROM `'._DB_PREFIX_
                             .'order_history` moh
                         WHERE moh.`id_order` = psord.`id_order`
-                        GROUP BY moh.`id_order`)                    
+                        GROUP BY moh.`id_order`)
                         AND psord.payment = "PagSeguro"
                         AND osl.`id_lang` = psord.id_lang
                         AND psord.date_add >= DATE_SUB(CURDATE(),INTERVAL \''
@@ -362,7 +362,7 @@ class PagSeguroConciliation
         return $results[0]['name'];
 
     }
-    
+
     public function getPestashopOrderStatusId($name)
     {
 
@@ -378,14 +378,13 @@ class PagSeguroConciliation
     {
 
         $query = 'SELECT osl.`id_order_state`, osl.`name`
-    			  FROM `'._DB_PREFIX_.'order_state_lang` osl
-    			  WHERE osl.`id_order_state` = '.$id.'';
+            	  FROM `'._DB_PREFIX_.'order_state_lang` osl
+            	  WHERE osl.`id_order_state` = '.$id.'';
 
         return $query;
 
     }
-    
-    
+
     private function getOrderStatusIdByName($name)
     {
 
@@ -396,14 +395,14 @@ class PagSeguroConciliation
         return $query;
 
     }
-    
+
     private function decryptId($reference)
     {
 
             return substr($reference, 5);
 
     }
-    
+
     private function createTables($id_order, $id_order_state, $status_pagseguro, $date_add, $name, $id_pagseguro, $row)
     {
 
@@ -419,12 +418,12 @@ class PagSeguroConciliation
         $this->tableResult .= "<td style='text-align: center;'>" .$name."</td>";
         $this->tableResult .= "<td style='text-align: center;'>". $status_pagseguro."</td>";
         $this->tableResult .= "<td id='editar'>
-			                        <a onclick='editRedirect(" . $cOrder . ")'
-			                            id='" . $id_order . "' style='cursor:pointer'>
-			                        <img src='../img/admin/details.gif'
-			                            border='0' alt='edit' title='Editar'/>
-			                        </a>
-			                    </td>";
+        	                        <a onclick='editRedirect(" . $cOrder . ")'
+        	                            id='" . $id_order . "' style='cursor:pointer'>
+        	                        <img src='../img/admin/details.gif'
+        	                            border='0' alt='edit' title='Editar'/>
+        	                        </a>
+        	                    </td>";
         $this->tableResult .= "<td id='duplicar'><a onclick='duplicateStatus(".$row['id_order'].","
                 .$row['id_status_pagseguro'].",".$row['id_order_state'].")' style='cursor:pointer'> "
                 . "<img src='../img/admin/edit.gif' border='0' alt='Modificar' title='Modificar'/> </a></td>";
@@ -505,7 +504,7 @@ class PagSeguroConciliation
     }
 
     /**
-     * 
+     *
      * Create Log
      * @param array $dados;
      */
@@ -515,7 +514,7 @@ class PagSeguroConciliation
 
         /* Retrieving configurated default charset */
         PagSeguroConfig::setApplicationCharset(Configuration::get('PAGSEGURO_CHARSET'));
-        
+
         /* Retrieving configurated default log info */
         if (Configuration::get('PAGSEGURO_LOG_ACTIVE')) {
             PagSeguroConfig::activeLog(_PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION'));
@@ -527,9 +526,9 @@ class PagSeguroConciliation
             . $dados['newIdStatus'] . ")' - '" . date("d/m/Y H:i") . "') - end"
         );
     }
-    
+
         /**
- 	 * 
+ 	 *
  	 * Update Order Status in Database
  	 * @param $id (int)
  	 * @param $new_status (int)

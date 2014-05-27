@@ -32,7 +32,7 @@ function checkout()
         type: 'POST',
         url: "{$action_url}",
         success: function(response) {
-		var json = $.parseJSON(response);
+        var json = $.parseJSON(response);
             PagSeguroLightbox(
             json.code,{
                 success: function(token){
@@ -72,21 +72,21 @@ function redirecToPageError(){
 <h3>{l s='Pagamento via PagSeguro' mod='pagseguro'}</h3>
 <form action="{$action_url}" method="post">
 	<p>
-		<img src="{$image_payment}" alt="{l s='pagseguro' mod='pagseguro'}" width="86" height="49" style="float:left; margin: 0px 10px 5px 0px;" />
-		{l s='Você escolheu efetuar o pagamento via PagSeguro' mod='pagseguro'}
-		<br/><br />
-		{l s='Breve resumo da sua compra:' mod='pagseguro'}
+        <img src="{$image_payment}" alt="{l s='pagseguro' mod='pagseguro'}" width="86" height="49" style="float:left; margin: 0px 10px 5px 0px;" />
+        {l s='Você escolheu efetuar o pagamento via PagSeguro' mod='pagseguro'}
+        <br/><br />
+        {l s='Breve resumo da sua compra:' mod='pagseguro'}
 	</p>
 	<p style="margin-top:20px;">
-		- {l s='O valor total de sua compra é ' mod='pagseguro'}
-		<span id="amount" class="price">{displayPrice price=$total}</span>
-		{if $use_taxes == 1}
-			{l s='(tax incl.)' mod='pagseguro'}
-		{/if}
+        - {l s='O valor total de sua compra é ' mod='pagseguro'}
+        <span id="amount" class="price">{displayPrice price=$total}</span>
+        {if $use_taxes == 1}
+        	{l s='(tax incl.)' mod='pagseguro'}
+        {/if}
 	</p>
     {if $current_currency_name != "Real"}
         <p>
-		{l s='Moeda atual: ' mod='pagseguro'}&nbsp;<b>{$current_currency_name}</b>
+        {l s='Moeda atual: ' mod='pagseguro'}&nbsp;<b>{$current_currency_name}</b>
                 <input type="hidden" name="currency_payment" value="{$current_currency_id}" />
 	</p>
         {/if}
@@ -96,24 +96,24 @@ function redirecToPageError(){
 	</p>
         {if $current_currency_name != "Real" && $total_real > 0.00}
 	<p>
-		- {l s='O valor total de sua compra convertido é ' mod='pagseguro'}
+        - {l s='O valor total de sua compra convertido é ' mod='pagseguro'}
                 <span id="amount" class="price">{displayPrice price=$total_real currency=$currency_real}</span>
-		{if $use_taxes == 1}
-			{l s='(tax incl.)' mod='pagseguro'}
-		{/if}
+        {if $use_taxes == 1}
+        	{l s='(tax incl.)' mod='pagseguro'}
+        {/if}
 	</p>
         {/if}
 	<p>
-		<br /><br />
-		<b>{l s='Por favor, confirme sua compra clicando no botão \'Confirmo minha compra\'' mod='pagseguro'}</b>
+        <br /><br />
+        <b>{l s='Por favor, confirme sua compra clicando no botão \'Confirmo minha compra\'' mod='pagseguro'}</b>
 	</p>
 	<p class="cart_navigation">
     	{if ($checkout)}
             <input type="button" name="submit" value="{l s='Confirmo minha compra' mod='pagseguro'}" class="exclusive_large" onclick="checkout()" />
         {else}
-		    <input type="submit" name="submit" value="{l s='Confirmo minha compra' mod='pagseguro'}" class="exclusive_large" />
+            <input type="submit" name="submit" value="{l s='Confirmo minha compra' mod='pagseguro'}" class="exclusive_large" />
         {/if}
-		<a href="{$link->getPageLink('order', true, NULL, "step=3")}" class="button_large">{l s='Outros formas de pagamento' mod='pagseguro'}</a>
+        <a href="{$link->getPageLink('order', true, NULL, "step=3")}" class="button_large">{l s='Outros formas de pagamento' mod='pagseguro'}</a>
 	</p>
 </form>
 {/if}

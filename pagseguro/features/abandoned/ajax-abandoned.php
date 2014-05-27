@@ -19,9 +19,9 @@ switch ($ajaxRequest) {
 
         $recoveryCode = Tools::getValue('recovery');
         $idCustomer = Tools::getValue('customer');
-        
+
         $customer = new Customer((int)($idCustomer));
-        
+
         $orderMessage = OrderMessage::getOrderMessages($idLang);
         $template = '';
         $message = '';
@@ -52,7 +52,7 @@ switch ($ajaxRequest) {
             _PS_ROOT_DIR_ . '/modules/pagseguro/mails/',
             true
         );
-        
+
         if ($isSend) {
             echo '<div class="module_confirmation conf confirm" '.Util::getWidthVersion(_PS_VERSION_).' ">'
                 . $pagseguro->l('Email enviado com sucesso') . '</div>';
@@ -62,9 +62,9 @@ switch ($ajaxRequest) {
         }
         break;
     case 'multiemails':
-    
+
         $emails = Tools::getValue('send_emails');
-        
+
         $orderMessage = OrderMessage::getOrderMessages($idLang);
         $template = '';
         $message = '';
@@ -86,7 +86,7 @@ switch ($ajaxRequest) {
                 '{link}' => '<a href="https://pagseguro.uol.com.br/checkout/v2/resume.html?r='.$recovery
                 .'" target="_blank"> Clique aqui para continuar sua compra </a>'
             );
-    
+
             $isSend = @Mail::Send(
                 $idLang,
                 'recovery_cart',
@@ -101,7 +101,7 @@ switch ($ajaxRequest) {
                 _PS_ROOT_DIR_ . '/modules/pagseguro/mails/',
                 true
             );
-                
+
             if (!$isSend) {
                 echo '<div class="module_error alert error" '.Util::getWidthVersion(_PS_VERSION_).' ">'
                     . $pagseguro->l('Falha ao enviar email') . '</div>';
@@ -109,8 +109,9 @@ switch ($ajaxRequest) {
             }
         }
 
-        echo json_encode(array('divError' => '<div class="module_confirmation conf confirm" '.Util::getWidthVersion(_PS_VERSION_).' ">'
-                . $pagseguro->l('Emails enviados com sucesso') . '</div>', 'divContent' => $pagseguro->getAbandonedTabHtml()));
+        echo json_encode(array('divError' => '<div class="module_confirmation conf confirm" '.
+            Util::getWidthVersion(_PS_VERSION_).' ">'. $pagseguro->l('Emails enviados com sucesso') .
+            '</div>', 'divContent' => $pagseguro->getAbandonedTabHtml()));
 
         break;
     case 'searchtable':
