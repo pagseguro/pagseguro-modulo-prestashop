@@ -29,8 +29,6 @@
 <script type="text/javascript" src="{$module_dir}assets/js/jquery.blockUI.js"></script>
 <script type="text/javascript" src="{$module_dir}assets/js/pbTable.min.js"></script>
 
-{$hook_teste}
-
 <form class="psplugin" id="psplugin" action="{$action_post}" method="POST">
     <h1>
         <img src="{$module_dir}assets/images/logops_228x56.png" />
