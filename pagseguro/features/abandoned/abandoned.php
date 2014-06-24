@@ -28,6 +28,8 @@ class PagSeguroAbandoned
         foreach (Language::getLanguages(false) as $language) {
             if (strcmp($language["iso_code"], 'br') == 0) {
                 $this->idLang = $language["id_lang"];
+            } else if (strcmp($language["iso_code"], 'en') == 0) {
+                $this->idLang = $language["id_lang"];
             }
         }
         
@@ -41,10 +43,8 @@ class PagSeguroAbandoned
 
     public function getTableResult()
     {
-        
         $this->setObjCredential();
         $tableResult = $this->getTable();
-
         return $tableResult;
     }
 

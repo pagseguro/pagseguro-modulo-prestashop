@@ -55,6 +55,11 @@ Para acessar e configurar o módulo acesse o menu Módulos -> Modules -> Payment
 Changelog
 ---------
 ---
+1.9
+
+- Fix: Possibilidade de consultar transações no PagSeguro para conciliar os status com a base local.
+- Adicionado opção para recuperação de carrinho
+
 1.8
 
 - Mudanças no layout do painel de configuração.

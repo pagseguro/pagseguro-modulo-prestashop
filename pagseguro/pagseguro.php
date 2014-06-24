@@ -25,6 +25,7 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
+
 include_once dirname(__FILE__) . '/features/PagSeguroLibrary/PagSeguroLibrary.php';
 include_once dirname(__FILE__) . '/features/modules/pagsegurofactoryinstallmodule.php';
 include_once dirname(__FILE__) . '/features/util/encryptionIdPagSeguro.php';
@@ -49,7 +50,7 @@ class PagSeguro extends PaymentModule
     {
         $this->name = 'pagseguro';
         $this->tab = 'payments_gateways';
-        $this->version = '1.8';
+        $this->version = '1.9';
         $this->author = 'PagSeguro Internet LTDA.';
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
@@ -231,16 +232,15 @@ class PagSeguro extends PaymentModule
         
         $adminToken = Tools::getAdminTokenLite('AdminOrders');
 
-        $tableResult = include_once(dirname(__FILE__) . '\features\conciliation\conciliation.php');
+        $tableResult = include_once(dirname(__FILE__) . '/features/conciliation/conciliation.php');
 
         $smarty->assign('dias', $dias);
         $smarty->assign('urlAdminOrder', $_SERVER['SCRIPT_NAME'].'?tab=AdminOrders');
         $smarty->assign('adminToken', $adminToken);
         $smarty->assign('tableResult', $tableResult['tabela']);
         $smarty->assign('titulo', $this->l('Conciliação'));
-        $smarty->assign('errorMsg', $tableResult['errorMsg']);
+        $smarty->assign('errorMsg', $tableResult['errorMsg']); 
         $smarty->assign('regError', $tableResult['regError']);
-
         $conteudo = "";
         $conteudo = $this->display(
             __PS_BASE_URI__ . 'modules/pagseguro',
@@ -256,17 +256,26 @@ class PagSeguro extends PaymentModule
         global $smarty;
 
         $adminToken = Tools::getAdminTokenLite('AdminOrders');
+
+        $days_recovery = Tools::safeOutput(Configuration::get('PAGSEGURO_DAYS_RECOVERY'));
+
     
-        $tableResult = include_once(dirname(__FILE__) . '\features\abandoned\abandoned.php');
+        $tableResult = include_once(dirname(__FILE__) . '/features/abandoned/abandoned.php');
 
         $smarty->assign('urlAdminOrder', $_SERVER['SCRIPT_NAME'].'?tab=AdminOrders');
         $smarty->assign('adminToken', $adminToken);
         $smarty->assign('tableResult', $tableResult['table']);
-        $smarty->assign('titulo', $this->l('Abandonadas'));
         $smarty->assign('errorMsg', $tableResult['errorMsg']);
-    
+        $smarty->assign('is_recovery_cart', Configuration::get('PAGSEGURO_RECOVERY_ACTIVE'));
+        $smarty->assign('days_recovery', $days_recovery);
+        $smarty->assign('titulo', $this->l('Abandonadas'));
+
         $content = "";
-        $content = $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/menu/abandoned.tpl');
+        $content = $this->display(
+            __PS_BASE_URI__ . 'modules/pagseguro', 
+            '/views/templates/menu/abandoned.tpl'
+        );
+
         return $content;
     
     }
@@ -305,7 +314,7 @@ class PagSeguro extends PaymentModule
         $error['dom'][1] = (is_null($error['dom'][1]) ? "DOM XML instalado." : $error['dom'][1]);
         $error['spl'][1] = (is_null($error['spl'][1]) ? "Biblioteca padrão do PHP(SPL) instalada." : $error['spl'][1]);
         $error['version'][1] =
-                (is_null($error['version'][1]) ? "Versão do PHP superior à 5.1.6." : $error['version'][1]);
+                (is_null($error['version'][1]) ? "Versão do PHP superior à 5.3.3." : $error['version'][1]);
 
         $smarty->assign('error', $error);
 
@@ -341,7 +350,14 @@ class PagSeguro extends PaymentModule
         $smarty->assign('days_recovery', Configuration::get('PAGSEGURO_DAYS_RECOVERY'));
         $smarty->assign('checkActiveSlide', Tools::safeOutput($this->checkActiveSlide()));
         $smarty->assign('css_version', $this->getCssDisplay());
-    
+
+        if (empty($_POST['menuTab'])) {
+            $smarty->assign('menu_tab', 'menuTab1');
+        } else {
+            $menuTab = $_POST['menuTab'];
+            $smarty->assign('menu_tab', $menuTab);
+        }
+
         $smarty->assign(array(
             'tab' => array(
                 'config' => array(

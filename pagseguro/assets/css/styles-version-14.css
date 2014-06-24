@@ -13,7 +13,7 @@
 **************************************************/
 /****************************************** Core */
 
-#menuTab {padding: 0; margin: 0; text-align: left; }
+#menuTab {padding: 0; margin: 0; text-align: left; margin-left: 10px; }
 #menuTab li { text-align: left; float: left; display: inline; padding: 5px; padding-right: 10px; background: #EFEFEF; font-weight: bold; cursor: pointer; border-left: 1px solid #CCCCCC; border-right: 1px solid #CCCCCC; border-top: 1px solid #CCCCCC; margin-left:5px; height:14px}
 #menuTab li img { width: 16px; }
 #menuTab li.menuTabButton.selected { background: #FFFFF0; border-left: 1px solid #CCCCCC; border-right: 1px solid #CCCCCC; border-top: 1px solid #CCCCCC; margin-bottom: -1px; padding-bottom: 6px; }
@@ -33,9 +33,17 @@ table.gridConciliacao th { text-align: left;
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#87cd74', endColorstr='#64bc4c'); /* IE6 & IE7 */
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#87cd74', endColorstr='#64bc4c')"; /* IE8 */
 	background-position: center right;
-    background-repeat: no-repeat;
-    cursor: pointer;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  padding-left: 5px;
+  font-size: 14px;
 }
+
+.dataTables_empty { 
+  font-size: 12px; 
+  text-align: center; 
+}
+
 
 table.gridConciliacao thead tr .headerSortUp {
 	padding-right: 15px;
@@ -60,19 +68,22 @@ input.invalid { background: red; color: #FDFDFD; }
 #paginator a:active { color: #777; }
 #paginator a:focus { outline: 1px; }
 
-div.hintps {font-size:16px; position : absolute !important; display : none; width : 300px; height : 300px; top : 20%; right : 50px; color : #5B9028;}
+div.hintps {font-size:16px; position : absolute !important; display : none; width : 300px; height : 300px; top : 20%; right : 50px; color : #5B9028; padding-top:50px\9;}
 div.tabItem input {}
-div.tabItem input[type=text], div.tabItem select { width : 450px; border : 1px solid #cecece; border-radius : 3px 3px 3px 3px; font-size : 16pt; padding : 8px 8px 8px 8px;}
+div.tabItem input[type=text], div.tabItem select { clear: both; width : 450px; border : 1px solid #cecece; border-radius : 3px 3px 3px 3px; font-size : 15pt; padding : 8px 8px 8px 8px; height: 20px;}
 @-moz-document url-prefix() { 
-	div.tabItem input[type=select], div.tabItem select, x:default  { height: 45px; width: 467px;}
+	div.tabItem input[type=select], div.tabItem select, x:default  { height: 37px; width: 465px; clear: both; font-size: 15pt; padding-top: 5px;}
 }
+
 div.tabItem input[type=option] {}
 div.tabItem input[type=submit] {}
-div.tabItem label { font: 'Helvetica Neue', Verdana, Arial, sans-serif !important; color : #57AD29; font-weight : bold; text-align : left; width: 300px !important; }
+div.tabItem label { font: 'Helvetica Neue', Verdana, Arial, sans-serif !important; color : #57AD29; font-weight : bold; text-align : left; width: 450px !important; clear: both; }
 /* Make the nav take up the whole body width, and give it some top and bottom margin space */
 
 div.tabItem {
+    width: 900px;
     text-align: left;
+    margin-left: 10px;
     font-size: 16px;
     line-height: 24px;
     font-family: Arial, sans-serif !important;
@@ -85,7 +96,10 @@ div.tabItem * { padding: 0; margin: 0; border: 0; box-sizing: content-box }
 /** PagSeguro General Styles **/
 
 form.psplugin { position : relative !important; width : 910px; left : -470px !important; margin-left : 50%; }
-form.menu { width: 928px; margin: 0 auto; }
+@-moz-document url-prefix() { 
+  div.hintps{ padding-top: 50px; }
+}
+form.menu { width: 928px; margin: 0px auto; }
 div.module_confirmation, div.module_error { margin : 0 auto!important; }
 
 h2, .psplugin > h1 span { border: medium none; color: #5B9028; font-family: "CorbelRegular",sans-serif; font-size: 20pt; font-weight: normal; text-align: left; }
@@ -94,97 +108,6 @@ h2, .psplugin > h1 span { border: medium none; color: #5B9028; font-family: "Cor
 /** Pagination **/
 .text-center {
 	text-align: center;
-}
-.pagination {
-  display: inline-block;
-  border-radius: 4px;
-}
-.pagination > li {
-  display: inline;
-}
-.pagination > li > a,
-.pagination > li > span {
-  position: relative;
-  float: left;
-  padding: 6px 12px;
-  margin-left: -1px;
-  line-height: 1.42857143;
-  color: #5B9028;
-  text-decoration: none;
-  background-color: #fff;
-  border: 1px solid #ddd;
-}
-.pagination > li:first-child > a,
-.pagination > li:first-child > span {
-  margin-left: 0;
-  border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px;
-}
-.pagination > li:last-child > a,
-.pagination > li:last-child > span {
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
-}
-.pagination > li > a:hover,
-.pagination > li > span:hover,
-.pagination > li > a:focus,
-.pagination > li > span:focus {
-  color: #74cf5a;
-  background-color: #eee;
-  border-color: #ddd;
-}
-.pagination > .active > a,
-.pagination > .active > span,
-.pagination > .active > a:hover,
-.pagination > .active > span:hover,
-.pagination > .active > a:focus,
-.pagination > .active > span:focus {
-  z-index: 2;
-  color: #fff;
-  cursor: default;
-  background-color: #87cd74;
-  border-color: #87cd74;
-}
-.pagination > .disabled > span,
-.pagination > .disabled > span:hover,
-.pagination > .disabled > span:focus,
-.pagination > .disabled > a,
-.pagination > .disabled > a:hover,
-.pagination > .disabled > a:focus {
-  color: #999;
-  cursor: not-allowed;
-  background-color: #fff;
-  border-color: #ddd;
-}
-.pagination-lg > li > a,
-.pagination-lg > li > span {
-  padding: 10px 16px;
-  font-size: 18px;
-}
-.pagination-lg > li:first-child > a,
-.pagination-lg > li:first-child > span {
-  border-top-left-radius: 6px;
-  border-bottom-left-radius: 6px;
-}
-.pagination-lg > li:last-child > a,
-.pagination-lg > li:last-child > span {
-  border-top-right-radius: 6px;
-  border-bottom-right-radius: 6px;
-}
-.pagination-sm > li > a,
-.pagination-sm > li > span {
-  padding: 5px 10px;
-  font-size: 12px;
-}
-.pagination-sm > li:first-child > a,
-.pagination-sm > li:first-child > span {
-  border-top-left-radius: 3px;
-  border-bottom-left-radius: 3px;
-}
-.pagination-sm > li:last-child > a,
-.pagination-sm > li:last-child > span {
-  border-top-right-radius: 3px;
-  border-bottom-right-radius: 3px;
 }
 .pager {
   padding-left: 0;
@@ -372,3 +295,71 @@ h2, .psplugin > h1 span { border: medium none; color: #5B9028; font-family: "Cor
 .tablesorter-default tbody > tr.odd:hover > td {
     background: #c2e6ba;
 }
+
+  .info
+    {
+        font-size: 11px;
+        margin-top: 5px;
+    }
+    /* Add this attribute to the element that needs a tooltip */
+    [data-tooltip] {
+        position: relative;
+        z-index: 2;
+        cursor: pointer;
+    }
+
+    /* Hide the tooltip content by default */
+    [data-tooltip]:before,
+    [data-tooltip]:after {
+      visibility: hidden;
+        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+        filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    /* Position tooltip above the element */
+    [data-tooltip]:before {
+        position: absolute;
+        bottom: 150%;
+        left: 50%;
+        margin-bottom: 5px;
+        margin-left: -80px;
+        padding: 7px;
+        width: 260px;
+        -webkit-border-radius: 3px;
+        -moz-border-radius:    3px;
+        border-radius:         3px;
+        background-color: #000;
+        background-color: hsla(0, 0%, 20%, 0.9);
+        color: #fff;
+        content: attr(data-tooltip);
+        text-align: center;
+        font-size: 12px;
+        line-height: 1.2;
+    }
+
+    /* Triangle hack to make tooltip look like a speech bubble */
+    [data-tooltip]:after {
+        position: absolute;
+        bottom: 150%;
+        left: 50%;
+        margin-left: -5px;
+        width: 0;
+        border-top: 5px solid #000;
+        border-top: 5px solid hsla(0, 0%, 20%, 0.9);
+        border-right: 5px solid transparent;
+        border-left: 5px solid transparent;
+        content: " ";
+        font-size: 0;
+        line-height: 0;
+    }
+
+    /* Show tooltip content on hover */
+    [data-tooltip]:hover:before,
+    [data-tooltip]:hover:after {
+        visibility: visible;
+        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+        filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+        opacity: 1;
+    }
