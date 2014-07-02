@@ -24,11 +24,13 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
+<link type="text/css" rel="stylesheet" href="{$module_dir}assets/css/jquery.dataTables.min.css" />
 <link type="text/css" rel="stylesheet" href="{$css_version}" />
 <script type="text/javascript" src="{$module_dir}assets/js/jquery.min.js"></script>
 <script type="text/javascript" src="{$module_dir}assets/js/jquery.blockUI.js"></script>
-<script type="text/javascript" src="{$module_dir}assets/js/pbTable.min.js"></script>
-
+<script type="text/javascript" src="{$module_dir}assets/js/jquery-1102.min.js"></script>
+<script type="text/javascript" charset="utf8" src="{$module_dir}assets/js/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf8" src="{$module_dir}assets/js/dataTables.refresh.js"></script>
 <form class="psplugin" id="psplugin" action="{$action_post}" method="POST">
     <h1>
         <img src="{$module_dir}assets/images/logops_228x56.png" />
@@ -50,17 +52,59 @@
         </div>
     {/foreach}
     </div>
-    <p class="center"><button id="update" class="pagseguro-button green-theme normal" name="btnSubmit" />Salvar</button></p>
-	<input type='hidden' id='menuTab' name='menuTab' value='menuTab1'>
+
+    <div id="divSalvar">
+        <p class="center" id="pSalvar">
+        	<input type="submit" id='update' class='pagseguro-button green-theme normal' name='btnSubmit' value="Salvar" />
+        </p>
+    </div>
+
+	<input type='hidden' id='hiddenMenuTab' name='menuTab' value='{$menu_tab}' />
+
 </form>
 <br>
 <script type="text/javascript">
     {literal}
+
+        var tip = 'O botão salvar só será habilitado quando os campos E-mail e Token forem preenchidos.';
+
+        if(document.getElementById('pagseguro_email').value.length == ""){
+
+                document.getElementById("pSalvar").innerHTML = "<a data-tooltip='"+this.tip+"' id='tooltip'><button id='update' class='pagseguro-button green-theme normal' name='btnSubmit' disabled />Salvar</button></a>";
+
+        }
+
+        if(document.getElementById('pagseguro_token').value.length == ""){
+
+                document.getElementById("pSalvar").innerHTML = "<a data-tooltip='"+this.tip+"' id='tooltip'><button id='update' class='pagseguro-button green-theme normal' name='btnSubmit' disabled />Salvar</button></a>";
+
+        }
+
+        function validarForm(formInput){ 
+
+            if (formInput == "pagseguro_email")
+            {
+                var nInput = 'pagseguro_token';
+            } else {
+                var nInput = 'pagseguro_email';
+            }
+
+            if(document.getElementById(formInput).value.length == ""){
+
+                document.getElementById("pSalvar").innerHTML = "<a data-tooltip='"+this.tip+"' id='tooltip'><button id='update' class='pagseguro-button green-theme normal' name='btnSubmit' disabled />Salvar</button></a>";
+
+            } else if( (document.getElementById(formInput).value.length != "") & (document.getElementById(nInput).value.length != "")) {
+                 document.getElementById('update').disabled=false;
+                 document.getElementById("pSalvar").innerHTML = "<button id='update' class='pagseguro-button green-theme normal' name='btnSubmit' />Salvar</button>";
+            }
+        }
+
         var url = location.href;  
         var baseURL = url.substring(0, url.indexOf('/', 18));
-        var paginaAtual = 0;
+        var paginaAtual = 1;
         var menuTab = 'menuTab1';
 
+        
         $('.menuTabButton').live('click',
             function () {
                 $('.menuTabButton.selected').removeClass('selected');
@@ -68,13 +112,14 @@
                 $('.tabItem.selected').removeClass('selected');
                 $('#' + this.id + 'Sheet').addClass('selected');
                 menuTab = this.id;
-                
+                document.getElementById('menuTab').value = menuTab;
                 $("input[name=menuTab]").val(menuTab);
                 hideInput(this.id);
         });
 
         
         function hideInput(menuTab) {
+
             if (menuTab == 'menuTab2') {
                 if ($('select#pagseguro_log').val() == '0') {
                     if($('#directory-log').is(':visible')) {
@@ -100,156 +145,6 @@
                 $('#directory-val-link').toggle(300);
             }
         );
-
-        $.fn.pageMe = function(opts){
-            var $this = this,
-                defaults = {
-                    perPage: 10,
-                    paginationPerPage: 10,
-                    showPrevNext: false,
-                    hidePageNumbers: false
-                },
-                settings = $.extend(defaults, opts);
-
-            var listElement = $('#resultTable');
-            var perPage = settings.perPage;
-            var paginationPerPage = parseInt(settings.paginationPerPage) - 1;
-            var children = listElement.children();
-            var pager = $('.pager');
-
-            if (typeof settings.childSelector!="undefined") {
-                children = listElement.find(settings.childSelector);
-            }
-
-            if (typeof settings.pagerSelector!="undefined") {
-                pager = $(settings.pagerSelector);
-            }
-
-            var numItems = children.size();
-            var numPages = Math.ceil(numItems/perPage);
-
-            pager.data("curr",0);
-
-            if (settings.showPrevNext){
-                $('<li><a href="#" class="prev_link">«</a></li>').appendTo(pager);
-            }
-
-            var curr = 0;
-            var i = 0;
-            while(numPages > curr && (settings.hidePageNumbers==false)){
-                if(i > paginationPerPage) {
-                    $('<li class="li'+i+'"><a href="#" id='+i+' class="page_link">'+(curr+1)+'</a></li>').appendTo(pager);
-                    $('li.li'+i).hide();
-                } else {
-                    $('<li class="li'+i+' ativo"><a href="#" id='+i+' class="page_link">'+(curr+1)+'</a></li>').appendTo(pager);
-                }
-                i++;
-                curr++;
-            }
-
-          	$('.page_link').click(
-                function(){
-                    click(this.id);
-                }
-            );
-
-            function click(id){
-                var atual = parseInt(id);
-                if($('li.li'+(atual-(paginationPerPage - 1))).hasClass("ativo") && atual < (numPages-1)) {
-                    $('li.li'+(atual-paginationPerPage)).hide();
-                    $('li.li'+(atual+1)).show();
-                    $('li.li'+(atual-paginationPerPage)).removeClass("ativo");
-                    $('li.li'+(atual+1)).addClass("ativo");
-                } else if($('li.li'+(atual+(paginationPerPage - 1))).hasClass("ativo") && atual >= 1) {
-                    $('li.li'+(atual+paginationPerPage)).hide();
-                    $('li.li'+(atual-1)).show();
-                    $('li.li'+(atual+paginationPerPage)).removeClass("ativo");
-                    $('li.li'+(atual-1)).addClass("ativo");
-                }
-            }
-
-            if (settings.showPrevNext){
-                $('<li><a href="#" class="next_link">»</a></li>').appendTo(pager);
-            }
-
-            pager.find('.page_link:first').addClass('active');
-            pager.find('.prev_link').hide();
-            if (numPages<=1) {
-                pager.find('.next_link').hide();
-            }
-
-          	pager.children().eq(1).addClass("active");
-
-            children.hide();
-            children.slice(0, perPage).show();
-
-            pager.find('li .page_link').click(function(){
-                var clickedPage = $(this).html().valueOf()-1;
-                paginaAtual = clickedPage;
-                goTo(clickedPage,perPage);
-                return false;
-            });
-            pager.find('li .prev_link').click(function(){
-                previous();
-                return false;
-            });
-            pager.find('li .next_link').click(function(){
-                next();
-                return false;
-            });
-
-            function previous(){
-                click(parseInt(pager.data("curr")) - 1);
-                var goToPage = parseInt(pager.data("curr")) - 1;
-                paginaAtual = goToPage;
-                goTo(goToPage);
-            }
-
-            function next(){
-                click(parseInt(pager.data("curr")) + 1);
-                goToPage = parseInt(pager.data("curr")) + 1;
-                paginaAtual = goToPage;
-                goTo(goToPage);
-            }
-
-            if(paginaAtual != 0) {
-                goTo(paginaAtual);
-            }
-            
-            function goTo(page){
-                var startAt = page * perPage,
-                    endOn = startAt + perPage;
-
-                children.css('display','none').slice(startAt, endOn).show();
-
-                if (page>=1) {
-                    pager.find('.prev_link').show();
-                }
-                else {
-                    pager.find('.prev_link').hide();
-                }
-                
-                if (page<(numPages-1)) {
-                    pager.find('.next_link').show();
-                }
-                else {
-                    pager.find('.next_link').hide();
-                }
-
-                pager.data("curr",page);
-                pager.children().removeClass("active");
-                pager.children().eq(page+1).addClass("active");
-
-            }
-        };
-        
-        window.onload = function() {
-            paginacao();
-        };
-        
-        function paginacao(){
-            $('table.gridConciliacao').pageMe({pagerSelector:'#myPager',showPrevNext:true});
-        }
         
         function blockModal(block) {
             if(block == 1) {
@@ -279,17 +174,17 @@
         });
 
         function reloadTable() {
-            $.ajax({
+            jQuery.ajax({
                     type: 'POST',
                     url: '../modules/pagseguro/features/conciliation/conciliation.php',
                     dataType : "json",
-                    data: {dias: $('#pagseguro_dias').val()},
+                    data: {dias: jQuery('#pagseguro_dias_btn').val()},
                     success: function(result) {
-                        $('#resultTable').empty();
-                        $('#resultTable').append(result.tabela);
-                        $('#myPager').empty();
-                        
-                        paginacao();
+                        if (result != "") {
+                            jQuery('#htmlgrid').dataTable().fnClearTable(true);           
+                            jQuery('#htmlgrid').dataTable().fnAddData(result);
+                            //jQuery('#htmlgrid').dataTable().fnStandingRedraw();
+                        }
                         
                         blockModal(0);
                     },
@@ -300,8 +195,8 @@
         }
         
         function editRedirect(rowId){
-            var token = $('#adminToken').val();
-            var url = $('#urlAdminOrder').val();
+            var token = jQuery('#adminToken').val();
+            var url = jQuery('#urlAdminOrder').val();
 
             window.open(url + '&id_order='+rowId+'&vieworder&token='+token);
             
@@ -311,7 +206,7 @@
 
             if(rowIdStatusPagSeg != rowIdStatusPreShop && rowIdStatusPagSeg != ""){
                 blockModal(1);
-                $.ajax({
+                jQuery.ajax({
                     type: 'POST',
                     url: '../modules/pagseguro/features/conciliation/conciliation.php',
                     data: {idOrder: rowId, newIdStatus: rowIdStatusPagSeg },

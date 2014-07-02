@@ -90,6 +90,9 @@ class PagSeguroTransactionSummary
      */
     private $paymentMethod;
 
+    /**
+     * Recovery Code
+     */
     private $recoveryCode;
     
     /**
@@ -304,11 +307,18 @@ class PagSeguroTransactionSummary
         return $this->paymentMethod;
     }
     
+    /**
+     * @return the recovery code
+     */
     public function getRecoveryCode()
     {
         return $this->recoveryCode;
     }
     
+    /**
+     * Sets the recovery code
+     * @param string $recoveryCode
+     */
     public function setRecoveryCode($recoverycode)
     {
         $this->recoveryCode = $recoverycode;

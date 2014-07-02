@@ -1,7 +1,5 @@
 <?php
 
-ini_set("display_errors", 1);
-
 include_once dirname(__FILE__) .
         '/../../../../config/config.inc.php';
 include_once dirname(__FILE__) .
@@ -29,7 +27,8 @@ if (isset($_POST['idOrder'])) {
 } elseif (isset($_POST['dias'])) {
 
         $conciliation->getDays($_POST['dias']);
-        echo json_encode($conciliation->getTableResult());
+
+        echo json_encode($conciliation->getTableArrayResult());
 
 } else {
 
@@ -42,10 +41,12 @@ class PagSeguroConciliation
 
     private $obj_credential = "";
     private $errorMsg = false;
+    private $regError = false;
     private $tableResult = "";
-    private $daysRange = 1;
+    private $daysRange = 0;
     private $idStatusPagseguro;
-
+    private $fullArray = array();  
+    private $counter = 1;  
 
     /**
     *
@@ -61,10 +62,19 @@ class PagSeguroConciliation
 
     }
 
-    public function setTableResults()
+    public function getTableArrayResult()
     {
+        $this->counter = 0;     
+        $this->setObjCredential(); 
+        $this->setTableResults(true);;
+        return $this->fullArray;
 
-        if (!$this->errorMsg) {
+    }
+
+    public function setTableResults($flow = false)
+    {       
+
+        if (!$this->regError) {
 
             if ($this->getPrestashopPaymentList()) {
 
@@ -83,33 +93,57 @@ class PagSeguroConciliation
 
                             if ($row['id_order'] == $this->decryptId($value['reference'])) {
 
-                                $row['id_pagseguro'] = $value['reference'];
+                                $row['id_pagseguro'] = $value['code'];
                                 $row['id_status_pagseguro'] = $value['status'];
                                 $row['status_pagseguro'] = Util::getStatusCMS($value['status']);
 
                                 if ($this->verifyVersion() === false) {
 
-                                    $this->createTables(
-                                        $row['id_order'],
-                                        $row['id_order_state'],
-                                        $row['status_pagseguro'],
-                                        $this->dateToBr($row['date_add']),
-                                        $this->getPrestashopStatus($row['current_state']),
-                                        $row['id_pagseguro'],
-                                        $row
-                                    );
+                                    if ($flow) {
+                                        $this->createArray(
+                                            $row['id_order'],
+                                            $row['id_order_state'],
+                                            $row['status_pagseguro'],
+                                            $this->dateToBr($row['date_add']),
+                                            $this->getPrestashopStatus($row['current_state']),
+                                            $row['id_pagseguro'],
+                                            $row
+                                        );
+                                    } else {   
+                                        $this->createTables(
+                                            $row['id_order'],
+                                            $row['id_order_state'],
+                                            $row['status_pagseguro'],
+                                            $this->dateToBr($row['date_add']),
+                                            $this->getPrestashopStatus($row['current_state']),
+                                            $row['id_pagseguro'],
+                                            $row
+                                        );
+                                    }
 
                                 } else {
 
-                                    $this->createTables(
-                                        $row['id_order'],
-                                        $row['id_order_state'],
-                                        $row['status_pagseguro'],
-                                        $this->dateToBr($row['date_add']),
-                                        $this->getPrestashopStatus($row['id_order_state']),
-                                        $row['id_pagseguro'],
-                                        $row
-                                    );
+                                    if ($flow) {
+                                        $this->createArray(
+                                            $row['id_order'],
+                                            $row['id_order_state'],
+                                            $row['status_pagseguro'],
+                                            $this->dateToBr($row['date_add']),
+                                            $this->getPrestashopStatus($row['id_order_state']),
+                                            $row['id_pagseguro'],
+                                            $row
+                                        );
+                                    } else {     
+                                        $this->createTables(
+                                            $row['id_order'],
+                                            $row['id_order_state'],
+                                            $row['status_pagseguro'],
+                                            $this->dateToBr($row['date_add']),
+                                            $this->getPrestashopStatus($row['id_order_state']),
+                                            $row['id_pagseguro'],
+                                            $row
+                                        );
+                                    }
 
                                 }
                             }
@@ -119,20 +153,15 @@ class PagSeguroConciliation
                     }
 
                 } else {
-
-                        return array(
-                            'tabela' => $this->tableResult,
-                            'errorMsg' => $this->errorMsg,
-                            'regError' => true
-                            );
-
+                    $this->errorMsg = true;
                 }
-
+            } else {
+                $this->errorMsg = true;
             }
 
-        }
+        } 
 
-        return array('tabela' => $this->tableResult,'errorMsg' => $this->errorMsg, 'regError' => false );
+        return array('tabela' => $this->tableResult,'errorMsg' => $this->errorMsg, 'regError' => $this->regError );
     }
 
     /**
@@ -143,13 +172,13 @@ class PagSeguroConciliation
     {
         $email = Configuration::get('PAGSEGURO_EMAIL');
         $token = Configuration::get('PAGSEGURO_TOKEN');
+
         if (!empty($email) && !empty($token)) {
             $this->obj_credential = new PagSeguroAccountCredentials($email, $token);
         } else {
-            $this->errorMsg = true;
+            $this->regError = true;
         }
     }
-
 
     /**
     *
@@ -194,10 +223,8 @@ class PagSeguroConciliation
                 $return = $this->validateRef($result);
 
         } catch (PagSeguroServiceException $e) {
-
-                echo("Can't find informed user or token.");
+                //throw new Exception("Can't find informed user or token.", 1);
                 $return = false;
-
         }
 
         return $return;
@@ -215,19 +242,21 @@ class PagSeguroConciliation
 
         $transactions = $result->getTransactions();
 
-        foreach ($transactions as $key => $transactionSummary) {
+        if (!empty($transactions)){
+            foreach ($transactions as $key => $transactionSummary) {
 
-                    $decrypt = $this->decrypt($transactionSummary->getReference());
+                        $decrypt = $this->decrypt($transactionSummary->getReference());
 
-            if ($this->getToken() == $decrypt) {
+                if ($this->getToken() == $decrypt) {
 
-                            $prestashopTransactions[$n]['code'] = $transactionSummary->getCode();
-                            $prestashopTransactions[$n]['reference'] = $transactionSummary->getReference();
-                            $prestashopTransactions[$n++]['status'] = $transactionSummary->getStatus()->getValue();
+                                $prestashopTransactions[$n]['code'] = $transactionSummary->getCode();
+                                $prestashopTransactions[$n]['reference'] = $transactionSummary->getReference();
+                                $prestashopTransactions[$n++]['status'] = $transactionSummary->getStatus()->getValue();
+
+                }
 
             }
-
-        }
+        }   
 
         if (!isset($prestashopTransactions)) {
             $prestashopTransactions = false;
@@ -348,7 +377,7 @@ class PagSeguroConciliation
         } else {
                     $result = false;
         }
-            return $result;
+        return $result;
     }
 
     private function getPrestashopStatus($status)
@@ -403,33 +432,62 @@ class PagSeguroConciliation
 
     }
 
-    private function createTables($id_order, $id_order_state, $status_pagseguro, $date_add, $name, $id_pagseguro, $row)
+    private function createTables($id_order, $id_order_state, $status_pagseguro, $date_add, $name, $pagseguro_code, $row)
     {
 
 
         $cOrder = $id_order;
         $id_order = sprintf("#%06s", $id_order);
 
-        $this->tableResult .= " <tr class='tabela' id='" .$id_order."' style='color:"
+        $this->tableResult .= " <tr class='tabela' id='" .$id_order."' style='font-size: 12px; color:"
                 .$this->getColor($id_order_state, $status_pagseguro)."'>";
-        $this->tableResult .= "<td style='text-align: center;'>" .$date_add."</td>";
-        $this->tableResult .= "<td style='text-align: center;'>" .$id_order."</td>";
-        $this->tableResult .= "<td style='text-align: center;'>" .$id_pagseguro ."</td>";
-        $this->tableResult .= "<td style='text-align: center;'>" .$name."</td>";
-        $this->tableResult .= "<td style='text-align: center;'>". $status_pagseguro."</td>";
+        $this->tableResult .= "<td style='text-align: center;'> " .$date_add." </td>";
+        $this->tableResult .= "<td style='text-align: center;'> " .$id_order." </td>";
+        $this->tableResult .= "<td style='text-align: center;'> " .$pagseguro_code ." </td>";
+        $this->tableResult .= "<td style='text-align: center;'> " .$name." </td>";
+        $this->tableResult .= "<td style='text-align: center;'> ". $status_pagseguro." </td>";
         $this->tableResult .= "<td id='editar'>
         	                        <a onclick='editRedirect(" . $cOrder . ")'
         	                            id='" . $id_order . "' style='cursor:pointer'>
-        	                        <img src='../img/admin/details.gif'
+        	                        <img src='../img/admin/edit.gif'
         	                            border='0' alt='edit' title='Editar'/>
         	                        </a>
         	                    </td>";
         $this->tableResult .= "<td id='duplicar'><a onclick='duplicateStatus(".$row['id_order'].","
                 .$row['id_status_pagseguro'].",".$row['id_order_state'].")' style='cursor:pointer'> "
-                . "<img src='../img/admin/edit.gif' border='0' alt='Modificar' title='Modificar'/> </a></td>";
+                . "<img src='../modules/pagseguro/assets/images/refresh_.png' border='0' alt='Atualizar' title='Atualizar' width='16'/> </a></td>";
         $this->tableResult .= "</tr>";
 
 
+    }
+
+    private function createArray($id_order, $id_order_state, $status_pagseguro, $date_add, $name, $pagseguro_code, $row)
+    {
+
+
+        $cOrder = $id_order;
+        $id_order = sprintf("#%06s", $id_order);
+
+        $array = array(  $date_add,
+                         $id_order,
+                         $pagseguro_code,
+                         $name,
+                         $status_pagseguro,
+                         "<a onclick='editRedirect(" . $cOrder . ")' id='" . $id_order . "' style='cursor:pointer'>
+                                    <img src='../img/admin/edit.gif' border='0' alt='edit' title='Editar'/></a>",
+                         "<a onclick='duplicateStatus(".$row['id_order']."," .$row['id_status_pagseguro'].",".$row['id_order_state'].")' style='cursor:pointer'> "
+                                        . "<img src='../modules/pagseguro/assets/images/refresh_.png' border='0' alt='Atualizar' title='Atualizar' width='16'/> </a>"
+            );
+        
+        
+
+       $this->addArray($array);
+
+    }
+
+    private function addArray($array)
+    {
+            $this->fullArray[$this->counter++] = $array;
     }
 
     private function getImages($statusPagSeguro, $row)
