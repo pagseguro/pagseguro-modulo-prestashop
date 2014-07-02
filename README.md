@@ -52,6 +52,12 @@ Para acessar e configurar o módulo acesse o menu Módulos -> Modules -> Payment
 - **diretório**: informe o local a partir da raíz de instalação do PrestaShop onde se deseja criar o arquivo de log. Ex.: /logs/ps.log. Caso não informe nada, o log será gravado dentro da pasta ../PagSeguroLibrary/PagSeguro.log.
 
 
+Dúvidas?
+----------
+---
+Caso tenha dúvidas ou precise de suporte, acesse nosso [fórum].
+
+
 Changelog
 ---------
 ---
@@ -132,12 +138,6 @@ Notas
 - Para que ocorra normalmente a geração de logs, certifique-se que o diretório e o arquivo de log tenham permissões de leitura e escrita.
 
 
-[Dúvidas?]
-----------
----
-Em caso de dúvidas mande um e-mail para desenvolvedores@pagseguro.com.br
-
-
 Contribuições
 -------------
 ---
@@ -150,7 +150,7 @@ Achou e corrigiu um bug ou tem alguma feature em mente e deseja contribuir?
 
   [API de Pagamentos]: https://pagseguro.uol.com.br/v2/guia-de-integracao/api-de-pagamentos.html
   [API de Notificações]: https://pagseguro.uol.com.br/v2/guia-de-integracao/api-de-notificacoes.html
-  [Dúvidas?]: https://pagseguro.uol.com.br/desenvolvedor/comunidade.jhtml
+  [fórum]: http://forum.pagseguro.uol.com.br/
   [Pagamentos via API]: https://pagseguro.uol.com.br/integracao/pagamentos-via-api.jhtml
   [Notificação de Transações]: https://pagseguro.uol.com.br/integracao/notificacao-de-transacoes.jhtml
   [PrestaShop]: http://www.prestashop.com/
