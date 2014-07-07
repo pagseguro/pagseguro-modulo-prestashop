@@ -50,7 +50,7 @@ class PagSeguroServiceException extends Exception
         if ($errors) {
             $this->errors = $errors;
         }
-        $this->httpMessage = $this->getFormattedMessage();
+        //$this->httpMessage = $this->getFormattedMessage();
         parent::__construct($this->getOneLineMessage());
     }
 

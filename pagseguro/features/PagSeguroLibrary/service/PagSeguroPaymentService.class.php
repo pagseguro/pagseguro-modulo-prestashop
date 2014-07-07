@@ -79,7 +79,6 @@ class PagSeguroPaymentService
             );
 
             $httpStatus = new PagSeguroHttpStatus($connection->getStatus());
-
             switch ($httpStatus->getType()) {
 
                 case 'OK':
@@ -89,7 +88,7 @@ class PagSeguroPaymentService
                         $paymentReturn = $PaymentParserData->getCode();
                     } else {
                         $paymentReturn = self::buildCheckoutUrl($connectionData, $PaymentParserData->getCode());
-                    }
+                    }    
                     LogPagSeguro::info(
                         "PagSeguroPaymentService.Register(" . $paymentRequest->toString() . ") - end {1}" .
                         $PaymentParserData->getCode()
