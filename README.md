@@ -64,7 +64,7 @@ Changelog
 1.9
 
 - Fix: Possibilidade de consultar transações no PagSeguro para conciliar os status com a base local.
-- Adicionado opção para recuperação de carrinho
+- Adicionado opção para visualização de transações abandonadas, permitindo o envio de email com um link para que o comprador possa continuar o processo de compra de onde ele parou.
 
 1.8
 
