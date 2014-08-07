@@ -1,6 +1,5 @@
 <?php
-
-/*
+/**
  * 2007-2013 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -19,14 +18,16 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- *  @author PrestaShop SA <contact@prestashop.com>
- *  @copyright  2007-2013 PrestaShop SA
- *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @author    PrestaShop SA <contact@prestashop.com>
+ *  @copyright 2007-2014 PrestaShop SA
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
 include_once dirname(__FILE__) . '/pagseguroPS14.php';
 include_once dirname(__FILE__) . '/pagseguroPS15.php';
+include_once dirname(__FILE__) . '/pagseguroPS16.php';
+include_once dirname(__FILE__) . '/pagseguroPS1601.php';
 include_once dirname(__FILE__) . '/pagseguroPS1501toPS1503.php';
 
 class PagSeguroFactoryInstallModule
@@ -34,14 +35,18 @@ class PagSeguroFactoryInstallModule
         
     public static function createModule($version)
     {
-        
+        $context = "";
         switch ($version) {
             case version_compare($version, '1.5.0.1', '<'):
                 return new PagSeguroPS14($context);
             case version_compare($version, '1.5.0.1', '>=') && version_compare($version, '1.5.0.3', '<='):
                 return new PagSeguroPS1501ToPS1503();
-            case version_compare($version, '1.5.0.3', '>'):
+            case version_compare($version, '1.5.0.3', '>') && version_compare($version, '1.6.0.1', '<'):
                 return new PagSeguroPS15();
+            case version_compare($version, '1.6.0.1', '>=') && version_compare($version, '1.6.0.2', '<'):
+                return new PagSeguroPS1601();
+            case version_compare($version, '1.6.0.2', '>='):
+                return new PagSeguroPS16();
         }
     }
 }

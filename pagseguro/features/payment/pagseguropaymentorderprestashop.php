@@ -1,6 +1,5 @@
 <?php
-
-/*
+/**
  * 2007-2013 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -19,9 +18,9 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- *  @author PrestaShop SA <contact@prestashop.com>
- *  @copyright  2007-2013 PrestaShop SA
- *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @author    PrestaShop SA <contact@prestashop.com>
+ *  @copyright 2007-2014 PrestaShop SA
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
@@ -58,18 +57,25 @@ class PagSeguroPaymentOrderPrestashop
     
     public function setVariablesPaymentExecutionView()
     {
-        global $smarty;
         
         $id_currency = PagSeguro::returnIdCurrency();
         
         if ($this->context->cart->id_currency != $id_currency && ! is_null($id_currency)) {
             $this->setCurrencyVariable($id_currency);
         }
+
+        if ( version_compare(_PS_VERSION_, '1.5.0.2', '>=') && version_compare(_PS_VERSION_, '1.6.0.1', '<') ){
+             $center_column = '757px';
+        } if ( version_compare(_PS_VERSION_, '1.6.0.1', '>=') ) {
+             $center_column = '900px';
+        } else {
+            $center_column = '535px';
+        }
         
         $this->context->smarty->assign(
             array(
                 'version' => _PS_VERSION_,
-                'width_center_column' => version_compare(_PS_VERSION_, '1.5.0.2', '>=') ? '757px' : '535px',
+                'width_center_column' => $center_column,
                 'image_payment' => __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png',
                 'nbProducts' => $this->context->cart->nbProducts(),
                 'current_currency_id' => $this->context->currency->id,

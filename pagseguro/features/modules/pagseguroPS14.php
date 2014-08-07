@@ -1,6 +1,5 @@
 <?php
-
-/*
+/**
  * 2007-2013 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -19,9 +18,9 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- *  @author PrestaShop SA <contact@prestashop.com>
- *  @copyright  2007-2013 PrestaShop SA
- *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @author    PrestaShop SA <contact@prestashop.com>
+ *  @copyright 2007-2014 PrestaShop SA
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
@@ -33,10 +32,11 @@ class PagSeguroPS14 implements PagSeguroModuleConfigurable
 {
 
     private $context;
+    private $params = "";
 
     public function installConfiguration()
     {
-        /* For 1.4.3 and less compatibility */
+        /** For 1.4.3 and less compatibility */
         $updateConfig = Util::getUpdateConfigVersion14();
         
         foreach ($updateConfig as $u => $v) {
@@ -60,6 +60,7 @@ class PagSeguroPS14 implements PagSeguroModuleConfigurable
     public function paymentConfiguration($params)
     {
         include_once dirname(__FILE__).'/../../../../init.php';
+        $this->params = $params;
         $this->context = Context::getContext();
 
         $this->context->smarty->assign(

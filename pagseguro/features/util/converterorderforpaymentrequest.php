@@ -1,6 +1,5 @@
 <?php
-
-/*
+/**
  * 2007-2013 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -19,9 +18,9 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- *  @author PrestaShop SA <contact@prestashop.com>
- *  @copyright  2007-2013 PrestaShop SA
- *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @author    PrestaShop SA <contact@prestashop.com>
+ *  @copyright 2007-2014 PrestaShop SA
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
@@ -81,22 +80,22 @@ class ConverterOrderForPaymentRequest
     {
         $redirectURL = Util::getRedirectUrl();
         
-        /* Currency */
+        /** Currency */
         $this->paymentRequest->setCurrency(PagSeguroCurrencies::getIsoCodeByName('REAL'));
         
-        /* Extra amount */
+        /** Extra amount */
         $this->paymentRequest->setExtraAmount($this->getExtraAmountValues());
         
-        /* Products */
+        /** Products */
         $this->paymentRequest->setItems($this->generateProductsData());
         
-        /* Sender */
+        /** Sender */
         $this->paymentRequest->setSender($this->generateSenderData());
         
-        /* Shipping */
+        /** Shipping */
         $this->paymentRequest->setShipping($this->generateShippingData());
         
-        /* Redirect URL */
+        /** Redirect URL */
         if (! Tools::isEmpty($redirectURL)) {
             $this->paymentRequest->setRedirectURL($redirectURL);
         }
@@ -157,7 +156,7 @@ class ConverterOrderForPaymentRequest
                 $pagSeguro_item->setAmount($product['price_wt']);
             }
             
-            /* Defines weight in grams */
+            /** Defines weight in grams */
             $pagSeguro_item->setWeight($product['weight'] * 1000);
             
             if ($product['additional_shipping_cost'] > 0) {
@@ -314,18 +313,19 @@ class ConverterOrderForPaymentRequest
     
     private function performPagSeguroRequest($isLightBox)
     {
+        $code = "";
         try {
             
-            /* Retrieving PagSeguro configurations */
+            /** Retrieving PagSeguro configurations */
             $this->retrievePagSeguroConfiguration();
             
-            /* Set PagSeguro Prestashop module version */
+            /** Set PagSeguro Prestashop module version */
             $this->setPagSeguroModuleVersion();
             
-            /* Set PagSeguro PrestaShop CMS version */
+            /** Set PagSeguro PrestaShop CMS version */
             $this->setPagSeguroCMSVersion();
             
-            /* Performing request */
+            /** Performing request */
             $credentials = new PagSeguroAccountCredentials(
                 Configuration::get('PAGSEGURO_EMAIL'),
                 Configuration::get('PAGSEGURO_TOKEN')
@@ -345,7 +345,7 @@ class ConverterOrderForPaymentRequest
                     )
                 );
             }
-            /* Redirecting to PagSeguro */
+            /** Redirecting to PagSeguro */
             if (Validate::isUrl($url)) {
                 return Tools::truncate($url, 255, '');
             }
@@ -359,10 +359,10 @@ class ConverterOrderForPaymentRequest
     private function retrievePagSeguroConfiguration()
     {
         
-        /* Retrieving configurated default charset */
+        /** Retrieving configurated default charset */
         PagSeguroConfig::setApplicationCharset(Configuration::get('PAGSEGURO_CHARSET'));
         
-        /* Retrieving configurated default log info */
+        /** Retrieving configurated default log info */
         if (Configuration::get('PAGSEGURO_LOG_ACTIVE')) {
             PagSeguroConfig::activeLog(_PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION'));
         }

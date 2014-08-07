@@ -1,4 +1,25 @@
 <?php
+/**
+ * 2007-2014 [PagSeguro Internet Ltda.]
+ *
+ * NOTICE OF LICENSE
+ *
+ *Licensed under the Apache License, Version 2.0 (the "License");
+ *you may not use this file except in compliance with the License.
+ *You may obtain a copy of the License at
+ *
+ *http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *Unless required by applicable law or agreed to in writing, software
+ *distributed under the License is distributed on an "AS IS" BASIS,
+ *WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *See the License for the specific language governing permissions and
+ *limitations under the License.
+ *
+ *  @author    PagSeguro Internet Ltda.
+ *  @copyright 2007-2014 PagSeguro Internet Ltda.
+ *  @license   http://www.apache.org/licenses/LICENSE-2.0
+ */
 
 include_once dirname(__FILE__) .
         '/../../../../config/config.inc.php';
@@ -11,28 +32,42 @@ include_once dirname(__FILE__) .
 include_once dirname(__FILE__) .
         '/../../features/PagSeguroLibrary/domain/PagSeguroTransactionStatus.class.php';
 
-
 $conciliation = new PagSeguroConciliation();
 
-if (isset($_POST['idOrder'])) {
+if (Tools::getValue('idOrder')) {
 
-        $pagSeguroStatus = Util::getStatusCMS($_POST['newIdStatus']);
-        $status_id = $conciliation->getPestashopOrderStatusId($pagSeguroStatus);
-        $data = array ("idOrder" => $_POST['idOrder'],
-                                        "newStatus" => $pagSeguroStatus,
-                                        "newIdStatus" => $_POST['newIdStatus']);
-        $conciliation->createLog($data);
-        $conciliation->updateStatus($_POST['idOrder'], $status_id);
+    $pagSeguroStatus = Util::getStatusCMS(Tools::getValue('newIdStatus'));
+    $status_id = $conciliation->getPestashopOrderStatusId($pagSeguroStatus);
 
-} elseif (isset($_POST['dias'])) {
+    $data = array ("idOrder" => Tools::getValue('idOrder'),
+                   "newStatus" => $pagSeguroStatus,
+                   "newIdStatus" => Tools::getValue('newIdStatus'));
 
-        $conciliation->getDays($_POST['dias']);
+    $conciliation->createLog('register',$data);
 
-        echo json_encode($conciliation->getTableArrayResult());
+    if (Tools::getValue('orderDays') != 1)
+        $conciliation->getDays(Tools::getValue('orderDays'));
+
+    $conciliation->updateStatus(Tools::getValue('idOrder'), $status_id);
+
+    echo Tools::jsonEncode( $conciliation->getTableArrayResult() );
+
+
+} elseif (Tools::getValue('dias')) {
+
+
+    $data = array ('days' => Tools::getValue('dias'));
+
+    $conciliation->createLog('search',$data);
+
+    $conciliation->getDays(Tools::getValue('dias'));
+
+    echo Tools::jsonEncode( $conciliation->getTableArrayResult() );
+
 
 } else {
 
-        return $conciliation->getTableResult();
+    return $conciliation->getTableResult();
 
 }
 
@@ -47,12 +82,12 @@ class PagSeguroConciliation
     private $idStatusPagseguro;
     private $fullArray = array();  
     private $counter = 1;  
+    private $order_state = "";
 
-    /**
+    /****
     *
     * Getters and Setter
     */
-
     public function getTableResult()
     {
 
@@ -82,12 +117,11 @@ class PagSeguroConciliation
 
                 if ($paymentPagSeguro) {
 
-                    foreach ($this->getPrestashopPaymentList() as $key => $row) {
+                    foreach ($this->getPrestashopPaymentList() as $row) {
 
                         $row['status_pagseguro'] = '';
                         $row['id_status_pagseguro'] = '';
                         $row['id_pagseguro'] = '';
-                        $imagesResults = '';
 
                         foreach ($paymentPagSeguro as $value) {
 
@@ -164,7 +198,7 @@ class PagSeguroConciliation
         return array('tabela' => $this->tableResult,'errorMsg' => $this->errorMsg, 'regError' => $this->regError );
     }
 
-    /**
+    /****
     *
     * Set credentials account(e-mail) and token.
     */
@@ -180,7 +214,7 @@ class PagSeguroConciliation
         }
     }
 
-    /**
+    /****
     *
     * Get a list of payments.
     * Methods: getPagSeguroPaymentsList(); getToken(); decrypt(); validateRef();
@@ -189,8 +223,8 @@ class PagSeguroConciliation
     private function getPagSeguroPaymentsList()
     {
 
-        $pageNumber = 1;
-        $maxPageResults = 20;
+        $pageNumber = "";
+        $maxPageResults = 1000;
 
         $timeZone = date_default_timezone_get();
         date_default_timezone_set('America/Sao_Paulo');
@@ -206,10 +240,9 @@ class PagSeguroConciliation
         } else {
 
                 $initialDate = $this->subDayIntoDate($finalDate, $this->daysRange);
-
         }
 
-
+        $results = array();
         try {
 
                 $result = PagSeguroTransactionSearchService::searchByDate(
@@ -220,10 +253,58 @@ class PagSeguroConciliation
                     $finalDate
                 );
 
+                $pageNumber = $result->getTotalPages();
+
+                if ($result->getTotalPages() > 1) {
+                    
+                    for ($i = 1; $i <= $pageNumber; $i++) {
+
+                        $results[] = PagSeguroTransactionSearchService::searchByDate(
+                            $this->obj_credential,
+                            $i,
+                            $maxPageResults,
+                            $initialDate,
+                            $finalDate
+                        ); 
+                    }
+
+                    $newArray = new ArrayObject();
+                    for ($i = 0; $i < count($results); $i++) {
+
+                        $nResult = $results[$i];
+                        foreach ($nResult->getTransactions() as $item) {
+                            $newArray['transactions'][] = $item;
+                        }
+                    }
+
+                    $result = $newArray;
+                } else {
+
+                    $results[] = PagSeguroTransactionSearchService::searchByDate(
+                        $this->obj_credential,
+                        $pageNumber,
+                        $maxPageResults,
+                        $initialDate,
+                        $finalDate
+                    );
+
+                    $newArray = new ArrayObject();
+                    for ($i = 0; $i < count($results); $i++) {
+
+                        $nResult = $results[$i];
+                        foreach ($nResult->getTransactions() as $item) {
+                            $newArray['transactions'][] = $item;
+                        }
+                    }
+
+                    $result = $newArray;
+
+                }
+                
+
                 $return = $this->validateRef($result);
 
         } catch (PagSeguroServiceException $e) {
-                //throw new Exception("Can't find informed user or token.", 1);
                 $return = false;
         }
 
@@ -231,19 +312,20 @@ class PagSeguroConciliation
 
     }
 
-    /**
+    /****
     *
     * checks if the PAGSEGURO_ID is the same and returns the related transactions
     * @param PagSeguroTransactionSearchResult $result
     * @param counter $n
     */
-    public function validateRef(PagSeguroTransactionSearchResult $result, $n = 0)
+    public function validateRef(ArrayObject $result, $n = 0)
     {
 
-        $transactions = $result->getTransactions();
+        $prestashopTransactions = array();
+        $transactions = $result['transactions'];
 
         if (!empty($transactions)){
-            foreach ($transactions as $key => $transactionSummary) {
+            foreach ($transactions as $transactionSummary) {
 
                         $decrypt = $this->decrypt($transactionSummary->getReference());
 
@@ -266,7 +348,7 @@ class PagSeguroConciliation
 
     }
 
-    /**
+    /****
     *
     * Grab a PAGSEGURO_ID and decrypts
     * @param string $reference
@@ -274,11 +356,11 @@ class PagSeguroConciliation
     private function decrypt($reference)
     {
 
-            return substr($reference, 0, 5);
+            return Tools::substr($reference, 0, 5);
 
     }
 
-    /**
+    /****
     *
     * Return PagSeguro ID
     */
@@ -295,7 +377,7 @@ class PagSeguroConciliation
 
     }
 
-        /**
+        /****
         *
         *  Return Prestashop payment list
         *
@@ -310,7 +392,7 @@ class PagSeguroConciliation
                         psord.`current_state`,
                         osl.`name`,
                         oh.`id_order_state`,
-                        (SELECT COUNT(od.`id_order`) FROM `ps_order_detail` od
+                        (SELECT COUNT(od.`id_order`) FROM `'._DB_PREFIX_.'order_detail` od
                                 WHERE od.`id_order` = psord.`id_order`
                                 GROUP BY `id_order`) AS product_number
 
@@ -329,7 +411,7 @@ class PagSeguroConciliation
                         AND psord.payment = "PagSeguro"
                         AND osl.`id_lang` = psord.id_lang
                         AND psord.date_add >= DATE_SUB(CURDATE(),INTERVAL \''
-                            .(isset($_POST['dias']) ? $_POST['dias'] : '5').
+                            .( Tools::getValue('dias') ? Tools::getValue('dias') : '1').
                         '\' DAY)';
 
         } else {
@@ -339,7 +421,7 @@ class PagSeguroConciliation
                         psord.`date_add`,
                         osl.`name`,
                         oh.`id_order_state`,
-                        (SELECT COUNT(od.`id_order`) FROM `ps_order_detail` od
+                        (SELECT COUNT(od.`id_order`) FROM `'._DB_PREFIX_.'order_detail` od
                                 WHERE od.`id_order` = psord.`id_order`
                                 GROUP BY `id_order`) AS product_number
 
@@ -358,7 +440,7 @@ class PagSeguroConciliation
                         AND psord.payment = "PagSeguro"
                         AND osl.`id_lang` = psord.id_lang
                         AND psord.date_add >= DATE_SUB(CURDATE(),INTERVAL \''
-                            .(isset($_POST['dias']) ? $_POST['dias'] : '5').
+                            .(Tools::getValue('dias') ? Tools::getValue('dias') : '1').
                         '\' DAY)';
         }
 
@@ -428,7 +510,7 @@ class PagSeguroConciliation
     private function decryptId($reference)
     {
 
-            return substr($reference, 5);
+            return Tools::substr($reference, 5);
 
     }
 
@@ -439,7 +521,7 @@ class PagSeguroConciliation
         $cOrder = $id_order;
         $id_order = sprintf("#%06s", $id_order);
 
-        $this->tableResult .= " <tr class='tabela' id='" .$id_order."' style='font-size: 12px; color:"
+        $this->tableResult .= "<tr class='tabela' id='" .$id_order."' style='font-size: 12px; color:"
                 .$this->getColor($id_order_state, $status_pagseguro)."'>";
         $this->tableResult .= "<td style='text-align: center;'> " .$date_add." </td>";
         $this->tableResult .= "<td style='text-align: center;'> " .$id_order." </td>";
@@ -464,6 +546,7 @@ class PagSeguroConciliation
     private function createArray($id_order, $id_order_state, $status_pagseguro, $date_add, $name, $pagseguro_code, $row)
     {
 
+        $this->order_state = $id_order_state;
 
         $cOrder = $id_order;
         $id_order = sprintf("#%06s", $id_order);
@@ -479,8 +562,6 @@ class PagSeguroConciliation
                                         . "<img src='../modules/pagseguro/assets/images/refresh_.png' border='0' alt='Atualizar' title='Atualizar' width='16'/> </a>"
             );
         
-        
-
        $this->addArray($array);
 
     }
@@ -561,31 +642,44 @@ class PagSeguroConciliation
         return 'red';
     }
 
-    /**
+    /****
      *
      * Create Log
      * @param array $dados;
      */
 
-    public function createLog($dados)
+    public function createLog($type, $dados)
     {
 
-        /* Retrieving configurated default charset */
+        /*** Retrieving configurated default charset */
         PagSeguroConfig::setApplicationCharset(Configuration::get('PAGSEGURO_CHARSET'));
 
-        /* Retrieving configurated default log info */
+        /*** Retrieving configurated default log info */
         if (Configuration::get('PAGSEGURO_LOG_ACTIVE')) {
             PagSeguroConfig::activeLog(_PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION'));
         }
 
-        LogPagSeguro::info(
-            "PagSeguroConciliation.Register( 'Alteração de Status da compra '"
-            . $dados['idOrder'] . "' para o Status '" . $dados['newStatus'] . "("
-            . $dados['newIdStatus'] . ")' - '" . date("d/m/Y H:i") . "') - end"
-        );
+        switch ($type) {
+            case 'search':
+                
+                LogPagSeguro::info(
+                    "PagSeguroConciliation.Search( 'Pesquisa de conciliação realizada em " . date("d/m/Y H:i") . " em um intervalo de ".$dados['days']." dias.')"
+                );
+                break;
+            
+            default:
+
+                LogPagSeguro::info(
+                    "PagSeguroConciliation.Register( 'Alteração de Status da compra '"
+                    . $dados['idOrder'] . "' para o Status '" . $dados['newStatus'] . "("
+                    . $dados['newIdStatus'] . ")' - '" . date("d/m/Y H:i") . "') - end"
+                );
+                break;
+        }
+        
     }
 
-        /**
+        /****
  	 *
  	 * Update Order Status in Database
  	 * @param $id (int)
@@ -629,9 +723,9 @@ class PagSeguroConciliation
 
             $date = date("Ymd");
 
-            $thisyear = substr($date, 0, 4);
-            $thismonth = substr($date, 4, 2);
-            $thisday = substr($date, 6, 2);
+            $thisyear = Tools::substr($date, 0, 4);
+            $thismonth = Tools::substr($date, 4, 2);
+            $thisday = Tools::substr($date, 6, 2);
             $nextdate = mktime(0, 0, 0, $thismonth, $thisday - $days, $thisyear);
 
             $nData = strftime("%Y-%m-%d", $nextdate);

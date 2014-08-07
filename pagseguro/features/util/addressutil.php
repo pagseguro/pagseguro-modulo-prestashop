@@ -1,6 +1,5 @@
 <?php
-
-/*
+/**
  * 2007-2013 PrestaShop
 *
 * NOTICE OF LICENSE
@@ -19,9 +18,9 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2013 PrestaShop SA
-*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  @author    PrestaShop SA <contact@prestashop.com>
+*  @copyright 2007-2014 PrestaShop SA
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
@@ -109,7 +108,7 @@ class AddressUtil
         }
         
         return array(
-            self::endtrim(substr($address, 0, 69)),
+            self::endtrim(Tools::substr($address, 0, 69)),
             self::endtrim($number),
             self::endtrim($complement),
             self::endtrim($district)
@@ -120,23 +119,24 @@ class AddressUtil
     {
         $token = preg_split('/[-,\\n]/', $text);
 
-        for ($i = 0; $i < strlen($token[0]); $i ++) {
-            if (is_numeric(substr($token[0], $i, 1))) {
+        for ($i = 0; $i < Tools::strlen($token[0]); $i ++) {
+            if (is_numeric(Tools::substr($token[0], $i, 1))) {
                 return array(
-                    substr($token[0], 0, $i),
-                    substr($token[0], $i),
+                    Tools::substr($token[0], 0, $i),
+                    Tools::substr($token[0], $i),
                     $token[1]
                 );
             }
         }
         
         $text = preg_replace('/\s/', ' ', $text);
-        $find = substr($text, - strlen($text));
-        for ($i = 0; $i < strlen($text); $i ++) {
-            if (is_numeric(substr($find, $i, 1))) {
+        $textlen = Tools::strlen($text);
+        $find = Tools::substr($text, - $textlen);
+        for ($i = 0; $i < Tools::strlen($text); $i ++) {
+            if (is_numeric(Tools::substr($find, $i, 1))) {
                 return array(
-                    substr($text, 0, - strlen($text) + $i),
-                    substr($text, - strlen($text) + $i),
+                    Tools::substr($text, 0, - Tools::strlen($text) + $i),
+                    Tools::substr($text, - Tools::strlen($text) + $i),
                     ''
                 );
             }

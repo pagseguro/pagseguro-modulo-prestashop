@@ -1,6 +1,5 @@
 <?php
-
-/*
+/**
  * 2007-2013 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -19,11 +18,12 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- *  @author PrestaShop SA <contact@prestashop.com>
- *  @copyright  2007-2013 PrestaShop SA
- *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @author    PrestaShop SA <contact@prestashop.com>
+ *  @copyright 2007-2014 PrestaShop SA
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
+
 include_once dirname(__FILE__).'/../../../../config/config.inc.php';
 
 class EncryptionIdPagSeguro
@@ -49,10 +49,10 @@ class EncryptionIdPagSeguro
     
     public static function decrypt($plaintext)
     {
-        $token = substr($plaintext, 0, 5);
+        $token = Tools::substr($plaintext, 0, 5);
         $id = Configuration::get('PAGSEGURO_ID');
         if (strcmp($id, $token) == 0) {
-            return substr($plaintext, 5);
+            return Tools::substr($plaintext, 5);
         }
         return $plaintext;
     }

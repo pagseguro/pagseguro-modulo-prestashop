@@ -1,23 +1,27 @@
 <?php
-/*
- ************************************************************************
- Copyright [2011] [PagSeguro Internet Ltda.]
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
- http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
- ************************************************************************
+/**
+ * 2007-2014 [PagSeguro Internet Ltda.]
+ *
+ * NOTICE OF LICENSE
+ *
+ *Licensed under the Apache License, Version 2.0 (the "License");
+ *you may not use this file except in compliance with the License.
+ *You may obtain a copy of the License at
+ *
+ *http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *Unless required by applicable law or agreed to in writing, software
+ *distributed under the License is distributed on an "AS IS" BASIS,
+ *WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *See the License for the specific language governing permissions and
+ *limitations under the License.
+ *
+ *  @author    PagSeguro Internet Ltda.
+ *  @copyright 2007-2014 PagSeguro Internet Ltda.
+ *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
-/**
+/***
  * Encapsulates web service calls to search for PagSeguro transactions
  */
 class PagSeguroTransactionSearchService
@@ -61,7 +65,7 @@ class PagSeguroTransactionSearchService
             "&initialDate={$initialDate}&finalDate={$finalDate}{$page}{$maxPageResults}";
     }
 
-    /**
+    /***
      * Finds a transaction with a matching transaction code
      *
      * @param PagSeguroCredentials $credentials
@@ -106,7 +110,6 @@ class PagSeguroTransactionSearchService
                         $e->getOneLineMessage()
                     );
                     throw $e;
-                    break;
 
                 default:
                     $e = new PagSeguroServiceException($httpStatus);
@@ -115,8 +118,6 @@ class PagSeguroTransactionSearchService
                         $e->getOneLineMessage()
                     );
                     throw $e;
-                    break;
-
             }
 
             return isset($transaction) ? $transaction : false;
@@ -131,7 +132,7 @@ class PagSeguroTransactionSearchService
 
     }
 
-    /**
+    /***
      * Search transactions associated with this set of credentials within a date range
      *
      * @param PagSeguroCredentials $credentials
@@ -200,7 +201,6 @@ class PagSeguroTransactionSearchService
                         ") - end " . $e->getOneLineMessage()
                     );
                     throw $e;
-                    break;
 
                 default:
                     $e = new PagSeguroServiceException($httpStatus);
@@ -211,8 +211,6 @@ class PagSeguroTransactionSearchService
                         $e->getOneLineMessage()
                     );
                     throw $e;
-                    break;
-
             }
 
             return isset($searchResult) ? $searchResult : false;
@@ -227,7 +225,7 @@ class PagSeguroTransactionSearchService
 
     }
 
-    /**
+    /***
      * Search transactions abandoned associated with this set of credentials within a date range
      *
      * @param PagSeguroCredentials $credentials
@@ -295,7 +293,6 @@ class PagSeguroTransactionSearchService
                         PagSeguroHelper::formatDate($finalDate) . ") - end " . $e->getOneLineMessage()
                     );
                     throw $e;
-                    break;
 
                 default:
                     $e = new PagSeguroServiceException($httpStatus);
@@ -305,8 +302,6 @@ class PagSeguroTransactionSearchService
                         PagSeguroHelper::formatDate($finalDate) . ") - end " . $e->getOneLineMessage()
                     );
                     throw $e;
-                    break;
-
             }
 
             return isset($searchResult) ? $searchResult : false;

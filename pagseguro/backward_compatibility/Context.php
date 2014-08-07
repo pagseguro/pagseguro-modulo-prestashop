@@ -1,5 +1,5 @@
 <?php
-/*
+/**
 * 2007-2013 PrestaShop
 *
 * NOTICE OF LICENSE
@@ -18,9 +18,9 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2013 PrestaShop SA
-*  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+*  @author    PrestaShop SA <contact@prestashop.com>
+*  @copyright 2007-2014 PrestaShop SA
+*  @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
@@ -75,90 +75,90 @@ if (version_compare(_PS_VERSION_, '1.4', '<')) {
 class Context
 {
 
-    /**
+    /***
      *
      * @var Context
      */
     protected static $instance;
 
-    /**
+    /***
      *
      * @var Cart
      */
     public $cart;
 
-    /**
+    /***
      *
      * @var Customer
      */
     public $customer;
 
-    /**
+    /***
      *
      * @var Cookie
      */
     public $cookie;
 
-    /**
+    /***
      *
      * @var Link
      */
     public $link;
 
-    /**
+    /***
      *
      * @var Country
      */
     public $country;
 
-    /**
+    /***
      *
      * @var Employee
      */
     public $employee;
 
-    /**
+    /***
      *
      * @var Controller
      */
     public $controller;
 
-    /**
+    /***
      *
      * @var Language
      */
     public $language;
 
-    /**
+    /***
      *
      * @var Currency
      */
     public $currency;
 
-    /**
+    /***
      *
      * @var AdminTab
      */
     public $tab;
 
-    /**
+    /***
      *
      * @var Shop
      */
     public $shop;
 
-    /**
+    /***
      *
      * @var Smarty
      */
     public $smarty;
 
-    /**
+    /***
      * @ var Mobile Detect
      */
     public $mobile_detect;
 
-    /**
+    /***
      *
      * @var boolean string device of the customer
      */
@@ -229,7 +229,7 @@ class Context
              ! Context::getContext()->cookie->no_mobile;
     }
 
-    /**
+    /***
      * Get a singleton context
      *
      * @return Context
@@ -242,7 +242,7 @@ class Context
         return self::$instance;
     }
 
-    /**
+    /***
      * Clone current context
      *
      * @return Context
@@ -252,7 +252,7 @@ class Context
         return clone ($this);
     }
 
-    /**
+    /***
      *
      * @return int Shop context type (Shop::CONTEXT_ALL, etc.)
      */
@@ -265,7 +265,7 @@ class Context
     }
 }
 
-/**
+/***
  * Class Shop for Backward compatibility
  */
 class ShopBackwardModule extends Shop
@@ -288,7 +288,7 @@ class ShopBackwardModule extends Shop
         return 1;
     }
 
-    /**
+    /***
      * Get shop theme name
      *
      * @return string
@@ -304,14 +304,14 @@ class ShopBackwardModule extends Shop
     }
 }
 
-/**
+/***
  * Class Controller for a Backward compatibility
  * Allow to use method declared in 1.5
  */
 class ControllerBackwardModule
 {
 
-    /**
+    /***
      *
      * @param
      *            $js_uri
@@ -322,7 +322,7 @@ class ControllerBackwardModule
         Tools::addJS($js_uri);
     }
 
-    /**
+    /***
      *
      * @param
      *            $css_uri
@@ -344,7 +344,7 @@ class ControllerBackwardModule
     }
 }
 
-/**
+/***
  * Class Customer for a Backward compatibility
  * Allow to use method declared in 1.5
  */
@@ -353,7 +353,7 @@ class CustomerBackwardModule extends Customer
 
     public $logged = false;
 
-    /**
+    /***
      * Check customer informations and return customer validity
      *
      * @since 1.5.0
@@ -365,7 +365,7 @@ class CustomerBackwardModule extends Customer
         if (! $with_guest && $this->is_guest == 1) {
             return false;
         }
-        /* Customer is valid only if it can be load and if object password is the same as database one */
+        /** Customer is valid only if it can be load and if object password is the same as database one */
         if ($this->logged == 1 && $this->id && Validate::isUnsignedId($this->id) &&
              Customer::checkPassword($this->id, $this->passwd)) {
             return true;

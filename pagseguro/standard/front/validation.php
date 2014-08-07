@@ -1,6 +1,5 @@
 <?php
-
-/*
+/**
  * 2007-2013 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -19,9 +18,9 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- *  @author PrestaShop SA <contact@prestashop.com>
- *  @copyright  2007-2013 PrestaShop SA
- *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @author    PrestaShop SA <contact@prestashop.com>
+ *  @copyright 2007-2014 PrestaShop SA
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
@@ -43,7 +42,7 @@ try {
     }
     Tools::redirectLink($validate->request($checkout));
 } catch (PagSeguroServiceException $exc) {
-    canceledOrderForErro();
+    canceledOrderForErro($pag_seguro);
     displayErroPage();
 } catch (Exception $e) {
     displayErroPage();
@@ -56,9 +55,8 @@ function displayErroPage()
     $showView->run();
 }
 
-function canceledOrderForErro()
+function canceledOrderForErro($pag_seguro)
 {
-    global $pag_seguro;
     
     $currentOrder = (int) ($pag_seguro->currentOrder);
     

@@ -17,20 +17,23 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2011 PrestaShop SA
+*  @author    PrestaShop SA <contact@prestashop.com>
+*  @copyright 2007-2014 PrestaShop SA
 *  @version  Release: $Revision: 6594 $
-*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-<script type="text/javascript" src="https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.lightbox.js"></script>
+<script type="text/javascript" src="https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.lightbox.js"></script>
 <script type="text/javascript">
 function checkout()
 {
+    var url = "{$action_url|escape}";
+    url = url.replace("&amp;","&");
+    url = url.replace("&amp;","&");
     var query = $.ajax({
         type: 'POST',
-        url: "{$action_url}",
+        url: url,
         success: function(response) {
         var json = $.parseJSON(response);
             PagSeguroLightbox(
@@ -43,7 +46,7 @@ function checkout()
                 }
             });
         },
-        error: function() {
+        error: function(error) {
             redirecToPageError();            
         }
     });
@@ -54,11 +57,10 @@ function redirecToPageError(){
 </script>
 
 <style type="text/css" media="all"> 
-	div#center_column{ width: {$width_center_column}; }
+	div#center_column{ width: {$width_center_column|escape}; }
 </style>
 
 {capture name=path}{l s='Pagamento via PagSeguro' mod='pagseguro'}{/capture}
-{include file="$tpl_dir./breadcrumb.tpl"}
 
 <h2>{l s='Resumo da compra' mod='pagseguro'}</h2>
 
@@ -66,13 +68,13 @@ function redirecToPageError(){
 {include file="$tpl_dir./order-steps.tpl"}
 
 {if isset($nbProducts) && $nbProducts <= 0}
-	<p class="warning">{l s='Seu carrinho de compras está vazio.'}</p>
+	<p class="warning">{l s='Seu carrinho de compras está vazio.' mod='pagseguro'}</p>
 {else}
 
 <h3>{l s='Pagamento via PagSeguro' mod='pagseguro'}</h3>
-<form action="{$action_url}" method="post">
+<form action="{$action_url|escape}" method="post">
 	<p>
-        <img src="{$image_payment}" alt="{l s='pagseguro' mod='pagseguro'}" width="86" height="49" style="float:left; margin: 0px 10px 5px 0px;" />
+        <img src="{$image_payment|escape}" alt="{l s='pagseguro' mod='pagseguro'}" width="86" height="49" style="float:left; margin: 0px 10px 5px 0px;" />
         {l s='Você escolheu efetuar o pagamento via PagSeguro' mod='pagseguro'}
         <br/><br />
         {l s='Breve resumo da sua compra:' mod='pagseguro'}
@@ -86,8 +88,8 @@ function redirecToPageError(){
 	</p>
     {if $current_currency_name != "Real"}
         <p>
-        {l s='Moeda atual: ' mod='pagseguro'}&nbsp;<b>{$current_currency_name}</b>
-                <input type="hidden" name="currency_payment" value="{$current_currency_id}" />
+        {l s='Moeda atual: ' mod='pagseguro'}&nbsp;<b>{$current_currency_name|escape}</b>
+                <input type="hidden" name="currency_payment" value="{$current_currency_id|escape}" />
 	</p>
         {/if}
 	<p style="margin-top:20px;">

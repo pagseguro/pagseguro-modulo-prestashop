@@ -1,30 +1,33 @@
 <?php
-
-/*
- * ***********************************************************************
- Copyright [2011] [PagSeguro Internet Ltda.]
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
- http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
- * ***********************************************************************
+/**
+ * 2007-2014 [PagSeguro Internet Ltda.]
+ *
+ * NOTICE OF LICENSE
+ *
+ *Licensed under the Apache License, Version 2.0 (the "License");
+ *you may not use this file except in compliance with the License.
+ *You may obtain a copy of the License at
+ *
+ *http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *Unless required by applicable law or agreed to in writing, software
+ *distributed under the License is distributed on an "AS IS" BASIS,
+ *WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *See the License for the specific language governing permissions and
+ *limitations under the License.
+ *
+ *  @author    PagSeguro Internet Ltda.
+ *  @copyright 2007-2014 PagSeguro Internet Ltda.
+ *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
-/**
+/***
  * Class PagSeguroTransactionParser
  */
 class PagSeguroTransactionParser extends PagSeguroServiceParser
 {
 
-    /**
+    /***
      * @param $str_xml
      * @return PagSeguroTransactionSearchResult
      */
@@ -56,7 +59,7 @@ class PagSeguroTransactionParser extends PagSeguroServiceParser
             $transactions = array();
             if (isset($data['transactions']['transaction'][0])) {
                 $i = 0;
-                foreach ($data['transactions']['transaction'] as $key => $value) {
+                foreach ($data['transactions']['transaction'] as $value) {
                     $transactions[$i++] = self::parseTransactionSummary($value);
                 }
             } else {
@@ -68,7 +71,7 @@ class PagSeguroTransactionParser extends PagSeguroServiceParser
         return $searchResutlt;
     }
 
-    /**
+    /***
      * @param $str_xml
      * @return PagSeguroTransaction
      */
@@ -167,7 +170,7 @@ class PagSeguroTransactionParser extends PagSeguroServiceParser
             $i = 0;
 
             if (isset($data["items"]['item'][0])) {
-                foreach ($data["items"]['item'] as $key => $value) {
+                foreach ($data["items"]['item'] as $value) {
                     $item = self::parseTransactionItem($value);
                     $items[$i] = $item;
                     $i++;
@@ -297,7 +300,7 @@ class PagSeguroTransactionParser extends PagSeguroServiceParser
         return $transaction;
     }
 
-    /**
+    /***
      * @param $data
      * @return PagSeguroItem
      */
@@ -335,7 +338,7 @@ class PagSeguroTransactionParser extends PagSeguroServiceParser
         return $item;
     }
 
-    /**
+    /***
      * @param $data
      * @return PagSeguroTransactionSummary
      */

@@ -1,10 +1,35 @@
-/*!
+/**
+* 2007-2014 PrestaShop
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Academic Free License (AFL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/afl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to license@prestashop.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+* versions in the future. If you wish to customize PrestaShop for your
+* needs please refer to http://www.prestashop.com for more information.
+*
+*  @author    PrestaShop SA <contact@prestashop.com>
+*  @copyright 2007-2014 PrestaShop SA
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  International Registered Trademark & Property of PrestaShop SA
+*/
+
+/**!
  * jQuery blockUI plugin
  * Version 2.66.0-2013.10.09
  * Requires jQuery v1.7 or later
  *
  * Examples at: http://malsup.com/jquery/block/
- * Copyright (c) 2007-2013 M. Alsup
+ * Copyright (c) 2007-2014 M. Alsup
  * Dual licensed under the MIT and GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
@@ -13,7 +38,7 @@
  */
 
 ;(function() {
-/*jshint eqeqeq:false curly:false latedef:false */
+/**jshint eqeqeq:false curly:false latedef:false */
 "use strict";
 
 	function setup($) {
@@ -172,7 +197,7 @@
 
 			// IE issues: 'about:blank' fails on HTTPS and javascript:false is s-l-o-w
 			// (hat tip to Jorge H. N. de Vasconcelos)
-			/*jshint scripturl:true */
+			/**jshint scripturl:true */
 			iframeSrc: /^https/i.test(window.location.href || '') ? 'javascript:false' : 'about:blank',
 
 			// force usage of iframe in non-IE browsers (handy for blocking applets)
@@ -336,7 +361,7 @@
 			}
 
 			// style the overlay
-			if (!opts.theme /*&& (!opts.applyPlatformOpacityRules)*/)
+			if (!opts.theme /**&& (!opts.applyPlatformOpacityRules)*/)
 				lyr2.css(opts.overlayCSS);
 			lyr2.css('position', full ? 'fixed' : 'absolute');
 
@@ -609,7 +634,7 @@
 	}
 
 
-	/*global define:true */
+	/**global define:true */
 	if (typeof define === 'function' && define.amd && define.amd.jQuery) {
 		define(['jquery'], setup);
 	} else {

@@ -1,6 +1,5 @@
 <?php
-
-/*
+/**
  * 2007-2013 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -19,9 +18,9 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- *  @author PrestaShop SA <contact@prestashop.com>
- *  @copyright  2007-2013 PrestaShop SA
- *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @author    PrestaShop SA <contact@prestashop.com>
+ *  @copyright 2007-2014 PrestaShop SA
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
@@ -245,6 +244,16 @@ class Util
     {
         return __PS_BASE_URI__ . 'modules/pagseguro/assets/js/behaviors-version-15.js';
     }
+
+    public static function getJsBehaviorPS16()
+    {
+        return __PS_BASE_URI__ . 'modules/pagseguro/assets/js/behaviors-version-15.js';
+    }
+
+    public static function getJsBehaviorPS1601()
+    {
+        return __PS_BASE_URI__ . 'modules/pagseguro/assets/js/behaviors-version-15.js';
+    }
     
     public static function getCssDisplayPS14()
     {
@@ -254,6 +263,16 @@ class Util
     public static function getCssDisplayPS15()
     {
         return __PS_BASE_URI__ . 'modules/pagseguro/assets/css/styles-version-15.css';
+    }
+
+    public static function getCssDisplayPS16()
+    {
+        return __PS_BASE_URI__ . 'modules/pagseguro/assets/css/styles-version-16.css';
+    }
+
+    public static function getCssDisplayPS1601()
+    {
+        return __PS_BASE_URI__ . 'modules/pagseguro/assets/css/styles-version-1601.css';
     }
     
     private static function getBaseDefaultUrl()
@@ -271,6 +290,12 @@ class Util
         $index = version_compare(_PS_VERSION_, '1.5.0.3', '<=') ? '' : 'index.php';
         return self::getBaseDefaultUrl() . $index;
     }
+
+    public static function getDefaultRedirectUrlPS16()
+    {
+        $index = "";
+        return self::getBaseDefaultUrl() . $index;
+    }
     
     public static function getDefaultNotificationUrlPS14()
     {
@@ -278,6 +303,11 @@ class Util
     }
     
     public static function getDefaultNotificationUrlPS15()
+    {
+        return self::getBaseDefaultUrl() . 'index.php?fc=module&module=pagseguro&controller=notification';
+    }
+
+    public static function getDefaultNotificationUrlPS16()
     {
         return self::getBaseDefaultUrl() . 'index.php?fc=module&module=pagseguro&controller=notification';
     }
@@ -305,6 +335,18 @@ class Util
         return $urlToCompose . '?controller=order-confirmation&id_cart=' . $data['id_cart'] .
         '&id_module=' . $data['id_module'] . '&id_order=' . $data['id_order'] . '&key=' . $data['key'];
     }
+
+    public static function urlToRedirectPS16 (Array $data)
+    {
+
+        $urlToCompose = self::getRedirectUrl();
+        if (Tools::isEmpty($urlToCompose)) {
+            $urlToCompose = self::getDefaultRedirectUrlPS15();
+        }
+
+        return $urlToCompose . '?controller=order-confirmation&id_cart=' . $data['id_cart'] .
+        '&id_module=' . $data['id_module'] . '&id_order=' . $data['id_order'] . '&key=' . $data['key'];
+    }
     
     public static function urlToNotificationPS14 ()
     {
@@ -313,6 +355,12 @@ class Util
     }
     
     public static function urlToNotificationPS15 ()
+    {
+        $urlToNotification = self::getNotificationUrl();
+        return Tools::isEmpty($urlToNotification) ? self::getDefaultNotificationUrlPS15() : $urlToNotification;
+    }
+
+    public static function urlToNotificationPS16 ()
     {
         $urlToNotification = self::getNotificationUrl();
         return Tools::isEmpty($urlToNotification) ? self::getDefaultNotificationUrlPS15() : $urlToNotification;
