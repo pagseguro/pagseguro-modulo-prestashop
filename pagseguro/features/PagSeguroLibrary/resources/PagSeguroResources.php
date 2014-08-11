@@ -24,19 +24,19 @@
 // Static URLs
 $PagSeguroResources['staticUrl'] = array();
 $PagSeguroResources['staticUrl']['production'] = "https://stc.pagseguro.uol.com.br";
-$PagSeguroResources['staticUrl']['production'] = "https://stc.sandbox.pagseguro.uol.com.br";
+$PagSeguroResources['staticUrl']['sandbox'] = "https://stc.sandbox.pagseguro.uol.com.br";
 
 // WebService URLs
 $PagSeguroResources['webserviceUrl'] = array();
 $PagSeguroResources['webserviceUrl']['production'] = "https://ws.pagseguro.uol.com.br";
-$PagSeguroResources['webserviceUrl']['production'] = "https://ws.sandbox.pagseguro.uol.com.br";
+$PagSeguroResources['webserviceUrl']['sandbox'] = "https://ws.sandbox.pagseguro.uol.com.br";
 
 // Payment service
 $PagSeguroResources['paymentService'] = array();
 $PagSeguroResources['paymentService']['servicePath'] = "/v2/checkout";
 $PagSeguroResources['paymentService']['checkoutUrl'] = "/v2/checkout/payment.html";
 $PagSeguroResources['paymentService']['baseUrl']['production'] = "https://pagseguro.uol.com.br";
-$PagSeguroResources['paymentService']['baseUrl']['production'] = "https://sandbox.pagseguro.uol.com.br";
+$PagSeguroResources['paymentService']['baseUrl']['sandbox'] = "https://sandbox.pagseguro.uol.com.br";
 $PagSeguroResources['paymentService']['serviceTimeout'] = 20;
 
 // Notification service
