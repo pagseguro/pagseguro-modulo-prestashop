@@ -24,14 +24,18 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{if $version >= '1.5.0.2'}
+{if $version == 6}
+    <style type="text/css" media="all">{literal}div#center_column{ width: 75%; }{/literal}</style>
+{else if $version == 5}
     <style type="text/css" media="all">{literal}div#center_column{ width: 757px; }{/literal}</style>
-{else}
+{else if $version == 4}
     <style type="text/css" media="all">{literal}div#center_column{ width: 535px; }{/literal}</style>
 {/if}
 
 {capture name=path}{l s='Pagamento via PagSeguro' mod='pagseguro'}{/capture}
-{include file="$tpl_dir./breadcrumb.tpl"}
+{if $version != 6}
+	{include file="$tpl_dir./breadcrumb.tpl"}
+{/if}
 
 {assign var='current_step' value='payment'}
 {include file="$tpl_dir./order-steps.tpl"}

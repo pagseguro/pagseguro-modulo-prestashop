@@ -1072,3 +1072,13 @@ h1 {
   line-height: middle;
 }
 
+.blockUI, .blockMsg, .blockPage{
+  padding-top: 0px!important;
+}
+
+.blockUImg {
+  vertical-align: middle;
+}
+
+
+

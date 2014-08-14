@@ -24,9 +24,21 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
+{if $version eq false}
+<div class="row">
+	<div class="col-xs-12 col-md-6">
+		<p class="payment_module">
+		    <a style="background: url({$image|escape}) 1% 50% no-repeat;" href="{$action_url|escape}" title="{l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}">
+			{l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}
+		    </a>
+		</p> 
+	</div>
+</div>
+{else}
 <p class="payment_module">
     <a href="{$action_url|escape}" title="{l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}">
         <img src="{$image|escape}" alt="{l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}" />
             {l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}
     </a>
 </p> 
+{/if}

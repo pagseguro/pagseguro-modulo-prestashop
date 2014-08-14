@@ -29,7 +29,7 @@ include_once  dirname(__FILE__) . '/../../pagseguro.php';
 class PagSeguroPaymentOrderPrestashop
 {
     private $paymentUrlPS14 = 'modules/pagseguro/standard/front/validation.php';
-    private $paymentUrlPS15 = 'index.php?fc=module&module=pagseguro&controller=validation';
+    private $paymentUrl = 'index.php?fc=module&module=pagseguro&controller=validation';
     
     private $context;
     
@@ -40,7 +40,7 @@ class PagSeguroPaymentOrderPrestashop
     
     private function returnUrlPaymentForVersionModule()
     {
-        return version_compare(_PS_VERSION_, '1.5.0.3', '<=') ? $this->paymentUrlPS14 : $this->paymentUrlPS15;
+        return version_compare(_PS_VERSION_, '1.5.0.3', '<=') ? $this->paymentUrlPS14 : $this->paymentUrl;
     }
     
     private function setCurrencyVariable($id_currency)
@@ -67,7 +67,7 @@ class PagSeguroPaymentOrderPrestashop
         if ( version_compare(_PS_VERSION_, '1.5.0.2', '>=') && version_compare(_PS_VERSION_, '1.6.0.1', '<') ){
              $center_column = '757px';
         } if ( version_compare(_PS_VERSION_, '1.6.0.1', '>=') ) {
-             $center_column = '900px';
+             $center_column = '100%';
         } else {
             $center_column = '535px';
         }

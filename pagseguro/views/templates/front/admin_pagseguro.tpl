@@ -154,7 +154,7 @@
         function blockModal(block) {
             if(block == 1) {
                 jQuery.blockUI({
-                    message: '<h1>Carregando '+'<img src="../modules/pagseguro/assets/images/loading.gif" />'+'</h1>',
+                    message: '<h1>Carregando '+'<img class="blockUImg" src="../modules/pagseguro/assets/images/loading.gif" />'+'</h1>',
                     css: {
                         border: 'none',
                         padding: '15px',

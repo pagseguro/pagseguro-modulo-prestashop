@@ -126,6 +126,10 @@ class PagSeguro extends PaymentModule
 
     public function uninstall()
     {
+    	if (! $this->uninstallOrderMessage()) {
+    		return false;
+    	}
+    	
         if (! $this->modulo->uninstallConfiguration()) {
             return false;
         }
@@ -544,6 +548,14 @@ class PagSeguro extends PaymentModule
         }
         
         $this->modulo->paymentConfiguration($params);
+        
+        if (version_compare(_PS_VERSION_, '1.6.0.1', '<'))
+        	$bootstrap = true;
+        else
+        	$boostrap = false;
+        
+        $this->context->smarty->assign('version', $bootstrap);
+        
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/hook/payment.tpl');
     }
 
@@ -611,6 +623,45 @@ class PagSeguro extends PaymentModule
         $orderMensagem->save();
 
         return Configuration::updateValue('PAGSEGURO_MESSAGE_ORDER_ID', $orderMensagem->id);
+    }
+    
+	private function uninstallOrderMessage()
+    {
+    	$orderMensagem = new OrderMessage();
+    	$sql = "SELECT `id_order_message` as id FROM `"._DB_PREFIX_."order_message_lang` WHERE `name` = 'cart recovery pagseguro'";
+    	$result = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql));
+    
+    	if ($result) {
+    
+    		$bool = false;
+    		foreach ($result as $order_message) {
+    
+    			if (!$bool) {
+    
+    				$orders[] = $order_message['id'];
+    				$bool = true;
+    			} else {
+    
+    				if ( array_search($order_message['id'], $orders) === false){
+    					$orders[] = $order_message['id'];
+    				}
+    			}
+    		}
+    
+    		for($i = 0; $i < count($orders) ;$i++){
+    
+    			$sql = "DELETE FROM `"._DB_PREFIX_."order_message` WHERE `id_order_message` = '".$orders[$i]."'";
+    			$execute = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql));
+    		}
+    
+    		for($i = 0; $i < count($result) ;$i++){
+    			$id = $result[$i]['id'];
+    			$sql = "DELETE FROM `"._DB_PREFIX_."order_message_lang` WHERE `id_order_message` = '".$id."'";
+    			$execute = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql));
+    		}
+    		return true;
+    	}
+    	return false;
     }
 
     private function generatePagSeguroOrderStatus()
