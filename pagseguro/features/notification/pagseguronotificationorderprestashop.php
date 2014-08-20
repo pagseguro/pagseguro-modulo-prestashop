@@ -122,7 +122,7 @@ class PagSeguroNotificationOrderPrestashop
             Util::createAddOrderHistory((int)$this->reference, $id_st_transaction);
         }
 
-        $this->saveTransactionId($this->obj_transaction->getCode(), $this->obj_transaction->getReference());
+        $this->saveTransactionId($this->obj_transaction->getCode(), $this->decryptId($this->obj_transaction->getReference()));
     }
 
     private function returnIdOrderByStatusPagSeguro($value)
@@ -194,5 +194,16 @@ class PagSeguroNotificationOrderPrestashop
         LogPagSeguro::info(
             "PagSeguroService.Notification( 'Erro ao processar notificação. ErrorMessage: ".$e." ') - end"
         );
+    }
+    
+    /****
+     *
+     * Grab a PAGSEGURO_ID and decrypts
+     * @param string $reference
+     * @return PAGSEGURO_ID
+     */
+    private function decryptId($reference)
+    {
+    	return Tools::substr($reference, 5);
     }
 }

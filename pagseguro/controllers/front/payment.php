@@ -33,6 +33,7 @@ class PagSeguroPaymentModuleFrontController extends ModuleFrontController
 {
 
     public $ssl = true;
+    public $context;
 
     public function initContent()
     {
@@ -42,6 +43,14 @@ class PagSeguroPaymentModuleFrontController extends ModuleFrontController
 
         $payment = new PagSeguroPaymentOrderPrestashop();
         $payment->setVariablesPaymentExecutionView();
+
+        $environment = PagSeguroConfig::getEnvironment();
+
+        $this->context = Context::getContext();
+        $this->context->smarty->assign('environment', $environment);
+        if (version_compare(_PS_VERSION_, '1.5.0.1', '>='))
+        	$this->context->smarty->assign('width_center_column', '100%');
+        
         $this->setTemplate('payment_execution.tpl');
     }
 }

@@ -43,5 +43,8 @@ if (! $context->cookie->isLogged(true)) {
 $payment = new PagSeguroPaymentOrderPrestashop();
 $payment->setVariablesPaymentExecutionView();
 
+$environment = PagSeguroConfig::getEnvironment();
+$context->smarty->assign('environment', $environment);
+
 $showView->setTemplate(_PS_MODULE_DIR_.'pagseguro/views/templates/front/payment_execution.tpl');
 $showView->run();

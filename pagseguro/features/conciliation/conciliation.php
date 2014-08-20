@@ -278,30 +278,25 @@ class PagSeguroConciliation
                     }
 
                     $result = $newArray;
+                    
                 } else {
-
-                    $results[] = PagSeguroTransactionSearchService::searchByDate(
-                        $this->obj_credential,
-                        $pageNumber,
-                        $maxPageResults,
-                        $initialDate,
-                        $finalDate
-                    );
-
-                    $newArray = new ArrayObject();
-                    for ($i = 0; $i < count($results); $i++) {
-
-                        $nResult = $results[$i];
-                        foreach ($nResult->getTransactions() as $item) {
-                            $newArray['transactions'][] = $item;
-                        }
+                    
+                    for ($i = 0; $i < count($result); $i++) {
+                    
+                    	if (count($result) > 1)
+                    		$nResult = $result[$i];
+                    	else
+                    		$nResult = $result;
+                    
+                    	$newArray = new ArrayObject();
+                    	foreach ($nResult->getTransactions() as $item) {
+                    		$newArray['transactions'][] = $item;
+                    	}
                     }
-
+                    
                     $result = $newArray;
-
                 }
                 
-
                 $return = $this->validateRef($result);
 
         } catch (PagSeguroServiceException $e) {

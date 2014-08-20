@@ -26,6 +26,9 @@
 
 <link type="text/css" rel="stylesheet" href="{$module_dir|escape:'none'}assets/css/jquery.dataTables.min.css" />
 <link type="text/css" rel="stylesheet" href="{$css_version|escape:'none'}" />
+{if $cheats}
+<link type="text/css" rel="stylesheet" href="{$module_dir|escape:'none'}assets/css/firefox-cheats.css" />
+{/if}
 <script type="text/javascript" src="{$module_dir|escape:'none'}assets/js/jquery.min.js"></script>
 <script type="text/javascript" src="{$module_dir|escape:'none'}assets/js/jquery.blockUI.js"></script>
 <script type="text/javascript" src="{$module_dir|escape:'none'}assets/js/jquery-1102.min.js"></script>

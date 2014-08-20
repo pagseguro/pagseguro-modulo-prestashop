@@ -111,7 +111,7 @@ armazenadas em seu sistema com o PagSeguro.</small></p>
                            { "sClass": "tabela", 'aTargets': [ 1, 2, 3, 4, 5, 6 ] }
                        ],
                    "oLanguage": {
-                        "sEmptyTable":"Nenhuma transação a ser conciliada.",
+                        "sEmptyTable":"Nenhuma transação a ser conciliada. Realize uma pesquisa.",
                         "oPaginate": {
                             "sNext": 'Próximo',
                             "sLast": 'Último',

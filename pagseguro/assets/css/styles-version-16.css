@@ -100,10 +100,14 @@ input.invalid { background: red; color: #FDFDFD; }
 #paginator a:active { color: #777; }
 #paginator a:focus { outline: 1px; }
 
-div.hintps {font-size:16px; position : absolute !important; display : none; width : 300px; height : 300px; top : 20%; right : 15%; color : #5B9028;}
+div.hintps {font-size:16px; position : absolute !important; display : none; width : 300px; height : 300px; top : 30%!important; right : 20%!important; color : #5B9028;}
 
-@media screen and (-webkit-min-device-pixel-ratio:0) { 
-  div.hintps {font-size:16px; position : absolute !important; display : none; width : 300px; height : 300px; top : 20%; right : 10%; color : #5B9028;}
+@-moz-document url-prefix() {
+  div.hintps {font-size:16px; position : absolute !important; display : none; width : 300px; height : 300px; top : 20%!important; right : 20%!important; color : #5B9028;}
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  div.hintps {font-size:16px; position : absolute !important; display : none; width : 300px; height : 300px; top : 10%!important; right : 10%!important; color : #5B9028;}
 }
 
 div.tabItem input {}

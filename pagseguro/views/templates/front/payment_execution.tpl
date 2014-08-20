@@ -24,7 +24,11 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
+{if $environment != 'production'}
+<script type="text/javascript" src="https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.lightbox.js"></script>
+{else}
 <script type="text/javascript" src="https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.lightbox.js"></script>
+{/if}
 <script type="text/javascript">
 function checkout()
 {

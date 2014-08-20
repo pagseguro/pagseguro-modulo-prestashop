@@ -27,25 +27,35 @@
 {if $version == 6}
     <style type="text/css" media="all">{literal}div#center_column{ width: 75%; }{/literal}</style>
 {else if $version == 5}
-    <style type="text/css" media="all">{literal}div#center_column{ width: 100%; }{/literal}</style>
+    <style type="text/css" media="all">{literal}div#center_column{ width: 757px; }{/literal}</style>
 {else if $version == 4}
     <style type="text/css" media="all">{literal}div#center_column{ width: 535px; }{/literal}</style>
 {/if}
 
-{capture name=path}{l s='Pagamento via PagSeguro' mod='pagseguro'}{/capture}
-{if $version != 6}
-	{include file="$tpl_dir./breadcrumb.tpl"}
-{/if}
+<link type="text/css" rel="stylesheet" href="{$css_version|escape:'none'}" />
+<script type="text/javascript" src="{$module_dir|escape:'none'}assets/js/jquery.min.js"></script>
 
-{assign var='current_step' value='payment'}
-{include file="$tpl_dir./order-steps.tpl"}
+<div>
+	<form class="psplugin" id="psplugin">
+		<h1>
+		        <img src="{$module_dir|escape:'none'}assets/images/logops_228x56.png" />
+		</h1> 
+		<div id="tabList">
+			<div class="tabItem selected">
+				<h2>cUrl.</h2>
+				<p><small>Ops! Ocorreu um erro.</small></p>
+				<div class="module_error error">CURL can't connect: {$err|escape:'none'}</div>
+			</div>
+		</div>
+	</form>
+</div>
 
-<h3>Ocorreu um erro, durante a compra.</h3>
-<p>
-    Desculpe, infelizmente ocorreu um erro durante a finaliza&ccedil;&atilde;o da compra.
-    Por favor entre em contato com o administrador da loja se o problema persistir.
-</p>
+<script type="text/javascript">
+    {literal}
 
-<p>
-    <a href="{$base_dir|escape}" class="button_small" title="{l s='Voltar' mod='pagseguro'}">&laquo; {l s='Voltar' mod='pagseguro'}</a>
-</p>
+        jQuery( document ).ready(function() {
+            jQuery('#content').removeClass("nobootstrap"); 
+            jQuery('#content').addClass("nobootstrap-ps"); 
+        });
+    {/literal}
+</script>

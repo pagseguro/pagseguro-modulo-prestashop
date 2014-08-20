@@ -85,12 +85,13 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController
     private function _whichVersion()
     {
     	if(version_compare(_PS_VERSION_, '1.6.0.1', ">=")){
-    		return $version = '6';
+    		$version = '6';
     	} else if(version_compare(_PS_VERSION_, '1.5.0.1', "<")){
-    		return $version = '4';
+    		$version = '4';
     	} else {
-    		return $version = '5';
+    		$version = '5';
     	}
+    	return $version;
     }
     
 }
