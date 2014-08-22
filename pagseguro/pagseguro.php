@@ -404,7 +404,7 @@ class PagSeguro extends PaymentModule
             )
         ));
     	
-        if (!$this->cUrl())
+        /*if (!$this->cUrl())*/
         	return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', 'views/templates/front/admin_pagseguro.tpl');
     }
     
