@@ -177,7 +177,6 @@
         jQuery("input[name = 'search']").on('click',
             function() {
                 blockModal(1);
-                jQuery("#pagseguro_dias_hidden").val(jQuery('#pagseguro_dias_btn').val());
                 reloadTable();             
         });
 
@@ -187,7 +186,7 @@
                     type: 'POST',
                     url: '../modules/pagseguro/features/conciliation/conciliation.php',
                     dataType : "json",
-                    data: {dias: jQuery("#pagseguro_dias_hidden").val()},
+                    data: {dias: jQuery('#pagseguro_dias_btn').val()},
                     success: function(result) {
                         if (result != "") {
                             jQuery('#htmlgrid').dataTable().fnClearTable(true);           
@@ -218,14 +217,10 @@
                 jQuery.ajax({
                     type: 'POST',
                     url: '../modules/pagseguro/features/conciliation/conciliation.php',
-                    data: {idOrder: rowId, newIdStatus: rowIdStatusPagSeg, orderDays: jQuery("#pagseguro_dias_hidden").val() },
+                    data: {idOrder: rowId, newIdStatus: rowIdStatusPagSeg, orderDays: jQuery('#pagseguro_dias_btn').val() },
                     success: function(result) {
 
-                        jQuery('#htmlgrid').dataTable().fnClearTable(true);           
-                        jQuery('#htmlgrid').dataTable().fnAddData(JSON.parse(result));
-                        jQuery('#htmlgrid').dataTable()._fnInitComplete();
-
-                        blockModal(0);
+                        reloadTable();
                     },
                     error: function() {
                         blockModal(0);

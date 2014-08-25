@@ -24,6 +24,9 @@ legend {text-align: center; width: 99%; margin-bottom: 10px; }
 table.gridConciliacao { border-collapse: collapse; border: 1px solid #E5E5E5; align:center }
 table.gridConciliacao td, table.gridConciliacao th { padding: 5px; border: 1px solid #E5E5E5; text-align: center; font-size: 12px; }
 td#editar, td#duplicar { text-align:center; }
+table.gridConciliacao thead{
+  background: url('../images/bg_table_head.png') #87cd74 repeat-x !important;   
+}
 table.gridConciliacao th { text-align: left; 
     background-image : -webkit-linear-gradient(top, #87cd74, #64bc4c);
     background-image : -moz-linear-gradient(top, #87cd74, #64bc4c);
@@ -40,7 +43,9 @@ table.gridConciliacao th { text-align: left;
 
 table.gridAbandoned { border-collapse: collapse; border: 1px solid #E5E5E5; align:center }
 table.gridAbandoned td, table.gridAbandoned th { padding: 5px; border: 1px solid #E5E5E5; text-align: center; font-size: 12px;}
-
+table.gridAbandoned thead{
+  background: url('../images/bg_table_head.png') #87cd74 repeat-x !important;   
+}
 table.gridAbandoned thead th { text-align: left; 
     background-image : -webkit-linear-gradient(top, #87cd74, #64bc4c);
     background-image : -moz-linear-gradient(top, #87cd74, #64bc4c);

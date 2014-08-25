@@ -683,26 +683,11 @@ class PagSeguroConciliation
     public function updateStatus($id, $new_status)
     {
 
-        if ($this->verifyVersion() === false) {
-            $query = 'UPDATE `'._DB_PREFIX_.'order_history` oh
-                             SET oh.`id_order_state` = '.$new_status.'
-                             WHERE oh.`id_order` = '.$id.'';
-
-            Db::getInstance()->executeS($query);
-
-            $query = 'UPDATE `'._DB_PREFIX_.'orders` oh
-                             SET oh.`current_state` = '.$new_status.'
-                             WHERE oh.`id_order` = '.$id.'';
-
-            Db::getInstance()->executeS($query);
-
-        } else {
-            $query = 'UPDATE `'._DB_PREFIX_.'order_history` oh
-                             SET oh.`id_order_state` = '.$new_status.'
-                             WHERE oh.`id_order` = '.$id.'';
-
-            Db::getInstance()->executeS($query);
-        }
+        	$objOrder = new Order($id); //order with id=1
+            $history = new OrderHistory();
+            $history->id_order = (int)$objOrder->id;
+            $history->changeIdOrderState($new_status, (int)($objOrder->id));
+            $history->addWithemail();
 
     }
 

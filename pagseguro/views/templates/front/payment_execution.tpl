@@ -56,7 +56,7 @@ function checkout()
     });
 }
 function redirecToPageError(){
-    window.location.href = baseDir + 'modules/pagseguro/controllers/front/error.php';
+    window.location.href = baseDir + "{$errurl|escape:none}";
 }
 </script>
 

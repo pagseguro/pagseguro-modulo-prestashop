@@ -28,7 +28,6 @@ include_once dirname(__FILE__).'/../../../../config/config.inc.php';
 include_once dirname(__FILE__).'/../../../../init.php';
 include_once dirname(__FILE__).'/../../pagseguro.php';
 include_once dirname(__FILE__).'/../../backward_compatibility/backward.php';
-include_once dirname(__FILE__).'/../../features/payment/pagseguropaymentorderprestashop.php';
 
 $useSSL = true;
 
@@ -36,18 +35,5 @@ $showView = new BWDisplay();
 
 $context = Context::getContext();
 
-if (! $context->cookie->isLogged(true)) {
-    Tools::redirect('authentication.php?back=order.php');
-}
-
-$payment = new PagSeguroPaymentOrderPrestashop();
-$payment->setVariablesPaymentExecutionView();
-
-$environment = PagSeguroConfig::getEnvironment();
-$context->smarty->assign('environment', $environment);
-
-$url = "modules/pagseguro/standard/front/error.php";
-$context->smarty->assign('errurl', $url);
-
-$showView->setTemplate(_PS_MODULE_DIR_.'pagseguro/views/templates/front/payment_execution.tpl');
+$showView->setTemplate(_PS_MODULE_DIR_.'pagseguro/views/templates/front/error.tpl');
 $showView->run();

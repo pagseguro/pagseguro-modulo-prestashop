@@ -25,13 +25,16 @@ legend {text-align: center; width: 99%; margin-bottom: 10px;}
 table.gridConciliacao { border-collapse: collapse; border: 1px solid #E5E5E5; align:center }
 table.gridConciliacao td, table.gridConciliacao th { padding: 5px; border: 1px solid #E5E5E5; text-align: center; font-size: 12px; }
 td#editar, td#duplicar { text-align:center; }
+table.gridConciliacao thead{
+  background: url('../images/bg_table_head.png') #87cd74 repeat-x !important;   
+}
 table.gridConciliacao th { text-align: left;
   background-image : -webkit-linear-gradient(top, #87cd74, #64bc4c);
   background-image : -moz-linear-gradient(top, #87cd74, #64bc4c);
   background-image : -o-linear-gradient(top, #87cd74, #64bc4c);
   background-image : -ms-linear-gradient(top, #87cd74, #64bc4c);
-  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#87cd74', endColorstr='#64bc4c'); /*** IE6 & IE7 */
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#87cd74', endColorstr='#64bc4c')"; /*** IE8 */
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#87cd74', endColorstr='#64bc4c')!important; /*** IE6 & IE7 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#87cd74', endColorstr='#64bc4c')"!important; /*** IE8 */
   background-position: center right;
   background-repeat: no-repeat;
   cursor: pointer;
@@ -41,14 +44,16 @@ table.gridConciliacao th { text-align: left;
 
 table.gridAbandoned { border-collapse: collapse; border: 1px solid #E5E5E5; align:center }
 table.gridAbandoned td, table.gridAbandoned th { padding: 5px; border: 1px solid #E5E5E5; text-align: center; font-size: 12px;}
-
+table.gridAbandoned thead{
+  background: url('../images/bg_table_head.png') #87cd74 repeat-x !important;   
+}
 table.gridAbandoned thead th { text-align: left; 
     background-image : -webkit-linear-gradient(top, #87cd74, #64bc4c);
     background-image : -moz-linear-gradient(top, #87cd74, #64bc4c);
     background-image : -o-linear-gradient(top, #87cd74, #64bc4c);
     background-image : -ms-linear-gradient(top, #87cd74, #64bc4c);
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#87cd74', endColorstr='#64bc4c'); /*** IE6 & IE7 */
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#87cd74', endColorstr='#64bc4c')"; /*** IE8 */
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#87cd74', endColorstr='#64bc4c')!important; /*** IE6 & IE7 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#87cd74', endColorstr='#64bc4c')"!important; /*** IE8 */
     background-position: center right;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -438,7 +443,7 @@ h2, .psplugin > h1 span { border: medium none; color: #5B9028; font-family: "Cor
   
 }
 @media screen and (-webkit-min-device-pixel-ratio:0) { 
-	#pSalvar input {
+  #pSalvar input {
      height: 33px!important;
   }
 }

@@ -51,6 +51,9 @@ class PagSeguroPaymentModuleFrontController extends ModuleFrontController
         if (version_compare(_PS_VERSION_, '1.5.0.1', '>='))
         	$this->context->smarty->assign('width_center_column', '100%');
         
+        $url = "index.php?fc=module&module=pagseguro&controller=error";
+        $this->context->smarty->assign('errurl', $url);
+        
         $this->setTemplate('payment_execution.tpl');
     }
 }

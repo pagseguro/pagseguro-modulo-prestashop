@@ -42,11 +42,14 @@ try {
     }
     Tools::redirectLink($validate->request($checkout));
 } catch (PagSeguroServiceException $exc) {
+	
     canceledOrderForErro($pag_seguro);
-    displayErroPage();
-} catch (Exception $e) {
-    displayErroPage();
-}
+    
+    if ($checkout)    
+        throw new Exception($exc->getMessage(), 1);
+    else
+        displayErroPage();
+} 
     
 function displayErroPage()
 {

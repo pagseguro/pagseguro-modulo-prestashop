@@ -52,8 +52,6 @@ armazenadas em seu sistema com o PagSeguro.</small></p>
 			    <div class="row">
 					<div class="col-md-12">
 
-                        <input type="hidden" value="1" id="pagseguro_dias_hidden" />
-
 					    <select id='pagseguro_dias_btn' name='pagseguro_dias' class='select'>
 					        {$dias|escape:'none'}
 					    </select>
