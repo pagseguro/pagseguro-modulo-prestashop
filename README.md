@@ -1,5 +1,5 @@
-Módulo de integração PagSeguro para PrestaShop 1.4 e 1.5
-========================================================
+Módulo de integração PagSeguro para PrestaShop 1.4, 1.5 e 1.6
+=============================================================
 ---
 Descrição
 ---------
@@ -13,7 +13,7 @@ Com o módulo instalado e configurado, você pode pode oferecer o PagSeguro como
 Requisitos
 ----------
 ---
- - [PrestaShop] 1.4.5.1 a 1.5.6.0
+ - [PrestaShop] 1.4.5.1 a 1.6.0.9
  - [PHP] 5.3.3+
  - [SPL]
  - [cURL]
@@ -44,13 +44,18 @@ Para acessar e configurar o módulo acesse o menu Módulos -> Modules -> Payment
 
 - **e-mail**: e-mail cadastrado no PagSeguro.
 - **token**: token cadastrado no PagSeguro.
-- **url de redirecionamento**: ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado automaticamente para a página de confirmação em sua loja ou então para a URL que você informar neste campo. Para ativar o redirecionamento ao final do pagamento é preciso ativar o serviço de [Pagamentos via API]. Obs.: Esta URL é informada automaticamente e você só deve alterá-la caso deseje que seus clientes sejam redirecionados para outro local.
-- **url de notificação**: sempre que uma transação mudar de status, o PagSeguro envia uma notificação para sua loja ou para a URL que você informar neste campo. Obs.: Esta URL é informada automaticamente e você só deve alterá-la caso deseje receber as notificações em outro local.
 - **charset**: codificação do seu sistema (ISO-8859-1 ou UTF-8).
 - **checkout**: especifica o modelo de checkout que será utilizado. É possível escolher entre checkout padrão e checkout lightbox.
+- **url de redirecionamento**: ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado automaticamente para a página de confirmação em sua loja ou então para a URL que você informar neste campo. Para ativar o redirecionamento ao final do pagamento é preciso ativar o serviço de [Pagamentos via API]. Obs.: Esta URL é informada automaticamente e você só deve alterá-la caso deseje que seus clientes sejam redirecionados para outro local.
+- **url de notificação**: sempre que uma transação mudar de status, o PagSeguro envia uma notificação para sua loja ou para a URL que você informar neste campo. Obs.: Esta URL é informada automaticamente e você só deve alterá-la caso deseje receber as notificações em outro local.
 - **log**: ativa/desativa a geração de logs.
 - **diretório**: informe o local a partir da raíz de instalação do PrestaShop onde se deseja criar o arquivo de log. Ex.: /logs/ps.log. Caso não informe nada, o log será gravado dentro da pasta ../PagSeguroLibrary/PagSeguro.log.
-
+- **listar transações abandonadas?**: ativa/desativa a pesquisa de transações que foram abandonadas no checkout do PagSeguro.
+- **transações iniciadas há no máximo (dias)**: defina a quantidade máxima de dias em que a transação foi abandonada. Ex.: se você definir 8, então somente as transações abandonadas há até 8 dias, a contar da data da compra, serão exibidas.
+- **conciliação**: retorna todas as transações efetivadas no PagSeguro em um período de até 30 dias anteriores a data em que a consulta for realizada. A pesquisa retornará um comparativo com o status das transações em sua base local e o status atual da transação no PagSeguro, desta forma você pode identificar e atualizar transações com status divergentes.
+- **dias**: número de dias que devem ser considerados para a pesquisa de conciliação.
+- **abandonadas** retorna uma lista com todas as transações que não foram efetivadas em um determinado espaço de tempo (ver *transações iniciadas há no máximo (dias)*). Ao ativar esta funcionalidade você pode disparar e-mail's de recuperação de venda. O e-mail conterá um link que redirecionará o comprador para o fluxo de pagamento, exatamente no ponto onde ele parou.
+- **requisitos**: exibe se os pré-requisitos básicos para o correto funcionamento do módulo estão sendo atendidos
 
 Dúvidas?
 ----------
