@@ -494,10 +494,7 @@ class PagSeguro extends PaymentModule
     {
         return sprintf(
             $this->l(
-                'Verifique se a moeda REAL esta instalada e ativada.
-                Para importar a moeda vá em Localização e importe "Brazil" no Pacote de Localização, 
-                após isso, vá em localização, moedas, e habilite o REAL.<br>
-                O PagSeguro aceita apenas BRL (Real) como moeda de pagamento.'
+                'Verifique se a moeda REAL esta instalada e ativada.'
             )
         );
     }
