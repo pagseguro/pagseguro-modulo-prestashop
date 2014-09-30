@@ -72,6 +72,7 @@ Changelog
 - Mudanças no layout do painel de configuração.
 - Possibilidade de consultar transações no PagSeguro para conciliar os status com a base local.
 - Adicionado opção para visualização de transações abandonadas, permitindo o envio de email com um link para que o comprador possa continuar o processo de compra de onde ele parou.
+- Ajustes em geral.
 
 1.7
 
