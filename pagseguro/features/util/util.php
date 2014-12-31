@@ -30,8 +30,8 @@ class Util
 {
 
     private static $charset_options = array(
-        '1' => 'ISO-8859-1',
-        '2' => 'UTF-8'
+        '2' => 'UTF-8',
+        '1' => 'ISO-8859-1'
     );
 
     private static $active = array(
@@ -44,20 +44,10 @@ class Util
         '1' => 'LIGHTBOX'
     );
 
-    private static $order_status = array(
-        'INITIATED' => 'Iniciado',
-        'WAITING_PAYMENT' => 'Aguardando pagamento',
-        'IN_ANALYSIS' => 'Em análise',
-        'PAID' => 'Paga',
-        'AVAILABLE' => 'Disponível',
-        'IN_DISPUTE' => 'Em disputa',
-        'REFUNDED' => 'Devolvida',
-        'CANCELLED' => 'Cancelada'
-    );
-
     private static $order_status_pagseguro = array(
         'INITIATED' => array(
             'name' => 'Iniciado',
+            'id' => 0,
             'send_email' => false,
             'template' => '',
             'hidden' => true,
@@ -70,6 +60,7 @@ class Util
         ),
         'WAITING_PAYMENT' => array(
             'name' => 'Aguardando pagamento',
+            'id' => 1,
             'send_email' => true,
             'template' => 'awaiting_payment',
             'hidden' => false,
@@ -82,6 +73,7 @@ class Util
         ),
         'IN_ANALYSIS' => array(
             'name' => 'Em análise',
+            'id' => 2,
             'send_email' => true,
             'template' => 'in_analysis',
             'hidden' => false,
@@ -94,6 +86,7 @@ class Util
         ),
         'PAID' => array(
             'name' => 'Paga',
+            'id' => 3,
             'send_email' => true,
             'template' => 'payment',
             'hidden' => false,
@@ -106,6 +99,7 @@ class Util
         ),
         'AVAILABLE' => array(
             'name' => 'Disponível',
+            'id' => 4,
             'send_email' => false,
             'template' => '',
             'hidden' => true,
@@ -118,6 +112,7 @@ class Util
         ),
         'IN_DISPUTE' => array(
             'name' => 'Em disputa',
+            'id' => 5,
             'send_email' => false,
             'template' => '',
             'hidden' => true,
@@ -130,6 +125,7 @@ class Util
         ),
         'REFUNDED' => array(
             'name' => 'Devolvida',
+            'id' => 6,
             'send_email' => true,
             'template' => 'refund',
             'hidden' => false,
@@ -142,6 +138,7 @@ class Util
         ),
         'CANCELLED' => array(
             'name' => 'Cancelada',
+            'id' => 7,
             'send_email' => true,
             'template' => 'order_canceled',
             'hidden' => false,
@@ -169,39 +166,24 @@ class Util
         'PS_OS_WS_PAYMENT' => 12
     );
     
-    private static $array_st_cms = array(
-        0 => 'Iniciado',
-        1 => 'Aguardando pagamento',
-        2 => 'Em análise',
-        3 => 'Paga',
-        4 => 'Disponível',
-        5 => 'Em disputa',
-        6 => 'Devolvida',
-        7 => 'Cancelada'
-    );
+    private static $days_recovery = array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
     
-    private static $days_recovery = array(
-        1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5,
-        6 => 6, 7 => 7, 8 => 8, 9 => 9, 10=> 10
-    );
+    private static $days_search = array(5,  10, 15, 20, 25, 30);
     
-    private static $days_search = array(
-        0 => 5,  1 => 10, 2 => 15,
-        3 => 20, 4 => 25, 5 => 30
-    );
-    
-    public static function getStatusCMS($id_status)
-    {
-        return self::$array_st_cms[$id_status];
+    public static function getPagSeguroStatusName($idStatus) {
+        foreach (self::$order_status_pagseguro as $key => $value) {
+            if ( $idStatus == $value['id'] ) {
+                return $value['name'];
+            }
+        }
+        return null;
     }
     
-    public static function getDaysSearch()
-    {
+    public static function getDaysSearch() {
         return self::$days_search;
     }
     
-    public static function getDaysRecovery()
-    {
+    public static function getDaysRecovery() {
         return self::$days_recovery;
     }
     
@@ -218,11 +200,6 @@ class Util
     public static function getTypeCheckout()
     {
         return self::$type_checkout;
-    }
-
-    public static function getOrderStatus()
-    {
-        return self::$order_status;
     }
 
     public static function getCustomOrderStatusPagSeguro()
@@ -412,13 +389,5 @@ class Util
         }
     }
     
-    public static function createAddOrderHistory($idOrder, $status)
-    {
-        $order_history = new OrderHistory();
-        $order_history->id_order = $idOrder;
-        $order_history->changeIdOrderState($status, $idOrder);
-        $order_history->addWithemail();
-    
-        return true;
-    }
+
 }

@@ -46,7 +46,7 @@ function checkout()
                     window.location.href = json.redirect;
                 },
                 abort: function(){
-                	window.location.href = json.urlCompleta;
+                	// window.location.href = json.urlCompleta;
                 }
             });
         },

@@ -1,5 +1,5 @@
-/**
-* 2007-2014 PrestaShop
+{*
+* 2007-2014 PrestaShop 
 *
 * NOTICE OF LICENSE
 *
@@ -19,33 +19,16 @@
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
 *  @copyright 2007-2014 PrestaShop SA
+*  @version  Release: $Revision: 6594 $
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
-*/
+*}
 
-$().ready(function(){
-    pagseguro_config.constructor();
-});
+<h2 class="title" title="Requisitos">Requisitos</h2>
+<ul class="pagseguro-list">
+    {foreach from=$requirements item=requirement}
+    	
+   		<li {if !$requirement[0]} class="pagseguro-list-item-error" {/if} >{$requirement[1]|escape:'none'}</li>
 
-var pagseguro_config = ({
-    
-    constructor : function(){
-        pagseguro_config.initBinds();
-        pagseguro_config.initialVerification();
-    },
-    
-    initBinds : function(){
-        $('select#pagseguro_log').bind('change', function(){
-            if ($(this).val() == '1')
-                $('table tr#logDir').show();
-            else 
-                $('table tr#logDir').hide();
-        });
-    },
-    
-    initialVerification : function(){
-        $('select#pagseguro_log').change();
-    }
-
-});
-
+    {/foreach}
+</ul>

@@ -115,15 +115,23 @@ class PagSeguroNotificationOrderPrestashop
         (int) $this->obj_transaction->getStatus()->getValue() : null;
 
         if ($this->isNotNull($id_status)) {
-            $id_st_transaction = (int) $this->returnIdOrderByStatusPagSeguro(Util::getStatusCMS($id_status));
+            $id_st_transaction = (int) $this->returnIdOrderByStatusPagSeguro(Util::getPagSeguroStatusName($id_status));
         }
 
         if ($this->isNotNull($id_st_transaction)) {
-            Util::createAddOrderHistory((int)$this->reference, $id_st_transaction);
+            $this->addOrderHistory((int)$this->reference, $id_st_transaction);
         }
 
         $this->saveTransactionId($this->obj_transaction->getCode(), $this->decryptId($this->obj_transaction->getReference()));
     }
+
+    private function addOrderHistory($idOrder, $status) {
+        $order_history = new OrderHistory();
+        $order_history->id_order = $idOrder;
+        $order_history->changeIdOrderState($status, $idOrder);
+        $order_history->addWithemail();
+        return true;
+    }    
 
     private function returnIdOrderByStatusPagSeguro($value)
     {
@@ -164,7 +172,7 @@ class PagSeguroNotificationOrderPrestashop
         $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'pagseguro_order` (`id_transaction`, `id_order`)
                 VALUES (\'' . pSQL($transaction) . '\', \'' . (int) $id_order . '\')';
 
-        if (! Db::getInstance(_PS_USE_SQL_SLAVE_)->Execute($sql)) {
+        if (! Db::getInstance()->Execute($sql)) {
             die(Tools::displayError('Error when updating Transaction Code from PagSeguro in database'));
         }
     }
@@ -176,7 +184,7 @@ class PagSeguroNotificationOrderPrestashop
         `id_order` = \'' . (int) $id_order . '\'
         WHERE `id` = \'' . (int) $pagseguro_order . '\';';
 
-        if (! Db::getInstance(_PS_USE_SQL_SLAVE_)->Execute($sql)) {
+        if (! Db::getInstance()->Execute($sql)) {
             die(Tools::displayError('Error when updating Transaction Code from PagSeguro in database'));
         }
     }
@@ -195,6 +203,8 @@ class PagSeguroNotificationOrderPrestashop
             "PagSeguroService.Notification( 'Erro ao processar notificação. ErrorMessage: ".$e." ') - end"
         );
     }
+
+
     
     /****
      *
@@ -206,4 +216,5 @@ class PagSeguroNotificationOrderPrestashop
     {
     	return Tools::substr($reference, 5);
     }
+
 }

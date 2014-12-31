@@ -24,12 +24,25 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+include_once dirname(__FILE__) . '/../../../../config/config.inc.php';
 
-header("Cache-Control: no-store, no-cache, must-revalidate");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
+Class PagSeguroModuleAuthTools {
 
-header("Location: ../");
-exit();
+	public static function adminLogged() {
+
+		$logged = false;
+
+		if (version_compare(_PS_VERSION_, '1.6.0.9', ">=")) {
+		
+			$cookie = new Cookie('psAdmin');
+			$logged = (boolean)$cookie->id_employee;
+
+		} else {
+			return true;
+		}
+
+		return $logged;
+		
+	}
+
+}

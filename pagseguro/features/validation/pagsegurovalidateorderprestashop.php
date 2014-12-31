@@ -95,8 +95,8 @@ class PagSeguroValidateOrderPrestashop
         }
     }
 
-    private function validateOrder()
-    {
+    private function validateOrder() {
+        
         $customer = new Customer($this->context->cart->id_customer);
         
         if (! Validate::isLoadedObject($customer)) {
@@ -114,12 +114,24 @@ class PagSeguroValidateOrderPrestashop
             false,
             $customer->secure_key
         );
-        
+
+        $this->createPagSeguroOrder($this->module->currentOrder);
+
         return array(
             'id_cart' => (int) $this->context->cart->id,
             'id_module' => $this->module->id,
-            'id_order' =>$this->module->currentOrder,
+            'id_order' => $this->module->currentOrder,
             'key' => $customer->secure_key
         );
+        
     }
+
+
+    private function createPagSeguroOrder($id_order) {
+        $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'pagseguro_order` (`id_order`) VALUES ('.(int)$id_order.');';
+        if (! Db::getInstance()->Execute($sql)) {
+            die(Tools::displayError('Error when create PagSeguro Order on checkout'));
+        }
+    }
+
 }
