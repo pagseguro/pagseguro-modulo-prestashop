@@ -33,6 +33,9 @@
 function checkout()
 {
     var url = "{$action_url|escape}";
+    if (location.protocol === 'https:') {
+        url = url.replace("http", "https");
+    }
     url = url.replace("&amp;","&");
     url = url.replace("&amp;","&");
     var query = $.ajax({
