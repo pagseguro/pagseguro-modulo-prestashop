@@ -43,8 +43,8 @@
 		<div id="tabList">
 			<div class="tabItem selected">
 				<h2>cUrl.</h2>
-				<p><small>Ops! Ocorreu um erro.</small></p>
-				<div class="module_error error">CURL can't connect: {$err|escape:'none'}</div>
+				<p><small>{l s='Ops! Ocorreu um erro.' mod='pagseguro'}</small></p>
+				<div class="module_error error">{l s='CURL can't connect:' mod='pagseguro'} {$err|escape:'none'}</div>
 			</div>
 		</div>
 	</form>

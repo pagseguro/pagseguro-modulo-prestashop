@@ -24,7 +24,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-<h2 class="title" title="Transações Abandonadas">Transações Abandonadas</h2>
+<h2 class="title" title="{$pageTitle}">{$pageTitle}</h2>
 
 <input type="hidden" id="adminToken" value="{$adminToken|escape}" />
 <input type="hidden" id="urlAdminOrder" value="{$urlAdminOrder|escape}" />
@@ -52,10 +52,10 @@
             <select class="pagseguro-field" id="pagseguro-daystorecovery-input">
                 {html_options values=$daysToRecoveryKeys output=$daysToRecoveryValues selected=1}
             </select>
-            <span>&nbsp;últimos dias</span>
+            <span>&nbsp;{l s='últimos dias' mod='pagseguro'}</span>
 
             <div class="right-tools">
-                Recuperação de carrinho:&nbsp;
+                {l s='Recuperação de carrinho' mod='pagseguro'}:&nbsp;
                 <button disabled="disabled" class="pagseguro-button" id="send-email-button">
                     {l s='Enviar e-mail' mod='pagseguro'}
                 </button>
@@ -67,11 +67,11 @@
             <thead>
                 <tr>
                     <th class="col-md-0"><input type="checkbox" class="select-all"></th>
-                    <th class="col-md-1">Data do Pedido</th>
-                    <th class="col-md-2">ID PrestaShop</th>
-                    <th class="col-md-3">Validade do link</th>
-                    <th class="col-md-4">E-mails enviados</th>
-                    <th class="col-md-5">Pedido</th>
+                    <th class="col-md-1">{l s='Data do Pedido' mod='pagseguro'}</th>
+                    <th class="col-md-2">{l s='ID PrestaShop' mod='pagseguro'}</th>
+                    <th class="col-md-3">{l s='Validade do link' mod='pagseguro'}</th>
+                    <th class="col-md-4">{l s='E-mails enviados' mod='pagseguro'}</th>
+                    <th class="col-md-5">{l s='Pedido' mod='pagseguro'}</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -80,7 +80,7 @@
     {else}
         
         <div class="pagseguro-msg pagseguro-msg-alert pagseguro-msg-small">
-            <p>Ative a opção "listar transações abandonadas".</p>
+            <p>{l s='Ative a opção "listar transações abandonadas"' mod='pagseguro'}.</p>
         </div>
 
     {/if}
@@ -88,7 +88,7 @@
 {else}
     
     <div class="pagseguro-msg pagseguro-msg-alert pagseguro-msg-small">
-        <p>Para visualizar as transações abandonadas é necessário configurar suas <span class="link pagseguro-goto-configuration">credenciais do PagSeguro</span>.</p>
+        <p>{l s='Para visualizar as transações abandonadas é necessário configurar suas' mod='pagseguro'} <span class="link pagseguro-goto-configuration">{l s='credenciais do PagSeguro' mod='pagseguro'}</span>.</p>
     </div>
 
 {/if}

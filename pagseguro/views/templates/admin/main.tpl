@@ -35,7 +35,7 @@
 			
 			<div id="pagseguro-logo">
 				<img src="{$module_dir|escape:'none'}assets/images/logo-180x41.gif" />
-				<div id="pagseguro-module-version">Versão {$moduleVersion}</div>
+				<div id="pagseguro-module-version">{l s='Versão' mod='pagseguro'} {$moduleVersion}</div>
 			</div>
 		    
 		    <a id="pagseguro-registration-button" class="pagseguro-button gray-theme" href="https://pagseguro.uol.com.br/registration/registration.jhtml?ep=5&tipo=cadastro#!vendedor" target="_blank">{l s='Faça seu cadastro' mod='pagseguro'}</a>
@@ -64,8 +64,8 @@
 			    </ul>
 
 		    	<div id="pagseguro-save-wrapper">
-		    		<p>Clique no botão abaixo para salvar suas configurações.</p>
-		    		<button id="pagseguro-save-button" class="pagseguro-button gray-theme" type="button">Salvar Configuração</button>
+		    		<p>{l s='Clique no botão abaixo para salvar suas configurações.' mod='pagseguro'}</p>
+		    		<button id="pagseguro-save-button" class="pagseguro-button gray-theme" type="button">{l s='Salvar Configuração' mod='pagseguro'}</button>
 		    	</div>
 
 			</div>
@@ -77,7 +77,7 @@
 					    
 						{if isset($success)}
 							<div class="pagseguro-msg pagseguro-msg-success pagseguro-msg-small">
-								<p>Dados atualizados com sucesso.</p>
+								<p>{l s='Dados atualizados com sucesso' mod='pagseguro'}.</p>
 							</div>
 						{/if}
 
@@ -100,6 +100,36 @@
 
 </div>
 
+<script type="text/javascript">
+	var PrestaShopPagSeguroModuleTexts = {
+		
+		general: {
+			wait: "{l s='Aguarde...' mod='pagseguro'}",
+			selectItem: "{l s='Selecione ao menos um item.' mod='pagseguro'}",
+			search: "{l s='Realize uma pesquisa.' mod='pagseguro'}",
+			next:"{l s='Próximo' mod='pagseguro'}",
+			last: "{l s='Último' mod='pagseguro'}",
+			first: "{l s='Primeiro' mod='pagseguro'}",
+			previous: "{l s='Anterior' mod='pagseguro'}",
+			seeDetails: "{l s='Ver&nbsp;detalhes' mod='pagseguro'}"
+		},
+
+		conciliation: {
+			empty: "{l s='Não há transações para conciliação no período.' mod='pagseguro'}",
+			serviceError: "{l s='Não foi possível obter os dados de conciliação.' mod='pagseguro'}",
+			fail: "{l s='Não foi possível realizar a conciliação.' mod='pagseguro'}",
+			success: "{l s='Conciliação realizada com sucesso.' mod='pagseguro'}"
+		},
+
+		abandoned: {
+			empty: "{l s='Não há transações abandonadas no período.' mod='pagseguro'}",
+			fail: "{l s='Não foi possível obter os dados de transações abandonadas.' mod='pagseguro'}",
+			sendMailError: "{l s='Não foi possível enviar o(s) e-mail(s).' mod='pagseguro'}",
+			sendMailSuccess:"{l s='E-mail(s) enviado(s) com sucesso.' mod='pagseguro'}"
+		}
+
+	};
+</script>
 <script type="text/javascript" src="{$module_dir|escape:'none'}assets/js/jquery.min.js"></script>
 <script type="text/javascript" src="{$module_dir|escape:'none'}assets/js/jquery.colorbox-min.js"></script>
 <script type="text/javascript" src="{$module_dir|escape:'none'}assets/js/jquery-1102.min.js"></script>

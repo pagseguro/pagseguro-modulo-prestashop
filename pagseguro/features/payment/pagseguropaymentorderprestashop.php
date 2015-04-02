@@ -71,7 +71,7 @@ class PagSeguroPaymentOrderPrestashop
         } else {
             $center_column = '535px';
         }
-        
+
         $this->context->smarty->assign(
             array(
                 'version' => _PS_VERSION_,

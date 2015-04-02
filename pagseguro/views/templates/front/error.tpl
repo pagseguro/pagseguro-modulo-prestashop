@@ -40,10 +40,10 @@
 {assign var='current_step' value='payment'}
 {include file="$tpl_dir./order-steps.tpl"}
 
-<h3>Ocorreu um erro, durante a compra.</h3>
+<h3>{l s='Ocorreu um erro, durante a compra.' mod='pagseguro'}</h3>
 <p>
-    Desculpe, infelizmente ocorreu um erro durante a finaliza&ccedil;&atilde;o da compra.
-    Por favor entre em contato com o administrador da loja se o problema persistir.
+	{l s='Desculpe, infelizmente ocorreu um erro durante a finaliza&ccedil;&atilde;o da compra.
+    Por favor entre em contato com o administrador da loja se o problema persistir.' mod='pagseguro'}
 </p>
 
 <p>

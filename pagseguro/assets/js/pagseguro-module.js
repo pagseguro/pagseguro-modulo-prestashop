@@ -1,5 +1,6 @@
 var PrestaShopPagSeguroModule = new function() {
 
+    var Texts = PrestaShopPagSeguroModuleTexts;
 
     var General = new function() {
 
@@ -91,7 +92,7 @@ var PrestaShopPagSeguroModule = new function() {
                 id: 'pagseguro-loading-message',
                 type: 'loading',
                 size: 'medium',
-                message: 'Aguarde...',
+                message: Texts.general.wait,
                 tag: 'h3'
             });
             Messages.remove();
@@ -403,7 +404,7 @@ var PrestaShopPagSeguroModule = new function() {
                     var transaction  = data[i];
                     var params       = 'reference='+transaction.orderId+'&amp;status='+transaction.pagSeguroStatusId;
                     var orderUrl     = (AdminData.url + '&amp;id_order=' + transaction.orderId + '&amp;vieworder&amp;token='+AdminData.token);
-                    var orderLink    = '<a class="link" target="_blank" href="'+orderUrl+'"><i class="icon-external-link"></i>&nbsp;Ver&nbsp;detalhes</span>';
+                    var orderLink    = '<a class="link" target="_blank" href="'+orderUrl+'"><i class="icon-external-link"></i>&nbsp;'+Texts.general.seeDetails+'</span>';
                     var checkbox     = '<input name="conciliationTransactions[]" type="checkbox" class="conciliation-transaction" value="'+params+'" id="conciliation-transaction-'+i+'">';
                     
                     result[i] = [
@@ -427,7 +428,7 @@ var PrestaShopPagSeguroModule = new function() {
                 }
 
             } else {
-                Modal.message('alert', "Não há transações para conciliação no período.");
+                Modal.message('alert', Texts.conciliation.empty);
             }
 
         };
@@ -446,7 +447,7 @@ var PrestaShopPagSeguroModule = new function() {
                     onSearchSuccess(response.data, callback);
                 },
                 error: function() {
-                    Modal.message('error', "Não foi possível obter os dados de conciliação.");
+                    Modal.message('error', Texts.conciliation.serviceError);
                 }
             });
 
@@ -455,7 +456,7 @@ var PrestaShopPagSeguroModule = new function() {
         var conciliationService = function(params) {
             
             var onError = function(){
-                Modal.message('error', 'Não foi possível realizar a conciliação.');
+                Modal.message('error', Texts.conciliation.fail);
             };
 
             Modal.showLoading();
@@ -466,7 +467,7 @@ var PrestaShopPagSeguroModule = new function() {
                     if (response.success) {
                         
                         searchService(function() {
-                            Modal.message('success', 'Conciliação realizada com sucesso.');
+                            Modal.message('success', Texts.conciliation.success);
                         });
 
                     } else {
@@ -485,7 +486,7 @@ var PrestaShopPagSeguroModule = new function() {
             if (dataSelector.filter(":checked").length > 0) {
                 conciliationService(dataSelector.serialize());
             } else {
-                Messages.addError('Selecione ao menos um item.');
+                Messages.addError(Texts.general.selectItem);
             }
 
         };
@@ -501,12 +502,12 @@ var PrestaShopPagSeguroModule = new function() {
                 pageLength: 10,
 
                 oLanguage: {
-                    sEmptyTable:"Realize uma pesquisa.",
+                    sEmptyTable:Texts.general.search,
                     oPaginate: {
-                        sNext: 'Próximo',
-                        sLast: 'Último',
-                        sFirst: 'Primeiro',
-                        sPrevious: 'Anterior'
+                        sNext: Texts.general.next,
+                        sLast: Texts.general.last,
+                        sFirst: Texts.general.first,
+                        sPrevious: Texts.general.previous
                     }
                 },
 
@@ -617,7 +618,7 @@ var PrestaShopPagSeguroModule = new function() {
 
                     var transaction = transactions[i];
                     var viewUrl     = (AdminData.url + '&amp;id_order=' + transaction.reference + '&amp;vieworder&amp;token='+AdminData.token);
-                    var viewLink    = '<a class="link" target="_blank" href="'+viewUrl+'"><i class="icon-external-link"></i>&nbsp;Ver&nbsp;detalhes</span>';
+                    var viewLink    = '<a class="link" target="_blank" href="'+viewUrl+'"><i class="icon-external-link"></i>&nbsp;'+Texts.general.seeDetails+'</span>';
                     var params      = 'customer='+transaction.customerId+'&amp;reference='+transaction.reference+'&amp;recovery='+transaction.recoveryCode;
                     var checkbox    = '<input name="abandonedTransactions[]" type="checkbox" class="abandoned-transaction" value="'+params+'" id="abandoned-transaction-'+i+'">';
                     
@@ -641,7 +642,7 @@ var PrestaShopPagSeguroModule = new function() {
                 }
 
             } else {
-                Modal.message('alert', "Não há transações abandonadas no período.");
+                Modal.message('alert', Texts.abandoned.empty);
             }
 
         };
@@ -662,7 +663,7 @@ var PrestaShopPagSeguroModule = new function() {
                     onRequestTransactions(response.transactions, callback);
                 },
                 error: function() {
-                    Modal.message('error', "Não foi possível obter os dados de transações abandonadas.");
+                    Modal.message('error', Texts.abandoned.fail);
                 }
             });
 
@@ -671,7 +672,7 @@ var PrestaShopPagSeguroModule = new function() {
         var sendMailRequest = function(params) {
             
             var onError = function(){
-                Modal.message('error', 'Não foi possível enviar o(s) e-mail(s).');
+                Modal.message('error', Texts.abandoned.sendMailError);
             };
 
             Modal.showLoading();
@@ -690,7 +691,7 @@ var PrestaShopPagSeguroModule = new function() {
                         currentPage = (transactionsTable.api().page.info().page);
 
                         requestTransactions(function(table) {
-                            Modal.message('success', 'E-mail(s) enviado(s) com sucesso.');
+                            Modal.message('success', Texts.abandoned.sendMailSuccess);
                             transactionsTable.fnPageChange(currentPage);
                         });
 
@@ -728,12 +729,12 @@ var PrestaShopPagSeguroModule = new function() {
                 pageLength: 10,
 
                 oLanguage: {
-                    sEmptyTable:"Realize uma pesquisa.",
+                    sEmptyTable: Texts.general.search,
                     oPaginate: {
-                        sNext: 'Próximo',
-                        sLast: 'Último',
-                        sFirst: 'Primeiro',
-                        sPrevious: 'Anterior'
+                        sNext: Texts.general.next,
+                        sLast: Texts.general.last,
+                        sFirst: Texts.general.first,
+                        sPrevious: Texts.general.previous
                     }
                 },
 
@@ -831,4 +832,3 @@ var PrestaShopPagSeguroModule = new function() {
 
 
 };
-

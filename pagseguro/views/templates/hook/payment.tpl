@@ -23,8 +23,7 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-
-{if $version eq false}
+{if $hasBootstrap}
 <div class="row">
 	<div class="col-xs-12 col-md-6">
 		<p class="payment_module">
@@ -36,9 +35,9 @@
 </div>
 {else}
 <p class="payment_module">
-    <a href="{$action_url|escape}" title="{l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}">
+    <a style="" href="{$action_url|escape}" title="{l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}">
         <img src="{$image|escape}" alt="{l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}" />
-            {l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}
+        <span style="display:inline-block;margin:18px 0 0 10px;">{l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}</span>
     </a>
 </p> 
 {/if}
