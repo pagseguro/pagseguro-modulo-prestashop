@@ -68,6 +68,12 @@ Changelog
 ---------
 ---
 
+2.0
+
+- Não exibir botão de pagamento quando não houver email/token.
+- Tradução enUS.
+- Alinhamento de imagem na confirmação de pagamento nas versões 1.5.x.
+
 1.9
 
 - Mudanças no layout do painel de configuração.
