@@ -1,10 +1,13 @@
 language: php
 php:
-  - "5.4"
-  - "5.3"
-  - "5.2"
+- '5.4'
+- '5.3'
+- '5.2'
 before_script:
-  - pear install --alldeps pear/PHP_CodeSniffer
-  - phpenv rehash
+- pear install --alldeps pear/PHP_CodeSniffer
+- phpenv rehash
 script:
-  - phpcs --extensions=php -p --standard=PSR2 ./
+- phpcs --extensions=php -p --standard=PSR2 ./
+notifications:
+  slack:
+    secure: KPPdTe3MJdhLiFs5cYJ1RgicH6obfBoH6hEjopglavrFobPNCES9fpiRNb+ZRXlOoC/o9M/ywI8SgwFydK+z0yIkmLh/D2U3LsrGvNFGk7wzeLkNfRCzHZu6w87xXtV0c2Gw7meYmrN7gafA3PXjqczsgx3k7Jnm1TQwYLUNDUg=
