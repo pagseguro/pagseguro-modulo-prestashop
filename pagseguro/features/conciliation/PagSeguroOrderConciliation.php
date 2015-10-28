@@ -1,6 +1,4 @@
 <?php
-
-
 /**
  * 2007-2014 [PagSeguro Internet Ltda.]
  *
@@ -44,10 +42,10 @@ class PagSeguroOrderConciliation {
 
         foreach ($transactions as $transaction) {
 
-            parse_str($transaction);
-
-            $orderId    = $reference;
-            $statusId   = $status;
+            parse_str($transaction, $output);
+            
+            $orderId    = $output['reference'];
+            $statusId   = $output['status'];
             $statusName = Util::getPagSeguroStatusName($statusId);
 
             $this->logInfo("
@@ -115,7 +113,7 @@ class PagSeguroOrderConciliation {
 
         if ($hasData) {
             
-            $stateIndexName = $this->verifyVersion() ? 'id_order_state' : 'current_state';
+            //$stateIndexName = $this->verifyVersion() ? 'id_order_state' : 'current_state';
 
             foreach ($prestashopList as $order) {
 

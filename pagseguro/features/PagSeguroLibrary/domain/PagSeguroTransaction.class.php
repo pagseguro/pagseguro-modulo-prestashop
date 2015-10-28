@@ -55,6 +55,11 @@ class PagSeguroTransaction
     private $reference;
 
     /***
+     * Recovery code
+     */
+    private $recoveryCode;
+
+    /***
      * Transaction type
      * @see PagSeguroTransactionType
      * @var PagSeguroTransactionType
@@ -83,6 +88,11 @@ class PagSeguroTransaction
     private $paymentMethod;
 
     /***
+     *  Payment Link
+     */
+    private $paymentLink;
+
+    /***
      * Gross amount of the transaction
      */
     private $grossAmount;
@@ -103,6 +113,11 @@ class PagSeguroTransaction
     private $netAmount;
 
     /***
+     * Escrow End Date
+     */
+    private $escrowEndDate;
+
+    /***
      * Extra amount
      */
     private $extraAmount;
@@ -111,6 +126,26 @@ class PagSeguroTransaction
      * Installment count
      */
     private $installmentCount;
+
+    /***
+     * creditorFees amount
+     */
+    private $creditorFees;
+
+    /***
+     * Operational Fee Amount amount
+     */
+    private $operationalFeeAmount;
+
+    /***
+     * Installment Fee Amount amount
+     */
+    private $installmentFeeAmount;
+
+    /***
+     * Item count 
+     */
+    private $itemCount;
 
     /***
      * item/product list in this transaction
@@ -208,6 +243,24 @@ class PagSeguroTransaction
         $this->reference = $reference;
     }
 
+     /***
+     * @return string the recovery code
+     */
+    public function getRecoveryCode()
+    {
+        return $this->recoveryCode;
+    }
+
+    /***
+     * Sets the recovery code
+     *
+     * @param code
+     */
+    public function setRecoveryCode($recoveryCode)
+    {
+        $this->recoveryCode = $recoveryCode;
+    }
+
     /***
      * @return PagSeguroTransactionType the transaction type
      * @see PagSeguroTransactionType
@@ -269,6 +322,23 @@ class PagSeguroTransaction
     public function getPaymentMethod()
     {
         return $this->paymentMethod;
+    }
+
+    /***
+     * Sets the payment link used in this transaction
+     * @param url $paymentLink
+     */
+    public function setPaymentLink($paymentLink)
+    {
+        $this->paymentLink = $paymentLink;
+    }
+
+    /***
+     * @return the payment link method used in this transaction
+     */
+    public function getPaymentLink()
+    {
+        return $this->paymentLink;
     }
 
     /***
@@ -349,6 +419,23 @@ class PagSeguroTransaction
     }
 
     /***
+     * @return date the escrow end date
+     */
+    public function getEscrowEndDate()
+    {
+        return $this->escrowEndDate;
+    }
+
+    /***
+     * Sets the escrow end date
+     * @param date $escrowEndDate
+     */
+    public function setEscrowEndDate($escrowEndDate)
+    {
+        $this->escrowEndDate = $escrowEndDate;
+    }
+
+    /***
      * @return float the extra amount
      */
     public function getExtraAmount()
@@ -380,6 +467,57 @@ class PagSeguroTransaction
     public function setInstallmentCount($installmentCount)
     {
         $this->installmentCount = $installmentCount;
+    }
+
+    /***
+     * Sets the transaction creditorFees
+     * @param float $creditorFees
+     */
+    public function setCreditorFees($creditorFees)
+    {
+        $this->creditorFees = $creditorFees;
+    }
+
+    /***
+     * @return object the transaction creditor fees
+     */
+    public function getCreditorFees()
+    {
+        return $this->creditorFees;
+    }
+
+    /***
+     * Sets the transaction Operational Fee Amount
+     * @param float $operationalFeeAmount
+     */
+    public function setOperationalFeeAmount($operationalFeeAmount)
+    {
+        $this->operationalFeeAmount = $operationalFeeAmount;
+    }
+
+    /***
+     * @return float the transaction operational fee amount
+     */
+    public function getOperationalFeeAmount()
+    {
+        return $this->operationalFeeAmount;
+    }
+
+    /***
+     * Sets the transaction Installment Fee Amount
+     * @param float $installmentFeeAmount
+     */
+    public function setInstallmentFeeAmount($installmentFeeAmount)
+    {
+        $this->installmentFeeAmount = $installmentFeeAmount;
+    }
+
+    /***
+     * @return float the transaction installment fee amount
+     */
+    public function getInstallmentFeeAmount()
+    {
+        return $this->installmentFeeAmount;
     }
 
     /***

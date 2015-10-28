@@ -96,7 +96,6 @@ class PagSeguroServiceException extends Exception
     {
 
         switch ($type = $this->httpStatus->getType()) {
-
             case 'BAD_REQUEST':
             case 'UNAUTHORIZED':
             case 'FORBIDDEN':
@@ -105,11 +104,9 @@ class PagSeguroServiceException extends Exception
             case 'BAD_GATEWAY':
                 $message = $type;
                 break;
-
             default:
                 $message = "UNDEFINED";
                 break;
-
         }
         return $message;
     }

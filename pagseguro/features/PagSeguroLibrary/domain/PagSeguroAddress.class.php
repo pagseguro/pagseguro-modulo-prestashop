@@ -279,10 +279,9 @@ class PagSeguroAddress
     {
 
         if (Tools::strlen($defaultState) == 2) {
-            $upperDefaultState = Tools::strtoupper($defaultState);
             foreach (self::$acronyms as $key => $val) {
-                if ($val == $upperDefaultState) {
-                    return $upperDefaultState;
+                if ($val == Tools::strtoupper($defaultState)) {
+                    return Tools::strtoupper($defaultState);
                 }
             }
             return '';
@@ -291,9 +290,8 @@ class PagSeguroAddress
         $state = utf8_decode($defaultState);
         $state = Tools::strtolower($state);
 
-        $ascii = array();
-
         // Code ASCII of the vowel
+        $ascii = array();
         $ascii['a'] = range(224, 230);
         $ascii['e'] = range(232, 235);
         $ascii['i'] = range(236, 239);
@@ -306,8 +304,8 @@ class PagSeguroAddress
         $ascii['d'] = array(208);
         $ascii['n'] = array(241);
         $ascii['y'] = array(253, 255);
-
-        $change = array();    
+        
+        $change = array();
         foreach ($ascii as $key => $item) {
             $accents = '';
             foreach ($item as $code) {

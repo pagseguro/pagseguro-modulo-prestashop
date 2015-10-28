@@ -1,5 +1,5 @@
 {*
-* 2007-2011 PrestaShop 
+* 2007-2015 PrestaShop 
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2014 PrestaShop SA
+*  @copyright 2007-2015 PrestaShop SA
 *  @version  Release: $Revision: 6594 $
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
@@ -40,12 +40,12 @@
 {assign var='current_step' value='payment'}
 {include file="$tpl_dir./order-steps.tpl"}
 
-<h3>{l s='Ocorreu um erro, durante a compra.' mod='pagseguro'}</h3>
+<h3>Ocorreu um erro, durante a compra.</h3>
 <p>
-	{l s='Desculpe, infelizmente ocorreu um erro durante a finaliza&ccedil;&atilde;o da compra.
-    Por favor entre em contato com o administrador da loja se o problema persistir.' mod='pagseguro'}
+    Desculpe, infelizmente ocorreu um erro durante a finaliza&ccedil;&atilde;o da compra.
+    Por favor entre em contato com o administrador da loja se o problema persistir.
 </p>
 
 <p>
-    <a href="{$base_dir|escape}" class="button_small" title="{l s='Voltar' mod='pagseguro'}">&laquo; {l s='Voltar' mod='pagseguro'}</a>
+    <a href="{$base_dir|escape:'htmlall':'UTF-8'}" class="button_small" title="{l s='Voltar' mod='pagseguro'}">&laquo; {l s='Voltar' mod='pagseguro'}</a>
 </p>

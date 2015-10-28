@@ -57,7 +57,7 @@ class PagSeguroHttpConnection
         $this->response = $response;
     }
 
-    public function post($url, array $data, $timeout = 20, $charset = 'ISO-8859-1')
+    public function post($url, array $data = array(), $timeout = 20, $charset = 'ISO-8859-1')
     {
         return $this->curlConnection('POST', $url, $timeout, $charset, $data);
     }
@@ -117,8 +117,10 @@ class PagSeguroHttpConnection
         $error = curl_errno($curl);
         $errorMessage = curl_error($curl);
         curl_close($curl);
+
         $this->setStatus((int) $info['http_code']);
         $this->setResponse((String) $resp);
+
         if ($error) {
             throw new Exception("CURL can't connect: $errorMessage");
         } else {

@@ -46,8 +46,8 @@ class PagSeguroError
      */
     public function __construct($code, $message)
     {
-        $this->code = $code;
-        $this->message = $message;
+        $this->setCode($code);
+        $this->setMessage($message);
     }
 
     /***

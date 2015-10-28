@@ -2,11 +2,11 @@
 <module>
 	<name>pagseguro</name>
 	<displayName><![CDATA[PagSeguro]]></displayName>
-	<version><![CDATA[2.0]]></version>
-	<description><![CDATA[Get paid by credit card, bank transfer and boleto.]]></description>
+	<version><![CDATA[2.0.0]]></version>
+	<description><![CDATA[Receba pagamentos por cartão de crédito, transferência bancária e boleto]]></description>
 	<author><![CDATA[PagSeguro Internet LTDA.]]></author>
 	<tab><![CDATA[payments_gateways]]></tab>
-	<confirmUninstall><![CDATA[Are you sure you want to remove this module?]]></confirmUninstall>
+	<confirmUninstall><![CDATA[Tem certeza que deseja remover este módulo?]]></confirmUninstall>
 	<is_configurable>1</is_configurable>
 	<need_instance>1</need_instance>
 	<limited_countries></limited_countries>

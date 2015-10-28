@@ -54,6 +54,18 @@ class PagSeguroConnectionData
     /***
      * @var
      */
+    private $baseUrl;
+    /***
+     * @var
+     */
+    private $installmentUrl;
+    /***
+     * @var
+     */
+    private $sessionUrl;
+    /***
+     * @var
+     */
     private $servicePath;
     /***
      * @var
@@ -74,19 +86,26 @@ class PagSeguroConnectionData
         $this->credentials = $credentials;
         $this->serviceName = $serviceName;
 
-        $this->setEnvironment(PagSeguroConfig::getEnvironment());
-        $this->setWebserviceUrl(PagSeguroResources::getWebserviceUrl($this->getEnvironment()));
-        $this->setPaymentUrl(PagSeguroResources::getPaymentUrl($this->getEnvironment()));
-        $this->setCharset(PagSeguroConfig::getApplicationCharset());
+        try {
+            $this->setEnvironment(PagSeguroConfig::getEnvironment());
+            $this->setWebserviceUrl(PagSeguroResources::getWebserviceUrl($this->getEnvironment()));
+            $this->setPaymentUrl(PagSeguroResources::getPaymentUrl($this->getEnvironment()));
+            $this->setBaseUrl(PagSeguroResources::getBaseUrl($this->getEnvironment()));
+            $this->setInstallmentUrl(PagSeguroResources::getInstallmentUrl());
+            $this->setAuthorizationUrl(PagSeguroResources::getAuthorizationUrl());
+            $this->setSessionUrl(PagSeguroResources::getSessionUrl());
+            $this->setCharset(PagSeguroConfig::getApplicationCharset());
 
-        $this->resources = PagSeguroResources::getData($this->serviceName);
-        if (isset($this->resources['servicePath'])) {
-            $this->setServicePath($this->resources['servicePath']);
+            $this->resources = PagSeguroResources::getData($this->serviceName);
+            if (isset($this->resources['servicePath'])) {
+                $this->setServicePath($this->resources['servicePath']);
+            }
+            if (isset($this->resources['serviceTimeout'])) {
+                $this->setServiceTimeout($this->resources['serviceTimeout']);
+            }
+        } catch (Exception $e) {
+            throw $e;
         }
-        if (isset($this->resources['serviceTimeout'])) {
-            $this->setServiceTimeout($this->resources['serviceTimeout']);
-        }
-
     }
 
     /***
@@ -154,7 +173,7 @@ class PagSeguroConnectionData
     }
 
     /***
-     * @param $environment
+     * @param $paymentUrl
      */
     public function setPaymentUrl($paymentUrl)
     {
@@ -164,9 +183,78 @@ class PagSeguroConnectionData
     /***
      * @return mixed
      */
-    public function getServicePath()
+    public function getBaseUrl()
     {
-        return $this->servicePath;
+        return $this->baseUrl;
+    }
+
+    /***
+     * @param $baseUrl
+     */
+    public function setBaseUrl($baseUrl)
+    {
+        $this->baseUrl = $baseUrl;
+    }
+
+    /***
+     * @return mixed
+     */
+    public function getInstallmentUrl()
+    {
+        return $this->installmentUrl;
+    }
+
+    /***
+     * @param $installmentUrl
+     */
+    public function setInstallmentUrl($installmentUrl)
+    {
+        $this->installmentUrl = $installmentUrl;
+    }
+
+    /***
+     * @return mixed
+     */
+    public function getAuthorizationUrl()
+    {
+        return $this->authorizationUrl;
+    }
+
+    /***
+     * @param $installmentUrl
+     */
+    public function setAuthorizationUrl($authorizationUrl)
+    {
+        $this->authorizationUrl = $authorizationUrl;
+    }
+
+    /***
+     * @return mixed
+     */
+    public function getSessionUrl()
+    {
+        return $this->sessionUrl;
+    }
+
+    /***
+     * @param $installmentUrl
+     */
+    public function setSessionUrl($sessionUrl)
+    {
+        $this->sessionUrl = $sessionUrl;
+    }
+
+    /***
+     * @param mixed $version
+     * @return mixed
+     */
+    public function getServicePath($version = null)
+    {
+        if ($version) {
+            return $this->servicePath[$version];
+        } else {
+            return $this->servicePath;
+        }
     }
 
     /***
@@ -194,11 +282,16 @@ class PagSeguroConnectionData
     }
 
     /***
+     * @param mixed $version
      * @return string
      */
-    public function getServiceUrl()
+    public function getServiceUrl($version = null)
     {
-        return $this->getWebserviceUrl() . $this->getServicePath();
+        if ($version) {
+            return $this->getWebserviceUrl() . $this->getServicePath($version);
+        } else {
+            return $this->getWebserviceUrl() . $this->getServicePath();
+        }
     }
 
     /***

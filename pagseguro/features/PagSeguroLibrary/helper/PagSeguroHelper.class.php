@@ -45,16 +45,19 @@ class PagSeguroHelper
     }
 
     /***
-     * @param $numeric
+     * @param $value
      * @return string
      */
-    public static function decimalFormat($numeric)
+    public static function decimalFormat($value)
     {
-        if (is_float($numeric)) {
-            $numeric = (float) $numeric;
-            $numeric = (string) number_format($numeric, 2, '.', '');
+        if (is_int($value)) {
+            return $value;
+        }else if (is_float($value)) {
+            if (strcspn(strrev($value), '.') >= 3) {
+                $value = floor($value * 100) / 100;
+            }
         }
-        return $numeric;
+        return (string)number_format($value, 2, '.', '');
     }
 
     /***
@@ -108,7 +111,6 @@ class PagSeguroHelper
     {
 
         if (!is_array($string) && !is_object($string)) {
-
             $stringLength = Tools::strlen($string);
             $endcharsLength = Tools::strlen($endchars);
 

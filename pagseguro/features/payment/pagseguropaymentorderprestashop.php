@@ -71,12 +71,12 @@ class PagSeguroPaymentOrderPrestashop
         } else {
             $center_column = '535px';
         }
-
+        
         $this->context->smarty->assign(
             array(
                 'version' => _PS_VERSION_,
                 'width_center_column' => $center_column,
-                'image_payment' => __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png',
+                'image_payment' => __PS_BASE_URI__ . 'modules/pagseguro/views/img/logops_86x49.png',
                 'nbProducts' => $this->context->cart->nbProducts(),
                 'current_currency_id' => $this->context->currency->id,
                 'current_currency_name' => $this->context->currency->name,

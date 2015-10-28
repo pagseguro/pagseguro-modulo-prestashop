@@ -50,9 +50,9 @@ class PagSeguroAbandonedOrder {
         if ($transactions) {
         	$sendMultiple = true;
             $templateData = $this->getMailTemplateData();
-            foreach ($transactions as $key => $value) {
+            foreach ($transactions as $value) {
                 parse_str($value);
-                if (!$this->sendMail($templateData, $reference, $recovery, $customer)) {
+                if (!$this->sendMail($templateData, null, null, null)) {
                 	$sendMultiple = false;
                     break;
                 }
@@ -104,7 +104,7 @@ class PagSeguroAbandonedOrder {
         $sql = "SELECT * FROM ". _DB_PREFIX_ ."pagseguro_order";
 
         if ($orders = Db::getInstance()->executeS($sql)) {
-            foreach ($orders as $key => $order) {
+            foreach ($orders as $order) {
                 $result[$order['id_order']] = $order;
             }
         }
@@ -210,7 +210,7 @@ class PagSeguroAbandonedOrder {
 
         $orderMessage = OrderMessage::getOrderMessages($idLang);
 
-        foreach ($orderMessage as $key => $value) {
+        foreach ($orderMessage as $value) {
             if (strcmp($value["id_order_message"], Configuration::get('PAGSEGURO_MESSAGE_ORDER_ID')) == 0) {
                 $template = $value['name'];
                 $message  = $value['message'];

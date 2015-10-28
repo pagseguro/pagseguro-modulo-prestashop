@@ -66,22 +66,22 @@ class PagSeguroItem
     {
         if ($data) {
             if (isset($data['id'])) {
-                $this->id = $data['id'];
+                $this->setId($data['id']);
             }
             if (isset($data['description'])) {
-                $this->description = $data['description'];
+                $this->setDescription($data['description']);
             }
             if (isset($data['quantity'])) {
-                $this->quantity = $data['quantity'];
+                $this->setQuantity($data['quantity']);
             }
             if (isset($data['amount'])) {
-                $this->amount = $data['amount'];
+                $this->setAmount($data['amount']);
             }
             if (isset($data['weight'])) {
-                $this->weight = $data['weight'];
+                $this->setWeight($data['weight']);
             }
             if (isset($data['shippingCost'])) {
-                $this->shippingCost = $data['shippingCost'];
+                $this->setShippingCost($data['shippingCost']);
             }
         }
     }

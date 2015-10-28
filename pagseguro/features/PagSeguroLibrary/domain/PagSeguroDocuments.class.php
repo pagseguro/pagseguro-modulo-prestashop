@@ -32,7 +32,8 @@ class PagSeguroDocuments
      * @var array
      */
     private static $availableDocumentList = array(
-        'CPF' => 'Cadastro de Pessoa Física'
+        'CPF' => 'Cadastro de Pessoa Física',
+        'CNPJ' => 'Cadastro de Pessoa Jurídica'
     );
 
     /***
@@ -77,7 +78,6 @@ class PagSeguroDocuments
      */
     public static function getDocumentByDescription($documentDescription)
     {
-        $lowerDocDescription = Tools::strtolower($documentDescription);
-        return array_search($lowerDocDescription, array_map('strtolower', self::$availableDocumentList));
+        return array_search(Tools::strtolower($documentDescription), array_map('strtolower', self::$availableDocumentList));
     }
 }

@@ -1,5 +1,5 @@
 /**
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,13 +18,13 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2014 PrestaShop SA
+*  @copyright 2007-2015 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
 /**! DataTables 1.10.0
- * ©2008-2014 SpryMedia Ltd - datatables.net/license
+ * 2008-2015 SpryMedia Ltd - datatables.net/license
  */
 
 /***
@@ -34,7 +34,7 @@
  * @file        jquery.dataTables.js
  * @author         SpryMedia Ltd (www.sprymedia.co.uk)
  * @contact     www.sprymedia.co.uk/contact
- * @copyright  Copyright 2008-2014 SpryMedia Ltd.
+ * @copyright  Copyright 2008-2015 SpryMedia Ltd.
  *
  * This source file is free software, available under the following license:
  *   MIT license - http://datatables.net/license

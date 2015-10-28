@@ -28,17 +28,17 @@ class PagSeguroMetaDataItemKeys
 {
 
     private static $availableItemKeysList = array(
-        'PASSENGER_CPF' => 'CPF do passageiro',
-        'PASSENGER_PASSPORT' => 'Passaporte do passageiro',
-        'ORIGIN_CITY' => 'Cidade de origem',
-        'DESTINATION_CITY' => 'Cidade de destino',
-        'ORIGIN_AIRPORT_CODE' => 'Código do aeroporto de origem',
-        'DESTINATION_AIRPORT_CODE' => 'Código do aeroporto de destino',
-        'GAME_NAME' => 'Nome do jogo',
-        'PLAYER_ID' => 'Id do jogador',
-        'TIME_IN_GAME_DAYS' => 'Tempo no jogo em dias',
-        'MOBILE_NUMBER' => 'Celular de recarga',
-        'PASSENGER_NAME' => 'Nome do passageiro'
+        'PASSENGER_CPF' => 'Passenger CPF',
+        'PASSENGER_PASSPORT' => 'Passager passport',
+        'ORIGIN_CITY' => 'Origin city',
+        'DESTINATION_CITY' => 'Destination city',
+        'ORIGIN_AIRPORT_CODE' => 'Airport source code',
+        'DESTINATION_AIRPORT_CODE' => 'Destination airport code',
+        'GAME_NAME' => 'Game name',
+        'PLAYER_ID' => 'Player identification',
+        'TIME_IN_GAME_DAYS' => 'In days game time',
+        'MOBILE_NUMBER' => 'Recharge cell',
+        'PASSENGER_NAME' => 'Passenger name'
     );
 
     /***
@@ -83,8 +83,6 @@ class PagSeguroMetaDataItemKeys
      */
     public static function getItemKeyByDescription($itemDescription)
     {
-
-    	$lowerItemDescription = Tools::strtolower($itemDescription);
-        return array_search($lowerItemDescription, array_map('strtolower', self::$availableItemKeysList));
+        return array_search(Tools::strtolower($itemDescription), array_map('strtolower', self::$availableItemKeysList));
     }
 }

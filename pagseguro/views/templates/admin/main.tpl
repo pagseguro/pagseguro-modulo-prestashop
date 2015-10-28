@@ -1,5 +1,5 @@
 {*
-* 2007-2011 PrestaShop
+* 2007-2015 PrestaShop 
 *
 * NOTICE OF LICENSE
 *
@@ -18,15 +18,14 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2014 PrestaShop SA
+*  @copyright 2007-2015 PrestaShop SA
 *  @version  Release: $Revision: 6594 $
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*  International Registered Trademark & Property of PrestaShop SA
-*}
+*} 
 
-<link type="text/css" rel="stylesheet" href="{$module_dir|escape:'none'}assets/css/pagseguro-module.css" />
-<link type="text/css" rel="stylesheet" href="{$module_dir|escape:'none'}assets/css/pagseguro-modal.css" />
-<link type="text/css" rel="stylesheet" href="{$cssFileVersion|escape:'none'}" />
+<link type="text/css" rel="stylesheet" href="{$module_dir|escape:'htmlall':'UTF-8'}views/css/pagseguro-module.css" />
+<link type="text/css" rel="stylesheet" href="{$module_dir|escape:'htmlall':'UTF-8'}views/css/pagseguro-modal.css" />
+<link type="text/css" rel="stylesheet" href="{$cssFileVersion|escape:'htmlall':'UTF-8'}" />
 
 <div id="pagseguro-module">
 	
@@ -34,8 +33,8 @@
 		<div class="wrapper">
 			
 			<div id="pagseguro-logo">
-				<img src="{$module_dir|escape:'none'}assets/images/logo-180x41.gif" />
-				<div id="pagseguro-module-version">{l s='Versão' mod='pagseguro'} {$moduleVersion}</div>
+				<img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/logo-180x41.gif" />
+				<div id="pagseguro-module-version">Versão {$moduleVersion|escape:'htmlall':'UTF-8'}</div>
 			</div>
 		    
 		    <a id="pagseguro-registration-button" class="pagseguro-button gray-theme" href="https://pagseguro.uol.com.br/registration/registration.jhtml?ep=5&tipo=cadastro#!vendedor" target="_blank">{l s='Faça seu cadastro' mod='pagseguro'}</a>
@@ -64,8 +63,8 @@
 			    </ul>
 
 		    	<div id="pagseguro-save-wrapper">
-		    		<p>{l s='Clique no botão abaixo para salvar suas configurações.' mod='pagseguro'}</p>
-		    		<button id="pagseguro-save-button" class="pagseguro-button gray-theme" type="button">{l s='Salvar Configuração' mod='pagseguro'}</button>
+		    		<p>Clique no botão abaixo para salvar suas configurações.</p>
+		    		<button id="pagseguro-save-button" class="pagseguro-button gray-theme" type="button">Salvar Configuração</button>
 		    	</div>
 
 			</div>
@@ -77,7 +76,7 @@
 					    
 						{if isset($success)}
 							<div class="pagseguro-msg pagseguro-msg-success pagseguro-msg-small">
-								<p>{l s='Dados atualizados com sucesso' mod='pagseguro'}.</p>
+								<p>Dados atualizados com sucesso.</p>
 							</div>
 						{/if}
 
@@ -87,7 +86,7 @@
 							</div>
 					    {/foreach}
 
-					    {$page.content|escape:'none'}
+					    {$page.content|escape:'quotes':'UTF-8'}
 
 					</div>
 			    {/foreach}
@@ -100,38 +99,8 @@
 
 </div>
 
-<script type="text/javascript">
-	var PrestaShopPagSeguroModuleTexts = {
-		
-		general: {
-			wait: "{l s='Aguarde...' mod='pagseguro'}",
-			selectItem: "{l s='Selecione ao menos um item.' mod='pagseguro'}",
-			search: "{l s='Realize uma pesquisa.' mod='pagseguro'}",
-			next:"{l s='Próximo' mod='pagseguro'}",
-			last: "{l s='Último' mod='pagseguro'}",
-			first: "{l s='Primeiro' mod='pagseguro'}",
-			previous: "{l s='Anterior' mod='pagseguro'}",
-			seeDetails: "{l s='Ver&nbsp;detalhes' mod='pagseguro'}"
-		},
-
-		conciliation: {
-			empty: "{l s='Não há transações para conciliação no período.' mod='pagseguro'}",
-			serviceError: "{l s='Não foi possível obter os dados de conciliação.' mod='pagseguro'}",
-			fail: "{l s='Não foi possível realizar a conciliação.' mod='pagseguro'}",
-			success: "{l s='Conciliação realizada com sucesso.' mod='pagseguro'}"
-		},
-
-		abandoned: {
-			empty: "{l s='Não há transações abandonadas no período.' mod='pagseguro'}",
-			fail: "{l s='Não foi possível obter os dados de transações abandonadas.' mod='pagseguro'}",
-			sendMailError: "{l s='Não foi possível enviar o(s) e-mail(s).' mod='pagseguro'}",
-			sendMailSuccess:"{l s='E-mail(s) enviado(s) com sucesso.' mod='pagseguro'}"
-		}
-
-	};
-</script>
-<script type="text/javascript" src="{$module_dir|escape:'none'}assets/js/jquery.min.js"></script>
-<script type="text/javascript" src="{$module_dir|escape:'none'}assets/js/jquery.colorbox-min.js"></script>
-<script type="text/javascript" src="{$module_dir|escape:'none'}assets/js/jquery-1102.min.js"></script>
-<script type="text/javascript" charset="utf8" src="{$module_dir|escape:'none'}assets/js/jquery.dataTables.js"></script>
-<script type="text/javascript" charset="utf8" src="{$module_dir|escape:'none'}assets/js/pagseguro-module.js"></script>
+<script type="text/javascript" src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/jquery.min.js"></script>
+<script type="text/javascript" src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/jquery.colorbox-min.js"></script>
+<script type="text/javascript" src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/jquery-1102.min.js"></script>
+<script type="text/javascript" charset="utf8" src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf8" src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/pagseguro-module.js"></script>

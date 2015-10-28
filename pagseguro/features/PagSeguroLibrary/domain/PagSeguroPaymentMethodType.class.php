@@ -52,7 +52,7 @@ class PagSeguroPaymentMethodType
     public function __construct($value = null)
     {
         if ($value) {
-            $this->value = $value;
+            $this->setValue($value);
         }
     }
 
@@ -86,6 +86,6 @@ class PagSeguroPaymentMethodType
     public function getTypeFromValue($value = null)
     {
         $value = ($value == null ? $this->value : $value);
-        return array_search($this->value, self::$typeList);
+        return array_search($value, self::$typeList);
     }
 }

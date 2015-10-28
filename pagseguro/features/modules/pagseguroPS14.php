@@ -67,7 +67,7 @@ class PagSeguroPS14 implements PagSeguroModuleConfigurable
             array(
                 'version_module' => _PS_VERSION_,
                 'action_url' => _PS_BASE_URL_ . __PS_BASE_URI__ . 'modules/pagseguro/standard/front/payment.php',
-                'image' => __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png',
+                'image' => __PS_BASE_URI__ . 'modules/pagseguro/views/img/logops_86x49.png',
                 'this_path' => __PS_BASE_URI__ . 'modules/pagseguro/',
                 'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/'
             )

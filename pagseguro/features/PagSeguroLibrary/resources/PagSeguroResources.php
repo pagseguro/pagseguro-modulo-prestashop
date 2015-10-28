@@ -21,6 +21,12 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 
+$PagSeguroResources = array();
+// Base URLs
+$PagSeguroResources['baseUrl'] = array();
+$PagSeguroResources['baseUrl']['production'] = "https://pagseguro.uol.com.br";
+$PagSeguroResources['baseUrl']['sandbox'] = "https://sandbox.pagseguro.uol.com.br";
+
 // Static URLs
 $PagSeguroResources['staticUrl'] = array();
 $PagSeguroResources['staticUrl']['production'] = "https://stc.pagseguro.uol.com.br";
@@ -39,12 +45,58 @@ $PagSeguroResources['paymentService']['baseUrl']['production'] = "https://pagseg
 $PagSeguroResources['paymentService']['baseUrl']['sandbox'] = "https://sandbox.pagseguro.uol.com.br";
 $PagSeguroResources['paymentService']['serviceTimeout'] = 20;
 
+// Session service
+$PagSeguroResources['sessionService'] = array();
+$PagSeguroResources['sessionService']['url'] = "/v2/sessions";
+
+//Installment service
+$PagSeguroResources['installmentService'] = array();
+$PagSeguroResources['installmentService']['url'] = "/checkout/v2/installments.json";
+
+// Direct payment service
+$PagSeguroResources['directPaymentService'] = array();
+$PagSeguroResources['directPaymentService']['servicePath'] = "/v2/transactions";
+$PagSeguroResources['directPaymentService']['checkoutUrl'] = "/v2/transactions";
+$PagSeguroResources['directPaymentService']['serviceTimeout'] = 20;
+
+// PreApproval service
+$PagSeguroResources['preApproval'] = array();
+$PagSeguroResources['preApproval']['servicePath'] = "/v2/pre-approvals/request";
+$PagSeguroResources['preApproval']['checkoutUrl'] = "/v2/checkout";
+$PagSeguroResources['preApproval']['cancelUrl'] = "/v2/pre-approvals/cancel/";
+$PagSeguroResources['preApproval']['findUrl'] = "/v2/pre-approvals/";
+$PagSeguroResources['preApproval']['paymentUrl'] = "/v2/pre-approvals/payment";
+$PagSeguroResources['preApproval']['requestUrl'] = "/v2/pre-approvals/request.html";
+$PagSeguroResources['preApproval']['baseUrl']['production'] = $PagSeguroResources['webserviceUrl']['production'];
+$PagSeguroResources['preApproval']['baseUrl']['sandbox'] = $PagSeguroResources['webserviceUrl']['sandbox'];
+$PagSeguroResources['preApproval']['serviceTimeout'] = 20;
+
 // Notification service
 $PagSeguroResources['notificationService'] = array();
-$PagSeguroResources['notificationService']['servicePath'] = "/v2/transactions/notifications";
+$PagSeguroResources['notificationService']['servicePath'] = "/v3/transactions/notifications";
+$PagSeguroResources['notificationService']['applicationPath'] = "v2/authorizations/notifications";
+$PagSeguroResources['notificationService']['preApprovalPath'] = "v2/pre-approvals/notifications";
 $PagSeguroResources['notificationService']['serviceTimeout'] = 20;
 
 // Transaction search service
 $PagSeguroResources['transactionSearchService'] = array();
-$PagSeguroResources['transactionSearchService']['servicePath'] = "/v2/transactions";
+$PagSeguroResources['transactionSearchService']['servicePath']['v2'] = "/v2/transactions";
+$PagSeguroResources['transactionSearchService']['servicePath']['v3'] = "/v3/transactions";
 $PagSeguroResources['transactionSearchService']['serviceTimeout'] = 20;
+
+// Authorizations service
+$PagSeguroResources['authorizationService'] = array();
+$PagSeguroResources['authorizationService']['servicePath'] = "/v2/authorizations";
+$PagSeguroResources['authorizationService']['approvalUrl'] = "/v2/authorization/request.jhtml";
+$PagSeguroResources['authorizationService']['requestUrl'] = "/request";
+$PagSeguroResources['authorizationService']['serviceTimeout'] = 20;
+
+// Refund service
+$PagSeguroResources['refundService'] = array();
+$PagSeguroResources['refundService']['servicePath'] = "/v2/transactions/refunds";
+$PagSeguroResources['refundService']['serviceTimeout'] = 200;
+
+// Cancels service
+$PagSeguroResources['cancelService'] = array();
+$PagSeguroResources['cancelService']['servicePath'] = "/v2/transactions/cancels";
+$PagSeguroResources['cancelService']['serviceTimeout'] = 200;

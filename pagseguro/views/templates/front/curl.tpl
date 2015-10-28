@@ -1,5 +1,5 @@
 {*
-* 2007-2011 PrestaShop 
+* 2007-2015 PrestaShop 
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2014 PrestaShop SA
+*  @copyright 2007-2015 PrestaShop SA
 *  @version  Release: $Revision: 6594 $
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
@@ -32,19 +32,19 @@
     <style type="text/css" media="all">{literal}div#center_column{ width: 535px; }{/literal}</style>
 {/if}
 
-<link type="text/css" rel="stylesheet" href="{$css_version|escape:'none'}" />
-<script type="text/javascript" src="{$module_dir|escape:'none'}assets/js/jquery.min.js"></script>
+<link type="text/css" rel="stylesheet" href="{$css_version|escape:'htmlall':'UTF-8'}" />
+<script type="text/javascript" src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/jquery.min.js"></script>
 
 <div>
 	<form class="psplugin" id="psplugin">
 		<h1>
-		        <img src="{$module_dir|escape:'none'}assets/images/logops_228x56.png" />
+		        <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/logops_228x56.png" />
 		</h1> 
 		<div id="tabList">
 			<div class="tabItem selected">
 				<h2>cUrl.</h2>
-				<p><small>{l s='Ops! Ocorreu um erro.' mod='pagseguro'}</small></p>
-				<div class="module_error error">{l s='CURL can't connect:' mod='pagseguro'} {$err|escape:'none'}</div>
+				<p><small>Ops! Ocorreu um erro.</small></p>
+				<div class="module_error error">CURL can't connect: {$err|escape:'quotes':'UTF-8'}</div>
 			</div>
 		</div>
 	</form>

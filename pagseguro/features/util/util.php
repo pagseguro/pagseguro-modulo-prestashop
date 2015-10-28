@@ -171,7 +171,7 @@ class Util
     private static $days_search = array(5,  10, 15, 20, 25, 30);
     
     public static function getPagSeguroStatusName($idStatus) {
-        foreach (self::$order_status_pagseguro as $key => $value) {
+        foreach (self::$order_status_pagseguro as $value) {
             if ( $idStatus == $value['id'] ) {
                 return $value['name'];
             }
@@ -214,42 +214,42 @@ class Util
     
     public static function getJsBehaviorPS14()
     {
-        return __PS_BASE_URI__ . 'modules/pagseguro/assets/js/behaviors-version-14.js';
+        return __PS_BASE_URI__ . 'modules/pagseguro/views/js/behaviors-version-14.js';
     }
     
     public static function getJsBehaviorPS15()
     {
-        return __PS_BASE_URI__ . 'modules/pagseguro/assets/js/behaviors-version-15.js';
+        return __PS_BASE_URI__ . 'modules/pagseguro/views/js/behaviors-version-15.js';
     }
 
     public static function getJsBehaviorPS16()
     {
-        return __PS_BASE_URI__ . 'modules/pagseguro/assets/js/behaviors-version-15.js';
+        return __PS_BASE_URI__ . 'modules/pagseguro/views/js/behaviors-version-15.js';
     }
 
     public static function getJsBehaviorPS1601()
     {
-        return __PS_BASE_URI__ . 'modules/pagseguro/assets/js/behaviors-version-15.js';
+        return __PS_BASE_URI__ . 'modules/pagseguro/views/js/behaviors-version-15.js';
     }
     
     public static function getCssDisplayPS14()
     {
-        return __PS_BASE_URI__ . 'modules/pagseguro/assets/css/styles-version-14.css';
+        return __PS_BASE_URI__ . 'modules/pagseguro/views/css/styles-version-14.css';
     }
     
     public static function getCssDisplayPS15()
     {
-        return __PS_BASE_URI__ . 'modules/pagseguro/assets/css/styles-version-15.css';
+        return __PS_BASE_URI__ . 'modules/pagseguro/views/css/styles-version-15.css';
     }
 
     public static function getCssDisplayPS16()
     {
-        return __PS_BASE_URI__ . 'modules/pagseguro/assets/css/styles-version-16.css';
+        return __PS_BASE_URI__ . 'modules/pagseguro/views/css/styles-version-16.css';
     }
 
     public static function getCssDisplayPS1601()
     {
-        return __PS_BASE_URI__ . 'modules/pagseguro/assets/css/styles-version-1601.css';
+        return __PS_BASE_URI__ . 'modules/pagseguro/views/css/styles-version-1601.css';
     }
     
     private static function getBaseDefaultUrl()

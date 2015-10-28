@@ -28,34 +28,30 @@ include_once dirname(__FILE__) . '/features/PagSeguroLibrary/PagSeguroLibrary.ph
 include_once dirname(__FILE__) . '/features/modules/pagsegurofactoryinstallmodule.php';
 include_once dirname(__FILE__) . '/features/util/encryptionIdPagSeguro.php';
 
-if (! defined('_PS_VERSION_')) {
+if (!defined('_PS_VERSION_')) {
     exit();
 }
-
 
 class PagSeguro extends PaymentModule {
 
     private $modulo;
-
     protected $errors = array();
-
     public $context;
-
     private $pageId = '1';
 
     public function __construct() {
 
         $this->name = 'pagseguro';
         $this->tab = 'payments_gateways';
-        $this->version = '2.0';
+        $this->version = '2.0.0';
         $this->author = 'PagSeguro Internet LTDA.';
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
 
         parent::__construct();
 
-        $this->displayName = $this->l('Pagseguro');
-        $this->description = $this->l('Receba pagamentos por cartão de crédito, transferência bancária e boleto.');
+        $this->displayName = $this->l('PagSeguro');
+        $this->description = $this->l('Receba pagamentos por cartão de crédito, transferência bancária e boleto');
         $this->confirmUninstall = $this->l('Tem certeza que deseja remover este módulo?');
 
         if (version_compare(_PS_VERSION_, '1.5.0.2', '<')) {
@@ -65,81 +61,66 @@ class PagSeguro extends PaymentModule {
         $this->setContext();
 
         $this->modulo = PagSeguroFactoryInstallModule::createModule(_PS_VERSION_);
-
     }
 
     public function install() {
 
         if (version_compare(PagSeguroLibrary::getVersion(), '2.1.8', '<=')) {
-            if (! $this->validatePagSeguroRequirements()) {
+            if (!$this->validatePagSeguroRequirements()) {
                 return false;
             }
         }
-        if (! $this->validatePagSeguroId()) {
-            return  false;
+        if (!$this->validatePagSeguroId()) {
+            return false;
         }
 
-        if (! $this->validateOrderMessage()) {
+        if (!$this->validateOrderMessage()) {
             return false;
         }
-        if (! $this->generatePagSeguroOrderStatus()) {
+        if (!$this->generatePagSeguroOrderStatus()) {
             return false;
         }
-        if (! $this->createTables()) {
+        if (!$this->createTables()) {
             return false;
         }
-        if (! $this->modulo->installConfiguration()) {
+        if (!$this->modulo->installConfiguration()) {
             return false;
         }
-        if (! parent::install() or
-            ! $this->registerHook('payment') or
-            ! $this->registerHook('paymentReturn') or
-            ! Configuration::updateValue('PAGSEGURO_EMAIL', '') or
-            ! Configuration::updateValue('PAGSEGURO_TOKEN', '') or
-            ! Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') or
-            ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '') or
-            ! Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset')) or
-            ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active')) or
-            ! Configuration::updateValue('PAGSEGURO_RECOVERY_ACTIVE', false) or
-            ! Configuration::updateValue('PAGSEGURO_CHECKOUT', false) or
-            ! Configuration::updateValue(
-                'PAGSEGURO_LOG_FILELOCATION',
-                PagSeguroConfig::getData('log', 'fileLocation')
-            )) {
+        if (!parent::install() or ! $this->registerHook('payment') or ! $this->registerHook('paymentReturn') or ! Configuration::updateValue('PAGSEGURO_EMAIL', '') or ! Configuration::updateValue('PAGSEGURO_TOKEN', '') or ! Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') or ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '') or ! Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset')) or ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active')) or ! Configuration::updateValue('PAGSEGURO_RECOVERY_ACTIVE', false) or ! Configuration::updateValue('PAGSEGURO_CHECKOUT', false) or ! Configuration::updateValue(
+                        'PAGSEGURO_LOG_FILELOCATION', PagSeguroConfig::getData('log', 'fileLocation')
+                )) {
             return false;
         }
 
         return true;
-
     }
 
     public function uninstall() {
 
-        if (! $this->uninstallOrderMessage()) {
+        if (!$this->uninstallOrderMessage()) {
             return false;
         }
 
-        if (! $this->modulo->uninstallConfiguration()) {
+        if (!$this->modulo->uninstallConfiguration()) {
             return false;
         }
 
-        if (! Configuration::deleteByName('PAGSEGURO_EMAIL')
-        or ! Configuration::deleteByName('PAGSEGURO_TOKEN')
-        or ! Configuration::deleteByName('PAGSEGURO_URL_REDIRECT')
-        or ! Configuration::deleteByName('PAGSEGURO_NOTIFICATION_URL')
-        or ! Configuration::deleteByName('PAGSEGURO_CHARSET')
-        or ! Configuration::deleteByName('PAGSEGURO_LOG_ACTIVE')
-        or ! Configuration::deleteByName('PAGSEGURO_RECOVERY_ACTIVE')
-        or ! Configuration::deleteByName('PAGSEGURO_LOG_FILELOCATION')
-        or ! Configuration::deleteByName('PS_OS_PAGSEGURO')
-        or ! Configuration::deleteByName('PAGSEGURO_CHECKOUT')
-        or ! parent::uninstall()) {
+        if (!Configuration::deleteByName('PAGSEGURO_EMAIL')
+                or ! Configuration::deleteByName('PAGSEGURO_TOKEN')
+                or ! Configuration::deleteByName('PAGSEGURO_URL_REDIRECT')
+                or ! Configuration::deleteByName('PAGSEGURO_NOTIFICATION_URL')
+                or ! Configuration::deleteByName('PAGSEGURO_CHARSET')
+                or ! Configuration::deleteByName('PAGSEGURO_LOG_ACTIVE')
+                or ! Configuration::deleteByName('PAGSEGURO_RECOVERY_ACTIVE')
+                or ! Configuration::deleteByName('PAGSEGURO_LOG_FILELOCATION')
+                or ! Configuration::deleteByName('PS_OS_PAGSEGURO')
+                or ! Configuration::deleteByName('PAGSEGURO_CHECKOUT')
+                or ! parent::uninstall()) {
             return false;
         }
 
         return true;
     }
-
 
     public function getNotificationUrl() {
         return $this->modulo->getNotificationUrl();
@@ -157,11 +138,10 @@ class PagSeguro extends PaymentModule {
         return $this->modulo->getCssDisplay();
     }
 
-
     public static function returnIdCurrency($value = 'BRL') {
         $sql = 'SELECT `id_currency`
         FROM `' . _DB_PREFIX_ . 'currency`
-        WHERE `deleted` = 0
+        WHERE `deleted` = 0 
         AND `iso_code` = "' . $value . '"';
 
         $id_currency = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql));
@@ -170,17 +150,18 @@ class PagSeguro extends PaymentModule {
 
     public function hookPayment($params) {
 
-        $token = Configuration::get('PAGSEGURO_EMAIL');
-        $email = Configuration::get('PAGSEGURO_TOKEN');
-
-        if (!$token || !$email) {
-            return false;
+        if (!$this->active) {
+            return;
         }
 
         $this->modulo->paymentConfiguration($params);
 
-        $bootstrap = version_compare(_PS_VERSION_, '1.6.0.1', '>');
-        $this->addToView('hasBootstrap', $bootstrap);
+        if (version_compare(_PS_VERSION_, '1.6.0.1', '<'))
+            $bootstrap = true;
+        else
+            $bootstrap = false;
+
+        $this->addToView('version', $bootstrap);
 
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/hook/payment.tpl');
     }
@@ -190,41 +171,44 @@ class PagSeguro extends PaymentModule {
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/hook/payment_return.tpl');
     }
 
-    /***
+    /*     * *
      * PrestaShop getContent function steps:
      *
      *  1) Validate and save post confuguration data
      *  2) Route and show current virtual page
      *
      */
+
     public function getContent() {
         $this->verifyPost();
         return $this->pageRouter();
     }
 
-
     /*
-    *   Validate and save post confuguration data
-    */
+     *   Validate and save post confuguration data
+     */
+
     private function verifyPost() {
         if ($this->postValidation()) {
             $this->savePostData();
         }
     }
 
-    /***
+    /*     * *
      * Shorthand to assign on Smarty
      */
+
     private function addToView($key, $value) {
         if ($this->context->smarty) {
             $this->context->smarty->assign($key, $value);
         }
     }
 
-    /***
+    /*     * *
      * Realize post validations according with PagSeguro standards
      * case any inconsistence, return false and assign to view context on $errors array
      */
+
     private function postValidation() {
 
         $valid = true;
@@ -237,7 +221,7 @@ class PagSeguro extends PaymentModule {
             if ($email) {
                 if (Tools::strlen($email) > 60) {
                     $errors[] = $this->invalidFieldSizeMessage('E-MAIL');
-                } elseif (! Validate::isEmail($email)) {
+                } elseif (!Validate::isEmail($email)) {
                     $errors[] = $this->invalidMailMessage('E-MAIL');
                 }
             }
@@ -281,47 +265,59 @@ class PagSeguro extends PaymentModule {
             if (count($errors) > 0) {
                 $valid = false;
             }
-
         }
 
         $this->addToView('errors', $errors);
-
         return $valid;
-
     }
 
     /*
-    *   Validation error messages
-    */
-    private function missedCurrencyMessage() {return sprintf($this->l('Verifique se a moeda REAL está instalada e ativada.')); }
-    private function invalidMailMessage($field) {return sprintf($this->l('O campo %s deve ser conter um email válido.'), $field); }
-    private function invalidFieldSizeMessage($field) {return sprintf($this->l('O campo %s está com um tamanho inválido'), $field); }
-    private function invalidValueMessage($field) {return sprintf($this->l('O campo %s contém um valor inválido.'), $field); }
-    private function invalidUrlMessage($field) {return sprintf($this->l('O campo %s deve conter uma url válida.'), $field); }
+     *   Validation error messages
+     */
 
-    /***
+    private function missedCurrencyMessage() {
+        return sprintf($this->l('Verifique se a moeda REAL está instalada e ativada.'));
+    }
+
+    private function invalidMailMessage($field) {
+        return sprintf($this->l('O campo %s deve ser conter um email válido.'), $field);
+    }
+
+    private function invalidFieldSizeMessage($field) {
+        return sprintf($this->l('O campo %s está com um tamanho inválido'), $field);
+    }
+
+    private function invalidValueMessage($field) {
+        return sprintf($this->l('O campo %s contém um valor inválido.'), $field);
+    }
+
+    private function invalidUrlMessage($field) {
+        return sprintf($this->l('O campo %s deve conter uma url válida.'), $field);
+    }
+
+    /*     * *
      * Save configuration post data
      */
+
     private function savePostData() {
 
         if (Tools::isSubmit('pagseguroModuleSubmit')) {
 
-            $charsets = Util::getCharsetOptions();
-
             $updateData = Array(
-                'pagseguroEmail'            => 'PAGSEGURO_EMAIL',
-                'pagseguroToken'            => 'PAGSEGURO_TOKEN',
-                'pagseguroRedirectUrl'      => 'PAGSEGURO_URL_REDIRECT',
-                'pagseguroNotificationUrl'  => 'PAGSEGURO_NOTIFICATION_URL',
-                'pagseguroCharset'          => 'PAGSEGURO_CHARSET',
-                'pagseguroCheckout'         => 'PAGSEGURO_CHECKOUT',
-                'pagseguroLogActive'        => 'PAGSEGURO_LOG_ACTIVE',
-                'pagseguroLogFileLocation'  => 'PAGSEGURO_LOG_FILELOCATION',
-                'pagseguroRecoveryActive'   => 'PAGSEGURO_RECOVERY_ACTIVE'
+                'pagseguroEmail' => 'PAGSEGURO_EMAIL',
+                'pagseguroToken' => 'PAGSEGURO_TOKEN',
+                'pagseguroRedirectUrl' => 'PAGSEGURO_URL_REDIRECT',
+                'pagseguroNotificationUrl' => 'PAGSEGURO_NOTIFICATION_URL',
+                'pagseguroCharset' => 'PAGSEGURO_CHARSET',
+                'pagseguroCheckout' => 'PAGSEGURO_CHECKOUT',
+                'pagseguroLogActive' => 'PAGSEGURO_LOG_ACTIVE',
+                'pagseguroLogFileLocation' => 'PAGSEGURO_LOG_FILELOCATION',
+                'pagseguroRecoveryActive' => 'PAGSEGURO_RECOVERY_ACTIVE'
             );
 
             foreach ($updateData as $postIndex => $configIndex) {
-                if (isset($_POST[$postIndex])) {
+
+                if (Tools::getValue($postIndex)) {
                     Configuration::updateValue($configIndex, Tools::getValue($postIndex));
                 }
             }
@@ -332,15 +328,13 @@ class PagSeguro extends PaymentModule {
             }
 
             $this->addToView('success', true);
-
         }
-
     }
 
     private function prepareAdminToken() {
         $adminToken = Tools::getAdminTokenLite('AdminOrders');
         $this->addToView('adminToken', $adminToken);
-        $this->addToView('urlAdminOrder', $_SERVER['SCRIPT_NAME'].'?tab=AdminOrders');
+        $this->addToView('urlAdminOrder', $_SERVER['SCRIPT_NAME'] . '?tab=AdminOrders');
     }
 
     private function applyDefaultViewData() {
@@ -351,9 +345,10 @@ class PagSeguro extends PaymentModule {
         $this->prepareAdminToken();
     }
 
-    /***
+    /*     * *
      * Route virtual page
      */
+
     private function pageRouter() {
 
         $this->applyDefaultViewData();
@@ -365,7 +360,7 @@ class PagSeguro extends PaymentModule {
                 'content' => $this->getConfigurationPageHtml(),
                 'hasForm' => true,
                 'selected' => ($this->pageId == '1')
-           ),
+            ),
             'conciliation' => array(
                 'id' => 2,
                 'title' => $this->l('Conciliação'),
@@ -392,12 +387,9 @@ class PagSeguro extends PaymentModule {
         $this->addToView('pages', $pages);
 
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', 'views/templates/admin/main.tpl');
-
     }
 
     private function getConfigurationPageHtml() {
-
-        $this->addToView('pageTitle', $this->l('Configuração'));
 
         $this->addToView('email', Tools::safeOutput(Configuration::get('PAGSEGURO_EMAIL')));
         $this->addToView('token', Tools::safeOutput(Configuration::get('PAGSEGURO_TOKEN')));
@@ -425,14 +417,11 @@ class PagSeguro extends PaymentModule {
         $this->addToView('recoveryActiveSelected', Configuration::get('PAGSEGURO_RECOVERY_ACTIVE'));
 
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/settings.tpl');
-
     }
 
     private function getConciliationPageHtml() {
 
-        $this->addToView('pageTitle', $this->l('Conciliação'));
-
-        if ( Configuration::get('PAGSEGURO_EMAIL') && Configuration::get('PAGSEGURO_TOKEN') ) {
+        if (Configuration::get('PAGSEGURO_EMAIL') && Configuration::get('PAGSEGURO_TOKEN')) {
             $this->addToView('hasCredentials', true);
             $conciliationSearch = Util::getDaysSearch();
             $this->addToView('conciliationSearchKeys', array_keys($conciliationSearch));
@@ -440,12 +429,9 @@ class PagSeguro extends PaymentModule {
         }
 
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/conciliation.tpl');
-
     }
 
     private function getAbandonedPageHtml() {
-
-        $this->addToView('pageTitle', 'Transações Abandonadas');
 
         $recoveryActive = Configuration::get('PAGSEGURO_RECOVERY_ACTIVE');
 
@@ -459,13 +445,9 @@ class PagSeguro extends PaymentModule {
         }
 
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/abandoned.tpl');
-
     }
 
-
     private function getRequirementsPageHtml() {
-
-        $this->addToView('pageTitle', $this->l('Requisitos'));
 
         $requirements = array();
 
@@ -486,21 +468,20 @@ class PagSeguro extends PaymentModule {
         /** Currency validation */
         if ($currency) {
             $requirements['moeda'][0] = true;
-            $requirements['moeda'][1] = $this->l('Moeda REAL instalada.');
+            $requirements['moeda'][1] = "Moeda REAL instalada.";
         } else {
             $requirements['moeda'][0] = false;
             $requirements['moeda'][1] = $this->missedCurrencyMessage();
         }
 
-        $requirements['curl'][1] 	= (is_null($requirements['curl'][1])        ? $this->l('Biblioteca cURL instalada.') : $requirements['curl'][1]);
-        $requirements['dom'][1] 	= (is_null($requirements['dom'][1])         ? $this->l('DOM XML instalado.') : $requirements['dom'][1]);
-        $requirements['spl'][1] 	= (is_null($requirements['spl'][1])         ? $this->l('Biblioteca padrão do PHP(SPL) instalada.') : $requirements['spl'][1]);
-        $requirements['version'][1]     = (is_null($requirements['version'][1])     ? $this->l('Versão do PHP superior à 5.3.3.') : $requirements['version'][1]);
+        $requirements['curl'][1] = (is_null($requirements['curl'][1]) ? "Biblioteca cURL instalada." : $requirements['curl'][1]);
+        $requirements['dom'][1] = (is_null($requirements['dom'][1]) ? "DOM XML instalado." : $requirements['dom'][1]);
+        $requirements['spl'][1] = (is_null($requirements['spl'][1]) ? "Biblioteca padrão do PHP(SPL) instalada." : $requirements['spl'][1]);
+        $requirements['version'][1] = (is_null($requirements['version'][1]) ? "Versão do PHP superior à 5.3.3." : $requirements['version'][1]);
 
         $this->addToView('requirements', $requirements);
 
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/requirements.tpl');
-
     }
 
     private function setContext() {
@@ -511,13 +492,13 @@ class PagSeguro extends PaymentModule {
         $condional = true;
 
         foreach (PagSeguroConfig::validateRequirements() as $value) {
-            if (! Tools::isEmpty($value)) {
+            if (!Tools::isEmpty($value)) {
                 $condional = false;
                 $this->errors[] = Tools::displayError($value);
             }
         }
 
-        if (! $condional) {
+        if (!$condional) {
             $this->html = $this->displayError(implode('<br />', $this->errors));
         }
 
@@ -555,19 +536,17 @@ class PagSeguro extends PaymentModule {
 
         if ($hasColQuery = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS($sql)) {
 
-            if (!(int)$hasColQuery[0]['hascol']) {
+            if (!(int) $hasColQuery[0]['hascol']) {
                 return Db::getInstance()->Execute('
-                    ALTER TABLE `' . _DB_PREFIX_ . 'pagseguro_order` ADD COLUMN
+                    ALTER TABLE `' . _DB_PREFIX_ . 'pagseguro_order` ADD COLUMN 
                     `send_recovery` int(10) unsigned NOT NULL default 0
                 ');
             }
 
             return true;
-
         }
 
         return false;
-
     }
 
     private function validatePagSeguroId() {
@@ -584,9 +563,8 @@ class PagSeguro extends PaymentModule {
         $orderMensagem = new OrderMessage();
 
         foreach (Language::getLanguages(false) as $language) {
-            $idLang = (int) $language['id_lang'];
-            $orderMensagem->name[$idLang] = "cart recovery pagseguro";
-            $orderMensagem->message[$idLang] = $this->l('Verificamos que você não concluiu sua compra. Clique no link abaixo para dar prosseguimento.');
+            $orderMensagem->name[(int) $language['id_lang']] = "cart recovery pagseguro";
+            $orderMensagem->message[(int) $language['id_lang']] = "Verificamos que você não concluiu sua compra. Clique no link abaixo para dar prosseguimento.";
         }
 
         $orderMensagem->date_add = date('now');
@@ -598,7 +576,7 @@ class PagSeguro extends PaymentModule {
     private function uninstallOrderMessage() {
 
         $orders = array();
-        $sql = "SELECT `id_order_message` as id FROM `"._DB_PREFIX_."order_message_lang` WHERE `name` = 'cart recovery pagseguro'";
+        $sql = "SELECT `id_order_message` as id FROM `" . _DB_PREFIX_ . "order_message_lang` WHERE `name` = 'cart recovery pagseguro'";
         $result = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql));
 
         if ($result) {
@@ -612,21 +590,21 @@ class PagSeguro extends PaymentModule {
                     $bool = true;
                 } else {
 
-                    if ( array_search($order_message['id'], $orders) === false){
+                    if (array_search($order_message['id'], $orders) === false) {
                         $orders[] = $order_message['id'];
                     }
                 }
             }
 
-            for($i = 0; $i < count($orders) ;$i++){
+            for ($i = 0; $i < count($orders); $i++) {
 
-                $sql = "DELETE FROM `"._DB_PREFIX_."order_message` WHERE `id_order_message` = '".$orders[$i]."'";
+                $sql = "DELETE FROM `" . _DB_PREFIX_ . "order_message` WHERE `id_order_message` = '" . $orders[$i] . "'";
                 Db::getInstance()->execute($sql);
             }
 
-            for($i = 0; $i < count($result) ;$i++){
+            for ($i = 0; $i < count($result); $i++) {
                 $id = $result[$i]['id'];
-                $sql = "DELETE FROM `"._DB_PREFIX_."order_message_lang` WHERE `id_order_message` = '".$id."'";
+                $sql = "DELETE FROM `" . _DB_PREFIX_ . "order_message_lang` WHERE `id_order_message` = '" . $id . "'";
                 Db::getInstance()->execute($sql);
             }
             return true;
@@ -666,9 +644,7 @@ class PagSeguro extends PaymentModule {
                 $list_states = $this->findOrderStates($language['id_lang']);
 
                 $continue = $this->checkIfOrderStatusExists(
-                    $language['id_lang'],
-                    $statusPagSeguro['name'],
-                    $list_states
+                        $language['id_lang'], $statusPagSeguro['name'], $list_states
                 );
 
                 if ($continue) {
@@ -681,7 +657,6 @@ class PagSeguro extends PaymentModule {
                     $this->copyMailTo($statusPagSeguro['template'], $language['iso_code'], 'html');
                     $this->copyMailTo($statusPagSeguro['template'], $language['iso_code'], 'txt');
                 }
-
             }
 
             if ($continue) {
@@ -690,7 +665,6 @@ class PagSeguro extends PaymentModule {
 
                     $file = _PS_ROOT_DIR_ . '/img/os/' . (int) $order_state->id . '.gif';
                     copy($image, $file);
-
                 }
             }
 
@@ -706,13 +680,12 @@ class PagSeguro extends PaymentModule {
 
     private function copyMailTo($name, $lang, $ext) {
 
-        $template = _PS_MAIL_DIR_.$lang.'/'.$name.'.'.$ext;
+        $template = _PS_MAIL_DIR_ . $lang . '/' . $name . '.' . $ext;
 
-        if (! file_exists($template)) {
+        if (!file_exists($template)) {
 
-            $templateToCopy = _PS_ROOT_DIR_ . '/modules/pagseguro/mails/' . $name .'.'. $ext;
+            $templateToCopy = _PS_ROOT_DIR_ . '/modules/pagseguro/mails/' . $name . '.' . $ext;
             copy($templateToCopy, $template);
-
         }
     }
 
@@ -721,8 +694,8 @@ class PagSeguro extends PaymentModule {
         $sql = 'SELECT DISTINCT osl.`id_lang`, osl.`name`
             FROM `' . _DB_PREFIX_ . 'order_state` os
             INNER JOIN `' .
-             _DB_PREFIX_ . 'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state`)
-            WHERE osl.`id_lang` = '."$lang_id".' AND osl.`name` in ("Iniciado","Aguardando pagamento",
+                _DB_PREFIX_ . 'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state`)
+            WHERE osl.`id_lang` = ' . "$lang_id" . ' AND osl.`name` in ("Iniciado","Aguardando pagamento",
             "Em análise", "Paga","Disponível","Em disputa","Devolvida","Cancelada") AND os.`id_order_state` <> 6';
 
         return (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql));
@@ -736,7 +709,7 @@ class PagSeguro extends PaymentModule {
             FROM `' . _DB_PREFIX_ . 'order_state` os
             INNER JOIN `' . _DB_PREFIX_ . 'order_state_lang` osl
             ON (os.`id_order_state` = osl.`id_order_state` AND osl.`name` = \'' .
-             pSQL($nome_status) . '\')' . $isDeleted;
+                pSQL($nome_status) . '\')' . $isDeleted;
 
         $id_order_state = (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql));
 
@@ -761,29 +734,30 @@ class PagSeguro extends PaymentModule {
         return $save;
     }
 
-    /***
+    /*     * *
      * Verify if PagSeguro log file exists.
      * Case log file not exists, try create
      * else create PagSeguro.log into PagseguroLibrary folder into module
      */
+
     private function verifyLogFile($file) {
         $file = _PS_ROOT_DIR_ . $file;
         try {
-        	if (is_file($file)) {
-	            $handle = @fopen($file, 'a');
-	            if (is_resource($handle)){
-	            	fclose($handle);
-	            }
-        	}
+            if (is_file($file)) {
+                $handle = @fopen($file, 'a');
+                if (is_resource($handle)) {
+                    fclose($handle);
+                }
+            }
         } catch (Exception $e) {
             die($e->getMessage());
         }
     }
 
     private function _whichVersion() {
-        if(version_compare(_PS_VERSION_, '1.6.0.1', ">=")){
+        if (version_compare(_PS_VERSION_, '1.6.0.1', ">=")) {
             $version = '6';
-        } else if(version_compare(_PS_VERSION_, '1.5.0.1', "<")){
+        } else if (version_compare(_PS_VERSION_, '1.5.0.1', "<")) {
             $version = '4';
         } else {
             $version = '5';

@@ -33,9 +33,16 @@ class PagSeguroPaymentParser extends PagSeguroServiceParser
      */
     public static function getData($payment)
     {
-
+        
         $data = null;
 
+        // pre-approval
+        if (property_exists($payment, 'preApproval')) {
+            if ($payment->getPreApproval() != null) {
+                $data = PagSeguroPreApprovalParser::getData($payment->getPreApproval());
+            }
+        }
+       
         // reference
         if ($payment->getReference() != null) {
             $data["reference"] = $payment->getReference();
@@ -43,7 +50,6 @@ class PagSeguroPaymentParser extends PagSeguroServiceParser
 
         // sender
         if ($payment->getSender() != null) {
-
             if ($payment->getSender()->getName() != null) {
                 $data['senderName'] = $payment->getSender()->getName();
             }
@@ -68,10 +74,16 @@ class PagSeguroPaymentParser extends PagSeguroServiceParser
                 if (is_array($documents) && count($documents) == 1) {
                     foreach ($documents as $document) {
                         if (!is_null($document)) {
-                            $data['senderCPF'] = $document->getValue();
+                            $document->getType() == "CPF" ? 
+                                $data['senderCPF'] = $document->getValue() : 
+                                $data['senderCNPJ'] = $document->getValue();
                         }
                     }
                 }
+            }
+
+            if ($payment->getSender()->getIP() != null) {
+                $data['ip'] = $payment->getSender()->getIP();
             }
         }
 
@@ -83,10 +95,8 @@ class PagSeguroPaymentParser extends PagSeguroServiceParser
         // items
         $items = $payment->getItems();
         if (count($items) > 0) {
-
             $i = 0;
 
-            $key = "";
             foreach ($items as $key => $value) {
                 $i++;
                 if ($items[$key]->getId() != null) {
@@ -108,9 +118,7 @@ class PagSeguroPaymentParser extends PagSeguroServiceParser
                 if ($items[$key]->getShippingCost() != null) {
                     $data["itemShippingCost$i"] = PagSeguroHelper::decimalFormat($items[$key]->getShippingCost());
                 }
-                $var_value_hck = $value;
-                $aux = $var_value_hck;
-                $value = $aux;
+                unset($value);
             }
         }
 
@@ -121,7 +129,6 @@ class PagSeguroPaymentParser extends PagSeguroServiceParser
 
         // shipping
         if ($payment->getShipping() != null) {
-
             if ($payment->getShipping()->getType() != null && $payment->getShipping()->getType()->getValue() != null) {
                 $data['shippingType'] = $payment->getShipping()->getType()->getValue();
             }
@@ -158,7 +165,6 @@ class PagSeguroPaymentParser extends PagSeguroServiceParser
                 }
             }
         }
-
         // maxAge
         if ($payment->getMaxAge() != null) {
             $data['maxAge'] = $payment->getMaxAge();
@@ -196,6 +202,40 @@ class PagSeguroPaymentParser extends PagSeguroServiceParser
             }
         }
 
+        // paymentMethodConfig
+        if (count($payment->getPaymentMethodConfig()->getConfig()) > 0) {
+            $i = 0;
+            foreach ($payment->getPaymentMethodConfig()->getConfig() as $config) {
+                if ($config instanceof PagSeguroPaymentMethodConfigItem) {
+                    if (!PagSeguroHelper::isEmpty($config->getKey())
+                        && !PagSeguroHelper::isEmpty($config->getValue()))
+                    {
+                        $i++;
+                        if (!PagSeguroHelper::isEmpty($config->getGroup())) {
+                            $data['paymentMethodGroup' . $i] = $config->getGroup();
+                        }
+                        $data['paymentMethodConfigKey' . $i . "_1"] = $config->getKey();
+                        $data['paymentMethodConfigValue' . $i . "_1"] = $config->getValue();
+                    }
+                }
+            }
+        }
+
+        // AcceptedPaymentMethod
+        if (count($payment->getAcceptedPaymentMethod()->getConfig()) > 0) {
+            $i = 0;
+            foreach ($payment->getAcceptedPaymentMethod()->getConfig() as $acceptedPayment) {
+                if ($acceptedPayment instanceof PagSeguroAcceptPaymentMethod) {
+                    $data['acceptPaymentMethodGroup'] = $acceptedPayment->getGroup();
+                    $data['acceptPaymentMethodName'] = $acceptedPayment->getName();
+                }
+                if ($acceptedPayment instanceof PagSeguroExcludePaymentMethod) {
+                    $data['excludePaymentMethodGroup'] = $acceptedPayment->getGroup();
+                    $data['excludePaymentMethodName'] = $acceptedPayment->getName();
+                }
+            }
+        }
+
         // parameter
         if (count($payment->getParameter()->getItems()) > 0) {
             foreach ($payment->getParameter()->getItems() as $item) {
@@ -216,13 +256,27 @@ class PagSeguroPaymentParser extends PagSeguroServiceParser
 
     /***
      * @param $str_xml
-     * @return PagSeguroPaymentParserData
+     * @return PagSeguroPaymentParserData Success
      */
     public static function readSuccessXml($str_xml)
     {
         $parser = new PagSeguroXmlParser($str_xml);
         $data = $parser->getResult('checkout');
-        $PaymentParserData = new PagSeguroPaymentParserData();
+        $PaymentParserData = new PagSeguroParserData();
+        $PaymentParserData->setCode($data['code']);
+        $PaymentParserData->setRegistrationDate($data['date']);
+        return $PaymentParserData;
+    }
+
+    /***
+     * @param $str_xml
+     * @return parsed transaction
+     */
+    public static function readTransactionXml($str_xml)
+    {
+        $parser = new PagSeguroXmlParser($str_xml);
+        $data = $parser->getResult('transaction');
+        $PaymentParserData = new PagSeguroParserData();
         $PaymentParserData->setCode($data['code']);
         $PaymentParserData->setRegistrationDate($data['date']);
         return $PaymentParserData;

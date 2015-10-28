@@ -51,7 +51,7 @@ class PagSeguroPS1601 implements PagSeguroModuleConfigurable
             array(
                 'version_module' => _PS_VERSION_,
                 'action_url' => $this->context->link->getModuleLink('pagseguro', 'payment', array(), true),
-                'image' => __PS_BASE_URI__ . 'modules/pagseguro/assets/images/logops_86x49.png',
+                'image' => __PS_BASE_URI__ . 'modules/pagseguro/views/img/logops_86x49.png',
                 'this_path' => __PS_BASE_URI__ . 'modules/pagseguro/',
                 'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/'
             )

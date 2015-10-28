@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop 
+* 2007-2015 PrestaShop 
 *
 * NOTICE OF LICENSE
 *
@@ -18,31 +18,30 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2014 PrestaShop SA
+*  @copyright 2007-2015 PrestaShop SA
 *  @version  Release: $Revision: 6594 $
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*  International Registered Trademark & Property of PrestaShop SA
-*}
+*} 
 
-<h2 class="title" title="{$pageTitle}">{$pageTitle}</h2>
+<h2 class="title" title="Conciliação">Conciliação</h2>
 <p>
-    {l s='Esta consulta permite obter as transações recebidas por você em um intervalo de datas. Ela pode ser usada periodicamente para verificar se o seu sistema recebeu todas as notificações de transações enviadas pelo PagSeguro, de forma a conciliar as transações armazenadas em seu sistema com o PagSeguro.' mod='pagseguro'}
+    Esta consulta permite obter as transações recebidas por você em um intervalo de datas. Ela pode ser usada periodicamente para verificar se o seu sistema recebeu todas as notificações de transações enviadas pelo PagSeguro, de forma a conciliar as transações armazenadas em seu sistema com o PagSeguro.
 </p>
 
 {if isset($hasCredentials) && $hasCredentials}
     
-    <input type="hidden" id="adminToken" value="{$adminToken|escape}" />
-    <input type="hidden" id="urlAdminOrder" value="{$urlAdminOrder|escape}" />
+    <input type="hidden" id="adminToken" value="{$adminToken|escape:'htmlall':'UTF-8'}" />
+    <input type="hidden" id="urlAdminOrder" value="{$urlAdminOrder|escape:'htmlall':'UTF-8'}" />
 
     <div class="pagseguro-search-tools">
-       <button class="pagseguro-button" type="button" id="conciliation-search-button">{l s='Pesquisar' mod='pagseguro'}</button>
+       <button class="pagseguro-button" type="button" id="conciliation-search-button">Pesquisar</button>
         <select class="pagseguro-field" id="pagseguro-conciliation-days-input" name="pagseguro_dias">
             {html_options values=$conciliationSearchValues output=$conciliationSearchValues}
         </select>
-        <span>&nbsp;{l s='últimos dias' mod='pagseguro'}</span>
+        <span>&nbsp;últimos dias</span>
 
         <div class="right-tools">
-            <button class="pagseguro-button" type="button" id="conciliation-button">{l s='Conciliar' mod='pagseguro'}</button>
+            <button class="pagseguro-button" type="button" id="conciliation-button">Conciliar</button>
         </div>
     </div>
     
@@ -50,25 +49,25 @@
         <thead>
             <tr>
                 <th class="col-md-0"><input type="checkbox" class="select-all"></th>
-                <th class="col-md-1">{l s='Data' mod='pagseguro'}</th>
-                <th class="col-md-2">{l s='ID PrestaShop' mod='pagseguro'}</th>
-                <th class="col-md-3">{l s='ID PagSeguro' mod='pagseguro'}</th>
-                <th class="col-md-2">{l s='Status PrestaShop' mod='pagseguro'}</th>
-                <th class="col-md-4">{l s='Status PagSeguro' mod='pagseguro'}</th>
-                <th class="col-md-5">{l s='Pedido' mod='pagseguro'}</th>
+                <th class="col-md-1">Data</th>
+                <th class="col-md-2">ID PrestaShop</th>
+                <th class="col-md-3">ID PagSeguro</th>
+                <th class="col-md-2">Status PrestaShop</th>
+                <th class="col-md-4">Status PagSeguro</th>
+                <th class="col-md-5">Pedido</th>
             </tr>
         </thead>
         <tbody></tbody>
     </table>
 
     <div class="pagseguro-msg pagseguro-msg-info pagseguro-msg-micro">
-        <p>{l s='Somente transações geradas a partir da versão 1.8 do módulo serão listadas.' mod='pagseguro'}</p>
+        <p>Somente transações geradas a partir da versão 1.8 do módulo serão listadas.</p>
     </div>
 
 {else}
     
     <div class="pagseguro-msg pagseguro-msg-alert pagseguro-msg-small">
-        <p>{l s='Para conciliar transações é necessário configurar suas' mod='pagseguro'} <span class="link pagseguro-goto-configuration">{l s='credenciais do PagSeguro' mod='pagseguro'}</span>.</p>
+        <p>Para conciliar transações é necessário configurar suas <span class="link pagseguro-goto-configuration">credenciais do PagSeguro</span>.</p>
     </div>
 
 {/if}

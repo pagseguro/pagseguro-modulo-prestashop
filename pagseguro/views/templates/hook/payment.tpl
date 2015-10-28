@@ -1,5 +1,5 @@
 {*
-* 2007-2011 PrestaShop 
+* 2007-2015 PrestaShop 
 *
 * NOTICE OF LICENSE
 *
@@ -18,16 +18,17 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2014 PrestaShop SA
+*  @copyright 2007-2015 PrestaShop SA
 *  @version  Release: $Revision: 6594 $
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-{if $hasBootstrap}
+
+{if $version eq false}
 <div class="row">
 	<div class="col-xs-12 col-md-6">
 		<p class="payment_module">
-		    <a style="background: url({$image|escape}) 1% 50% no-repeat;" href="{$action_url|escape}" title="{l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}">
+		    <a style="background: url({$image|escape:'htmlall':'UTF-8'}) 1% 50% no-repeat;" href="{$action_url|escape:'htmlall':'UTF-8'}" title="{l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}">
 			{l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}
 		    </a>
 		</p> 
@@ -35,9 +36,9 @@
 </div>
 {else}
 <p class="payment_module">
-    <a style="" href="{$action_url|escape}" title="{l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}">
-        <img src="{$image|escape}" alt="{l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}" />
-        <span style="display:inline-block;margin:18px 0 0 10px;">{l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}</span>
+    <a href="{$action_url|escape:'htmlall':'UTF-8'}" title="{l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}">
+        <img src="{$image|escape:'htmlall':'UTF-8'}" alt="{l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}" />
+            {l s='Pague com PagSeguro e parcele em até 18 vezes' mod='pagseguro'}
     </a>
 </p> 
 {/if}

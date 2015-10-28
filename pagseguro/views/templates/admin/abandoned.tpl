@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop 
+* 2007-2015 PrestaShop 
 *
 * NOTICE OF LICENSE
 *
@@ -18,16 +18,15 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2014 PrestaShop SA
+*  @copyright 2007-2015 PrestaShop SA
 *  @version  Release: $Revision: 6594 $
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*  International Registered Trademark & Property of PrestaShop SA
-*}
+*} 
 
-<h2 class="title" title="{$pageTitle}">{$pageTitle}</h2>
+<h2 class="title" title="Transações Abandonadas">Transações Abandonadas</h2>
 
-<input type="hidden" id="adminToken" value="{$adminToken|escape}" />
-<input type="hidden" id="urlAdminOrder" value="{$urlAdminOrder|escape}" />
+<input type="hidden" id="adminToken" value="{$adminToken|escape:'htmlall':'UTF-8'}" />
+<input type="hidden" id="urlAdminOrder" value="{$urlAdminOrder|escape:'htmlall':'UTF-8'}" />
 
 
 {if isset($hasCredentials)}
@@ -38,7 +37,7 @@
             <div class="pagseguro-msg pagseguro-msg-error pagseguro-msg-small">
                 <ul>
                     {foreach from=$errorMsg key=errorKey item=errorMessage}
-                        <li>{$errorMessage|escape:'none'}</li>
+                        <li>{$errorMessage|escape:'htmlall':'UTF-8'}</li>
                     {/foreach}
                 </ul>
             </div>
@@ -52,10 +51,10 @@
             <select class="pagseguro-field" id="pagseguro-daystorecovery-input">
                 {html_options values=$daysToRecoveryKeys output=$daysToRecoveryValues selected=1}
             </select>
-            <span>&nbsp;{l s='últimos dias' mod='pagseguro'}</span>
+            <span>&nbsp;últimos dias</span>
 
             <div class="right-tools">
-                {l s='Recuperação de carrinho' mod='pagseguro'}:&nbsp;
+                Recuperação de carrinho:&nbsp;
                 <button disabled="disabled" class="pagseguro-button" id="send-email-button">
                     {l s='Enviar e-mail' mod='pagseguro'}
                 </button>
@@ -67,11 +66,11 @@
             <thead>
                 <tr>
                     <th class="col-md-0"><input type="checkbox" class="select-all"></th>
-                    <th class="col-md-1">{l s='Data do Pedido' mod='pagseguro'}</th>
-                    <th class="col-md-2">{l s='ID PrestaShop' mod='pagseguro'}</th>
-                    <th class="col-md-3">{l s='Validade do link' mod='pagseguro'}</th>
-                    <th class="col-md-4">{l s='E-mails enviados' mod='pagseguro'}</th>
-                    <th class="col-md-5">{l s='Pedido' mod='pagseguro'}</th>
+                    <th class="col-md-1">Data do Pedido</th>
+                    <th class="col-md-2">ID PrestaShop</th>
+                    <th class="col-md-3">Validade do link</th>
+                    <th class="col-md-4">E-mails enviados</th>
+                    <th class="col-md-5">Pedido</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -80,7 +79,7 @@
     {else}
         
         <div class="pagseguro-msg pagseguro-msg-alert pagseguro-msg-small">
-            <p>{l s='Ative a opção "listar transações abandonadas"' mod='pagseguro'}.</p>
+            <p>Ative a opção "listar transações abandonadas".</p>
         </div>
 
     {/if}
@@ -88,7 +87,7 @@
 {else}
     
     <div class="pagseguro-msg pagseguro-msg-alert pagseguro-msg-small">
-        <p>{l s='Para visualizar as transações abandonadas é necessário configurar suas' mod='pagseguro'} <span class="link pagseguro-goto-configuration">{l s='credenciais do PagSeguro' mod='pagseguro'}</span>.</p>
+        <p>Para visualizar as transações abandonadas é necessário configurar suas <span class="link pagseguro-goto-configuration">credenciais do PagSeguro</span>.</p>
     </div>
 
 {/if}

@@ -1,5 +1,5 @@
 {*
-* 2007-2011 PrestaShop 
+* 2007-2015 PrestaShop 
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2014 PrestaShop SA
+*  @copyright 2007-2015 PrestaShop SA
 *  @version  Release: $Revision: 6594 $
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
@@ -32,7 +32,7 @@
 <script type="text/javascript">
 function checkout()
 {
-    var url = "{$action_url|escape}";
+    var url = "{$action_url|escape:'htmlall':'UTF-8'}";
     if (location.protocol === 'https:') {
         url = url.replace("http", "https");
     }
@@ -59,12 +59,12 @@ function checkout()
     });
 }
 function redirecToPageError(){
-    window.location.href = baseDir + "{$errurl|escape:none}";
+    window.location.href = baseDir + "{$errurl|escape:'quotes':'UTF-8'}";
 }
 </script>
 
 <style type="text/css" media="all"> 
-	div#center_column{ width: {$width_center_column|escape}; }
+	div#center_column{ width: {$width_center_column|escape:'htmlall':'UTF-8'}; }
 </style>
 
 {capture name=path}{l s='Pagamento via PagSeguro' mod='pagseguro'}{/capture}
@@ -79,9 +79,9 @@ function redirecToPageError(){
 {else}
 
 <h3>{l s='Pagamento via PagSeguro' mod='pagseguro'}</h3>
-<form action="{$action_url|escape}" method="post">
+<form action="{$action_url|escape:'htmlall':'UTF-8'}" method="post">
 	<p>
-        <img src="{$image_payment|escape}" alt="{l s='pagseguro' mod='pagseguro'}" width="86" height="49" style="float:left; margin: 0px 10px 5px 0px;" />
+        <img src="{$image_payment|escape:'htmlall':'UTF-8'}" alt="{l s='pagseguro' mod='pagseguro'}" width="86" height="49" style="float:left; margin: 0px 10px 5px 0px;" />
         {l s='Você escolheu efetuar o pagamento via PagSeguro' mod='pagseguro'}
         <br/><br />
         {l s='Breve resumo da sua compra:' mod='pagseguro'}
@@ -95,8 +95,8 @@ function redirecToPageError(){
 	</p>
     {if $current_currency_name != "Real"}
         <p>
-        {l s='Moeda atual: ' mod='pagseguro'}&nbsp;<b>{$current_currency_name|escape}</b>
-                <input type="hidden" name="currency_payment" value="{$current_currency_id|escape}" />
+        {l s='Moeda atual: ' mod='pagseguro'}&nbsp;<b>{$current_currency_name|escape:'htmlall':'UTF-8'}</b>
+                <input type="hidden" name="currency_payment" value="{$current_currency_id|escape:'htmlall':'UTF-8'}" />
 	</p>
         {/if}
 	<p style="margin-top:20px;">
@@ -122,7 +122,7 @@ function redirecToPageError(){
         {else}
             <input type="submit" name="submit" value="{l s='Confirmo minha compra' mod='pagseguro'}" class="exclusive_large" />
         {/if}
-        <a href="{$link->getPageLink('order', true, NULL, "step=3")}" class="button_large">{l s='Outros formas de pagamento' mod='pagseguro'}</a>
+        <a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'htmlall':'UTF-8'}" class="button_large">{l s='Outros formas de pagamento' mod='pagseguro'}</a>
 	</p>
 </form>
 {/if}

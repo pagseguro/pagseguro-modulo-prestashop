@@ -23,7 +23,6 @@
 
 /***
  * Identifies a PagSeguro account
- * /
  */
 class PagSeguroAccountCredentials extends PagSeguroCredentials
 {
@@ -49,8 +48,8 @@ class PagSeguroAccountCredentials extends PagSeguroCredentials
     public function __construct($email, $token)
     {
         if ($email !== null && $token !== null) {
-            $this->email = $email;
-            $this->token = $token;
+            $this->setEmail($email);
+            $this->setToken($token);
         } else {
             throw new Exception("Credentials not set.");
         }

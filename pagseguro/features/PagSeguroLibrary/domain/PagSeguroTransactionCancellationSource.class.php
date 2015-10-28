@@ -34,7 +34,7 @@ class PagSeguroTransactionCancellationSource
      */
     private static $sourceList = array(
         'PAGSEGURO' => "INTERNAL",
-        'FINANCEIRA' => "EXTERNAL"        
+        'FINANCEIRA' => "EXTERNAL"
     );
 
     /***

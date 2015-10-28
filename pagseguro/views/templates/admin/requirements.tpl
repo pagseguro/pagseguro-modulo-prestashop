@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop 
+* 2007-2015 PrestaShop 
 *
 * NOTICE OF LICENSE
 *
@@ -18,17 +18,17 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2014 PrestaShop SA
+*  @copyright 2007-2015 PrestaShop SA
 *  @version  Release: $Revision: 6594 $
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-<h2 class="title" title="{$pageTitle}">{$pageTitle}</h2>
+<h2 class="title" title="Requisitos">Requisitos</h2>
 <ul class="pagseguro-list">
     {foreach from=$requirements item=requirement}
     	
-   		<li {if !$requirement[0]} class="pagseguro-list-item-error" {/if} >{$requirement[1]|escape:'none'}</li>
+   		<li {if !$requirement[0]} class="pagseguro-list-item-error" {/if} >{$requirement[1]|escape:'htmlall':'UTF-8'}</li>
 
     {/foreach}
 </ul>

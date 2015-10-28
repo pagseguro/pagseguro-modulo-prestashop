@@ -28,7 +28,8 @@ class PagSeguroDocument
 {
 
     private static $availableDocumentList = array(
-        1 => 'CPF'
+        1 => 'CPF',
+        2 => 'CNPJ'
     );
 
     /***
@@ -96,7 +97,6 @@ class PagSeguroDocument
      */
     public static function isDocumentTypeAvailable($documentType)
     {
-        $upperDocType = Tools::strtoupper($documentType);
-        return (array_search($upperDocType, self::$availableDocumentList));
+        return (array_search(Tools::strtoupper($documentType), self::$availableDocumentList));
     }
 }

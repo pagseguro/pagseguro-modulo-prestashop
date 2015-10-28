@@ -22,7 +22,7 @@
 #pagseguro-module-content{
     padding:1em 0 2em 0;
     position: relative;
-    background: url("../images/background.png") no-repeat scroll center 0 #FFF;
+    background: url("../img/background.png") no-repeat scroll center 0 #FFF;
     background-size: contain;
     overflow: hidden;
     clear: both;
@@ -275,20 +275,20 @@
 
 /* dataTable Sorting */
 .dataTable .sorting {
-    background-image: url("../images/dataTable/sort_both.png");
+    background-image: url("../img/dataTable/sort_both.png");
     cursor:pointer;
 }
 .dataTable .sorting_asc {
-    background-image: url("../images/dataTable/sort_asc.png");
+    background-image: url("../img/dataTable/sort_asc.png");
 }
 .dataTable .sorting_desc {
-    background-image: url("../images/dataTable/sort_desc.png");
+    background-image: url("../img/dataTable/sort_desc.png");
 }
 .dataTable .sorting_asc_disabled {
-    background-image: url("../images/dataTable/sort_asc_disabled.png");
+    background-image: url("../img/dataTable/sort_asc_disabled.png");
 }
 .dataTable .sorting_desc_disabled {
-    background-image: url("../images/dataTable/sort_desc_disabled.png");
+    background-image: url("../img/dataTable/sort_desc_disabled.png");
 }
 
 /* dataTable Pagination */
@@ -338,7 +338,7 @@
     list-style:none;
 }
 .pagseguro-list li {
-    background-image: url("../images/success.png");
+    background-image: url("../img/success.png");
     background-position: 1px 3px;
     background-repeat: no-repeat;
     border-bottom: 0 none;
@@ -348,7 +348,7 @@
 }
 .pagseguro-list .pagseguro-list-item-error{
     color:red;
-    background-image: url("../images/error.png");
+    background-image: url("../img/error.png");
     background-position: 1px 3px;
 }
 
@@ -499,14 +499,14 @@ i.icon-pagseguro-msg,
     display : inline-block;
     vertical-align : middle;
     overflow : hidden;
-    background-image : url('../images/messages.png');
+    background-image : url('../img/messages.png');
     background-repeat : no-repeat;
     background-size : cover;
 }
 
 i.icon-pagseguro-msg.icon-loading,
 .pagseguro-msg.pagseguro-msg-loading:before {
-    background-image : url('../images/loading.gif');
+    background-image : url('../img/loading.gif');
     background-position: 0 0;
 }
 
