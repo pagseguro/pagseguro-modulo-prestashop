@@ -28,7 +28,7 @@
 <p>Aqui você pode configurar o módulo PagSeguro no PrestaShop.</p>
 
 
-<form id="pagseguro-config-form" action="{$action_post|escape:'htmlall':'UTF-8'}" method="POST">
+<form id="pagseguro-config-form" action="{$action_post|escape:'none':'UTF-8'}" method="POST">
 
 	<input type="hidden" name="pagseguroModuleSubmit">
 
