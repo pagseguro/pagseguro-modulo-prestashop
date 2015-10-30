@@ -373,6 +373,15 @@ var PrestaShopPagSeguroModule = new function() {
                 });
 
                 changeHint(select);
+                
+                jQuery('#pagseguro-environment-input').change(function (event) {
+                    var SANDBOX = "sandbox";
+                    event.preventDefault();
+                    if (jQuery('#pagseguro-environment-input :selected').val() == SANDBOX)
+                    {
+                        Modal.message('warning', "Suas transações serão feitas em um ambiente de testes. Nenhuma das transações realizadas nesse ambiente tem valor monetário.");
+                    }
+                });
 
             };
 
@@ -839,8 +848,6 @@ var PrestaShopPagSeguroModule = new function() {
         };
 
     };
-
-
 
     /* ************************************* */
     /* *********** DOCUMENT READY ********** */

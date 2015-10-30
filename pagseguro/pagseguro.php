@@ -57,7 +57,8 @@ class PagSeguro extends PaymentModule {
         if (version_compare(_PS_VERSION_, '1.5.0.2', '<')) {
             include_once (dirname(__FILE__) . '/backward_compatibility/backward.php');
         }
-
+        
+        $this->verifyEnvironment();
         $this->setContext();
 
         $this->modulo = PagSeguroFactoryInstallModule::createModule(_PS_VERSION_);
@@ -86,7 +87,7 @@ class PagSeguro extends PaymentModule {
         if (!$this->modulo->installConfiguration()) {
             return false;
         }
-        if (!parent::install() or ! $this->registerHook('payment') or ! $this->registerHook('paymentReturn') or ! Configuration::updateValue('PAGSEGURO_EMAIL', '') or ! Configuration::updateValue('PAGSEGURO_TOKEN', '') or ! Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') or ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '') or ! Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset')) or ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active')) or ! Configuration::updateValue('PAGSEGURO_RECOVERY_ACTIVE', false) or ! Configuration::updateValue('PAGSEGURO_CHECKOUT', false) or ! Configuration::updateValue(
+        if (!parent::install() or ! $this->registerHook('payment') or ! $this->registerHook('paymentReturn') or ! Configuration::updateValue('PAGSEGURO_EMAIL', '') or ! Configuration::updateValue('PAGSEGURO_TOKEN', '') or ! Configuration::updateValue('PAGSEGURO_ENVIRONMENT', '') or ! Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') or ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '') or ! Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset')) or ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active')) or ! Configuration::updateValue('PAGSEGURO_RECOVERY_ACTIVE', false) or ! Configuration::updateValue('PAGSEGURO_CHECKOUT', false) or ! Configuration::updateValue(
                         'PAGSEGURO_LOG_FILELOCATION', PagSeguroConfig::getData('log', 'fileLocation')
                 )) {
             return false;
@@ -306,6 +307,7 @@ class PagSeguro extends PaymentModule {
             $updateData = Array(
                 'pagseguroEmail' => 'PAGSEGURO_EMAIL',
                 'pagseguroToken' => 'PAGSEGURO_TOKEN',
+                'pagseguroEnvironment' => 'PAGSEGURO_ENVIRONMENT',
                 'pagseguroRedirectUrl' => 'PAGSEGURO_URL_REDIRECT',
                 'pagseguroNotificationUrl' => 'PAGSEGURO_NOTIFICATION_URL',
                 'pagseguroCharset' => 'PAGSEGURO_CHARSET',
@@ -328,6 +330,8 @@ class PagSeguro extends PaymentModule {
             }
 
             $this->addToView('success', true);
+            
+            $this->verifyEnvironment();
         }
     }
 
@@ -393,6 +397,7 @@ class PagSeguro extends PaymentModule {
 
         $this->addToView('email', Tools::safeOutput(Configuration::get('PAGSEGURO_EMAIL')));
         $this->addToView('token', Tools::safeOutput(Configuration::get('PAGSEGURO_TOKEN')));
+        $this->addToView('environment', Tools::safeOutput(Configuration::get('PAGSEGURO_ENVIRONMENT')));
         $this->addToView('notificationUrl', $this->getNotificationUrl());
         $this->addToView('redirectUrl', $this->getDefaultRedirectionUrl());
 
@@ -764,5 +769,64 @@ class PagSeguro extends PaymentModule {
         }
         return $version;
     }
+    
+    private function verifyEnvironment() {
+        if ($this->getPagSeguroConfigEnvironment() 
+            != $this->getPrestaShopEnvironment())
+        {
+            $this->changeEnvironment();
+        }
+    }
+    
+    private function getPrestaShopEnvironment()
+    {
+        return Configuration::get('PAGSEGURO_ENVIRONMENT');
+    }
+    
+    private function getPagSeguroConfigEnvironment()
+    {
+        // Include the config file and get it's values
+        $path = dirname(__FILE__) . '/features/PagSeguroLibrary/config/PagSeguroConfigWrapper.php';
+        $fh = fopen($path,'r+');
 
+        while(!feof($fh)) {
+            $lines = explode(',',fgets($fh));
+            if (strpos($lines[0], "const PAGSEGURO_ENV"))
+            {
+                $context = explode("=",$lines[0]);
+                $environment = preg_replace("/[^a-zA-Z0-9]+/", "", $context[1]);
+            }
+        }       
+
+        fclose($fh);  
+        return $environment;
+    }
+    
+    private function changeEnvironment() 
+    {
+
+        // File to be changed
+        $archive = dirname(__FILE__) . '/features/PagSeguroLibrary/config/PagSeguroConfigWrapper.php';
+        // Search the current environment of library.
+        $search = "const PAGSEGURO_ENV";
+        // Save the file in an array in variable $arrayArchive.
+        $arrayArchive = file($archive);
+        $position = 0;
+        for ($i = 0; $i < sizeof($arrayArchive); $i++) {
+            // Checks the position of environmental on array, and stores the environment on variable $libEnvironment.
+            if (strpos($arrayArchive[$i], $search) &&
+               (strpos($arrayArchive[$i], 'production') || strpos($arrayArchive[$i], 'sandbox'))) {
+                $fullLine = $arrayArchive[$i];
+                $position = $i;
+                if (strpos($fullLine, 'production') == false) {
+                    $environment = "production";
+                } else {
+                    $environment = "sandbox";
+                }
+            }
+        }
+        
+        $arrayArchive[$position] = str_replace($this->getPagSeguroConfigEnvironment(), $environment, $fullLine);
+        file_put_contents($archive, implode("", $arrayArchive));
+    }
 }

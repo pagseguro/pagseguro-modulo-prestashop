@@ -28,7 +28,7 @@
 <p>Aqui você pode configurar o módulo PagSeguro no PrestaShop.</p>
 
 
-<form id="pagseguro-config-form" action="{$action_post|escape:'none':'UTF-8'}" method="POST">
+<form id="pagseguro-config-form" action="{$action_post|escape:'none'}" method="POST">
 
 	<input type="hidden" name="pagseguroModuleSubmit">
 
@@ -63,6 +63,25 @@
 				<input type="text" class="pagseguro-field" name="pagseguroToken" id="pagseguro-token-input" value="{$token|escape:'htmlall':'UTF-8'}" maxlength="32">
 			</div>
 		</div>
+
+	</div>
+                        
+        <div class="config-area">
+		
+            <h3 title="Ambiente" class="title-text title-3 title">Ambiente</h3>
+                
+            <!--
+                    ##################################
+                    ##### Environment  #####################
+            -->
+            <div class="config-sub-area">
+                    <div class="config-field">
+                            <select class="pagseguro-field" name="pagseguroEnvironment" id="pagseguro-environment-input">
+                                <option value="production" {if $environment eq "production"}selected{/if}>Produção</option>
+                                <option value="sandbox" {if $environment eq "sandbox"}selected{/if}>Sandbox</option>
+                            </select>
+                    </div>
+            </div>
 
 	</div>
 
