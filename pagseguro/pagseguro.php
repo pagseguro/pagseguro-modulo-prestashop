@@ -34,16 +34,16 @@ if (!defined('_PS_VERSION_')) {
 
 class PagSeguro extends PaymentModule {
 
-    private $modulo;
+    private   $modulo;
     protected $errors = array();
-    public $context;
-    private $pageId = '1';
+    public    $context;
+    private   $pageId = '1';
 
     public function __construct() {
 
         $this->name = 'pagseguro';
         $this->tab = 'payments_gateways';
-        $this->version = '2.0.0';
+        $this->version = '2.1.0';
         $this->author = 'PagSeguro Internet LTDA.';
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
@@ -87,9 +87,30 @@ class PagSeguro extends PaymentModule {
         if (!$this->modulo->installConfiguration()) {
             return false;
         }
-        if (!parent::install() or ! $this->registerHook('payment') or ! $this->registerHook('paymentReturn') or ! Configuration::updateValue('PAGSEGURO_EMAIL', '') or ! Configuration::updateValue('PAGSEGURO_TOKEN', '') or ! Configuration::updateValue('PAGSEGURO_ENVIRONMENT', '') or ! Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') or ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '') or ! Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset')) or ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active')) or ! Configuration::updateValue('PAGSEGURO_RECOVERY_ACTIVE', false) or ! Configuration::updateValue('PAGSEGURO_CHECKOUT', false) or ! Configuration::updateValue(
-                        'PAGSEGURO_LOG_FILELOCATION', PagSeguroConfig::getData('log', 'fileLocation')
-                )) {
+        if (!parent::install() or 
+            ! $this->registerHook('payment') or 
+            ! $this->registerHook('paymentReturn') or 
+            ! Configuration::updateValue('PAGSEGURO_EMAIL', '') or 
+            ! Configuration::updateValue('PAGSEGURO_TOKEN', '') or 
+            ! Configuration::updateValue('PAGSEGURO_ENVIRONMENT', '') or 
+            ! Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') or 
+            ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '') or 
+            ! Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset')) or 
+            ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active')) or 
+            ! Configuration::updateValue('PAGSEGURO_RECOVERY_ACTIVE', false) or 
+            ! Configuration::updateValue('PAGSEGURO_CHECKOUT', false) or 
+            ! Configuration::updateValue('PAGSEGURO_LOG_FILELOCATION', PagSeguroConfig::getData('log', 'fileLocation')) or
+            ! Configuration::updateValue('PAGSEGURO_DISCOUNT_CREDITCARD', false) or
+            ! Configuration::updateValue('PAGSEGURO_DISCOUNT_CREDITCARD_VL', "00.00") or
+            ! Configuration::updateValue('PAGSEGURO_DISCOUNT_BOLETO', false) or
+            ! Configuration::updateValue('PAGSEGURO_DISCOUNT_BOLETO_VL', "00.00") or
+            ! Configuration::updateValue('PAGSEGURO_DISCOUNT_EFT', false) or
+            ! Configuration::updateValue('PAGSEGURO_DISCOUNT_EFT_VL', "00.00") or
+            ! Configuration::updateValue('PAGSEGURO_DISCOUNT_DEPOSIT', false) or
+            ! Configuration::updateValue('PAGSEGURO_DISCOUNT_DEPOSIT_VL', "00.00") or
+            ! Configuration::updateValue('PAGSEGURO_DISCOUNT_BALANCE', false) or
+            ! Configuration::updateValue('PAGSEGURO_DISCOUNT_BALANCE_VL', "00.00")
+                ) {
             return false;
         }
 
@@ -116,6 +137,16 @@ class PagSeguro extends PaymentModule {
                 or ! Configuration::deleteByName('PAGSEGURO_LOG_FILELOCATION')
                 or ! Configuration::deleteByName('PS_OS_PAGSEGURO')
                 or ! Configuration::deleteByName('PAGSEGURO_CHECKOUT')
+                or ! Configuration::deleteByName('PAGSEGURO_DISCOUNT_CREDITCARD')
+                or ! Configuration::deleteByName('PAGSEGURO_DISCOUNT_CREDITCARD_VL')
+                or ! Configuration::deleteByName('PAGSEGURO_DISCOUNT_BOLETO')
+                or ! Configuration::deleteByName('PAGSEGURO_DISCOUNT_BOLETO_VL')
+                or ! Configuration::deleteByName('PAGSEGURO_DISCOUNT_EFT')
+                or ! Configuration::deleteByName('PAGSEGURO_DISCOUNT_EFT_VL')
+                or ! Configuration::deleteByName('PAGSEGURO_DISCOUNT_DEPOSIT')
+                or ! Configuration::deleteByName('PAGSEGURO_DISCOUNT_DEPOSIT_VL')
+                or ! Configuration::deleteByName('PAGSEGURO_DISCOUNT_BALANCE')
+                or ! Configuration::deleteByName('PAGSEGURO_DISCOUNT_BALANCE_VL')
                 or ! parent::uninstall()) {
             return false;
         }
@@ -172,33 +203,30 @@ class PagSeguro extends PaymentModule {
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/hook/payment_return.tpl');
     }
 
-    /*     * *
+    /**
      * PrestaShop getContent function steps:
      *
      *  1) Validate and save post confuguration data
      *  2) Route and show current virtual page
      *
      */
-
     public function getContent() {
         $this->verifyPost();
         return $this->pageRouter();
     }
 
-    /*
+    /**
      *   Validate and save post confuguration data
      */
-
     private function verifyPost() {
         if ($this->postValidation()) {
             $this->savePostData();
         }
     }
 
-    /*     * *
+    /**
      * Shorthand to assign on Smarty
      */
-
     private function addToView($key, $value) {
         if ($this->context->smarty) {
             $this->context->smarty->assign($key, $value);
@@ -262,6 +290,56 @@ class PagSeguro extends PaymentModule {
             if ($recoveryActive && !array_key_exists($recoveryActive, Util::getActive())) {
                 $errors[] = $this->invalidValueMessage('Listar transações abandonadas');
             }
+            
+            /** Discount credit card validation */
+            $discountCreditCard = Tools::getValue('pagseguroDiscountCreditCardInput');
+            if ($discountCreditCard && is_bool($discountCreditCard)) {
+                $errors[] = $this->invalidValueMessage("Desconto para cartão de crédito.");
+            }
+            $discountCreditCardValue = Tools::getValue('pagseguroDiscountCreditCardDiscountInput');
+            if ($discountCreditCardValue && is_float($discountCreditCardValue)) {
+                $errors[] = $this->invalidValueMessage("Valor do desconto para cartão de crédito.");
+            }
+            
+            /** Discount boleto validation */
+            $discountBoleto = Tools::getValue('pagseguroDiscountBoletoInput');
+            if ($discountBoleto && is_bool($discountBoleto)) {
+                $errors[] = $this->invalidValueMessage("Desconto para boleto.");
+            }
+            $discountBoletoValue = Tools::getValue('pagseguroDiscountBoletoDiscountInput');
+            if ($discountBoletoValue && is_float($discountBoletoValue)) {
+                $errors[] = $this->invalidValueMessage("Valor do desconto para boleto.");
+            }
+            
+            /** Discount EFT validation */
+            $discountEFT = Tools::getValue('pagseguroDiscountEFTInput');
+            if ($discountEFT && is_bool($discountEFT)) {
+                $errors[] = $this->invalidValueMessage("Desconto para débito online.");
+            }
+            $discountEFTValue = Tools::getValue('pagseguroDiscountEFTDiscountInput');
+            if ($discountBoletoValue && is_float($discountEFTValue)) {
+                $errors[] = $this->invalidValueMessage("Valor do desconto para débito online");
+            }
+            
+            /** Discount deposit validation */
+            $discountDeposit = Tools::getValue('pagseguroDiscountDepositInput');
+            if ($discountDeposit && is_bool($discountDeposit)) {
+                $errors[] = $this->invalidValueMessage("Desconto para depósito");
+            }
+            $discountDepositValue = Tools::getValue('pagseguroDiscountDepositDiscountInput');
+            if ($discountDepositValue && is_float($discountDepositValue)) {
+                $errors[] = $this->invalidValueMessage("Valor do desconto para depósito");
+            }
+            
+            /** Discount balance validation */
+            $discountBalance = Tools::getValue('pagseguroDiscountDepositInput');
+            if ($discountBalance && is_bool($discountBalance)) {
+                $errors[] = $this->invalidValueMessage("Desconto para saldo PagSeguro");
+            }
+            $discountBalanceValue = Tools::getValue('pagseguroDiscountDepositDiscountInput');
+            if ($discountBalanceValue && is_float($discountBalanceValue)) {
+                $errors[] = $this->invalidValueMessage("Valor do desconto para o saldo PagSeguro.");
+            }
 
             if (count($errors) > 0) {
                 $valid = false;
@@ -314,16 +392,57 @@ class PagSeguro extends PaymentModule {
                 'pagseguroCheckout' => 'PAGSEGURO_CHECKOUT',
                 'pagseguroLogActive' => 'PAGSEGURO_LOG_ACTIVE',
                 'pagseguroLogFileLocation' => 'PAGSEGURO_LOG_FILELOCATION',
-                'pagseguroRecoveryActive' => 'PAGSEGURO_RECOVERY_ACTIVE'
+                'pagseguroRecoveryActive' => 'PAGSEGURO_RECOVERY_ACTIVE',
             );
-
+            
             foreach ($updateData as $postIndex => $configIndex) {
-
                 if (Tools::getValue($postIndex)) {
                     Configuration::updateValue($configIndex, Tools::getValue($postIndex));
                 }
+                if (Tools::getValue($postIndex) == "0") {
+                    Configuration::updateValue($configIndex, Tools::getValue($postIndex));
+                }
             }
-
+            
+            $updateDiscount = Array(
+                'pagseguroDiscountCreditCardInput' => Array(
+                    "key" => 'PAGSEGURO_DISCOUNT_CREDITCARD', 
+                    "value" => Array(
+                        'pagseguroDiscountCreditCardDiscountInput' => 'PAGSEGURO_DISCOUNT_CREDITCARD_VL'
+                )),
+                'pagseguroDiscountBoletoInput' =>  Array(
+                    "key" => 'PAGSEGURO_DISCOUNT_BOLETO',
+                    "value"  => Array(
+                       'pagseguroDiscountBoletoDiscountInput' => 'PAGSEGURO_DISCOUNT_BOLETO_VL' 
+                )),
+                'pagseguroDiscountEftInput' => Array(
+                    "key" => 'PAGSEGURO_DISCOUNT_EFT',
+                    "value" => Array(
+                        'pagseguroDiscountEftDiscountInput' => 'PAGSEGURO_DISCOUNT_EFT_VL'
+                )),
+                'pagseguroDiscountDepositInput' => Array(
+                    "key" => 'PAGSEGURO_DISCOUNT_DEPOSIT',
+                    "value" => Array(
+                        'pagseguroDiscountDepositDiscountInput' => 'PAGSEGURO_DISCOUNT_DEPOSIT_VL'
+                )),
+                'pagseguroDiscountBalanceInput' => Array(
+                    "key" => 'PAGSEGURO_DISCOUNT_BALANCE',
+                    "value" => Array(
+                        'pagseguroDiscountBalanceDiscountInput' => 'PAGSEGURO_DISCOUNT_BALANCE_VL'
+                )),
+            );
+            
+            foreach ($updateDiscount as $postIndex => $configIndex) {
+                
+                if (Tools::getValue($postIndex)) {
+                    Configuration::updateValue($configIndex["key"], Tools::getValue($postIndex));
+                    Configuration::updateValue($configIndex["value"][key($configIndex["value"])], Tools::getValue(key($configIndex["value"])));
+                } else {
+                   Configuration::updateValue($configIndex["key"], Tools::getValue($postIndex));
+                    Configuration::updateValue($configIndex["value"][key($configIndex["value"])], "00.00");
+                }
+            }
+           
             /** Verify if log file exists, case not try create */
             if (Tools::getValue('pagseguroLogActive')) {
                 $this->verifyLogFile(Tools::getValue('pagseguro_log_dir'));
@@ -420,7 +539,18 @@ class PagSeguro extends PaymentModule {
         $this->addToView('recoveryActiveKeys', array_keys($activeOptions));
         $this->addToView('recoveryActiveValues', array_values($activeOptions));
         $this->addToView('recoveryActiveSelected', Configuration::get('PAGSEGURO_RECOVERY_ACTIVE'));
-
+        
+        $this->addToView('discountCreditCard', Configuration::get('PAGSEGURO_DISCOUNT_CREDITCARD'));
+        $this->addToView('discountCreditCardValue', Configuration::get('PAGSEGURO_DISCOUNT_CREDITCARD_VL'));
+        $this->addToView('discountBoleto', Configuration::get('PAGSEGURO_DISCOUNT_BOLETO'));
+        $this->addToView('discountBoletoValue', Configuration::get('PAGSEGURO_DISCOUNT_BOLETO_VL'));
+        $this->addToView('discountEFT', Configuration::get('PAGSEGURO_DISCOUNT_EFT'));
+        $this->addToView('discountEFTValue', Configuration::get('PAGSEGURO_DISCOUNT_EFT_VL'));
+        $this->addToView('discountDeposit', Configuration::get('PAGSEGURO_DISCOUNT_DEPOSIT'));
+        $this->addToView('discountDepositValue', Configuration::get('PAGSEGURO_DISCOUNT_DEPOSIT_VL'));
+        $this->addToView('discountBalance', Configuration::get('PAGSEGURO_DISCOUNT_BALANCE'));
+        $this->addToView('discountBalanceValue', Configuration::get('PAGSEGURO_DISCOUNT_BALANCE_VL'));
+        
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/settings.tpl');
     }
 

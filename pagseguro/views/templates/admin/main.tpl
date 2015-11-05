@@ -103,4 +103,5 @@
 <script type="text/javascript" src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/jquery.colorbox-min.js"></script>
 <script type="text/javascript" src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/jquery-1102.min.js"></script>
 <script type="text/javascript" charset="utf8" src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf8" src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/jquery.inputmask.bundle.js"></script>
 <script type="text/javascript" charset="utf8" src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/pagseguro-module.js"></script>

@@ -94,13 +94,17 @@ class ConverterOrderForPaymentRequest
         
         /** Shipping */
         $this->paymentRequest->setShipping($this->generateShippingData());
-        
+                
         /** Redirect URL */
         if (! Tools::isEmpty($redirectURL)) {
             $this->paymentRequest->setRedirectURL($redirectURL);
         }
+        
+        /** Discount */
+        $this->getDiscountData($this->paymentRequest);
+        
     }
-
+    
     private function getExtraAmountValues()
     {
         return Tools::convertPrice($this->getCartDiscounts() + $this->getWrappingValues());
@@ -264,6 +268,51 @@ class ConverterOrderForPaymentRequest
         }
         
         return $address;
+    }
+    
+    private function getDiscountData($paymentRequest) 
+    {
+        if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_CREDITCARD'))) {
+            $paymentRequest->addPaymentMethodConfig(
+                'CREDIT_CARD', 
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_CREDITCARD_VL')), 
+                'DISCOUNT_PERCENT'
+            );
+        }
+        
+        if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_EFT'))) {
+            $paymentRequest->addPaymentMethodConfig(
+                'EFT', 
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_EFT_VL')), 
+                'DISCOUNT_PERCENT'
+            );
+        }
+        
+        if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BOLETO'))) {
+            $paymentRequest->addPaymentMethodConfig(
+                'BOLETO', 
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BOLETO_VL')), 
+                'DISCOUNT_PERCENT'
+            );
+        }
+        
+        if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_DEPOSIT'))) {
+            $paymentRequest->addPaymentMethodConfig(
+                'DEPOSIT', 
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_DEPOSIT_VL')), 
+                'DISCOUNT_PERCENT'
+            );
+        }
+        
+        if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BALANCE'))) {
+            $paymentRequest->addPaymentMethodConfig(
+                'BALANCE', 
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BALANCE_VL')), 
+                'DISCOUNT_PERCENT'
+            );
+        }
+        
+        return $paymentRequest;
     }
 
     private function addressConfig($fullAddress)

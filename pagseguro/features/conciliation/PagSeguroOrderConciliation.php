@@ -44,8 +44,8 @@ class PagSeguroOrderConciliation {
 
             parse_str($transaction, $output);
             
-            $orderId    = $output['reference'];
-            $statusId   = $output['status'];
+            $orderId    = $output["reference"];
+            $statusId   = $output["status"];
             $statusName = Util::getPagSeguroStatusName($statusId);
 
             $this->logInfo("
@@ -82,10 +82,12 @@ class PagSeguroOrderConciliation {
 
 
     private function updateOrderStatus($orderId, $statusName) {
+
+        $moduleName = ($this->verifyVersion() === true) ? "" : "AND module_name = 'pagseguro'";
         
         $query  = '
             SELECT osl.`id_order_state`, osl.`name` FROM `'._DB_PREFIX_.'order_state_lang` osl
-            JOIN `'._DB_PREFIX_.'order_state` os ON osl.`id_order_state` = os.`id_order_state` AND module_name = \'pagseguro\'
+            JOIN `'._DB_PREFIX_.'order_state` os ON osl.`id_order_state` = os.`id_order_state` '.$moduleName.'
             WHERE osl.`name` LIKE "'.$statusName.'" GROUP BY osl.`name` LIMIT 0, 1
         ';
         
@@ -97,9 +99,7 @@ class PagSeguroOrderConciliation {
             $history->changeIdOrderState($status, $order->id);
             return (bool)$history->addWithemail();
         }
-
         return false;
-
     }
 
     private function getConciliationData($searchDays = 1) {
@@ -143,7 +143,6 @@ class PagSeguroOrderConciliation {
             }
 
         }
-
         return $resultList;
 
     }
@@ -151,7 +150,7 @@ class PagSeguroOrderConciliation {
 
     private function getPrestashopPaymentList($searchDays) {
         
-        $currentStateCol = $this->verifyVersion() ? 'psord.`current_state`,' : '';
+        $currentStateCol = ($this->verifyVersion() === true) ? "" : "psord.`current_state`,";
         
         $query = '
             SELECT
@@ -179,7 +178,7 @@ class PagSeguroOrderConciliation {
                     AND osl.`id_lang` = psord.id_lang
                     AND psord.date_add >= DATE_SUB(CURDATE(),INTERVAL \''.((int)$searchDays).'\' DAY)
         ';
-        
+
         return Db::getInstance()->ExecuteS($query);
 
     }

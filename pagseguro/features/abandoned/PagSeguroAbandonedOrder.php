@@ -50,9 +50,9 @@ class PagSeguroAbandonedOrder {
         if ($transactions) {
         	$sendMultiple = true;
             $templateData = $this->getMailTemplateData();
-            foreach ($transactions as $value) {
+            foreach ($transactions as $key => $value) {
                 parse_str($value);
-                if (!$this->sendMail($templateData, null, null, null)) {
+                if (!$this->sendMail($templateData, $reference, $recovery, $customer)) {
                 	$sendMultiple = false;
                     break;
                 }
@@ -104,7 +104,7 @@ class PagSeguroAbandonedOrder {
         $sql = "SELECT * FROM ". _DB_PREFIX_ ."pagseguro_order";
 
         if ($orders = Db::getInstance()->executeS($sql)) {
-            foreach ($orders as $order) {
+            foreach ($orders as $key => $order) {
                 $result[$order['id_order']] = $order;
             }
         }
@@ -210,7 +210,7 @@ class PagSeguroAbandonedOrder {
 
         $orderMessage = OrderMessage::getOrderMessages($idLang);
 
-        foreach ($orderMessage as $value) {
+        foreach ($orderMessage as $key => $value) {
             if (strcmp($value["id_order_message"], Configuration::get('PAGSEGURO_MESSAGE_ORDER_ID')) == 0) {
                 $template = $value['name'];
                 $message  = $value['message'];
@@ -224,14 +224,31 @@ class PagSeguroAbandonedOrder {
         );
 
     }
+    
+    private function buildAbandonedRecoveryUrl($recoveryCode)
+    {
+        
+        $protocol = "https://";
+        $environment = "sandbox.";
+        $resource = "pagseguro.uol.com.br/checkout/v2/resume.html";
+        $recovery = "?r=" . $recoveryCode;
+               
+        if ( Configuration::get('PAGSEGURO_ENVIRONMENT') == "sandbox") {
+            $url = $protocol.$environment.$resource.$recovery;
+        } else {
+            $url = $protocol.$resource.$recovery;
+        }
+        
+        return '<a href="'.$url.'" target="_blank"> Clique aqui para continuar sua compra </a>';
+    }
 
     private function sendMail(Array $templateData, $reference, $recoveryCode, $customerId) {
         
         $customer = new Customer((int) $customerId);
-
+        
         $params = array(
             '{message}' =>  $templateData['message'],
-            '{link}'    => '<a href="https://pagseguro.uol.com.br/checkout/v2/resume.html?r='.$recoveryCode.'" target="_blank"> Clique aqui para continuar sua compra </a>'
+            '{link}'    =>  $this->buildAbandonedMailUrl($recoveryCode)
         );
 
         $sendMail = @Mail::Send(

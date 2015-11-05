@@ -386,12 +386,113 @@ var PrestaShopPagSeguroModule = new function() {
             };
 
         };
+        
+        var DiscountBehavior = new function(){
+            
+            var creditcard;
+            var boleto;
+            var eft;
+            var deposit;
+            var balance;
+            
+            var verify = function(service)
+            {
+                if (value(service) == true) {
+                    configure(service);
+                    show(service);
+                } else {
+                    hide(service);
+                    return false;
+                }
+                return true;
+            }
+            
+            var value = function(service)
+            {
+                return jQuery(service).val();
+            }
+            
+            var hide = function(service)
+            {
+                service.next().hide()
+            }
+            
+            var show = function(service)
+            {
+                service.next().show()
+            }
+            
+            var configure = function(service)
+            {
+                //GetInput
+                var input = service.next().find('input');
+                //SetMask
+                input.inputmask({ mask: function () { /* do stuff */ return ["9.99", "99.99"]; }, greedy: false });
+                //SetCSS
+                input.css('width', '50px');
+            }
+            
+            var message = function()
+            {
+                Modal.message('warning', "O desconto será aplicado com base no subtotal do checkout PagSeguro.Eventuais valores de frete não serão levados em consideração para a aplicação do desconto. É recomendável que você simule o funcionamento desta feature no ambiente do Sandbox.");
+            }
+            
+            var onLoad = function(creditcard, boleto, etf, deposit, balance)
+            {
+                for (var i=0; i < arguments.length; i++) {
+                     verify(arguments[i]);
+                }
+            }
+                        
+            var setVars = function() {
+                creditcard = jQuery("#pagseguro-discount-creditcard-input");
+                boleto = jQuery("#pagseguro-discount-boleto-input");
+                eft = jQuery("#pagseguro-discount-eft-input");
+                deposit = jQuery("#pagseguro-discount-deposit-input");
+                balance = jQuery("#pagseguro-discount-balance-input");
+            }
+            
+            var hasChange = function()
+            {
+                creditcard.change(function(){
+                    if (verify(creditcard))
+                        message();
+                });   
+                
+                boleto.change(function(){
+                    if (verify(boleto))
+                        message();
+                }); 
+                
+                eft.change(function(){
+                    if (verify(eft))
+                        message();
+                }); 
+                
+                deposit.change(function(){
+                    if (verify(deposit))
+                        message();
+                }); 
+                
+                balance.change(function(){
+                    if (verify(balance))
+                        message();
+                });
+            }
+            
+            this.init = function()
+            {
+                setVars();
+                onLoad(creditcard, boleto, eft, deposit, balance);
+                hasChange(); 
+            };
+        };
 
         this.init = function() {
             OptionHintBehavior.init();
             LogActioveBehavior.init();
+            DiscountBehavior.init();
         };
-
     };
 
 
