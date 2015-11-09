@@ -52,6 +52,43 @@
 
 
 /* Menu */
+
+#pagseguro-module-menu i.icon { 
+    background-image: url("../img/messages.png"); 
+    background-repeat: no-repeat; 
+    background-size: 16px; 
+    background-position: 0 -122px; 
+    width: 16px; 
+    height: 16px; 
+    display: inline-block; 
+    vertical-align: middle; 
+    margin: -2px 5px 0 0; 
+}
+
+#pagseguro-module-menu li.open i.icon { 
+    background-position: 0 -142px; 
+}
+
+#pagseguro-module-menu span{
+    font-size: 1.0em;
+    margin-top: 0.8em;
+    margin-bottom: 0.8em;
+    margin-left: 0.8em;
+    padding: 0;
+    width: 100%;
+    color: #025ec7;
+}
+
+#pagseguro-module-menu .children{
+    display:block;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 #pagseguro-module-menu{
     width: 20%;
     max-width: 200px;
@@ -67,6 +104,19 @@
     padding: 0;
     width: 100%;
 }
+
+#pagseguro-module-menu ul li ul{
+    font-size: 1.0em;
+    margin-top: 0.4em;
+    margin-left: 1.5em;
+    padding: 0;
+    width: 100%;
+}
+
+#pagseguro-module-menu ul li ul li{
+    list-style: none outside none;
+}
+
 #pagseguro-module-menu li{
     list-style: none outside none;
 }

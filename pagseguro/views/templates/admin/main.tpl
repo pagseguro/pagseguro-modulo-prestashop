@@ -47,54 +47,100 @@
 		<div class="wrapper">
 		    
 		    <div id="pagseguro-module-menu">
-			    
-			    <ul>
-				    {foreach from=$pages item=page}
-						<li 
-							id="menu-item-{$page.id|escape:'htmlall':'UTF-8'}" 
-							class="menu-item {if $page.selected}selected{/if}" 
-							data-page-id="{$page.id|escape:'htmlall':'UTF-8'}"
-							{if $page.hasForm} data-has-form="true" {/if} >
-							<a class="link menu-item-link" href="#pagseguro-module-content-{$page.id|escape:'htmlall':'UTF-8'}">
-								{$page.title|escape:'htmlall':'UTF-8'}
-							</a>
-						</li>
-				    {/foreach}
-			    </ul>
+
+                        <ul>
+                            {foreach from=$pages item=page}
+                                
+                                {if !$page.hasChild}
+                                <li 
+                                    id="menu-item-{$page.id|escape:'htmlall':'UTF-8'}" 
+                                    class="menu-item {if $page.selected}selected{/if}" 
+                                    data-page-id="{$page.id|escape:'htmlall':'UTF-8'}"
+                                    {if $page.hasForm} data-has-form="true" {/if} >
+                                    <a class="link menu-item-link" href="#pagseguro-module-content-{$page.id|escape:'htmlall':'UTF-8'}">
+                                            {$page.title|escape:'htmlall':'UTF-8'}
+                                    </a>
+                                {else}
+                                    <li 
+                                    id="menu-item-{$page.id|escape:'htmlall':'UTF-8'}" 
+                                    data-page-id="{$page.id|escape:'htmlall':'UTF-8'}"
+                                    {if $page.hasForm} data-has-form="true" {/if} >
+                                        <span class="children"><i class="icon"></i>{$page.title|escape:'htmlall':'UTF-8'}</span>
+                                    
+                                {/if}
+                                    {if $page.hasChild}
+                                        <ul>
+                                            {foreach from=$page.content item=nav}
+                                                <li 
+                                                    id="menu-item-{$nav.id|escape:'htmlall':'UTF-8'}" 
+                                                    class="menu-item {if $nav.selected}selected{/if}" 
+                                                    data-page-id="{$nav.id|escape:'htmlall':'UTF-8'}"
+                                                    {if $nav.hasForm} data-has-form="true" {/if} >
+                                                    <a class="link menu-item-link" href="#pagseguro-module-content-{$nav.id|escape:'htmlall':'UTF-8'}">
+                                                            {$nav.title|escape:'htmlall':'UTF-8'}
+                                                    </a>
+                                                </li>
+                                            {/foreach}
+                                        </ul>
+                                    {/if}
+                                </li>
+                            {/foreach}
+                        </ul>
 
 		    	<div id="pagseguro-save-wrapper">
 		    		<p>Clique no botão abaixo para salvar suas configurações.</p>
 		    		<button id="pagseguro-save-button" class="pagseguro-button gray-theme" type="button">Salvar Configuração</button>
 		    	</div>
+                </div>
 
-			</div>
+                <div id="pagseguro-module-contents">
 
-		    <div id="pagseguro-module-contents">
-			    
-			    {foreach from=$pages item=page}
-					<div id="pagseguro-module-content-{$page.id|escape:'htmlall':'UTF-8'}" class="pagseguro-module-content {if $page.selected}selected{/if}">
-					    
-						{if isset($success)}
-							<div class="pagseguro-msg pagseguro-msg-success pagseguro-msg-small">
-								<p>Dados atualizados com sucesso.</p>
-							</div>
-						{/if}
+                    {foreach from=$pages item=page}
 
-					    {foreach from=$errors item=error}
-							<div class="pagseguro-msg pagseguro-msg-error pagseguro-msg-small">
-								<p>{$error|escape:'htmlall':'UTF-8'}</p>
-							</div>
-					    {/foreach}
+                            {if is_array($page.content)}
+                                {foreach from=$page.content item=subpage}
 
-					    {$page.content|escape:'quotes':'UTF-8'}
+                                    <div id="pagseguro-module-content-{$subpage.id|escape:'htmlall':'UTF-8'}" 
+                                         class="pagseguro-module-content {if $subpage.selected}selected{/if}">
 
-					</div>
-			    {/foreach}
+                                        {if isset($success)}
+                                            <div class="pagseguro-msg pagseguro-msg-success pagseguro-msg-small">
+                                                    <p>Dados atualizados com sucesso.</p>
+                                            </div>
+                                        {/if}
 
-		    </div>
+                                        {foreach from=$errors item=error}
+                                            <div class="pagseguro-msg pagseguro-msg-error pagseguro-msg-small">
+                                                <p>{$error|escape:'htmlall':'UTF-8'}</p>
+                                            </div>
+                                        {/foreach}
 
-		</div>
+                                        {$subpage.content|escape:'quotes':'UTF-8'}   
+                                    </div>                                           
+                                {/foreach}
+                            {else}       
+                                <div id="pagseguro-module-content-{$page.id|escape:'htmlall':'UTF-8'}" 
+                                     class="pagseguro-module-content {if $page.selected}selected{/if}">
 
+                                    {if isset($success)}
+                                        <div class="pagseguro-msg pagseguro-msg-success pagseguro-msg-small">
+                                                <p>Dados atualizados com sucesso.</p>
+                                        </div>
+                                    {/if}
+
+                                    {foreach from=$errors item=error}
+                                        <div class="pagseguro-msg pagseguro-msg-error pagseguro-msg-small">
+                                            <p>{$error|escape:'htmlall':'UTF-8'}</p>
+                                        </div>
+                                    {/foreach}
+
+                                    {$page.content|escape:'quotes':'UTF-8'}   
+
+                                </div> 
+                            {/if}
+                    {/foreach}
+                </div>
+            </div>
 	</div>
 
 </div>

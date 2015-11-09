@@ -482,28 +482,38 @@ class PagSeguro extends PaymentModule {
                 'title' => $this->l('Configuração'),
                 'content' => $this->getConfigurationPageHtml(),
                 'hasForm' => true,
-                'selected' => ($this->pageId == '1')
-            ),
-            'conciliation' => array(
+                'selected' => ($this->pageId == '1'),
+            ),           
+            'transactions' => array (
                 'id' => 2,
-                'title' => $this->l('Conciliação'),
-                'content' => $this->getConciliationPageHtml(),
+                'title' => $this->l('Transações'),
+                'content' => array(
+                    'conciliation' => array(
+                        'id' => 3,
+                        'title' => $this->l('Conciliação'),
+                        'content' => $this->getConciliationPageHtml(),
+                        'hasForm' => false,
+                        'selected' => ($this->pageId == '3')
+                    ),
+                    'abandoned' => array(
+                        'id' => 4,
+                        'title' => $this->l('Abandonadas'),
+                        'content' => $this->getAbandonedPageHtml(),
+                        'hasForm' => false,
+                        'selected' => ($this->pageId == '4')
+                    )
+                ),
                 'hasForm' => false,
-                'selected' => ($this->pageId == '2')
-            ),
-            'abandoned' => array(
-                'id' => 3,
-                'title' => $this->l('Abandonadas'),
-                'content' => $this->getAbandonedPageHtml(),
-                'hasForm' => false,
-                'selected' => ($this->pageId == '3')
+                'icon' => true,
+                'selected' => ($this->pageId == '2'),
+                'hasChild' => true
             ),
             'requirements' => array(
-                'id' => 4,
+                'id' => 5,
                 'title' => $this->l('Requisitos'),
                 'content' => $this->getRequirementsPageHtml(),
                 'hasForm' => false,
-                'selected' => ($this->pageId == '4')
+                'selected' => ($this->pageId == '5'),
             )
         );
 

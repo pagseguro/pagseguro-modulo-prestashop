@@ -225,21 +225,14 @@ class PagSeguroAbandonedOrder {
 
     }
     
-    private function buildAbandonedRecoveryUrl($recoveryCode)
+    private function buildAbandonedMailUrl($recoveryCode)
     {
-        
-        $protocol = "https://";
-        $environment = "sandbox.";
-        $resource = "pagseguro.uol.com.br/checkout/v2/resume.html";
-        $recovery = "?r=" . $recoveryCode;
-               
-        if ( Configuration::get('PAGSEGURO_ENVIRONMENT') == "sandbox") {
-            $url = $protocol.$environment.$resource.$recovery;
+        if (Configuration::get('PAGSEGURO_ENVIRONMENT') == "sandbox")
+        {
+            return '<a href="https://sandbox.pagseguro.uol.com.br/checkout/v2/resume.html?r='.$recoveryCode.'" target="_blank"> Clique aqui para continuar sua compra </a>';
         } else {
-            $url = $protocol.$resource.$recovery;
+            return '<a href="https://pagseguro.uol.com.br/checkout/v2/resume.html?r='.$recoveryCode.'" target="_blank"> Clique aqui para continuar sua compra </a>';
         }
-        
-        return '<a href="'.$url.'" target="_blank"> Clique aqui para continuar sua compra </a>';
     }
 
     private function sendMail(Array $templateData, $reference, $recoveryCode, $customerId) {

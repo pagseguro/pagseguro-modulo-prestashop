@@ -191,7 +191,7 @@ var PrestaShopPagSeguroModule = new function() {
 
             var selectedClass = "selected";
             var allItems = wrapper.find(".menu-item");
-
+            
             allItems.click(function(e){
                 
                 e.preventDefault();
@@ -214,7 +214,7 @@ var PrestaShopPagSeguroModule = new function() {
 
                         jQuery(".pagseguro-module-content").removeClass(selectedClass);
                         jQuery("#pagseguro-module-content-" + id).addClass(selectedClass);
-                        
+
                         if (hasForm) {
                             saveForm.show();
                         } else {
@@ -227,21 +227,15 @@ var PrestaShopPagSeguroModule = new function() {
                     };
 
                     if (windowSel.scrollTop() > 100) {
-                        
                         body.animate({scrollTop:0}, 800, 'swing', function(){
                             setTimeout(showNewPage, 100);
                         });
-
                     } else {
                         showNewPage();
                     }
-
                 };
-
                 return false;
-
             });
-
         };
 
         var applySaveForm = function() {
@@ -278,15 +272,12 @@ var PrestaShopPagSeguroModule = new function() {
             };
 
             windowSel.scroll(function(e){
-
                 var top = getWindowTop();
-
                 if (top >= initialPos) {
                     applyFixed(top);
                 } else {
                     resetFixed();
                 }
-
             });
 
             windowSel.resize(function(){
@@ -301,10 +292,30 @@ var PrestaShopPagSeguroModule = new function() {
         };
 
         var applyGotoConfig = function() {
+            
             jQuery(".pagseguro-goto-configuration").click(function(){
                 jQuery("#menu-item-1").trigger('click');
                 jQuery("#pagseguro-email-input").focus();
             });
+        };
+        
+        var retractableMenu = function() {
+            jQuery("#pagseguro-module-menu .children").click(function(){
+                var parent = jQuery(this);
+                if (parent.closest("li").hasClass("open")) {
+                    parent.closest("li").removeClass("open");
+                    parent.next().hide();
+                } else {
+                    parent.closest("li").addClass("open");
+                    parent.next().show();
+                }
+            });
+        };
+        
+        var sessionRetractable = function(){
+            if (sessionStorage.getItem('hasOpen') == 'true') {
+                jQuery("#pagseguro-module-menu .children").closest("li").addClass("open");
+            }
         };
 
         this.init = function(){
@@ -312,6 +323,8 @@ var PrestaShopPagSeguroModule = new function() {
             applyMenu();
             applySaveForm();
             applyGotoConfig();
+            retractableMenu();
+            sessionRetractable();
         };
 
     };
