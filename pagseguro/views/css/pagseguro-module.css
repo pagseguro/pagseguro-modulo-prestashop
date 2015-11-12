@@ -62,7 +62,7 @@
     height: 16px; 
     display: inline-block; 
     vertical-align: middle; 
-    margin: -2px 5px 0 0; 
+    margin: -2px 5px 0 0;
 }
 
 #pagseguro-module-menu li.open i.icon { 
@@ -471,7 +471,10 @@
     background-color: #ccc !important;
     color: #fff !important;
 }
-
+.pagseguro-confirm-button {
+    float: right;
+    margin: 5px;
+}
 
 /* Messages */
 .pagseguro-msg h3 > a { color:#035EC7!important }

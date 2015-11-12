@@ -117,27 +117,30 @@ class PagSeguroOrderConciliation {
 
             foreach ($prestashopList as $order) {
 
-                $orderId = (int)$order['id_order'];
-                $pagseguroData = isset($pagseguroList[ $orderId ]) ? $pagseguroList[ $orderId ] : false;
+                if ($order['environment'] == Configuration::get("PAGSEGURO_ENVIRONMENT")) {
 
-                if ($pagseguroData) {
+                    $orderId = (int)$order['id_order'];
+                    $pagseguroData = isset($pagseguroList[$orderId]) ? $pagseguroList[$orderId] : false;
 
-                    $prestaShopStatus   = $order['statusName'];
-                    $pagSeguroStatus    = Util::getPagSeguroStatusName($pagseguroData['status']);
-                    $differentStatus    = ($prestaShopStatus != $pagSeguroStatus);
+                    if ($pagseguroData) {
 
-                    if ($differentStatus) {
-                        array_push($resultList, Array(
-                            'orderId'           => $orderId,
-                            'maskedOrderId'     => sprintf("#%06s", $orderId),
-                            'date'              => $this->dateToBr($order['date_add']),
-                            'transactionCode'   => $pagseguroData['code'],
-                            'pagSeguroStatusId' => $pagseguroData['status'],
-                            'pagSeguroStatus'   => $pagSeguroStatus,
-                            'prestaShopStatus'  => $prestaShopStatus
-                        ));
+                        $prestaShopStatus = $order['statusName'];
+                        $pagSeguroStatus = Util::getPagSeguroStatusName($pagseguroData['status']);
+                        $differentStatus = ($prestaShopStatus != $pagSeguroStatus);
+
+                        if ($differentStatus) {
+                            array_push($resultList, Array(
+                                'orderId' => $orderId,
+                                'maskedOrderId' => sprintf("#%06s", $orderId),
+                                'date' => $this->dateToBr($order['date_add']),
+                                'transactionCode' => $pagseguroData['code'],
+                                'pagSeguroStatusId' => $pagseguroData['status'],
+                                'pagSeguroStatus' => $pagSeguroStatus,
+                                'prestaShopStatus' => $prestaShopStatus
+                            ));
+                        }
+
                     }
-
                 }
 
             }
@@ -159,10 +162,10 @@ class PagSeguroOrderConciliation {
                 '.$currentStateCol.'
                 osl.`name` AS statusName,
                 oh.`id_order_state`,
+                pso.`environment`,
                 (SELECT COUNT(od.`id_order`) FROM `'._DB_PREFIX_.'order_detail` od
                     WHERE od.`id_order` = psord.`id_order`
                     GROUP BY `id_order`) AS product_number
-
               FROM `'._DB_PREFIX_.'orders` AS psord
                     LEFT JOIN `'._DB_PREFIX_.'order_history` oh
                         ON (oh.`id_order` = psord.`id_order`)
@@ -170,7 +173,8 @@ class PagSeguroOrderConciliation {
                         ON (os.`id_order_state` = oh.`id_order_state`)
                     LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl
                         ON (os.`id_order_state` = osl.`id_order_state`)
-
+                    LEFT JOIN `'._DB_PREFIX_.'pagseguro_order`pso
+                      ON (pso.`id_order` = psord.`id_order`)
                  WHERE oh.`id_order_history` = (SELECT MAX(`id_order_history`) FROM `'._DB_PREFIX_.'order_history` moh
                     WHERE moh.`id_order` = psord.`id_order`
                     GROUP BY moh.`id_order`)
@@ -180,7 +184,6 @@ class PagSeguroOrderConciliation {
         ';
 
         return Db::getInstance()->ExecuteS($query);
-
     }
 
 

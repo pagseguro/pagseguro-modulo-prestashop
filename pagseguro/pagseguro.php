@@ -483,6 +483,7 @@ class PagSeguro extends PaymentModule {
                 'content' => $this->getConfigurationPageHtml(),
                 'hasForm' => true,
                 'selected' => ($this->pageId == '1'),
+                'hasChild' => false
             ),           
             'transactions' => array (
                 'id' => 2,
@@ -493,14 +494,24 @@ class PagSeguro extends PaymentModule {
                         'title' => $this->l('Conciliação'),
                         'content' => $this->getConciliationPageHtml(),
                         'hasForm' => false,
-                        'selected' => ($this->pageId == '3')
+                        'selected' => ($this->pageId == '3'),
+                        'hasChild' => false
                     ),
                     'abandoned' => array(
                         'id' => 4,
                         'title' => $this->l('Abandonadas'),
                         'content' => $this->getAbandonedPageHtml(),
                         'hasForm' => false,
-                        'selected' => ($this->pageId == '4')
+                        'selected' => ($this->pageId == '4'),
+                        'hasChild' => false
+                    ),
+                    'refund' => array(
+                        'id' => 5,
+                        'title' => $this->l('Estorno'),
+                        'content' => $this->getRefundPageHtml(),
+                        'hasForm' => false,
+                        'selected' => ($this->pageId == '5'),
+                        'hasChild' => false
                     )
                 ),
                 'hasForm' => false,
@@ -509,11 +520,12 @@ class PagSeguro extends PaymentModule {
                 'hasChild' => true
             ),
             'requirements' => array(
-                'id' => 5,
+                'id' => 6,
                 'title' => $this->l('Requisitos'),
                 'content' => $this->getRequirementsPageHtml(),
                 'hasForm' => false,
-                'selected' => ($this->pageId == '5'),
+                'selected' => ($this->pageId == '6'),
+                'hasChild' => false
             )
         );
 
@@ -590,6 +602,18 @@ class PagSeguro extends PaymentModule {
         }
 
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/abandoned.tpl');
+    }
+    
+    private function getRefundPageHtml() {
+
+        if (Configuration::get('PAGSEGURO_EMAIL') && Configuration::get('PAGSEGURO_TOKEN')) {
+            $this->addToView('hasCredentials', true);
+            $search = Util::getDaysSearch();
+            $this->addToView('searchKeys', array_keys($search));
+            $this->addToView('searchValues', array_values($search));
+        }
+
+        return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/refund.tpl');
     }
 
     private function getRequirementsPageHtml() {
@@ -683,8 +707,9 @@ class PagSeguro extends PaymentModule {
 
             if (!(int) $hasColQuery[0]['hascol']) {
                 return Db::getInstance()->Execute('
-                    ALTER TABLE `' . _DB_PREFIX_ . 'pagseguro_order` ADD COLUMN 
-                    `send_recovery` int(10) unsigned NOT NULL default 0
+                    ALTER TABLE `' . _DB_PREFIX_ . 'pagseguro_order` 
+                    ADD COLUMN `send_recovery` int(10) unsigned NOT NULL default 0, 
+                    ADD COLUMN `environment` varchar(50) NULL; 
                 ');
             }
 

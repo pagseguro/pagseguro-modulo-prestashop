@@ -71,24 +71,24 @@ class PagSeguroAbandonedOrder {
             $pagseguroOrders = $this->getPagSeguroOrders();
 
             foreach ($transactions as $transaction) {
-                
+
                 if ($this->isAbandonedOrder($transaction->getReference())) {
 
                     $reference = ((int)EncryptionIdPagSeguro::decrypt($transaction->getReference()));
                     $order = new Order($reference);
                     $sendRecovery = isset($pagseguroOrders[$reference]) ? (int)$pagseguroOrders[$reference]['send_recovery'] : 0;
-                    
+
                     array_push($resultData, Array(
-                        'transactionCode'   => $transaction->getCode(),
-                        'reference'         => $reference,
-                        'maskedReference'   => sprintf("#%06s", $reference),
-                        'expirationDate'    => $this->makeExpirationDate($transaction->getDate()),
-                        'orderDate'         => date("d/m/Y H:i", strtotime($order->date_add)),
-                        'customerId'        => $order->id_customer,
-                        'recoveryCode'      => $transaction->getRecoveryCode(),
-                        'sendRecovery'      => $sendRecovery
+                        'transactionCode' => $transaction->getCode(),
+                        'reference' => $reference,
+                        'maskedReference' => sprintf("#%06s", $reference),
+                        'expirationDate' => $this->makeExpirationDate($transaction->getDate()),
+                        'orderDate' => date("d/m/Y H:i", strtotime($order->date_add)),
+                        'customerId' => $order->id_customer,
+                        'recoveryCode' => $transaction->getRecoveryCode(),
+                        'sendRecovery' => $sendRecovery
                     ));
-                    
+
                 }
             }
 
@@ -227,12 +227,18 @@ class PagSeguroAbandonedOrder {
     
     private function buildAbandonedMailUrl($recoveryCode)
     {
-        if (Configuration::get('PAGSEGURO_ENVIRONMENT') == "sandbox")
-        {
-            return '<a href="https://sandbox.pagseguro.uol.com.br/checkout/v2/resume.html?r='.$recoveryCode.'" target="_blank"> Clique aqui para continuar sua compra </a>';
+        
+        $protocol = "https://";
+        $environment = "sandbox.";
+        $resource = "pagseguro.uol.com.br/checkout/v2/resume.html";
+        $recovery = "?r=" . $recoveryCode;
+               
+        if ( Configuration::get('PAGSEGURO_ENVIRONMENT') == "sandbox") {
+            $url = $protocol.$environment.$resource.$recovery;
         } else {
-            return '<a href="https://pagseguro.uol.com.br/checkout/v2/resume.html?r='.$recoveryCode.'" target="_blank"> Clique aqui para continuar sua compra </a>';
+            $url = $protocol.$resource.$recovery;
         }
+        return '<a href="'.$url.'" target="_blank"> Clique aqui para continuar sua compra </a>';
     }
 
     private function sendMail(Array $templateData, $reference, $recoveryCode, $customerId) {

@@ -64,6 +64,7 @@
                                     <li 
                                     id="menu-item-{$page.id|escape:'htmlall':'UTF-8'}" 
                                     data-page-id="{$page.id|escape:'htmlall':'UTF-8'}"
+                                    class="open"
                                     {if $page.hasForm} data-has-form="true" {/if} >
                                         <span class="children"><i class="icon"></i>{$page.title|escape:'htmlall':'UTF-8'}</span>
                                     

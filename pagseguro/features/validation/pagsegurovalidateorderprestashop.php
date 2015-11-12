@@ -128,7 +128,9 @@ class PagSeguroValidateOrderPrestashop
 
 
     private function createPagSeguroOrder($id_order) {
-        $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'pagseguro_order` (`id_order`) VALUES ('.(int)$id_order.');';
+        
+        $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'pagseguro_order` (`id_order`, `environment`) VALUES ('.(int)$id_order.', "'.Configuration::get("PAGSEGURO_ENVIRONMENT").'");';
+                
         if (! Db::getInstance()->Execute($sql)) {
             die(Tools::displayError('Error when create PagSeguro Order on checkout'));
         }
