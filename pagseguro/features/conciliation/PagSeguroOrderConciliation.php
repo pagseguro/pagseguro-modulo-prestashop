@@ -86,11 +86,11 @@ class PagSeguroOrderConciliation {
         $moduleName = ($this->verifyVersion() === true) ? "" : "AND module_name = 'pagseguro'";
         
         $query  = '
-            SELECT osl.`id_order_state`, osl.`name` FROM `'._DB_PREFIX_.'order_state_lang` osl
+            SELECT MAX(osl.`id_order_state`) as `id_order_state`, osl.`name` FROM `'._DB_PREFIX_.'order_state_lang` osl
             JOIN `'._DB_PREFIX_.'order_state` os ON osl.`id_order_state` = os.`id_order_state` '.$moduleName.'
             WHERE osl.`name` LIKE "'.$statusName.'" GROUP BY osl.`name` LIMIT 0, 1
         ';
-        
+
         if ($result  = Db::getInstance()->executeS($query)) {
             $status  = $result[0]['id_order_state'];
             $order   = new Order($orderId);

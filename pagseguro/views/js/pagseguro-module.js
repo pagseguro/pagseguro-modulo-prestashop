@@ -1090,7 +1090,8 @@ var PrestaShopPagSeguroModule = new function() {
                         Modal.message('success', "Transação estornada com sucesso!");
                     }
                 } else {
-                    Modal.hideLoading();
+                    refundTable.fnClearTable(true);
+                    Modal.message('success', "Transação estornada com sucesso!");
                 }
             } else {
                 Modal.message('alert', "Não foi possível executar esta ação. Utilize a conciliação de transações primeiro ou tente novamente mais tarde.");
@@ -1174,6 +1175,193 @@ var PrestaShopPagSeguroModule = new function() {
     };
 
     /* ************************************* */
+    /* *********** PAGE Cancel ********** */
+    /* ************************************* */
+    var PageCancel = new function() {
+
+        var cancelTable;
+        var AdminData = {
+            token: jQuery('#adminToken').val(),
+            url: jQuery('#urlAdminOrder').val()
+        };
+
+        var request = function(options) {
+            jQuery.ajax({
+                type: 'POST',
+                url: '../modules/pagseguro/features/Cancel/Cancel.php',
+                dataType : "json",
+                data: options.params,
+                success: options.success,
+                error: options.error,
+                complete: options.complete
+            });
+        };
+
+        var search = function(callback) {
+            Modal.showLoading();
+            request({
+                params: {
+                    days: $("#pagseguro-cancel-days-input").val(),
+                    action: 'doSearch'
+                },
+                success: function(response) {
+                    onSuccess(response.data, callback);
+                },
+                error: function() {
+                    Modal.message('error', "Não foi possível obter os dados de estorno.");
+                }
+            });
+        };
+
+        var onSuccess = function(data, callback) {
+
+            if (data.error == true && data.message == "[HTTP 401] - UNAUTHORIZED") {
+                Modal.message('error', "Não foi possível executar esta ação. Utilize a conciliação de transações primeiro ou tente novamente mais tarde.");
+
+            } else if (data.error == true && data.message == "[HTTP 403] - FORBIDDEN") {
+                Modal.message('error', "Sua conta PagSeguro não tem permissão para realizar esta ação. Em caso de dúvidas acesse <a href='http://forum.pagseguro.uol.com.br' target='_blank'>http://forum.pagseguro.uol.com.br</a>");
+
+            } else {
+
+                if (data.length > 0) {
+                    var result = new Array();
+                    for (var i in data) {
+
+                        var transaction  = data[i];
+                        result[i] = [
+                            [transaction.date],
+                            [transaction.prestaShopID],
+                            [transaction.pagSeguroID],
+                            [transaction.status],
+                            [transaction.action]
+                        ];
+                    }
+                    cancelTable.fnClearTable(true);
+                    cancelTable.fnAddData(result);
+
+                    if (typeof callback == 'function') {
+                        callback();
+                    } else {
+                        Modal.hideLoading();
+                    }
+
+                } else {
+                    cancelTable.fnClearTable(true);
+                    Modal.message('alert', "Não há transações para cancelar no período.");
+                }
+            }
+        };
+
+        var onCancel = function(response, callback) {
+            if (! response.error) {
+                if (response.data.length > 0) {
+
+                    var result = new Array();
+                    for (var i in response.data) {
+
+                        var transaction  = response.data[i];
+                        result[i] = [
+                            [transaction.date],
+                            [transaction.prestaShopID],
+                            [transaction.pagSeguroID],
+                            [transaction.status],
+                            [transaction.action]
+                        ];
+                    }
+                    cancelTable.fnClearTable(true);
+                    cancelTable.fnAddData(result);
+
+                    if (typeof callback == 'function') {
+                        callback();
+                    } else {
+                        Modal.message('success', "Transação cancelada com sucesso!");
+                    }
+                } else {
+                    cancelTable.fnClearTable(true);
+                    Modal.message('success', "Transação cancelada com sucesso!");
+                }
+            } else {
+                Modal.message('alert', "Não foi possível executar esta ação. Utilize a conciliação de transações primeiro ou tente novamente mais tarde.");
+            }
+        };
+
+        var doRefund = function(id, transactionCode, callback) {
+            Modal.showLoading();
+            jQuery.ajax({
+                type: 'POST',
+                url: '../modules/pagseguro/features/Cancel/Cancel.php',
+                dataType : "json",
+                data: {
+                    days: $("#pagseguro-refund-days-input").val(),
+                    order_id: id,
+                    transaction_code: transactionCode,
+                    action: 'doCancel'
+                },
+                success: function(response) {
+                    onCancel(response.data, callback);
+                },
+                error: function() {
+                    Modal.message('error', "Não foi possível executar esta ação. Utilize a conciliação de transações primeiro ou tente novamente mais tarde.");
+                }
+            });
+        };
+
+        var prepareTable = function() {
+            cancelTable = jQuery("#cancel-table").dataTable({
+                bStateSave: true,
+                info: false,
+                lengthChange: false,
+                searching: false,
+                pageLength: 10,
+
+                oLanguage: {
+                    sEmptyTable:"Realize uma pesquisa.",
+                    oPaginate: {
+                        sNext: 'Próximo',
+                        sLast: 'Último',
+                        sFirst: 'Primeiro',
+                        sPrevious: 'Anterior'
+                    }
+                }
+            });
+        };
+
+        this.init = function() {
+
+            prepareTable();
+
+            jQuery('#cancel-search-button').click(function () {
+                search();
+            });
+
+            jQuery('#cancel-table tbody').on('click', 'td', function( event ) {
+
+                event.preventDefault();
+                var table  = jQuery('#cancel-table').dataTable();
+                var pos    = table.fnGetPosition(this);
+                var data   = table.fnGetData(pos[0]);
+                if (data != null) {
+
+                    var action = jQuery(data[4]);
+                    if (jQuery(action[0]).attr("id") == "do-cancel") {
+                        Modal.confirm('Não será possível reverter esta ação. Deseja continuar?');
+
+                        jQuery('.pagseguro-confirm-button').on('click', function(target) {
+                            if (target.currentTarget.id == 'accept') {
+                                doRefund(data[1], data[2]);
+                            } else {
+                                Modal.hideLoading();
+                            }
+                        });
+                    } else {
+                        Modal.message('alert', "Não foi possível executar esta ação. Utilize a conciliação de transações primeiro ou tente novamente mais tarde.");
+                    }
+                }
+            });
+        };
+    };
+
+    /* ************************************* */
     /* *********** DOCUMENT READY ********** */
     /* ************************************* */
    jQuery(document).ready(function() {
@@ -1182,7 +1370,8 @@ var PrestaShopPagSeguroModule = new function() {
         PageSettings.init();
         PageConciliation.init();
         PageAbandoned.init();
-       PageRefund.init();
+        PageRefund.init();
+        PageCancel.init();
     });
 
 

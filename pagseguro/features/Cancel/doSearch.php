@@ -84,9 +84,9 @@ class doSearch {
 
                         if ($this->helper->getStatusName($paymentPagSeguroList[$item['id_order']]['status']) 
                             == $item['statusName']) {
-                            $arr['action'] = '<a id="do-refund" class="link" href="javascript:void(0)">Estornar</a>';
+                            $arr['action'] = '<a id="do-cancel" class="link" href="javascript:void(0)">Cancelar</a>';
                         } else {
-                            $arr['action'] = '<a id="before-refund" class="link" href="javascript:void(0)">Estornar</a>';
+                            $arr['action'] = '<a id="before-cancel" class="link" href="javascript:void(0)">Cancelar</a>';
                         }
 
                         array_push($this->paymentList, $arr);
@@ -148,8 +148,8 @@ class doSearch {
      * @throws PrestaShopDatabaseException
      */
     private function getPrestashopPaymentList() {
-        
-        $currentStateCol = ($this->helper->version() === true) ? "" : "psord.`current_state`,";     
+
+        $currentStateCol = ($this->helper->version() === true) ? "" : "psord.`current_state`,";
         $query = '
             SELECT
                 psord.`id_order`,
@@ -173,12 +173,12 @@ class doSearch {
             WHERE oh.`id_order_history` = (SELECT MAX(`id_order_history`) FROM `'._DB_PREFIX_.'order_history` moh
             WHERE moh.`id_order` = psord.`id_order`
             GROUP BY moh.`id_order`)
-               AND os.`id_order_state` BETWEEN 16 AND 18
+               AND (os.`id_order_state` = '.$this->getOrderStatusId("Aguardando Pagamento").' OR os.`id_order_state` = '.$this->getOrderStatusId("Em análise").')
                AND psord.payment = "PagSeguro"
                AND osl.`id_lang` = psord.id_lang
                AND psord.date_add >= DATE_SUB(CURDATE(),INTERVAL \''.((int)$this->days).'\' DAY)
         ';
-        
+
         return Db::getInstance()->ExecuteS($query);
     }
 
@@ -229,5 +229,18 @@ class doSearch {
             }
         }
         return $normalizedList;
-    }   
+    }
+
+    private function getOrderStatusId($status)
+    {
+        $moduleName = ($this->helper->version() === true) ? "" : "AND module_name = 'pagseguro'";
+
+        $query  = '
+            SELECT osl.`id_order_state`, osl.`name` FROM `'._DB_PREFIX_.'order_state_lang` osl
+            JOIN `'._DB_PREFIX_.'order_state` os ON osl.`id_order_state` = os.`id_order_state` '.$moduleName.'
+            WHERE osl.`name` LIKE "'.$status.'" GROUP BY osl.`name` LIMIT 0, 1
+        ';
+        $result  = Db::getInstance()->executeS($query);
+        return current($result)['id_order_state'];
+    }
 }
