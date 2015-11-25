@@ -80,7 +80,7 @@ class doRefund {
             $order   = new Order($this->helper->getRefSuffix($orderID));
             $history = new OrderHistory();
             $history->id_order = (int)$order->id;
-            $history->changeIdOrderState(current($result)['id_order_state'], $order->id);
+            $history->changeIdOrderState($result[0]['id_order_state'], $order->id);
             return (bool)$history->addWithemail();
         }
         return false;

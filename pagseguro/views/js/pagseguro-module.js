@@ -1208,7 +1208,7 @@ var PrestaShopPagSeguroModule = new function() {
                     onSuccess(response.data, callback);
                 },
                 error: function() {
-                    Modal.message('error', "Não foi possível obter os dados de estorno.");
+                    Modal.message('error', "Não foi possível obter os dados de cancelamento.");
                 }
             });
         };

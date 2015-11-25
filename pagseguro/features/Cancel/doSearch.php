@@ -241,6 +241,7 @@ class doSearch {
             WHERE osl.`name` LIKE "'.$status.'" GROUP BY osl.`name` LIMIT 0, 1
         ';
         $result  = Db::getInstance()->executeS($query);
-        return current($result)['id_order_state'];
+		$result = current($result);
+        return $result['id_order_state'];
     }
 }
