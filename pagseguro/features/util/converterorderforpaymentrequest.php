@@ -46,12 +46,12 @@ class ConverterOrderForPaymentRequest
         $this->module = $module;
         $this->context = Context::getContext();
     }
-    
+
     public function convertToRequestData()
     {
         $this->generatePagSeguroRequestData();
     }
-    
+
     public function setAdditionalRequest($additional_infos)
     {
         try {
@@ -79,32 +79,32 @@ class ConverterOrderForPaymentRequest
     private function generatePagSeguroRequestData()
     {
         $redirectURL = Util::getRedirectUrl();
-        
+
         /** Currency */
         $this->paymentRequest->setCurrency(PagSeguroCurrencies::getIsoCodeByName('REAL'));
-        
+
         /** Extra amount */
         $this->paymentRequest->setExtraAmount($this->getExtraAmountValues());
-        
+
         /** Products */
         $this->paymentRequest->setItems($this->generateProductsData());
-        
+
         /** Sender */
         $this->paymentRequest->setSender($this->generateSenderData());
-        
+
         /** Shipping */
         $this->paymentRequest->setShipping($this->generateShippingData());
-                
+
         /** Redirect URL */
         if (! Tools::isEmpty($redirectURL)) {
             $this->paymentRequest->setRedirectURL($redirectURL);
         }
-        
+
         /** Discount */
         $this->getDiscountData($this->paymentRequest);
-        
+
     }
-    
+
     private function getExtraAmountValues()
     {
         return Tools::convertPrice($this->getCartDiscounts() + $this->getWrappingValues());
@@ -115,15 +115,15 @@ class ConverterOrderForPaymentRequest
         $cart_discounts = version_compare(_PS_VERSION_, '1.5', '<') ?
             $this->context->cart->getDiscounts() :
             $this->context->cart->getCartRules();
-        
+
         $totalDiscouts = (float) 0;
-        
+
         if (count($cart_discounts) > 0) {
             foreach ($cart_discounts as $discount) {
                 $totalDiscouts += $discount['value_real'];
             }
         }
-        
+
         return number_format(Tools::ps_round($totalDiscouts, 2), 2, '.', '') * - 1;
     }
 
@@ -136,18 +136,18 @@ class ConverterOrderForPaymentRequest
     private function generateProductsData()
     {
         $pagseguro_items = array();
-        
+
         $cont = 1;
-        
+
         $id_currency = PagSeguro::returnIdCurrency();
-        
+
         foreach ($this->context->cart->getProducts() as $product) {
-            
+
             $pagSeguro_item = new PagSeguroItem();
             $pagSeguro_item->setId($cont ++);
             $pagSeguro_item->setDescription(Tools::truncate($product['name'], 255));
             $pagSeguro_item->setQuantity($product['quantity']);
-            
+
             if ($this->context->cart->id_currency != $id_currency && ! is_null($id_currency)) {
                 $pagSeguro_item->setAmount(
                     Util::convertPriceFull(
@@ -159,35 +159,34 @@ class ConverterOrderForPaymentRequest
             } else {
                 $pagSeguro_item->setAmount($product['price_wt']);
             }
-            
+
             /** Defines weight in grams */
             $pagSeguro_item->setWeight($product['weight'] * 1000);
-            
+
             if ($product['additional_shipping_cost'] > 0) {
                 $pagSeguro_item->setShippingCost($product['additional_shipping_cost']);
             }
             array_push($pagseguro_items, $pagSeguro_item);
         }
-        
         return $pagseguro_items;
     }
 
     private function generateSenderData()
     {
         $sender = new PagSeguroSender();
-        
+
         if (isset($this->context->customer) && ! is_null($this->context->customer)) {
-            
+
             $sender->setEmail($this->context->customer->email);
-            
+
             $firstName = $this->generateName($this->context->customer->firstname);
             $lastName = $this->generateName($this->context->customer->lastname);
-            
+
             $name = $firstName . ' ' . $lastName;
-            
+
             $sender->setName(Tools::truncate($name, 50));
         }
-        
+
         return $sender;
     }
 
@@ -197,9 +196,9 @@ class ConverterOrderForPaymentRequest
         $cont = 0;
         $customer = explode(' ', $value);
         foreach ($customer as $first) {
-            
+
             if (! Tools::isEmpty($first)) {
-                
+
                 if ($cont == 0) {
                     $name .= ($first);
                     $cont ++;
@@ -214,24 +213,24 @@ class ConverterOrderForPaymentRequest
     private function generateShippingData()
     {
         $cost = 00.00;
-        
+
         $id_currency = PagSeguro::returnIdCurrency();
-        
+
         $shipping = new PagSeguroShipping();
         $shipping->setAddress($this->generateShippingAddressData());
         $shipping->setType($this->generateShippingType());
-        
+
         if ($this->context->cart->id_currency != $id_currency && ! is_null($id_currency)) {
-            
+
             $totalOrder = $this->context->cart->getOrderTotal(true, Cart::ONLY_SHIPPING);
             $current_currency = new Currency($this->context->cart->id_currency);
             $new_currency = new Currency($id_currency);
-            
+
             $cost = Util::convertPriceFull($totalOrder, $current_currency, $new_currency);
         } else {
             $cost = $this->context->cart->getOrderTotal(true, Cart::ONLY_SHIPPING);
         }
-        
+
         $shipping->setCost(number_format(Tools::ps_round($cost, 2), 2, '.', ''));
         return $shipping;
     }
@@ -240,18 +239,18 @@ class ConverterOrderForPaymentRequest
     {
         $address = new PagSeguroAddress();
         $delivery_address = new Address((int) $this->context->cart->id_address_delivery);
-        
+
         if (! is_null($delivery_address)) {
-            
+
             $fullAddress = $this->addressConfig($delivery_address->address1);
-            
+
             $street = (is_null($fullAddress[0]) || empty($fullAddress[0])) ?
                 $delivery_address->address1 :
                 $fullAddress[0];
-            
+
             $number = is_null($fullAddress[1]) ? '' : $fullAddress[1];
             $complement = is_null($fullAddress[2]) ? '' : $fullAddress[2];
-            
+
             $address->setCity($delivery_address->city);
             $address->setPostalCode($delivery_address->postcode);
             $address->setStreet($street);
@@ -259,59 +258,59 @@ class ConverterOrderForPaymentRequest
             $address->setNumber($number);
             $address->setDistrict($delivery_address->address2);
             $address->setCity($delivery_address->city);
-            
+
             $country = new Country((int) $delivery_address->id_country);
             $address->setCountry($country->iso_code);
-            
+
             $state = new State((int) $delivery_address->id_state);
             $address->setState($state->iso_code);
         }
-        
+
         return $address;
     }
-    
-    private function getDiscountData($paymentRequest) 
+
+    private function getDiscountData($paymentRequest)
     {
         if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_CREDITCARD'))) {
             $paymentRequest->addPaymentMethodConfig(
-                'CREDIT_CARD', 
-                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_CREDITCARD_VL')), 
+                'CREDIT_CARD',
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_CREDITCARD_VL')),
                 'DISCOUNT_PERCENT'
             );
         }
-        
+
         if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_EFT'))) {
             $paymentRequest->addPaymentMethodConfig(
-                'EFT', 
-                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_EFT_VL')), 
+                'EFT',
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_EFT_VL')),
                 'DISCOUNT_PERCENT'
             );
         }
-        
+
         if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BOLETO'))) {
             $paymentRequest->addPaymentMethodConfig(
-                'BOLETO', 
-                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BOLETO_VL')), 
+                'BOLETO',
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BOLETO_VL')),
                 'DISCOUNT_PERCENT'
             );
         }
-        
+
         if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_DEPOSIT'))) {
             $paymentRequest->addPaymentMethodConfig(
-                'DEPOSIT', 
-                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_DEPOSIT_VL')), 
+                'DEPOSIT',
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_DEPOSIT_VL')),
                 'DISCOUNT_PERCENT'
             );
         }
-        
+
         if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BALANCE'))) {
             $paymentRequest->addPaymentMethodConfig(
-                'BALANCE', 
-                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BALANCE_VL')), 
+                'BALANCE',
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BALANCE_VL')),
                 'DISCOUNT_PERCENT'
             );
         }
-        
+
         return $paymentRequest;
     }
 
@@ -325,18 +324,18 @@ class ConverterOrderForPaymentRequest
     {
         $shipping_type = new PagSeguroShippingType();
         $shipping_type->setByType('NOT_SPECIFIED');
-        
+
         return $shipping_type;
     }
 
     private function setAdditionalRequestData($additionalInfos)
     {
         $this->urlToRedirect = $this->setRedirectUrl($additionalInfos);
-        
+
         $this->setReference($additionalInfos['id_order']);
-        
+
         $this->paymentRequest->setRedirectURL($this->urlToRedirect);
-        
+
         $this->paymentRequest->setNotificationURL($this->setNotificationUrl());
     }
 
@@ -359,33 +358,34 @@ class ConverterOrderForPaymentRequest
          $referenceToPagSeguro = EncryptionIdPagSeguro::encrypt($reference);
          $this->paymentRequest->setReference($referenceToPagSeguro);
     }
-    
+
     private function performPagSeguroRequest($isLightBox)
     {
+
         $code = "";
         try {
-            
+
             /** Retrieving PagSeguro configurations */
             $this->retrievePagSeguroConfiguration();
-            
+
             /** Set PagSeguro Prestashop module version */
             $this->setPagSeguroModuleVersion();
-            
+
             /** Set PagSeguro PrestaShop CMS version */
             $this->setPagSeguroCMSVersion();
-            
+
             /** Performing request */
             $credentials = new PagSeguroAccountCredentials(
                 Configuration::get('PAGSEGURO_EMAIL'),
                 Configuration::get('PAGSEGURO_TOKEN')
             );
-            
+
             $url = $this->paymentRequest->register($credentials);
-            
+
             if ($isLightBox) {
                 $resultado = parse_url($url);
                 parse_str($resultado['query']);
-                
+
                 return Tools::jsonEncode(
                     array(
                         'code' => $code,
@@ -407,10 +407,10 @@ class ConverterOrderForPaymentRequest
 
     private function retrievePagSeguroConfiguration()
     {
-        
+
         /** Retrieving configurated default charset */
         PagSeguroConfig::setApplicationCharset(Configuration::get('PAGSEGURO_CHARSET'));
-        
+
         /** Retrieving configurated default log info */
         if (Configuration::get('PAGSEGURO_LOG_ACTIVE')) {
             PagSeguroConfig::activeLog(_PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION'));

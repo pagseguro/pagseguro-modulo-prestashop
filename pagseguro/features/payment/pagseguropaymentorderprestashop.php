@@ -30,19 +30,19 @@ class PagSeguroPaymentOrderPrestashop
 {
     private $paymentUrlPS14 = 'modules/pagseguro/standard/front/validation.php';
     private $paymentUrl = 'index.php?fc=module&module=pagseguro&controller=validation';
-    
+
     private $context;
-    
+
     public function __construct()
     {
         $this->context = Context::getContext();
     }
-    
+
     private function returnUrlPaymentForVersionModule()
     {
         return version_compare(_PS_VERSION_, '1.5.0.3', '<=') ? $this->paymentUrlPS14 : $this->paymentUrl;
     }
-    
+
     private function setCurrencyVariable($id_currency)
     {
         $totalOrder = $this->context->cart->getOrderTotal(true, Cart::BOTH);
@@ -54,12 +54,12 @@ class PagSeguroPaymentOrderPrestashop
                 'currency_real' => $id_currency)
         );
     }
-    
+
     public function setVariablesPaymentExecutionView()
     {
-        
+
         $id_currency = PagSeguro::returnIdCurrency();
-        
+
         if ($this->context->cart->id_currency != $id_currency && ! is_null($id_currency)) {
             $this->setCurrencyVariable($id_currency);
         }
@@ -71,7 +71,7 @@ class PagSeguroPaymentOrderPrestashop
         } else {
             $center_column = '535px';
         }
-        
+
         $this->context->smarty->assign(
             array(
                 'version' => _PS_VERSION_,

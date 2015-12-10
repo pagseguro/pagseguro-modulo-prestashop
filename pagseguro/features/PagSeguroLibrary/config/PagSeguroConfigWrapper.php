@@ -92,7 +92,7 @@ class PagSeguroConfigWrapper
     private function getEnvironment()
     {
         $PagSeguroConfig = array();
-        
+
         $PagSeguroConfig['environment'] = getenv('PAGSEGURO_ENV') ?: self::PAGSEGURO_ENV;
 
         return $PagSeguroConfig;

@@ -43,18 +43,18 @@ class PagSeguroOrderConciliation {
         foreach ($transactions as $transaction) {
 
             parse_str($transaction, $output);
-            
-            $orderId    = $output["reference"];
-            $statusId   = $output["status"];
-            $statusName = Util::getPagSeguroStatusName($statusId);
+            $orderId         = $output["reference"];
+            $statusId        = $output["status"];
+            $transactionCode = $output["transactionCode"];
+            $statusName      = Util::getPagSeguroStatusName($statusId);
 
             $this->logInfo("
-                PagSeguroConciliation.Register( 'Alteração de Status da compra '". $orderId . "' 
-                para o Status '" . $statusName . "(". $statusId . ")' - '" . 
+                PagSeguroConciliation.Register( 'Alteração de Status da compra '". $orderId . "'
+                para o Status '" . $statusName . "(". $statusId . ")' - '" .
                 date("d/m/Y H:i") . "') - end
             ");
 
-            if (!$this->updateOrderStatus($orderId, $statusName)) {
+            if (!$this->updateOrderStatus($orderId, $statusName, $transactionCode)) {
                 $updated = false;
                 break;
             }
@@ -66,14 +66,14 @@ class PagSeguroOrderConciliation {
     }
 
     public function printConciliationJsonData($searchDays) {
-        
+
         $searchDays = (int)$searchDays;
 
         $this->logInfo("
-            PagSeguroConciliation.Search( 'Pesquisa de conciliação realizada em " . date("d/m/Y H:i") . " 
+            PagSeguroConciliation.Search( 'Pesquisa de conciliação realizada em " . date("d/m/Y H:i") . "
             em um intervalo de ".$searchDays." dias.')
         ");
-        
+
         $this->printJson(Array(
             'data' => $this->getConciliationData($searchDays)
         ));
@@ -81,10 +81,10 @@ class PagSeguroOrderConciliation {
     }
 
 
-    private function updateOrderStatus($orderId, $statusName) {
+    private function updateOrderStatus($orderId, $statusName, $transactionCode) {
 
         $moduleName = ($this->verifyVersion() === true) ? "" : "AND module_name = 'pagseguro'";
-        
+
         $query  = '
             SELECT MAX(osl.`id_order_state`) as `id_order_state`, osl.`name` FROM `'._DB_PREFIX_.'order_state_lang` osl
             JOIN `'._DB_PREFIX_.'order_state` os ON osl.`id_order_state` = os.`id_order_state` '.$moduleName.'
@@ -92,6 +92,7 @@ class PagSeguroOrderConciliation {
         ';
 
         if ($result  = Db::getInstance()->executeS($query)) {
+            $this->updateOrderCode($orderId, $transactionCode);
             $status  = $result[0]['id_order_state'];
             $order   = new Order($orderId);
             $history = new OrderHistory();
@@ -102,17 +103,28 @@ class PagSeguroOrderConciliation {
         return false;
     }
 
+    /**
+     * @return bool
+     */
+    private function updateOrderCode($orderId, $transactionCode)
+    {
+        return Db::getInstance()->Execute(
+            'UPDATE `'._DB_PREFIX_.'pagseguro_order`
+                SET id_transaction = "'.$transactionCode.'" WHERE id_order = '.$orderId.';'
+        );
+    }
+
     private function getConciliationData($searchDays = 1) {
 
         $prestashopList = $this->getPrestashopPaymentList($searchDays);
         $pagseguroList  = $this->getPagSeguroPaymentsList($searchDays);
 
         $hasData = ($searchDays && $prestashopList && $pagseguroList);
-        
+
         $resultList = Array();
 
         if ($hasData) {
-            
+
             //$stateIndexName = $this->verifyVersion() ? 'id_order_state' : 'current_state';
 
             foreach ($prestashopList as $order) {
@@ -152,9 +164,9 @@ class PagSeguroOrderConciliation {
 
 
     private function getPrestashopPaymentList($searchDays) {
-        
+
         $currentStateCol = ($this->verifyVersion() === true) ? "" : "psord.`current_state`,";
-        
+
         $query = '
             SELECT
                 psord.`id_order`,
@@ -195,10 +207,10 @@ class PagSeguroOrderConciliation {
 
         $defaultTimeZone = date_default_timezone_get();
         date_default_timezone_set('America/Sao_Paulo');
-        
+
         $finalDate = date("Y-m-d")."T".date("H:i");
         $initialDate = $this->subDayIntoDate($finalDate, (int)$searchDays);
-        
+
         date_default_timezone_set($defaultTimeZone);
 
         try {
@@ -212,13 +224,13 @@ class PagSeguroOrderConciliation {
             if ($totalPages >= 2) {
                 for ($page = 2; $page <= $totalPages; $page++) {
                     $this->pushTransactionSummary($transactionList, $this->createPagSeguroTransactionSearch(
-                        $page, 
+                        $page,
                         $initialDate,
                         $finalDate
                     ));
                 }
             }
-            
+
             return $this->normalizePagSeguroTransactions($transactionList);
 
         } catch (PagSeguroServiceException $e) {
@@ -229,7 +241,7 @@ class PagSeguroOrderConciliation {
 
 
     private function createPagSeguroCredentials() {
-        
+
         if (!$this->pagSeguroCredentials) {
             $email = Configuration::get('PAGSEGURO_EMAIL');
             $token = Configuration::get('PAGSEGURO_TOKEN');
@@ -251,7 +263,7 @@ class PagSeguroOrderConciliation {
         if (!$transactionList) {
             return false;
         }
-            
+
         $normalizedList = array();
         $defaultRefPrefix = Configuration::get('PAGSEGURO_ID');
 
@@ -278,7 +290,7 @@ class PagSeguroOrderConciliation {
 
     private function getRefSuffix($reference) {
         return Tools::substr($reference, 5);
-    }    
+    }
 
     private function createPagSeguroTransactionSearch($pageNum, $initialDate, $finalDate) {
         return PagSeguroTransactionSearchService::searchByDate(
@@ -328,7 +340,7 @@ class PagSeguroOrderConciliation {
         if ($this->logActive) {
             LogPagSeguro::info($logMessage);
         }
-    }   
+    }
 
     private function verifyVersion() {
         if (version_compare(_PS_VERSION_, '1.5.0.5', '<')) {
@@ -337,6 +349,6 @@ class PagSeguroOrderConciliation {
             $result = false;
         }
         return $result;
-    }      
+    }
 
 }

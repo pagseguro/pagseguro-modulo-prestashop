@@ -25,7 +25,7 @@
 
 <h2 class="title" title="Conciliação">Conciliação</h2>
 <p>
-    Esta consulta permite obter as transações recebidas por você em um intervalo de datas. Ela pode ser usada periodicamente para verificar se o seu sistema recebeu todas as notificações de transações enviadas pelo PagSeguro, de forma a conciliar as transações armazenadas em seu sistema com o PagSeguro.
+    Com esta funcionalidade você poderá listar as transações realizadas em um determinado intervalo de datas. Ela pode ser usada periodicamente para verificar se o seu sistema recebeu todas as notificações enviadas pelo PagSeguro e, consequentemente, manter o status de suas transações sempre atualizados.
 </p>
 
 {if isset($hasCredentials) && $hasCredentials}

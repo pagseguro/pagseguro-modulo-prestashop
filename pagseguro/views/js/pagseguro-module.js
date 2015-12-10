@@ -37,7 +37,7 @@ var PrestaShopPagSeguroModule = new function() {
     /* *********** MESSAGES **************** */
     /* ************************************* */
     var Messages = new function() {
-        
+
         var wrapper = jQuery("#pagseguro-module-contents");
 
         var getHtml = function(options) {
@@ -77,22 +77,22 @@ var PrestaShopPagSeguroModule = new function() {
 
     };
 
-    
+
     /* ************************************* */
     /* *********** MODAL **************** */
     /* ************************************* */
     var Modal = new function(){
-        
+
         var opened = false;
-        
+
         var getConfirmHtml = function(options) {
-            return '<div id="'+ options.id +'" class="pagseguro-msg pagseguro-msg-'+options.type+' pagseguro-msg-'+options.size+'"><'+options.tag+'>' + options.message + '</'+options.tag+'><hr /><div class="confirm"><button type="button" class="pagseguro-button pagseguro-confirm-button" id="accept">Sim</button><button type="button" class="pagseguro-button pagseguro-confirm-button" id="reject">Não</button></div></div>'; 
+            return '<div id="'+ options.id +'" class="pagseguro-msg pagseguro-msg-'+options.type+' pagseguro-msg-'+options.size+'"><'+options.tag+'>' + options.message + '</'+options.tag+'><hr /><div class="confirm"><button type="button" class="pagseguro-button pagseguro-confirm-button" id="accept">Sim</button><button type="button" class="pagseguro-button pagseguro-confirm-button" id="reject">Não</button></div></div>';
         }
-        
+
         var defaults = {
             transition:"none",speed:300,initialWidth:"600",innerWidth:"525",initialHeight:"450",title:!1,opacity:.65,close:"fechar <strong>x</strong>",fixed:true
         };
-        
+
         var _bindEvents = function(elements,o){
             var options = jQuery.extend({},defaults,o || {});
             $(elements).colorbox(options);
@@ -153,7 +153,7 @@ var PrestaShopPagSeguroModule = new function() {
             });
             resize();
         };
-        
+
         var showConfirm = function(type, message) {
             var html = getConfirmHtml({
                 type: type,
@@ -169,7 +169,7 @@ var PrestaShopPagSeguroModule = new function() {
             });
             resize();
         };
-        
+
         var confirm = function(message) {
             showConfirm('warning', message)
         };
@@ -216,12 +216,12 @@ var PrestaShopPagSeguroModule = new function() {
 
             var selectedClass = "selected";
             var allItems = wrapper.find(".menu-item");
-            
+
             allItems.click(function(e){
-                
+
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 if (!animating) {
 
                     animating = true;
@@ -234,7 +234,7 @@ var PrestaShopPagSeguroModule = new function() {
                     item.addClass(selectedClass);
 
                     var showNewPage = function() {
-                        
+
                         Messages.remove();
 
                         jQuery(".pagseguro-module-content").removeClass(selectedClass);
@@ -271,7 +271,7 @@ var PrestaShopPagSeguroModule = new function() {
         };
 
         var applyFixedPostion = function() {
-            
+
             var initialPos      = wrapper.offset().top;
             var initialLeft     = wrapper.offset().left;
             var initialWidth    = wrapper.width();
@@ -317,13 +317,13 @@ var PrestaShopPagSeguroModule = new function() {
         };
 
         var applyGotoConfig = function() {
-            
+
             jQuery(".pagseguro-goto-configuration").click(function(){
                 jQuery("#menu-item-1").trigger('click');
                 jQuery("#pagseguro-email-input").focus();
             });
         };
-        
+
         var retractableMenu = function() {
             jQuery("#pagseguro-module-menu .children").click(function(){
                 var parent = jQuery(this);
@@ -336,7 +336,7 @@ var PrestaShopPagSeguroModule = new function() {
                 }
             });
         };
-        
+
         var sessionRetractable = function(){
             if (sessionStorage.getItem('hasOpen') == 'true') {
                 jQuery("#pagseguro-module-menu .children").closest("li").addClass("open");
@@ -389,7 +389,7 @@ var PrestaShopPagSeguroModule = new function() {
             var changeHint = function(selector) {
 
                 selector.each(function(){
-                    
+
                     var select  = jQuery(this);
                     var wrapper = select.parents(".config-area");
 
@@ -403,7 +403,7 @@ var PrestaShopPagSeguroModule = new function() {
             };
 
             this.init = function() {
-                
+
                 var select = jQuery(".pagseguro-select-hint");
 
                 select.change(function(){
@@ -411,7 +411,7 @@ var PrestaShopPagSeguroModule = new function() {
                 });
 
                 changeHint(select);
-                
+
                 jQuery('#pagseguro-environment-input').change(function (event) {
                     var SANDBOX = "sandbox";
                     event.preventDefault();
@@ -424,15 +424,15 @@ var PrestaShopPagSeguroModule = new function() {
             };
 
         };
-        
+
         var DiscountBehavior = new function(){
-            
+
             var creditcard;
             var boleto;
             var eft;
             var deposit;
             var balance;
-            
+
             var verify = function(service)
             {
                 if (value(service) == true) {
@@ -444,22 +444,22 @@ var PrestaShopPagSeguroModule = new function() {
                 }
                 return true;
             }
-            
+
             var value = function(service)
             {
                 return jQuery(service).val();
             }
-            
+
             var hide = function(service)
             {
                 service.next().hide()
             }
-            
+
             var show = function(service)
             {
                 service.next().show()
             }
-            
+
             var configure = function(service)
             {
                 //GetInput
@@ -469,19 +469,19 @@ var PrestaShopPagSeguroModule = new function() {
                 //SetCSS
                 input.css('width', '50px');
             }
-            
+
             var message = function()
             {
                 Modal.message('warning', "O desconto será aplicado com base no subtotal do checkout PagSeguro.Eventuais valores de frete não serão levados em consideração para a aplicação do desconto. É recomendável que você simule o funcionamento desta feature no ambiente do Sandbox.");
             }
-            
+
             var onLoad = function(creditcard, boleto, etf, deposit, balance)
             {
                 for (var i=0; i < arguments.length; i++) {
                      verify(arguments[i]);
                 }
             }
-                        
+
             var setVars = function() {
                 creditcard = jQuery("#pagseguro-discount-creditcard-input");
                 boleto = jQuery("#pagseguro-discount-boleto-input");
@@ -489,40 +489,40 @@ var PrestaShopPagSeguroModule = new function() {
                 deposit = jQuery("#pagseguro-discount-deposit-input");
                 balance = jQuery("#pagseguro-discount-balance-input");
             }
-            
+
             var hasChange = function()
             {
                 creditcard.change(function(){
                     if (verify(creditcard))
                         message();
-                });   
-                
+                });
+
                 boleto.change(function(){
                     if (verify(boleto))
                         message();
-                }); 
-                
+                });
+
                 eft.change(function(){
                     if (verify(eft))
                         message();
-                }); 
-                
+                });
+
                 deposit.change(function(){
                     if (verify(deposit))
                         message();
-                }); 
-                
+                });
+
                 balance.change(function(){
                     if (verify(balance))
                         message();
                 });
             }
-            
+
             this.init = function()
             {
                 setVars();
                 onLoad(creditcard, boleto, eft, deposit, balance);
-                hasChange(); 
+                hasChange();
             };
         };
 
@@ -542,12 +542,12 @@ var PrestaShopPagSeguroModule = new function() {
         var conciliationTable; // DataTable
         var defaultPage = 0;
         var conciliationButton = jQuery("#conciliation-button");
-        
+
         var AdminData = {
             token: jQuery('#adminToken').val(),
             url: jQuery('#urlAdminOrder').val()
         };
-        
+
         var requestService = function(options) {
 
             jQuery.ajax({
@@ -558,7 +558,7 @@ var PrestaShopPagSeguroModule = new function() {
                 success: options.success,
                 error: options.error,
                 complete: options.complete
-            });            
+            });
 
         };
 
@@ -567,17 +567,17 @@ var PrestaShopPagSeguroModule = new function() {
             conciliationTable.fnClearTable(true);
 
             if (data.length > 0) {
-                
+
                 var result = new Array();
 
                 for (var i in data) {
 
                     var transaction  = data[i];
-                    var params       = 'reference='+transaction.orderId+'&amp;status='+transaction.pagSeguroStatusId;
+                    var params       = 'reference='+transaction.orderId+'&amp;status='+transaction.pagSeguroStatusId+'&amp;transactionCode='+transaction.transactionCode;
                     var orderUrl     = (AdminData.url + '&amp;id_order=' + transaction.orderId + '&amp;vieworder&amp;token='+AdminData.token);
                     var orderLink    = '<a class="link" target="_blank" href="'+orderUrl+'"><i class="icon-external-link"></i>&nbsp;Ver&nbsp;detalhes</span>';
                     var checkbox     = '<input name="conciliationTransactions[]" type="checkbox" class="conciliation-transaction" value="'+params+'" id="conciliation-transaction-'+i+'">';
-                    
+
                     result[i] = [
                         [checkbox],
                         [transaction.date],
@@ -605,7 +605,7 @@ var PrestaShopPagSeguroModule = new function() {
         };
 
         var searchService = function(callback) {
-            
+
             Modal.showLoading();
 
             var searchdays = $("#pagseguro-conciliation-days-input").val();
@@ -625,7 +625,7 @@ var PrestaShopPagSeguroModule = new function() {
         };
 
         var conciliationService = function(params) {
-            
+
             var onError = function(){
                 Modal.message('error', 'Não foi possível realizar a conciliação.');
             };
@@ -636,7 +636,7 @@ var PrestaShopPagSeguroModule = new function() {
                 params: params,
                 success: function(response) {
                     if (response.success) {
-                        
+
                         searchService(function() {
                             Modal.message('success', 'Conciliação realizada com sucesso.');
                         });
@@ -651,7 +651,7 @@ var PrestaShopPagSeguroModule = new function() {
         };
 
         var doConciliation = function() {
-            
+
             var dataSelector = jQuery('input[name="conciliationTransactions[]"]');
 
             if (dataSelector.filter(":checked").length > 0) {
@@ -663,10 +663,10 @@ var PrestaShopPagSeguroModule = new function() {
         };
 
         var prepareTable = function() {
-            
+
             conciliationTable = jQuery("#conciliation-table").dataTable({
-                
-                bStateSave: true,    
+
+                bStateSave: true,
                 info: false,
                 lengthChange: false,
                 searching: false,
@@ -696,10 +696,10 @@ var PrestaShopPagSeguroModule = new function() {
                     var checkedSendButton = function() {
                         conciliationButton.attr('disabled', checkboxes.filter(':checked').length <= 0);
                     };
-                    
+
                     checkedSendButton();
                     selectAll.unbind('click');
-                    
+
                     var hasNotChecked = false;
                     if (checkboxes.length > 0) {
                         checkboxes.each(function(){
@@ -732,7 +732,7 @@ var PrestaShopPagSeguroModule = new function() {
                 },
 
                 fnRowCallback: function(nRow, aData) {
-                    
+
                     jQuery(nRow).find('td').unbind('click').bind('click', function(e){
                         var clickedEl = jQuery(e.target);
                         if (!clickedEl.is('a, input')) {
@@ -747,16 +747,16 @@ var PrestaShopPagSeguroModule = new function() {
         };
 
         this.init = function() {
-            
+
             prepareTable();
-            
+
             jQuery('#conciliation-search-button').click(function () {
                 searchService();
             });
 
             conciliationButton.click(function () {
                 doConciliation();
-            });            
+            });
 
         };
 
@@ -771,18 +771,18 @@ var PrestaShopPagSeguroModule = new function() {
         var transactionsTable; // DataTable
         var sendMultipleButton = jQuery("#send-email-button");
         var defaultPage = 0;
-        
+
         var AdminData = {
             token: jQuery('#adminToken').val(),
             url: jQuery('#urlAdminOrder').val()
         };
-        
+
         var onRequestTransactions = function(transactions, callback) {
 
             transactionsTable.fnClearTable(true);
 
             if (transactions.length > 0) {
-                
+
                 var result = new Array();
 
                 for (var i in transactions) {
@@ -792,7 +792,7 @@ var PrestaShopPagSeguroModule = new function() {
                     var viewLink    = '<a class="link" target="_blank" href="'+viewUrl+'"><i class="icon-external-link"></i>&nbsp;Ver&nbsp;detalhes</span>';
                     var params      = 'customer='+transaction.customerId+'&amp;reference='+transaction.reference+'&amp;recovery='+transaction.recoveryCode;
                     var checkbox    = '<input name="abandonedTransactions[]" type="checkbox" class="abandoned-transaction" value="'+params+'" id="abandoned-transaction-'+i+'">';
-                    
+
                     result[i] = [
                         [checkbox],
                         [transaction.orderDate],
@@ -819,7 +819,7 @@ var PrestaShopPagSeguroModule = new function() {
         };
 
         var requestTransactions = function(callback) {
-            
+
             Modal.showLoading();
 
             var recoveryDays = $("#pagseguro-daystorecovery-input").val();
@@ -841,7 +841,7 @@ var PrestaShopPagSeguroModule = new function() {
         };
 
         var sendMailRequest = function(params) {
-            
+
             var onError = function(){
                 Modal.message('error', 'Não foi possível enviar o(s) e-mail(s).');
             };
@@ -849,16 +849,16 @@ var PrestaShopPagSeguroModule = new function() {
             Modal.showLoading();
 
             jQuery.ajax({
-                
+
                 type: "GET",
                 cache: false,
                 url: '../modules/pagseguro/features/abandoned/abandoned.php',
                 data: params,
                 dataType: 'json',
-                
+
                 success: function(response) {
                     if (response.success) {
-                        
+
                         currentPage = (transactionsTable.api().page.info().page);
 
                         requestTransactions(function(table) {
@@ -878,7 +878,7 @@ var PrestaShopPagSeguroModule = new function() {
         };
 
         var sendMultipleEmails = function() {
-            
+
             var dataSelector = jQuery('input[name="abandonedTransactions[]"]');
 
             if (dataSelector.filter(":checked").length > 0) {
@@ -887,13 +887,13 @@ var PrestaShopPagSeguroModule = new function() {
                 Messages.addError('Selecione ao menos um item.');
             }
 
-        };        
+        };
 
         var prepareTable = function() {
-            
+
             transactionsTable = jQuery("#abandoned-transactions-table").dataTable({
-                
-                bStateSave: true,    
+
+                bStateSave: true,
                 info: false,
                 lengthChange: false,
                 searching: false,
@@ -923,10 +923,10 @@ var PrestaShopPagSeguroModule = new function() {
                     var checkedSendButton = function() {
                         sendMultipleButton.attr('disabled', checkboxes.filter(':checked').length <= 0);
                     };
-                    
+
                     checkedSendButton();
                     selectAll.unbind('click');
-                    
+
                     var hasNotChecked = false;
                     if (checkboxes.length > 0) {
                         checkboxes.each(function(){
@@ -959,7 +959,7 @@ var PrestaShopPagSeguroModule = new function() {
                 },
 
                 fnRowCallback: function(nRow, aData) {
-                    
+
                     if (parseInt(aData[4], 10) <= 0) {
                         jQuery(nRow).addClass('unread');
                     }
@@ -987,18 +987,18 @@ var PrestaShopPagSeguroModule = new function() {
         };
 
     };
-    
+
     /* ************************************* */
     /* *********** PAGE Refund ********** */
     /* ************************************* */
     var PageRefund = new function() {
-        
+
         var refundTable;
         var AdminData = {
             token: jQuery('#adminToken').val(),
             url: jQuery('#urlAdminOrder').val()
         };
-        
+
         var request = function(options) {
             jQuery.ajax({
                 type: 'POST',
@@ -1010,7 +1010,7 @@ var PrestaShopPagSeguroModule = new function() {
                 complete: options.complete
             });
         };
-        
+
         var search = function(callback) {
             Modal.showLoading();
             request({
@@ -1026,9 +1026,9 @@ var PrestaShopPagSeguroModule = new function() {
                 }
             });
         };
-        
+
         var onSuccess = function(data, callback) {
-            
+
             if (data.error == true && data.message == "[HTTP 401] - UNAUTHORIZED") {
                 Modal.message('error', "Não foi possível executar esta ação. Utilize a conciliação de transações primeiro ou tente novamente mais tarde.");
 
@@ -1062,13 +1062,13 @@ var PrestaShopPagSeguroModule = new function() {
                 } else {
                     Modal.message('alert', "Não há transações para estornar no período.");
                 }
-            }     
+            }
         };
-        
+
          var onRefund = function(response, callback) {
             if (! response.error) {
                 if (response.data.length > 0) {
-                
+
                     var result = new Array();
                     for (var i in response.data) {
 
@@ -1097,7 +1097,7 @@ var PrestaShopPagSeguroModule = new function() {
                 Modal.message('alert', "Não foi possível executar esta ação. Utilize a conciliação de transações primeiro ou tente novamente mais tarde.");
             }
         };
-        
+
         var doRefund = function(id, transactionCode, callback) {
             Modal.showLoading();
             jQuery.ajax({
@@ -1121,7 +1121,7 @@ var PrestaShopPagSeguroModule = new function() {
 
         var prepareTable = function() {
             refundTable = jQuery("#refund-table").dataTable({
-                bStateSave: true,    
+                bStateSave: true,
                 info: false,
                 lengthChange: false,
                 searching: false,
@@ -1140,15 +1140,15 @@ var PrestaShopPagSeguroModule = new function() {
         };
 
         this.init = function() {
-            
+
             prepareTable();
-            
+
             jQuery('#refund-search-button').click(function () {
                 search();
             });
-            
+
             jQuery('#refund-table tbody').on('click', 'td', function( event ) {
-                
+
                 event.preventDefault();
                 var table  = jQuery('#refund-table').dataTable();
                 var pos    = table.fnGetPosition(this);
@@ -1376,4 +1376,3 @@ var PrestaShopPagSeguroModule = new function() {
 
 
 };
-
