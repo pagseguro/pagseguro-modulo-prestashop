@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop 
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -21,16 +21,20 @@
 *  @copyright 2007-2015 PrestaShop SA
 *  @version  Release: $Revision: 6594 $
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*} 
+*}
 
 <h2 class="title" title="Transações Abandonadas">Transações Abandonadas</h2>
+
+<p>
+    Com esta funcionalidade você poderá listar as transações abandonadas durante o checkout PagSeguro e disparar, manualmente, um e-mail para seu comprador. Este e-mail conterá um link que o redirecionará para o fluxo de pagamento, exatamente no ponto onde ele parou.
+</p>
 
 <input type="hidden" id="adminToken" value="{$adminToken|escape:'htmlall':'UTF-8'}" />
 <input type="hidden" id="urlAdminOrder" value="{$urlAdminOrder|escape:'htmlall':'UTF-8'}" />
 
 
 {if isset($hasCredentials)}
-    
+
     {if $recoveryActive}
 
         {if count($errors)}
@@ -44,7 +48,7 @@
         {/if}
 
         <div class="pagseguro-search-tools">
-            
+
             <button class="pagseguro-button" id="search-abandoned-button">
                 {l s='Pesquisar' mod='pagseguro'}
             </button>
@@ -70,14 +74,14 @@
                     <th class="col-md-2">ID PrestaShop</th>
                     <th class="col-md-3">Validade do link</th>
                     <th class="col-md-4">E-mails enviados</th>
-                    <th class="col-md-5">Pedido</th>
+                    <th class="col-md-5">Ação</th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
-        
+
     {else}
-        
+
         <div class="pagseguro-msg pagseguro-msg-alert pagseguro-msg-small">
             <p>Ative a opção "listar transações abandonadas".</p>
         </div>
@@ -85,7 +89,7 @@
     {/if}
 
 {else}
-    
+
     <div class="pagseguro-msg pagseguro-msg-alert pagseguro-msg-small">
         <p>Para visualizar as transações abandonadas é necessário configurar suas <span class="link pagseguro-goto-configuration">credenciais do PagSeguro</span>.</p>
     </div>
