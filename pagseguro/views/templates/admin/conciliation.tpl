@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop 
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -21,7 +21,7 @@
 *  @copyright 2007-2015 PrestaShop SA
 *  @version  Release: $Revision: 6594 $
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*} 
+*}
 
 <h2 class="title" title="Conciliação">Conciliação</h2>
 <p>
@@ -29,7 +29,7 @@
 </p>
 
 {if isset($hasCredentials) && $hasCredentials}
-    
+
     <input type="hidden" id="adminToken" value="{$adminToken|escape:'htmlall':'UTF-8'}" />
     <input type="hidden" id="urlAdminOrder" value="{$urlAdminOrder|escape:'htmlall':'UTF-8'}" />
 
@@ -44,7 +44,7 @@
             <button class="pagseguro-button" type="button" id="conciliation-button">Conciliar</button>
         </div>
     </div>
-    
+
     <table id="conciliation-table" class="pagseguro-table" cellspacing="0" width="100%">
         <thead>
             <tr>
@@ -54,7 +54,7 @@
                 <th class="col-md-3">ID PagSeguro</th>
                 <th class="col-md-2">Status PrestaShop</th>
                 <th class="col-md-4">Status PagSeguro</th>
-                <th class="col-md-5">Pedido</th>
+                <th class="col-md-5">Ação</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -65,7 +65,7 @@
     </div>
 
 {else}
-    
+
     <div class="pagseguro-msg pagseguro-msg-alert pagseguro-msg-small">
         <p>Para conciliar transações é necessário configurar suas <span class="link pagseguro-goto-configuration">credenciais do PagSeguro</span>.</p>
     </div>
