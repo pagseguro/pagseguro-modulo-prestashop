@@ -288,7 +288,8 @@ class PagSeguro extends PaymentModule {
 
             /** E-mail validation */
             $email = Tools::getValue('pagseguroEmail');
-            if ($email) {
+
+            if (empty($email)) {
                 if (Tools::strlen($email) > 60) {
                     $errors[] = $this->invalidFieldSizeMessage('E-MAIL');
                 } elseif (!Validate::isEmail($email)) {
@@ -298,8 +299,15 @@ class PagSeguro extends PaymentModule {
 
             /** Token validation */
             $token = Tools::getValue('pagseguroToken');
-            if ($token && Tools::strlen($token) != 32) {
+            if (empty($token) && Tools::strlen($token) != 32) {
                 $errors[] = $this->invalidFieldSizeMessage('TOKEN');
+            }
+
+            /** Credentials validation */
+            if (! $errors) {
+                if (! $this->validateCredentials()) {
+                    $errors[] = $this->invalidCredentails();
+                }
             }
 
             /** URL redirect validation */
@@ -432,80 +440,136 @@ class PagSeguro extends PaymentModule {
     }
 
     /**
+     * @param $field
+     * @return string
+     */
+    private function invalidCredentails() {
+        return $this->l('Certifique-se de que o e-mail e token são válidos.');
+    }
+
+    /**
+     * Valitates a PagSeguro credentials
+     * @return bool
+     */
+    private function validateCredentials()
+    {
+        if ($this->checkCredentials() instanceof PagSeguroTransactionSearchResult)
+            return true;
+        return false;
+    }
+
+    /**
+     * Check in PagSeguro webservice if this credentials are valid.
+     * @return PagSeguroTransactionSearchResult | PagSeguroException
+     */
+    private function checkCredentials()
+    {
+        PagSeguroConfig::setEnvironment(Tools::getValue('pagseguroEnvironment'));
+        try {
+            return PagSeguroTransactionSearchService::searchByDate(
+                new PagSeguroAccountCredentials(Tools::getValue('pagseguroEmail'),Tools::getValue('pagseguroToken')),
+                1,
+                1,
+                date('Y-m-d\TH:i:s')
+            );
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * Save configuration post config data
+     */
+    private function updateConfigData()
+    {
+        $updateData = Array(
+            'pagseguroEmail' => 'PAGSEGURO_EMAIL',
+            'pagseguroToken' => 'PAGSEGURO_TOKEN',
+            'pagseguroEnvironment' => 'PAGSEGURO_ENVIRONMENT',
+            'pagseguroRedirectUrl' => 'PAGSEGURO_URL_REDIRECT',
+            'pagseguroNotificationUrl' => 'PAGSEGURO_NOTIFICATION_URL',
+            'pagseguroCharset' => 'PAGSEGURO_CHARSET',
+            'pagseguroCheckout' => 'PAGSEGURO_CHECKOUT',
+            'pagseguroLogActive' => 'PAGSEGURO_LOG_ACTIVE',
+            'pagseguroLogFileLocation' => 'PAGSEGURO_LOG_FILELOCATION',
+            'pagseguroRecoveryActive' => 'PAGSEGURO_RECOVERY_ACTIVE',
+        );
+
+        foreach ($updateData as $postIndex => $configIndex) {
+            if (Tools::getValue($postIndex)) {
+                Configuration::updateValue($configIndex, Tools::getValue($postIndex));
+            }
+            if (Tools::getValue($postIndex) == "0") {
+                Configuration::updateValue($configIndex, Tools::getValue($postIndex));
+            }
+        }
+    }
+
+    /**
+     * Save configuration post for discount data
+     */
+    private function updateDiscountData()
+    {
+        $updateDiscount = Array(
+            'pagseguroDiscountCreditCardInput' => Array(
+                "key" => 'PAGSEGURO_DISCOUNT_CREDITCARD',
+                "value" => Array(
+                    'pagseguroDiscountCreditCardDiscountInput' => 'PAGSEGURO_DISCOUNT_CREDITCARD_VL'
+                )),
+            'pagseguroDiscountBoletoInput' =>  Array(
+                "key" => 'PAGSEGURO_DISCOUNT_BOLETO',
+                "value"  => Array(
+                    'pagseguroDiscountBoletoDiscountInput' => 'PAGSEGURO_DISCOUNT_BOLETO_VL'
+                )),
+            'pagseguroDiscountEftInput' => Array(
+                "key" => 'PAGSEGURO_DISCOUNT_EFT',
+                "value" => Array(
+                    'pagseguroDiscountEftDiscountInput' => 'PAGSEGURO_DISCOUNT_EFT_VL'
+                )),
+            'pagseguroDiscountDepositInput' => Array(
+                "key" => 'PAGSEGURO_DISCOUNT_DEPOSIT',
+                "value" => Array(
+                    'pagseguroDiscountDepositDiscountInput' => 'PAGSEGURO_DISCOUNT_DEPOSIT_VL'
+                )),
+            'pagseguroDiscountBalanceInput' => Array(
+                "key" => 'PAGSEGURO_DISCOUNT_BALANCE',
+                "value" => Array(
+                    'pagseguroDiscountBalanceDiscountInput' => 'PAGSEGURO_DISCOUNT_BALANCE_VL'
+                )),
+        );
+
+        foreach ($updateDiscount as $postIndex => $configIndex) {
+
+            if (Tools::getValue($postIndex)) {
+                Configuration::updateValue($configIndex["key"], Tools::getValue($postIndex));
+                Configuration::updateValue($configIndex["value"][key($configIndex["value"])], Tools::getValue(key($configIndex["value"])));
+            } else {
+                Configuration::updateValue($configIndex["key"], Tools::getValue($postIndex));
+                Configuration::updateValue($configIndex["value"][key($configIndex["value"])], "00.00");
+            }
+        }
+    }
+
+    /**
+     * Save configuration post for log data
+     */
+    private function updateLogData()
+    {
+        /** Verify if log file exists, case not try create */
+        if (Tools::getValue('pagseguroLogActive')) {
+            $this->verifyLogFile(Tools::getValue('pagseguro_log_dir'));
+        }
+    }
+
+    /**
      * Save configuration post data
      */
     private function savePostData() {
-
         if (Tools::isSubmit('pagseguroModuleSubmit')) {
-
-            $updateData = Array(
-                'pagseguroEmail' => 'PAGSEGURO_EMAIL',
-                'pagseguroToken' => 'PAGSEGURO_TOKEN',
-                'pagseguroEnvironment' => 'PAGSEGURO_ENVIRONMENT',
-                'pagseguroRedirectUrl' => 'PAGSEGURO_URL_REDIRECT',
-                'pagseguroNotificationUrl' => 'PAGSEGURO_NOTIFICATION_URL',
-                'pagseguroCharset' => 'PAGSEGURO_CHARSET',
-                'pagseguroCheckout' => 'PAGSEGURO_CHECKOUT',
-                'pagseguroLogActive' => 'PAGSEGURO_LOG_ACTIVE',
-                'pagseguroLogFileLocation' => 'PAGSEGURO_LOG_FILELOCATION',
-                'pagseguroRecoveryActive' => 'PAGSEGURO_RECOVERY_ACTIVE',
-            );
-
-            foreach ($updateData as $postIndex => $configIndex) {
-                if (Tools::getValue($postIndex)) {
-                    Configuration::updateValue($configIndex, Tools::getValue($postIndex));
-                }
-                if (Tools::getValue($postIndex) == "0") {
-                    Configuration::updateValue($configIndex, Tools::getValue($postIndex));
-                }
-            }
-
-            $updateDiscount = Array(
-                'pagseguroDiscountCreditCardInput' => Array(
-                    "key" => 'PAGSEGURO_DISCOUNT_CREDITCARD',
-                    "value" => Array(
-                        'pagseguroDiscountCreditCardDiscountInput' => 'PAGSEGURO_DISCOUNT_CREDITCARD_VL'
-                    )),
-                'pagseguroDiscountBoletoInput' =>  Array(
-                    "key" => 'PAGSEGURO_DISCOUNT_BOLETO',
-                    "value"  => Array(
-                        'pagseguroDiscountBoletoDiscountInput' => 'PAGSEGURO_DISCOUNT_BOLETO_VL'
-                    )),
-                'pagseguroDiscountEftInput' => Array(
-                    "key" => 'PAGSEGURO_DISCOUNT_EFT',
-                    "value" => Array(
-                        'pagseguroDiscountEftDiscountInput' => 'PAGSEGURO_DISCOUNT_EFT_VL'
-                    )),
-                'pagseguroDiscountDepositInput' => Array(
-                    "key" => 'PAGSEGURO_DISCOUNT_DEPOSIT',
-                    "value" => Array(
-                        'pagseguroDiscountDepositDiscountInput' => 'PAGSEGURO_DISCOUNT_DEPOSIT_VL'
-                    )),
-                'pagseguroDiscountBalanceInput' => Array(
-                    "key" => 'PAGSEGURO_DISCOUNT_BALANCE',
-                    "value" => Array(
-                        'pagseguroDiscountBalanceDiscountInput' => 'PAGSEGURO_DISCOUNT_BALANCE_VL'
-                    )),
-            );
-
-            foreach ($updateDiscount as $postIndex => $configIndex) {
-
-                if (Tools::getValue($postIndex)) {
-                    Configuration::updateValue($configIndex["key"], Tools::getValue($postIndex));
-                    Configuration::updateValue($configIndex["value"][key($configIndex["value"])], Tools::getValue(key($configIndex["value"])));
-                } else {
-                    Configuration::updateValue($configIndex["key"], Tools::getValue($postIndex));
-                    Configuration::updateValue($configIndex["value"][key($configIndex["value"])], "00.00");
-                }
-            }
-
-            /** Verify if log file exists, case not try create */
-            if (Tools::getValue('pagseguroLogActive')) {
-                $this->verifyLogFile(Tools::getValue('pagseguro_log_dir'));
-            }
-
+            $this->updateConfigData();
+            $this->updateDiscountData();
+            $this->updateLogData();
             $this->addToView('success', true);
-
             $this->verifyEnvironment();
         }
     }
@@ -1230,7 +1294,6 @@ class PagSeguro extends PaymentModule {
                 }
             }
         }
-
         $arrayArchive[$position] = str_replace($this->getPagSeguroConfigEnvironment(), $environment, $fullLine);
         file_put_contents($archive, implode("", $arrayArchive));
     }
