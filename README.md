@@ -68,6 +68,15 @@ Changelog
 ---------
 ---
 
+2.1
+
+- Possibilidade de consultar e solicitar o cancelamento de transações;
+- Possibilidade de consultar e solicitar o estorno de transações;
+- Possibilidade de definir descontos com base no meio de pagamento escolhido durante o checkout PagSeguro;
+- Integração com Sandbox;
+- Ajustes em geral;
+- Obs.: As funcionalidades descritas acima ainda não estão disponíveis comercialmente para todos os vendedores. Em caso de dúvidas acesse nosso fórum.
+
 2.0
 
 - Não exibir botão de pagamento quando não houver email/token.
@@ -181,4 +190,3 @@ Achou e corrigiu um bug ou tem alguma feature em mente e deseja contribuir?
   [cURL]: http://php.net/manual/en/book.curl.php
   [DOM]: http://php.net/manual/en/book.dom.php
   [GitHub]: https://github.com/pagseguro/prestashop
-

@@ -464,13 +464,16 @@ class PagSeguro extends PaymentModule {
      */
     private function checkCredentials()
     {
+        date_default_timezone_set("America/Sao_Paulo");
+        $date = new DateTime("Now");
+        $date->sub(new DateInterval('PT10M'));
         PagSeguroConfig::setEnvironment(Tools::getValue('pagseguroEnvironment'));
         try {
             return PagSeguroTransactionSearchService::searchByDate(
                 new PagSeguroAccountCredentials(Tools::getValue('pagseguroEmail'),Tools::getValue('pagseguroToken')),
                 1,
                 1,
-                date('Y-m-d\TH:i:s')
+                $date->format('Y-m-d\TH:i:s')
             );
         } catch (Exception $e) {
             return $e->getMessage();
