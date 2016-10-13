@@ -23,7 +23,6 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
-
 include_once dirname(__FILE__) . '/../../../../config/config.inc.php';
 
 $checkout = Configuration::get('PAGSEGURO_CHECKOUT');
@@ -60,9 +59,8 @@ function displayErroPage()
 
 function canceledOrderForErro($pag_seguro)
 {
-    
     $currentOrder = (int) ($pag_seguro->currentOrder);
-    
+
     $history = new OrderHistory();
     $history->id_order = $currentOrder;
     $history->changeIdOrderState(6, $currentOrder);

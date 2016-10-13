@@ -23,7 +23,6 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
-
 include_once dirname(__FILE__).'/../../../../config/config.inc.php';
 include_once dirname(__FILE__).'/../../../../init.php';
 include_once dirname(__FILE__).'/../../pagseguro.php';
@@ -43,8 +42,11 @@ if (! $context->cookie->isLogged(true)) {
 $payment = new PagSeguroPaymentOrderPrestashop();
 $payment->setVariablesPaymentExecutionView();
 
-$environment = PagSeguroConfig::getEnvironment();
-$context->smarty->assign('environment', $environment);
+//Initialize PagSeguro Library to get the environment
+\PagSeguro\Library::initialize();
+$environment = \PagSeguro\Configuration\Configure::getEnvironment();
+
+$context->smarty->assign('environment', $environment->getEnvironment());
 
 $url = "modules/pagseguro/standard/front/error.php";
 $context->smarty->assign('errurl', $url);

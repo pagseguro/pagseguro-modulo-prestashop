@@ -388,6 +388,4 @@ class Util
             return Tools::ps_round($amount, 2);
         }
     }
-    
-
 }

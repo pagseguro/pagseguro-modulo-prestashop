@@ -27,7 +27,6 @@
 include_once dirname(__FILE__) . '/../../../../config/config.inc.php';
 include_once dirname(__FILE__) . '/../../features/util/util.php';
 include_once dirname(__FILE__) . '/../../features/util/encryptionIdPagSeguro.php';
-include_once dirname(__FILE__) . '/../PagSeguroLibrary/PagSeguroLibrary.php';
 
 class ConverterOrderForPaymentRequest
 {
@@ -42,7 +41,7 @@ class ConverterOrderForPaymentRequest
 
     public function __construct($module)
     {
-        $this->paymentRequest = new PagSeguroPaymentRequest();
+        $this->paymentRequest = new \PagSeguro\Domains\Requests\Payment();
         $this->module = $module;
         $this->context = Context::getContext();
     }
@@ -56,7 +55,7 @@ class ConverterOrderForPaymentRequest
     {
         try {
             $this->setAdditionalRequestData($additional_infos);
-            $this->setNotificationUrl();
+            //$this->setNotificationUrl();//useless?
         } catch (PagSeguroServiceException $e) {
             throw $e;
         } catch (Exception $e) {
@@ -81,28 +80,27 @@ class ConverterOrderForPaymentRequest
         $redirectURL = Util::getRedirectUrl();
 
         /** Currency */
-        $this->paymentRequest->setCurrency(PagSeguroCurrencies::getIsoCodeByName('REAL'));
+        $this->paymentRequest->setCurrency("BRL");
 
         /** Extra amount */
         $this->paymentRequest->setExtraAmount($this->getExtraAmountValues());
 
         /** Products */
-        $this->paymentRequest->setItems($this->generateProductsData());
+        $this->generateProductsData();
 
         /** Sender */
-        $this->paymentRequest->setSender($this->generateSenderData());
+        $this->generateSenderData();
 
         /** Shipping */
-        $this->paymentRequest->setShipping($this->generateShippingData());
+        $this->generateShippingData();
 
         /** Redirect URL */
         if (! Tools::isEmpty($redirectURL)) {
-            $this->paymentRequest->setRedirectURL($redirectURL);
+            $this->paymentRequest->setRedirectUrl($redirectURL);
         }
 
         /** Discount */
         $this->getDiscountData($this->paymentRequest);
-
     }
 
     private function getExtraAmountValues()
@@ -135,59 +133,41 @@ class ConverterOrderForPaymentRequest
 
     private function generateProductsData()
     {
-        $pagseguro_items = array();
-
         $cont = 1;
-
         $id_currency = PagSeguro::returnIdCurrency();
 
         foreach ($this->context->cart->getProducts() as $product) {
-
-            $pagSeguro_item = new PagSeguroItem();
-            $pagSeguro_item->setId($cont ++);
-            $pagSeguro_item->setDescription(Tools::truncate($product['name'], 255));
-            $pagSeguro_item->setQuantity($product['quantity']);
-
             if ($this->context->cart->id_currency != $id_currency && ! is_null($id_currency)) {
-                $pagSeguro_item->setAmount(
-                    Util::convertPriceFull(
-                        $product['price_wt'],
-                        new Currency($this->context->cart->id_currency),
-                        new Currency($id_currency)
-                    )
+                $itemAmount = Util::convertPriceFull(
+                    $product['price_wt'],
+                    new Currency($this->context->cart->id_currency),
+                    new Currency($id_currency)
                 );
             } else {
-                $pagSeguro_item->setAmount($product['price_wt']);
+                $itemAmount = $product['price_wt'];
             }
-
-            /** Defines weight in grams */
-            $pagSeguro_item->setWeight($product['weight'] * 1000);
-
-            if ($product['additional_shipping_cost'] > 0) {
-                $pagSeguro_item->setShippingCost($product['additional_shipping_cost']);
-            }
-            array_push($pagseguro_items, $pagSeguro_item);
+            
+            $this->paymentRequest->addItems()->withParameters(
+                $cont ++,
+                Tools::truncate($product['name'], 255),
+                $product['quantity'],
+                $itemAmount,
+                $product['weight'] * 1000,
+                ($product['additional_shipping_cost'] > 0) ? $product['additional_shipping_cost'] : null
+            );
         }
-        return $pagseguro_items;
     }
 
     private function generateSenderData()
     {
-        $sender = new PagSeguroSender();
-
         if (isset($this->context->customer) && ! is_null($this->context->customer)) {
-
-            $sender->setEmail($this->context->customer->email);
-
+            $this->paymentRequest->setSender()->setEmail($this->context->customer->email);
+   
             $firstName = $this->generateName($this->context->customer->firstname);
             $lastName = $this->generateName($this->context->customer->lastname);
-
             $name = $firstName . ' ' . $lastName;
-
-            $sender->setName(Tools::truncate($name, 50));
+            $this->paymentRequest->setSender()->setName(Tools::truncate($name, 50));
         }
-
-        return $sender;
     }
 
     private function generateName($value)
@@ -215,10 +195,8 @@ class ConverterOrderForPaymentRequest
         $cost = 00.00;
 
         $id_currency = PagSeguro::returnIdCurrency();
-
-        $shipping = new PagSeguroShipping();
-        $shipping->setAddress($this->generateShippingAddressData());
-        $shipping->setType($this->generateShippingType());
+        $this->generateShippingAddressData();
+        $this->generateShippingType();
 
         if ($this->context->cart->id_currency != $id_currency && ! is_null($id_currency)) {
 
@@ -231,13 +209,12 @@ class ConverterOrderForPaymentRequest
             $cost = $this->context->cart->getOrderTotal(true, Cart::ONLY_SHIPPING);
         }
 
-        $shipping->setCost(number_format(Tools::ps_round($cost, 2), 2, '.', ''));
-        return $shipping;
+        $this->paymentRequest->setShipping()->setCost()
+            ->withParameters(number_format(Tools::ps_round($cost, 2), 2, '.', ''));
     }
 
     private function generateShippingAddressData()
     {
-        $address = new PagSeguroAddress();
         $delivery_address = new Address((int) $this->context->cart->id_address_delivery);
 
         if (! is_null($delivery_address)) {
@@ -250,68 +227,64 @@ class ConverterOrderForPaymentRequest
 
             $number = is_null($fullAddress[1]) ? '' : $fullAddress[1];
             $complement = is_null($fullAddress[2]) ? '' : $fullAddress[2];
-
-            $address->setCity($delivery_address->city);
-            $address->setPostalCode($delivery_address->postcode);
-            $address->setStreet($street);
-            $address->setComplement($complement);
-            $address->setNumber($number);
-            $address->setDistrict($delivery_address->address2);
-            $address->setCity($delivery_address->city);
-
-            $country = new Country((int) $delivery_address->id_country);
-            $address->setCountry($country->iso_code);
-
+            
             $state = new State((int) $delivery_address->id_state);
-            $address->setState($state->iso_code);
-        }
+            $country = new Country((int) $delivery_address->id_country);
 
-        return $address;
+            $this->paymentRequest->setShipping()->setAddress()->withParameters(
+                $street,
+                $number,
+                $delivery_address->address2,
+                $delivery_address->postcode,
+                $delivery_address->city,
+                $state->iso_code,
+                $country->iso_code,
+                $complement
+            );
+        }
     }
 
     private function getDiscountData($paymentRequest)
     {
         if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_CREDITCARD'))) {
-            $paymentRequest->addPaymentMethodConfig(
-                'CREDIT_CARD',
-                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_CREDITCARD_VL')),
-                'DISCOUNT_PERCENT'
+            $this->paymentRequest->addPaymentMethod()->withParameters(
+                PagSeguro\Enum\PaymentMethod\Group::CREDIT_CARD,
+                PagSeguro\Enum\PaymentMethod\Config\Keys::DISCOUNT_PERCENT,
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_CREDITCARD_VL'))
             );
         }
 
         if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_EFT'))) {
-            $paymentRequest->addPaymentMethodConfig(
-                'EFT',
-                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_EFT_VL')),
-                'DISCOUNT_PERCENT'
+            $this->paymentRequest->addPaymentMethod()->withParameters(
+                PagSeguro\Enum\PaymentMethod\Group::EFT,
+                PagSeguro\Enum\PaymentMethod\Config\Keys::DISCOUNT_PERCENT,
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_EFT_VL'))
             );
         }
 
         if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BOLETO'))) {
-            $paymentRequest->addPaymentMethodConfig(
-                'BOLETO',
-                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BOLETO_VL')),
-                'DISCOUNT_PERCENT'
+            $this->paymentRequest->addPaymentMethod()->withParameters(
+                PagSeguro\Enum\PaymentMethod\Group::BOLETO,
+                PagSeguro\Enum\PaymentMethod\Config\Keys::DISCOUNT_PERCENT,
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BOLETO_VL'))
             );
         }
 
         if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_DEPOSIT'))) {
-            $paymentRequest->addPaymentMethodConfig(
-                'DEPOSIT',
-                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_DEPOSIT_VL')),
-                'DISCOUNT_PERCENT'
+            $this->paymentRequest->addPaymentMethod()->withParameters(
+                PagSeguro\Enum\PaymentMethod\Group::DEPOSIT,
+                PagSeguro\Enum\PaymentMethod\Config\Keys::DISCOUNT_PERCENT,
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_DEPOSIT_VL'))
             );
         }
 
         if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BALANCE'))) {
-            $paymentRequest->addPaymentMethodConfig(
-                'BALANCE',
-                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BALANCE_VL')),
-                'DISCOUNT_PERCENT'
+            $this->paymentRequest->addPaymentMethod()->withParameters(
+                PagSeguro\Enum\PaymentMethod\Group::BALANCE,
+                PagSeguro\Enum\PaymentMethod\Config\Keys::DISCOUNT_PERCENT,
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BALANCE_VL'))
             );
         }
-
-        return $paymentRequest;
     }
 
     private function addressConfig($fullAddress)
@@ -322,10 +295,8 @@ class ConverterOrderForPaymentRequest
 
     private function generateShippingType()
     {
-        $shipping_type = new PagSeguroShippingType();
-        $shipping_type->setByType('NOT_SPECIFIED');
-
-        return $shipping_type;
+        $this->paymentRequest->setShipping()->setType()
+            ->withParameters(\PagSeguro\Enum\Shipping\Type::NOT_SPECIFIED);
     }
 
     private function setAdditionalRequestData($additionalInfos)
@@ -364,25 +335,17 @@ class ConverterOrderForPaymentRequest
 
         $code = "";
         try {
-
             /** Retrieving PagSeguro configurations */
-            $this->retrievePagSeguroConfiguration();
+            //$this->retrievePagSeguroConfiguration();
 
-            /** Set PagSeguro Prestashop module version */
-            $this->setPagSeguroModuleVersion();
+            $credentials = $this->module->getPagSeguroCredentials();
 
-            /** Set PagSeguro PrestaShop CMS version */
-            $this->setPagSeguroCMSVersion();
-
-            /** Performing request */
-            $credentials = new PagSeguroAccountCredentials(
-                Configuration::get('PAGSEGURO_EMAIL'),
-                Configuration::get('PAGSEGURO_TOKEN')
+            $url = $this->paymentRequest->register(
+                $credentials,
+                $this->module->isLightboxCheckoutType()
             );
 
-            $url = $this->paymentRequest->register($credentials);
-
-            if ($isLightBox) {
+            if ($this->module->isLightboxCheckoutType()) {
                 $resultado = parse_url($url);
                 parse_str($resultado['query']);
 
@@ -409,21 +372,21 @@ class ConverterOrderForPaymentRequest
     {
 
         /** Retrieving configurated default charset */
-        PagSeguroConfig::setApplicationCharset(Configuration::get('PAGSEGURO_CHARSET'));
+        //PagSeguroConfig::setApplicationCharset(Configuration::get('PAGSEGURO_CHARSET'));
 
         /** Retrieving configurated default log info */
-        if (Configuration::get('PAGSEGURO_LOG_ACTIVE')) {
-            PagSeguroConfig::activeLog(_PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION'));
-        }
+        //if (Configuration::get('PAGSEGURO_LOG_ACTIVE')) {
+        //    PagSeguroConfig::activeLog(_PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION'));
+        //}
     }
 
-    private function setPagSeguroModuleVersion()
-    {
-        PagSeguroLibrary::setModuleVersion('prestashop-v.' . $this->module->version);
-    }
-
-    private function setPagSeguroCMSVersion()
-    {
-        PagSeguroLibrary::setCMSVersion('prestashop-v.' . _PS_VERSION_);
-    }
+//    private function setPagSeguroModuleVersion()
+//    {
+//        PagSeguroLibrary::setModuleVersion('prestashop-v.' . $this->module->version);
+//    }
+//
+//    private function setPagSeguroCMSVersion()
+//    {
+//        PagSeguroLibrary::setCMSVersion('prestashop-v.' . _PS_VERSION_);
+//    }
 }

@@ -37,14 +37,13 @@ class PagSeguroPaymentModuleFrontController extends ModuleFrontController
 
     public function initContent()
     {
-
-        $this->display_column_left = false;
         parent::initContent();
+        $this->display_column_left = false;
 
         $payment = new PagSeguroPaymentOrderPrestashop();
         $payment->setVariablesPaymentExecutionView();
 
-        $environment = PagSeguroConfig::getEnvironment();
+        $environment = \PagSeguro\Configuration\Configure::getEnvironment();
 
         $this->context = Context::getContext();
         $this->context->smarty->assign('environment', $environment);
