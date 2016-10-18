@@ -28,10 +28,8 @@ include_once dirname(__FILE__) . '/features/modules/pagsegurofactoryinstallmodul
 include_once dirname(__FILE__) . '/features/util/encryptionIdPagSeguro.php';
 include_once dirname(__FILE__) . '/features/library/vendor/autoload.php';
 
-
 if (!defined('_PS_VERSION_'))
     exit();
-
 
 if (function_exists('__autoload')) {
     spl_autoload_register('__autoload');
@@ -80,6 +78,8 @@ class PagSeguro extends PaymentModule {
 
         \PagSeguro\Library::cmsVersion()->setName("'prestashop-v.'")->setRelease(_PS_VERSION_);
         \PagSeguro\Library::moduleVersion()->setName('prestashop-v.')->setRelease($this->version);
+        
+        \PagSeguro\Configuration\Configure::setAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), Configuration::get('PAGSEGURO_TOKEN'));
 
         parent::__construct();
 
@@ -93,8 +93,15 @@ class PagSeguro extends PaymentModule {
         //$this->verifyEnvironment();
         //Configura o ambiente pra lib
         \PagSeguro\Configuration\Configure::setEnvironment($this->getPrestaShopEnvironment());
+
         $this->setContext();
         $this->modulo = PagSeguroFactoryInstallModule::createModule(_PS_VERSION_);
+    }
+    
+    public function getEnvironment()
+    {
+        \PagSeguro\Configuration\Configure::setEnvironment($this->getPrestaShopEnvironment());
+        return \PagSeguro\Configuration\Configure::getEnvironment();
     }
     
     public function getPagSeguroCredentials()

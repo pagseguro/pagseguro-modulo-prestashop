@@ -37,10 +37,10 @@ $validate = new PagSeguroValidateOrderPrestashop($pag_seguro);
 try {
     $validate->validate();
     if ($checkout) {
-        die($validate->request($checkout));
+        die($validate->request());
     }
-    Tools::redirectLink($validate->request($checkout));
-} catch (PagSeguroServiceException $exc) {
+    Tools::redirectLink($validate->request());
+} catch (Exception $exc) {
 	
     canceledOrderForErro($pag_seguro);
     

@@ -56,19 +56,15 @@ class ConverterOrderForPaymentRequest
         try {
             $this->setAdditionalRequestData($additional_infos);
             //$this->setNotificationUrl();//useless?
-        } catch (PagSeguroServiceException $e) {
-            throw $e;
         } catch (Exception $e) {
             throw $e;
         }
     }
 
-    public function request($isLightBox)
+    public function request()
     {
         try {
-            return $this->performPagSeguroRequest($isLightBox);
-        } catch (PagSeguroServiceException $e) {
-            throw $e;
+            return $this->performPagSeguroRequest();
         } catch (Exception $e) {
             throw $e;
         }
@@ -330,20 +326,14 @@ class ConverterOrderForPaymentRequest
          $this->paymentRequest->setReference($referenceToPagSeguro);
     }
 
-    private function performPagSeguroRequest($isLightBox)
+    private function performPagSeguroRequest()
     {
 
         $code = "";
         try {
-            /** Retrieving PagSeguro configurations */
-            //$this->retrievePagSeguroConfiguration();
-
             $credentials = $this->module->getPagSeguroCredentials();
 
-            $url = $this->paymentRequest->register(
-                $credentials,
-                $this->module->isLightboxCheckoutType()
-            );
+            $url = $this->paymentRequest->register($credentials);
 
             if ($this->module->isLightboxCheckoutType()) {
                 $resultado = parse_url($url);
@@ -361,8 +351,6 @@ class ConverterOrderForPaymentRequest
             if (Validate::isUrl($url)) {
                 return Tools::truncate($url, 255, '');
             }
-        } catch (PagSeguroServiceException $e) {
-            throw $e;
         } catch (Exception $e) {
             throw $e;
         }

@@ -52,19 +52,16 @@ class PagSeguroValidateOrderPrestashop
             $this->validateCart();
             $this->converter->convertToRequestData();
             $this->converter->setAdditionalRequest($this->validateOrder());
-        } catch (PagSeguroServiceException $e) {
-            throw $e;
+
         } catch (Exception $e) {
             throw $e;
         }
     }
 
-    public function request($isLightBox)
+    public function request()
     {
         try {
-            return $this->converter->request($isLightBox);
-        } catch (PagSeguroServiceException $e) {
-            throw $e;
+            return $this->converter->request();
         } catch (Exception $e) {
             throw $e;
         }

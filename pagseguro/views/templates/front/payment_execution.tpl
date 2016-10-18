@@ -50,6 +50,7 @@ function checkout()
                 },
                 abort: function(){
                 	// window.location.href = json.urlCompleta;
+                        redirecToHomePage();
                 }
             });
         },
@@ -60,6 +61,10 @@ function checkout()
 }
 function redirecToPageError(){
     window.location.href = baseDir + "{$errurl|escape:'quotes':'UTF-8'}";
+}
+
+function redirecToHomePage(){
+    window.location.href = baseDir;
 }
 </script>
 

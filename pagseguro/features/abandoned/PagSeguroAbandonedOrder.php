@@ -22,10 +22,13 @@
  */
 
 include_once dirname(__FILE__) . '/../../../../config/config.inc.php';
-include_once dirname(__FILE__) . '/../../features/PagSeguroLibrary/PagSeguroLibrary.php';
 include_once dirname(__FILE__) . '/../../features/util/encryptionIdPagSeguro.php';
 include_once dirname(__FILE__) . '/../../features/util/util.php';
+include_once dirname(__FILE__) . '/../../features/library/vendor/autoload.php';
 
+if (function_exists('__autoload')) {
+    spl_autoload_register('__autoload');
+}
 
 class PagSeguroAbandonedOrder {
 
@@ -34,6 +37,19 @@ class PagSeguroAbandonedOrder {
     private $messages = array();
 
     public function __construct() {
+        $this->version = '2.1.0';
+
+        \PagSeguro\Library::initialize();
+        \PagSeguro\Configuration\Configure::setCharset(Configuration::get('PAGSEGURO_CHARSET'));
+        \PagSeguro\Configuration\Configure::setLog(
+            Configuration::get('PAGSEGURO_LOG_ACTIVE'),
+            _PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION')
+        );
+        \PagSeguro\Library::cmsVersion()->setName("'prestashop-v.'")->setRelease(_PS_VERSION_);
+        \PagSeguro\Library::moduleVersion()->setName('prestashop-v.')->setRelease($this->version);
+        \PagSeguro\Configuration\Configure::setAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), Configuration::get('PAGSEGURO_TOKEN'));
+        \PagSeguro\Configuration\Configure::setEnvironment(Configuration::get('PAGSEGURO_ENVIRONMENT'));
+        
         $this->createLog();
     }
 
@@ -48,7 +64,7 @@ class PagSeguroAbandonedOrder {
     public function sendMails(Array $transactions) {
         $sendMultiple = false;
         if ($transactions) {
-        	$sendMultiple = true;
+            $sendMultiple = true;
             $templateData = $this->getMailTemplateData();
             foreach ($transactions as $key => $value) {
                 parse_str($value);
@@ -63,7 +79,6 @@ class PagSeguroAbandonedOrder {
     }
 
     private function getTransactions($recoveryDays) {
-
         $resultData = array();
         
         if ($transactions = $this->getPagSeguroTransactions($recoveryDays)) {
@@ -71,7 +86,6 @@ class PagSeguroAbandonedOrder {
             $pagseguroOrders = $this->getPagSeguroOrders();
 
             foreach ($transactions as $transaction) {
-
                 if ($this->isAbandonedOrder($transaction->getReference())) {
 
                     $reference = ((int)EncryptionIdPagSeguro::decrypt($transaction->getReference()));
@@ -95,7 +109,6 @@ class PagSeguroAbandonedOrder {
         }
 
         return $resultData;
-
     }
 
     private function getPagSeguroOrders() {
@@ -153,46 +166,46 @@ class PagSeguroAbandonedOrder {
         $initialDay = date(DATE_ATOM, mktime($hour[1], $minutes, $seconds, $month, $day - $recoveryDays, $year));
 
         try {
-            $serviceData = PagSeguroTransactionSearchService::searchAbandoned($this->credentials, 1, 1000, $initialDay);
-        } catch (PagSeguroServiceException $e) {
-            array_push($this->messages, $e->getOneLineMessage());
+            $options = [
+                'initial_date' => $initialDay,
+                'page' => 1,
+                'max_per_page' => 1000
+            ];
+            
+            $serviceData = \PagSeguro\Services\Transactions\Search\Abandoned::search(
+                \PagSeguro\Configuration\Configure::getAccountCredentials(),
+                $options
+            );
+
         } catch (Exception $e) {
             array_push($this->messages, $e->getMessage());
         }
 
-        return $serviceData ? $serviceData->getTransactions() : false;
-
+        return ($serviceData->getResultsInThisPage() > 0) ? $serviceData->getTransactions() : false;
     }
 
     private function createCredentials() {
-            
-        if (!$this->credentials) {
-            $email = Configuration::get('PAGSEGURO_EMAIL');
-            $token = Configuration::get('PAGSEGURO_TOKEN');
-            if (!empty($email) && !empty($token)) {
-                $this->credentials = new PagSeguroAccountCredentials($email, $token);
-            } else {
-                array_push($this->messages, "PagSeguro credentials not set.");
-            }
+        if (empty(Configuration::get('PAGSEGURO_EMAIL'))
+            || empty(Configuration::get('PAGSEGURO_TOKEN'))) {
+            array_push($this->messages, "PagSeguro credentials not set.");
+            return false;
         }
 
-        return (bool)$this->credentials;
+        \PagSeguro\Configuration\Configure::setAccountCredentials(
+            Configuration::get('PAGSEGURO_EMAIL'),
+            Configuration::get('PAGSEGURO_TOKEN')
+        );
+        
+        return true;
     }
 
+    /**
+     * Create an start log for every abandoned transaction realized
+     */
     private function createLog() {
-
-        /*** Retrieving configurated default charset */
-        PagSeguroConfig::setApplicationCharset(Configuration::get('PAGSEGURO_CHARSET'));
-
-        /*** Retrieving configurated default log info */
-        if (Configuration::get('PAGSEGURO_LOG_ACTIVE')) {
-            PagSeguroConfig::activeLog(_PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION'));
-        }
-                
-        LogPagSeguro::info(
+        \PagSeguro\Resources\Log\Logger::info(
             "PagSeguroAbandoned.Search( 'Pesquisa de transações abandonadas realizada em " . date("d/m/Y H:i") . ".')"
         );
-
     }
 
     private function getMailTemplateData() {

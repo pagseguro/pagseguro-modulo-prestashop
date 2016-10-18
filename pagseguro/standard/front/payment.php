@@ -42,11 +42,9 @@ if (! $context->cookie->isLogged(true)) {
 $payment = new PagSeguroPaymentOrderPrestashop();
 $payment->setVariablesPaymentExecutionView();
 
-//Initialize PagSeguro Library to get the environment
-\PagSeguro\Library::initialize();
-$environment = \PagSeguro\Configuration\Configure::getEnvironment();
+$environment = Configuration::get('PAGSEGURO_ENVIRONMENT');
 
-$context->smarty->assign('environment', $environment->getEnvironment());
+$context->smarty->assign('environment', $environment);
 
 $url = "modules/pagseguro/standard/front/error.php";
 $context->smarty->assign('errurl', $url);
