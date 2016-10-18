@@ -43,6 +43,11 @@ class PagSeguroPaymentOrderPrestashop
         return version_compare(_PS_VERSION_, '1.5.0.3', '<=') ? $this->paymentUrlPS14 : $this->paymentUrl;
     }
 
+    private function returnUrlDirectPaymentForVersionModule()
+    {
+        return version_compare(_PS_VERSION_, '1.5.0.3', '<=') ? $this->paymentDirectUrlPS14 : $this->paymentDirectUrl;
+    }
+
     private function setCurrencyVariable($id_currency)
     {
         $totalOrder = $this->context->cart->getOrderTotal(true, Cart::BOTH);
@@ -86,6 +91,8 @@ class PagSeguroPaymentOrderPrestashop
                 'this_path' => __PS_BASE_URI__,
                 'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/',
                 'action_url' => _PS_BASE_URL_ . __PS_BASE_URI__ .$this->returnUrlPaymentForVersionModule(),
+                'success_url' => $this->context->link->getModuleLink('pagseguro', 'success', array(), true),
+                'installment_url' => $this->context->link->getModuleLink('pagseguro', 'installment', array(), true),
                 'checkout' => Configuration::get('PAGSEGURO_CHECKOUT'))
         );
     }

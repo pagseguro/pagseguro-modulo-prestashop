@@ -24,9 +24,7 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-include_once dirname(__FILE__) . '/features/modules/pagsegurofactoryinstallmodule.php';
-include_once dirname(__FILE__) . '/features/util/encryptionIdPagSeguro.php';
-include_once dirname(__FILE__) . '/features/library/vendor/autoload.php';
+require_once dirname(__FILE__).'/Loader.php';
 
 
 if (!defined('_PS_VERSION_'))
@@ -81,6 +79,8 @@ class PagSeguro extends PaymentModule {
         \PagSeguro\Library::cmsVersion()->setName("'prestashop-v.'")->setRelease(_PS_VERSION_);
         \PagSeguro\Library::moduleVersion()->setName('prestashop-v.')->setRelease($this->version);
 
+        \PagSeguro\Configuration\Configure::setAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), Configuration::get('PAGSEGURO_TOKEN'));
+
         parent::__construct();
 
         $this->displayName = $this->l('PagSeguro');
@@ -99,10 +99,6 @@ class PagSeguro extends PaymentModule {
     
     public function getPagSeguroCredentials()
     {
-        $email = Configuration::get('PAGSEGURO_EMAIL');
-        $token = Configuration::get('PAGSEGURO_TOKEN');
-        //Set the credentials
-        \PagSeguro\Configuration\Configure::setAccountCredentials($email, $token);
         return \PagSeguro\Configuration\Configure::getAccountCredentials();
     }
     
