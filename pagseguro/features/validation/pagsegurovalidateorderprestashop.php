@@ -42,7 +42,45 @@ class PagSeguroValidateOrderPrestashop
     {
         $this->module = $module;
         $this->context = Context::getContext();
-        $this->converter = new ConverterOrderForPaymentRequest($module);
+        /*
+         * Aqui instanciamos a classe que faz a requisição para o pagseguro, previamente instanciava uma request da API
+         * do tipo \PagSEguro\Domains\Requests\Payment apenas, agora aceitamos um parametro $request no construtor
+         * onde podemos passar o tipo da nossa requisição, caso contrário, instancia-se um payment.
+         */
+        $this->loadConverter();
+    }
+
+    private function loadConverter()
+    {
+        if (Configuration::get('PAGSEGURO_CHECKOUT') === '2') {
+
+            if (filter_var($_POST['type']) == 'boleto') {
+
+                $this->converter = new ConverterOrderForPaymentRequest(
+                    $this->module,
+                    new \PagSeguro\Domains\Requests\DirectPayment\Boleto()
+                );
+            }
+
+            if (filter_var($_POST['type']) == 'debit') {
+
+                $this->converter = new ConverterOrderForPaymentRequest(
+                    $this->module,
+                    new \PagSeguro\Domains\Requests\DirectPayment\OnlineDebit()
+                );
+            }
+
+            if (filter_var($_POST['type']) == 'credit-card') {
+
+                $this->converter = new ConverterOrderForPaymentRequest(
+                    $this->module,
+                    new \PagSeguro\Domains\Requests\DirectPayment\CreditCard()
+                );
+            }
+
+        } else {
+            $this->converter = new ConverterOrderForPaymentRequest($this->module);
+        }
     }
 
     public function validate()
@@ -67,6 +105,18 @@ class PagSeguroValidateOrderPrestashop
             throw $e;
         } catch (Exception $e) {
             throw $e;
+        }
+    }
+
+    /*
+     * Metodo que executa um pagamento foi criado para não precisar mudar a request, precisa melhorar...
+     */
+    public function payment()
+    {
+        try {
+            return $this->converter->payment();
+        } catch (Exception $exception) {
+            throw $exception;
         }
     }
 

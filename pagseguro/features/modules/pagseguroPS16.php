@@ -46,16 +46,27 @@ class PagSeguroPS16 implements PagSeguroModuleConfigurable
     {
         $this->params = $params;
         $this->context = Context::getContext();
-        
+
         $this->context->smarty->assign(
             array(
                 'version_module' => _PS_VERSION_,
-                'action_url' => $this->context->link->getModuleLink('pagseguro', 'payment', array(), true),
+                'action_url' => $this->actionUrl(),
                 'image' => __PS_BASE_URI__ . 'modules/pagseguro/views/img/logops_86x49.png',
                 'this_path' => __PS_BASE_URI__ . 'modules/pagseguro/',
                 'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/'
             )
         );
+    }
+
+    public function actionUrl()
+    {
+        if (Configuration::get('PAGSEGURO_CHECKOUT') === '0' || Configuration::get('PAGSEGURO_CHECKOUT') === '1' ) {
+            return $this->context->link->getModuleLink('pagseguro', 'payment', array(), true);
+        }
+
+        if (Configuration::get('PAGSEGURO_CHECKOUT') === '2') {
+            return $this->context->link->getModuleLink('pagseguro', 'direct', array(), true);
+        }
     }
 
     public function returnPaymentConfiguration($params)
