@@ -7,5 +7,4 @@ include_once dirname(__FILE__) . '/features/modules/pagsegurofactoryinstallmodul
 include_once dirname(__FILE__) . '/features/payment/pagseguropaymentorderprestashop.php';
 include_once dirname(__FILE__) . '/features/util/encryptionIdPagSeguro.php';
 include_once dirname(__FILE__) . '/features/library/vendor/autoload.php';
-include_once dirname(__FILE__) . '/controllers/front/direct.php';
 

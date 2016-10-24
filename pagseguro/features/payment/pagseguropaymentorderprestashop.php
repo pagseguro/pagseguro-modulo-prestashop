@@ -91,9 +91,30 @@ class PagSeguroPaymentOrderPrestashop
                 'this_path' => __PS_BASE_URI__,
                 'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/',
                 'action_url' => _PS_BASE_URL_ . __PS_BASE_URI__ .$this->returnUrlPaymentForVersionModule(),
-                'success_url' => $this->context->link->getModuleLink('pagseguro', 'success', array(), true),
-                'installment_url' => $this->context->link->getModuleLink('pagseguro', 'installment', array(), true),
+                'success_url' => $this->compatibilitySuccessUrl(),
+                'installment_url' => $this->compatibilitySInstallmentsUrl(),
                 'checkout' => Configuration::get('PAGSEGURO_CHECKOUT'))
         );
+    }
+
+    private function compatibilitySuccessUrl()
+    {
+        if ($this->versionCompare()) {
+            return $this->context->link->getModuleLink('pagseguro', 'success', array(), true);
+        }
+        return _PS_BASE_URL_ . __PS_BASE_URI__ . 'modules/pagseguro/standard/front/success.php';
+    }
+
+    private function compatibilitySInstallmentsUrl()
+    {
+        if ($this->versionCompare()) {
+            return $this->context->link->getModuleLink('pagseguro', 'installment', array(), true);
+        }
+        return _PS_BASE_URL_ . __PS_BASE_URI__ . 'modules/pagseguro/standard/front/installment.php';
+    }
+
+    private function versionCompare()
+    {
+        return version_compare(_PS_VERSION_, '1.5.0.1', '>=');
     }
 }

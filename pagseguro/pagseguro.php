@@ -92,7 +92,8 @@ class PagSeguro extends PaymentModule {
         }
         //$this->verifyEnvironment();
         //Configura o ambiente pra lib
-        \PagSeguro\Configuration\Configure::setEnvironment($this->getPrestaShopEnvironment());
+        if ($this->getPrestaShopEnvironment())
+            \PagSeguro\Configuration\Configure::setEnvironment($this->getPrestaShopEnvironment());
 
         $this->setContext();
         $this->modulo = PagSeguroFactoryInstallModule::createModule(_PS_VERSION_);
@@ -130,6 +131,7 @@ class PagSeguro extends PaymentModule {
                 return false;
             }
         }
+
         if (!$this->validatePagSeguroId()) {
             return false;
         }
@@ -148,6 +150,7 @@ class PagSeguro extends PaymentModule {
         if (!parent::install() or
             ! $this->registerHook('payment') or
             ! $this->registerHook('paymentReturn') or
+            ! $this->registerHook('header') or
             ! Configuration::updateValue('PAGSEGURO_EMAIL', '') or
             ! Configuration::updateValue('PAGSEGURO_TOKEN', '') or
             ! Configuration::updateValue('PAGSEGURO_ENVIRONMENT', '') or
@@ -281,6 +284,13 @@ class PagSeguro extends PaymentModule {
     public function hookPaymentReturn($params) {
         $this->modulo->returnPaymentConfiguration($params);
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/hook/payment_return.tpl');
+    }
+
+    public function hookHeader($params)
+    {
+        $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/pagseguro/views/css/bootstrap.css' );
+        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/pagseguro/views/js/jquery-2.2.4.min.js');
+        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/pagseguro/views/js/bootstrap.min.js');
     }
 
     /**
@@ -503,6 +513,9 @@ class PagSeguro extends PaymentModule {
      */
     private function checkCredentials()
     {
+
+        \PagSeguro\Configuration\Configure::setEnvironment(Tools::getValue('pagseguroEnvironment'));
+
         date_default_timezone_set("America/Sao_Paulo");
         $date = new DateTime("Now");
         $date->sub(new DateInterval('PT10M'));
@@ -515,7 +528,7 @@ class PagSeguro extends PaymentModule {
 
         try {
             return \PagSeguro\Services\Transactions\Search\Date::search(
-                $this->getPagSeguroCredentials(),
+                new \PagSeguro\Domains\AccountCredentials(Tools::getValue('pagseguroEmail'), Tools::getValue('pagseguroToken')),
                 $options
             );
 //            return PagSeguroTransactionSearchService::searchByDate(
@@ -869,12 +882,12 @@ class PagSeguro extends PaymentModule {
             $requirements['moeda'][1] = $this->missedCurrencyMessage();
         }
 
-        $requirements['curl'][1] = (is_null($requirements['curl'][1]) ? "Biblioteca cURL instalada." : $requirements['curl'][1]);
-        $requirements['dom'][1] = (is_null($requirements['dom'][1]) ? "DOM XML instalado." : $requirements['dom'][1]);
-        $requirements['spl'][1] = (is_null($requirements['spl'][1]) ? "Biblioteca padrão do PHP(SPL) instalada." : $requirements['spl'][1]);
-        $requirements['version'][1] = (is_null($requirements['version'][1]) ? "Versão do PHP superior à 5.3.3." : $requirements['version'][1]);
+//        $requirements['curl'][1] = (is_null($requirements['curl'][1]) ? "Biblioteca cURL instalada." : $requirements['curl'][1]);
+//        $requirements['dom'][1] = (is_null($requirements['dom'][1]) ? "DOM XML instalado." : $requirements['dom'][1]);
+//        $requirements['spl'][1] = (is_null($requirements['spl'][1]) ? "Biblioteca padrão do PHP(SPL) instalada." : $requirements['spl'][1]);
+//        $requirements['version'][1] = (is_null($requirements['version'][1]) ? "Versão do PHP superior à 5.3.3." : $requirements['version'][1]);
 
-        $this->addToView('requirements', $requirements);
+//        $this->addToView('requirements', $requirements);
 
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/requirements.tpl');
     }
@@ -1285,16 +1298,16 @@ class PagSeguro extends PaymentModule {
         return $version;
     }
 
-    /**
-     *
-     */
-    private function verifyEnvironment() {
-        if ($this->getPagSeguroConfigEnvironment()
-            != $this->getPrestaShopEnvironment())
-        {
-            $this->changeEnvironment();
-        }
-    }
+//    /**
+//     *
+//     */
+//    private function verifyEnvironment() {
+//        if ($this->getPagSeguroConfigEnvironment()
+//            != $this->getPrestaShopEnvironment())
+//        {
+//            $this->changeEnvironment();
+//        }
+//    }
 
     /**
      * @return mixed
@@ -1304,55 +1317,55 @@ class PagSeguro extends PaymentModule {
         return Configuration::get('PAGSEGURO_ENVIRONMENT');
     }
 
-    /**
-     * @return mixed
-     */
-    private function getPagSeguroConfigEnvironment()
-    {
-        // Include the config file and get it's values
-        $path = dirname(__FILE__) . '/features/Library/source/Configuration/Wrapper.php';
-        $fh = fopen($path,'r+');
+//    /**
+//     * @return mixed
+//     */
+//    private function getPagSeguroConfigEnvironment()
+//    {
+//        // Include the config file and get it's values
+//        $path = dirname(__FILE__) . '/features/Library/source/Configuration/Wrapper.php';
+//        $fh = fopen($path,'r+');
+//
+//        while(!feof($fh)) {
+//            $lines = explode(',',fgets($fh));
+//            if (strpos($lines[0], "const PAGSEGURO_ENV"))
+//            {
+//                $context = explode("=",$lines[0]);
+//                $environment = preg_replace("/[^a-zA-Z0-9]+/", "", $context[1]);
+//            }
+//        }
+//
+//        fclose($fh);
+//        return $environment;
+//    }
 
-        while(!feof($fh)) {
-            $lines = explode(',',fgets($fh));
-            if (strpos($lines[0], "const PAGSEGURO_ENV"))
-            {
-                $context = explode("=",$lines[0]);
-                $environment = preg_replace("/[^a-zA-Z0-9]+/", "", $context[1]);
-            }
-        }
-
-        fclose($fh);
-        return $environment;
-    }
-
-    /**
-     *
-     */
-    private function changeEnvironment()
-    {
-
-        // File to be changed
-        $archive = dirname(__FILE__) . '/features/Library/source/Configuration/Wrapper.php';
-        // Search the current environment of library.
-        $search = "const PAGSEGURO_ENV";
-        // Save the file in an array in variable $arrayArchive.
-        $arrayArchive = file($archive);
-        $position = 0;
-        for ($i = 0; $i < sizeof($arrayArchive); $i++) {
-            // Checks the position of environmental on array, and stores the environment on variable $libEnvironment.
-            if (strpos($arrayArchive[$i], $search) &&
-                (strpos($arrayArchive[$i], 'production') || strpos($arrayArchive[$i], 'sandbox'))) {
-                $fullLine = $arrayArchive[$i];
-                $position = $i;
-                if (strpos($fullLine, 'production') == false) {
-                    $environment = "production";
-                } else {
-                    $environment = "sandbox";
-                }
-            }
-        }
-        $arrayArchive[$position] = str_replace($this->getPagSeguroConfigEnvironment(), $environment, $fullLine);
-        file_put_contents($archive, implode("", $arrayArchive));
-    }
+//    /**
+//     *
+//     */
+//    private function changeEnvironment()
+//    {
+//
+//        // File to be changed
+//        $archive = dirname(__FILE__) . '/features/Library/source/Configuration/Wrapper.php';
+//        // Search the current environment of library.
+//        $search = "const PAGSEGURO_ENV";
+//        // Save the file in an array in variable $arrayArchive.
+//        $arrayArchive = file($archive);
+//        $position = 0;
+//        for ($i = 0; $i < sizeof($arrayArchive); $i++) {
+//            // Checks the position of environmental on array, and stores the environment on variable $libEnvironment.
+//            if (strpos($arrayArchive[$i], $search) &&
+//                (strpos($arrayArchive[$i], 'production') || strpos($arrayArchive[$i], 'sandbox'))) {
+//                $fullLine = $arrayArchive[$i];
+//                $position = $i;
+//                if (strpos($fullLine, 'production') == false) {
+//                    $environment = "production";
+//                } else {
+//                    $environment = "sandbox";
+//                }
+//            }
+//        }
+//        $arrayArchive[$position] = str_replace($this->getPagSeguroConfigEnvironment(), $environment, $fullLine);
+//        file_put_contents($archive, implode("", $arrayArchive));
+//    }
 }

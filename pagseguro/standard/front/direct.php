@@ -31,9 +31,9 @@ include_once dirname(__FILE__).'/../../features/payment/pagseguropaymentorderpre
 
 $useSSL = true;
 
-$pagseguro = new PagSeguro();
-
 $showView = new BWDisplay();
+
+$pagseguro = new PagSeguro();
 
 $context = Context::getContext();
 
@@ -44,12 +44,39 @@ if (! $context->cookie->isLogged(true)) {
 $payment = new PagSeguroPaymentOrderPrestashop();
 $payment->setVariablesPaymentExecutionView();
 
-$environment = Configuration::get('PAGSEGURO_ENVIRONMENT');
+$environment = \PagSeguro\Configuration\Configure::getEnvironment();
 
+$context->smarty->clearAssign('hide_left_column');
+$context->smarty->clearAssign('display_column_left');
+$context->smarty->assign('hide_left_column', 1);
+$context->smarty->assign('display_column_left', 0);
 $context->smarty->assign('environment', $environment);
 
-$url = "modules/pagseguro/standard/front/error.php";
+if (version_compare(_PS_VERSION_, '1.5.0.1', '>=')) {
+    $context->smarty->clearAssign('width_center_column');
+    $context->smarty->assign('width_center_column', '100%');
+}
+
+if ($environment == 'sandbox') {
+    $context->smarty->assign('pagseguro_direct_js', 'https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js');
+} else {
+    $context->smarty->assign('pagseguro_direct_js', 'https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js');
+}
+
+$session = \PagSeguro\Services\Session::create(
+    \PagSeguro\Configuration\Configure::getAccountCredentials()
+);
+
+$context->smarty->assign('pagseguro_session', $session->getResult());
+
+$year = idate("Y");
+$maxYear = $year + 20;
+
+$context->smarty->assign('cc_years', $year);
+$context->smarty->assign('cc_max_years', $maxYear);
+
+$url = "index.php?fc=module&module=pagseguro&controller=error";
 $context->smarty->assign('errurl', $url);
 
-$showView->setTemplate(_PS_MODULE_DIR_.'pagseguro/views/templates/front/payment_execution.tpl');
+$showView->setTemplate(_PS_MODULE_DIR_.'pagseguro/views/templates/front/payment-direct.tpl');
 $showView->run();

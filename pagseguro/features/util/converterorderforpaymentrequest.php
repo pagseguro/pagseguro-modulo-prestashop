@@ -444,9 +444,23 @@ class ConverterOrderForPaymentRequest
                     );
 
                     $this->setHolderPhone();
+
+                    $result = $this->paymentRequest->register(
+                        \PagSeguro\Configuration\Configure::getAccountCredentials()
+                    );
+
+                    return Tools::jsonEncode(
+                        array(
+                            'success' => true,
+                            'payload' => [
+                                'data' => [
+
+                                ]
+                            ]
+                        )
+                    );
                 }
 
-                //Get the crendentials and register the boleto payment
                 $result = $this->paymentRequest->register(
                     \PagSeguro\Configuration\Configure::getAccountCredentials()
                 );
@@ -456,11 +470,27 @@ class ConverterOrderForPaymentRequest
                         'success' => true,
                         'payload' => [
                             'data' => [
-
+                                'payment_link' => $result->getPaymentLink()
                             ]
                         ]
                     )
                 );
+//
+//                //Get the crendentials and register the boleto payment
+//                $result = $this->paymentRequest->register(
+//                    \PagSeguro\Configuration\Configure::getAccountCredentials()
+//                );
+//
+//                return Tools::jsonEncode(
+//                    array(
+//                        'success' => true,
+//                        'payload' => [
+//                            'data' => [
+//
+//                            ]
+//                        ]
+//                    )
+//                );
             }
 
             if (Configuration::get('PAGSEGURO_CHECKOUT') === '1') {

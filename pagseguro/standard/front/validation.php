@@ -43,7 +43,7 @@ try {
 } catch (Exception $exc) {
 	
     canceledOrderForErro($pag_seguro);
-    
+    var_dump($checkout); die;
     if ($checkout)    
         throw new Exception($exc->getMessage(), 1);
     else

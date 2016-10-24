@@ -1,7 +1,9 @@
 <?php
 
-
-//namespace PagSeguroModule\Controllers;
+include_once dirname(__FILE__) . '/../../../../config/config.inc.php';
+include_once dirname(__FILE__) . '/../../../../init.php';
+include_once dirname(__FILE__) . '/../../pagseguro.php';
+include_once dirname(__FILE__).'/../../features/payment/pagseguropaymentorderprestashop.php';
 
 class PagSeguroDirectModuleFrontController extends ModuleFrontController
 {

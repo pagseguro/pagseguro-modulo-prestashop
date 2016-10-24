@@ -69,6 +69,7 @@ class Builder
             $protocol = $xml->path->protocol;
         }
         $environment = Configure::getEnvironment()->getEnvironment();
+
         return sprintf(
             "%s://%s",
             $protocol,

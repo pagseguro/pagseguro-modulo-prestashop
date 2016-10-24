@@ -31,9 +31,9 @@ include_once dirname(__FILE__).'/../../features/payment/pagseguropaymentorderpre
 
 $useSSL = true;
 
-$pagseguro = new PagSeguro();
-
 $showView = new BWDisplay();
+
+$pagseguro = new PagSeguro();
 
 $context = Context::getContext();
 
@@ -41,15 +41,18 @@ if (! $context->cookie->isLogged(true)) {
     Tools::redirect('authentication.php?back=order.php');
 }
 
-$payment = new PagSeguroPaymentOrderPrestashop();
-$payment->setVariablesPaymentExecutionView();
+//$payment = new PagSeguroPaymentOrderPrestashop();
+//$payment->setVariablesPaymentExecutionView();
 
-$environment = Configuration::get('PAGSEGURO_ENVIRONMENT');
+$environment = \PagSeguro\Configuration\Configure::getEnvironment();
 
 $context->smarty->assign('environment', $environment);
+//if (version_compare(_PS_VERSION_, '1.5.0.1', '>='))
+//            $this->context->smarty->assign('width_center_column', '80%');
 
-$url = "modules/pagseguro/standard/front/error.php";
+$url = "index.php?fc=module&module=pagseguro&controller=error";
 $context->smarty->assign('errurl', $url);
 
-$showView->setTemplate(_PS_MODULE_DIR_.'pagseguro/views/templates/front/payment_execution.tpl');
+
+$showView->setTemplate(_PS_MODULE_DIR_.'pagseguro/views/templates/front/order-confirmation.tpl');
 $showView->run();
