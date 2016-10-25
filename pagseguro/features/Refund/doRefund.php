@@ -21,7 +21,11 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 include_once dirname(__FILE__) .'/Helper.php';
-include_once dirname(__FILE__) .'/../../features/PagSeguroLibrary/PagSeguroLibrary.php';
+include_once dirname(__FILE__) . '/../../features/library/vendor/autoload.php';
+
+if (function_exists('__autoload')) {
+    spl_autoload_register('__autoload');
+}
 
 /**
  * Class doRefund
@@ -37,6 +41,19 @@ class doRefund {
      *
      */
     public function __construct() {
+        $this->version = '2.1.0';
+
+        \PagSeguro\Library::initialize();
+        \PagSeguro\Configuration\Configure::setCharset(Configuration::get('PAGSEGURO_CHARSET'));
+        \PagSeguro\Configuration\Configure::setLog(
+            Configuration::get('PAGSEGURO_LOG_ACTIVE'),
+            _PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION')
+        );
+        \PagSeguro\Library::cmsVersion()->setName("'prestashop-v.'")->setRelease(_PS_VERSION_);
+        \PagSeguro\Library::moduleVersion()->setName('prestashop-v.')->setRelease($this->version);
+        \PagSeguro\Configuration\Configure::setAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), Configuration::get('PAGSEGURO_TOKEN'));
+        \PagSeguro\Configuration\Configure::setEnvironment(Configuration::get('PAGSEGURO_ENVIRONMENT'));
+
         $this->helper = new Helper();
     }
 
@@ -49,7 +66,6 @@ class doRefund {
      */
     public function goRefund($orderID, $transactionCode)
     {
-
         try {  
             $this->updateOrderStatus(current($orderID));
             $this->refund(current($transactionCode));
@@ -94,10 +110,12 @@ class doRefund {
      */
     private function refund($transactionCode) {
         try {
-            return PagSeguroRefundService::createRefundRequest($this->helper->getPagSeguroCredentials(), $transactionCode);
+            return \PagSeguro\Services\Transactions\Refund::create(
+                \PagSeguro\Configuration\Configure::getAccountCredentials(),
+                $transactionCode
+            );
         } catch (Exception $e) {
             throw $e;
         }
     }
-    
 }

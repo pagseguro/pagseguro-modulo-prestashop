@@ -41,8 +41,9 @@ class ConverterOrderForPaymentRequest
 
     public function __construct($module, $request = null)
     {
-        if (is_null($request))
-            $this->paymentRequest = new \PagSeguro\Domains\Requests\Payment();
+        if (is_null($request)) {
+            $request = new \PagSeguro\Domains\Requests\Payment();
+        }
         $this->paymentRequest = $request;
         $this->module = $module;
         $this->context = Context::getContext();
@@ -496,7 +497,7 @@ class ConverterOrderForPaymentRequest
             if (Configuration::get('PAGSEGURO_CHECKOUT') === '1') {
                 $url = $this->paymentRequest->register(
                     $credentials,
-                    true
+                    false
                 );
                 $resultado = parse_url($url);
                 parse_str($resultado['query']);

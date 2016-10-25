@@ -47,7 +47,7 @@ class PagSeguroAbandonedOrder {
         );
         \PagSeguro\Library::cmsVersion()->setName("'prestashop-v.'")->setRelease(_PS_VERSION_);
         \PagSeguro\Library::moduleVersion()->setName('prestashop-v.')->setRelease($this->version);
-        \PagSeguro\Configuration\Configure::setAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), Configuration::get('PAGSEGURO_TOKEN'));
+        //\PagSeguro\Configuration\Configure::setAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), Configuration::get('PAGSEGURO_TOKEN'));
         \PagSeguro\Configuration\Configure::setEnvironment(Configuration::get('PAGSEGURO_ENVIRONMENT'));
         
         $this->createLog();
@@ -102,10 +102,8 @@ class PagSeguroAbandonedOrder {
                         'recoveryCode' => $transaction->getRecoveryCode(),
                         'sendRecovery' => $sendRecovery
                     ));
-
                 }
             }
-
         }
 
         return $resultData;
@@ -127,9 +125,7 @@ class PagSeguroAbandonedOrder {
     }
 
     private function isAbandonedOrder($reference) {
-    
         if (strpos($reference, Configuration::get('PAGSEGURO_ID')) !== false) {
-
             $initiated      = Util::getPagSeguroStatusName(0);
             $decReference   = (int)EncryptionIdPagSeguro::decrypt($reference);
             $orderState     = OrderHistory::getLastOrderState($decReference);
@@ -137,7 +133,6 @@ class PagSeguroAbandonedOrder {
             if (strcmp($orderState->name, $initiated) != 0) {
                 return false;
             }
-
         } else {
             return false;
         }
@@ -152,7 +147,6 @@ class PagSeguroAbandonedOrder {
     }
 
     private function getPagSeguroTransactions($recoveryDays) {
-        
         if (!$this->createCredentials()) {
             return false;
         }
@@ -195,7 +189,7 @@ class PagSeguroAbandonedOrder {
             Configuration::get('PAGSEGURO_EMAIL'),
             Configuration::get('PAGSEGURO_TOKEN')
         );
-        
+
         return true;
     }
 
@@ -240,7 +234,6 @@ class PagSeguroAbandonedOrder {
     
     private function buildAbandonedMailUrl($recoveryCode)
     {
-        
         $protocol = "https://";
         $environment = "sandbox.";
         $resource = "pagseguro.uol.com.br/checkout/v2/resume.html";
@@ -255,7 +248,6 @@ class PagSeguroAbandonedOrder {
     }
 
     private function sendMail(Array $templateData, $reference, $recoveryCode, $customerId) {
-        
         $customer = new Customer((int) $customerId);
         
         $params = array(
@@ -290,5 +282,4 @@ class PagSeguroAbandonedOrder {
         ';
         return Db::getInstance()->Execute($sql) ? (int)Db::getInstance()->Affected_Rows() : false;
     }
-
 }
