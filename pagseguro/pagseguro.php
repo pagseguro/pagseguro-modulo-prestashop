@@ -156,11 +156,11 @@ class PagSeguro extends PaymentModule {
             ! Configuration::updateValue('PAGSEGURO_ENVIRONMENT', '') or
             ! Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') or
             ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '') or
-            ! Configuration::updateValue('PAGSEGURO_CHARSET', \PagSeguro\Configuration\Configure::getCharset()) or
-            ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', \PagSeguro\Configuration\Configure::getLog()) or
+            ! Configuration::updateValue('PAGSEGURO_CHARSET', \PagSeguro\Configuration\Configure::getCharset()->getEncoding()) or
+            ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', \PagSeguro\Configuration\Configure::getLog()->getActive()) or
             ! Configuration::updateValue('PAGSEGURO_RECOVERY_ACTIVE', false) or
             ! Configuration::updateValue('PAGSEGURO_CHECKOUT', false) or
-            ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', \PagSeguro\Configuration\Configure::getLog()) or
+            ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', \PagSeguro\Configuration\Configure::getLog()->getActive()) or
             ! Configuration::updateValue('PAGSEGURO_DISCOUNT_CREDITCARD', false) or
             ! Configuration::updateValue('PAGSEGURO_DISCOUNT_CREDITCARD_VL', "00.00") or
             ! Configuration::updateValue('PAGSEGURO_DISCOUNT_BOLETO', false) or

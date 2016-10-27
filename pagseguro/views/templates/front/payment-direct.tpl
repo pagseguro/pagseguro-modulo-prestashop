@@ -286,13 +286,15 @@
                         url = url.replace("&amp;","&");
                         url = url.replace("&amp;","&");
                         var document = unmaskField($('#document-boleto'));
+                        var hash = PagSeguroDirectPayment.getSenderHash();
 
                         var query = $.ajax({
                             type: 'POST',
                             url: url,
                             data : {
                                 type : 'boleto',
-                                document : document
+                                document : document,
+                                hash : hash
                             },
                             success: function(response) {
                                 var result = $.parseJSON(response);
@@ -343,6 +345,7 @@
                         url = url.replace("&amp;","&");
                         url = url.replace("&amp;","&");
                         var document = unmaskField($('#document-debit'));
+                        var hash = PagSeguroDirectPayment.getSenderHash();
 
                         var query = $.ajax({
                             type: 'POST',
@@ -350,7 +353,8 @@
                             data : {
                                 type : 'debit',
                                 document : document,
-                                bankid : bankId
+                                bankid : bankId,
+                                hash : hash
                             },
                             success: function(response) {
                                 var result = $.parseJSON(response);
@@ -392,6 +396,7 @@
                         url = url.replace("&amp;","&");
                         url = url.replace("&amp;","&");
                         var document = unmaskField($('#document-credit-card'));
+                        var hash = PagSeguroDirectPayment.getSenderHash();
 
 
                         PagSeguroDirectPayment.createCardToken({
@@ -418,7 +423,8 @@
                                         installment_quantity: quantity,
                                         installment_amount: amount,
                                         holder_name: holderName,
-                                        holder_birthdate: holderBirthdate
+                                        holder_birthdate: holderBirthdate,
+                                        hash : hash
                                     },
                                     type: 'POST',
                                 }).success(function (response) {
@@ -497,5 +503,4 @@
                         });
                     }($));
     </script>
-
 </div>

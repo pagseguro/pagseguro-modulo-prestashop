@@ -166,12 +166,9 @@ class ConverterOrderForPaymentRequest
              * @todo mock for sandbox
              */
             $this->paymentRequest->setSender()->setEmail('compradordeteste@sandbox.pagseguro.com.br');
-            $this->paymentRequest->setSender()->setDocument()->withParameters(
-                'CPF',
-                filter_var($_POST['document'])
-            );
 
-            //@todo check if is cpf or cnpj
+            $this->setSenderHash();
+            $this->setSenderDocument();
    
             $firstName = $this->generateName($this->context->customer->firstname);
             $lastName = $this->generateName($this->context->customer->lastname);
@@ -275,7 +272,8 @@ class ConverterOrderForPaymentRequest
                 $fullAddress[0];
 
             $number = is_null($fullAddress[1]) ? '' : $fullAddress[1];
-            $complement = is_null($fullAddress[2]) ? '' : $fullAddress[2];
+            //$complement = is_null($fullAddress[2]) ? '' : $fullAddress[2];
+            $district = is_null($fullAddress[2]) ? '' : $fullAddress[2];
             
             $state = new State((int) $delivery_address->id_state);
             $country = new Country((int) $delivery_address->id_country);
@@ -283,14 +281,13 @@ class ConverterOrderForPaymentRequest
             $this->paymentRequest->setShipping()->setAddress()->withParameters(
                 $street,
                 $number,
-                $delivery_address->address2,
+                $district,//$delivery_address->address2,
                 $delivery_address->postcode,
                 $delivery_address->city,
                 $state->iso_code,
                 $country->iso_code,
-                $complement
+                $delivery_address->address2 //$complement
             );
-
 
         }
     }
@@ -439,10 +436,7 @@ class ConverterOrderForPaymentRequest
                     $this->paymentRequest->setHolder()->setName(preg_replace('/( )+/', ' ', filter_var($_POST['holder_name']))); // Equals in Credit Card
                     $this->paymentRequest->setHolder()->setBirthdate(filter_var($_POST['holder_birthdate']));
 
-                    $this->paymentRequest->setHolder()->setDocument()->withParameters(
-                        'CPF',
-                        filter_var($_POST['document'])
-                    );
+                    $this->setHolderDocument();
 
                     $this->setHolderPhone();
 
@@ -556,6 +550,80 @@ class ConverterOrderForPaymentRequest
             4 => 'bancodobrasil',
             5 => 'hsbc'
         ];
+    }
+
+    /**
+     * Set the sender document 
+     */
+    private function setSenderDocument()
+    {
+        if (isset($_POST['document'])) {
+            $this->paymentRequest->setSender()->setDocument()->withArray(
+                $this->formatDocument($_POST['document'])
+            );
+        }
+    }
+    
+    private function setSenderHash()
+    {
+        if (isset($_POST['hash'])) {
+            $this->paymentRequest->setSender()->setHash(htmlentities(filter_var($_POST['hash'])));
+        }
+    }
+
+    /**
+     * Set the holder document 
+     */
+    private function setHolderDocument()
+    {
+        if (isset($_POST['document'])) {
+            $this->paymentRequest->setHolder()->setDocument()->withArray(
+                $this->formatDocument($_POST['document'])
+            );
+        }
+    }
+
+    /**
+     * Remove especial characters and keep only numbers of the $document and
+     * returns it and his type. If it is not a CPF or CNPJ size, 
+     * throws an exception
+     *
+     * @param string $document
+     * @return array
+     * @throws Exception Invalid document
+    */
+    private function formatDocument($document)
+    {
+       $properties = new \PagSeguro\Enum\Properties\Current;
+       $document = $this->keepOnlyNumbers(filter_var($document));
+       switch (strlen($document)) {
+            case 14:
+                return [
+                    $properties::DOCUMENT_VALUE => $document,
+                    $properties::DOCUMENT_TYPE => 'cnpj'
+                ];
+                break;
+            case 11:
+                return [
+                    $properties::DOCUMENT_VALUE => $document,
+                    $properties::DOCUMENT_TYPE => 'cpf'
+                ];
+                break;
+            default:
+                throw new \Exception('Invalid document');
+                break;
+        }
+    }
+    /**
+     * Remove empty spaces and special characters, returning 
+     * only the numbers of the $data
+     *
+     * @param   string $data
+     * @return  string
+    */
+    private function keepOnlyNumbers($data)
+    {
+        return preg_replace('/[^0-9]/', '', $data);
     }
 
     private function retrievePagSeguroConfiguration()
