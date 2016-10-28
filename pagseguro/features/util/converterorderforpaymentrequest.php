@@ -191,9 +191,6 @@ class ConverterOrderForPaymentRequest
             $senderPhone[1],
             $senderPhone[2]
         );
-
-        //@todo need sender phone error
-
     }
 
     private function setHolderPhone()
@@ -411,7 +408,6 @@ class ConverterOrderForPaymentRequest
         $code = "";
         try {
             $credentials = $this->module->getPagSeguroCredentials();
-//            var_dump($this->paymentRequest); die;
 
             if (Configuration::get('PAGSEGURO_CHECKOUT') === '2') {
                 if (filter_var($_POST['type']) == 'debit') {
@@ -493,6 +489,10 @@ class ConverterOrderForPaymentRequest
         }
     }
 
+    /**
+     * Request a PagSeguro paymentRequest(Checkout, Boleto, Debit, Credit Card)
+     * @return string
+     */
     private function pagSeguroRequest()
     {
         try {
@@ -500,7 +500,15 @@ class ConverterOrderForPaymentRequest
                 \PagSeguro\Configuration\Configure::getAccountCredentials()
             );
         } catch (Exception $exception) {
-            die($exception->getMessage());
+            echo Tools::jsonEncode(
+                array(
+                    'success' => false,
+                    'payload' => [
+                        'error' => $exception->getMessage()
+                    ]
+                )
+            );
+            exit;
         }
     }
 
