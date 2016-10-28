@@ -161,11 +161,12 @@ class ConverterOrderForPaymentRequest
     private function generateSenderData()
     {
         if (isset($this->context->customer) && ! is_null($this->context->customer)) {
-//            $this->paymentRequest->setSender()->setEmail($this->context->customer->email);
-            /**
-             * @todo mock for sandbox
-             */
-            $this->paymentRequest->setSender()->setEmail('compradordeteste@sandbox.pagseguro.com.br');
+
+            if (\PagSeguro\Configuration\Configure::getEnvironment() == "sandbox") {
+                $this->paymentRequest->setSender()->setEmail('prestashop@sandbox.pagseguro.com.br');
+            } else {
+                $this->paymentRequest->setSender()->setEmail($this->context->customer->email);
+            }
 
             $this->setSenderHash();
             $this->setSenderDocument();
@@ -183,8 +184,6 @@ class ConverterOrderForPaymentRequest
 
         $delivery_address = new Address((int) $this->context->cart->id_address_delivery);
         $phone = preg_replace('/[^a-z_\-0-9]/i', '', $delivery_address->phone);
-
-        $phone = '1633335707';
         $phone = preg_replace("~[^0-9]~", "", $phone);
         preg_match('~([0-9]{2})([0-9]{8,9})~', $phone, $senderPhone);
 
@@ -199,11 +198,8 @@ class ConverterOrderForPaymentRequest
 
     private function setHolderPhone()
     {
-
         $delivery_address = new Address((int) $this->context->cart->id_address_delivery);
         $phone = preg_replace('/[^a-z_\-0-9]/i', '', $delivery_address->phone);
-
-        $phone = '1633335707';
         $phone = preg_replace("~[^0-9]~", "", $phone);
         preg_match('~([0-9]{2})([0-9]{8,9})~', $phone, $senderPhone);
 
@@ -211,9 +207,6 @@ class ConverterOrderForPaymentRequest
             $senderPhone[1],
             $senderPhone[2]
         );
-
-        //@todo need sender phone error
-
     }
 
     private function generateName($value)
@@ -440,9 +433,7 @@ class ConverterOrderForPaymentRequest
 
                     $this->setHolderPhone();
 
-                    $result = $this->paymentRequest->register(
-                        \PagSeguro\Configuration\Configure::getAccountCredentials()
-                    );
+                    $this->pagSeguroRequest();
 
                     return Tools::jsonEncode(
                         array(
@@ -456,9 +447,7 @@ class ConverterOrderForPaymentRequest
                     );
                 }
 
-                $result = $this->paymentRequest->register(
-                    \PagSeguro\Configuration\Configure::getAccountCredentials()
-                );
+                $result = $this->pagSeguroRequest();
 
                 return Tools::jsonEncode(
                     array(
@@ -470,22 +459,6 @@ class ConverterOrderForPaymentRequest
                         ]
                     )
                 );
-//
-//                //Get the crendentials and register the boleto payment
-//                $result = $this->paymentRequest->register(
-//                    \PagSeguro\Configuration\Configure::getAccountCredentials()
-//                );
-//
-//                return Tools::jsonEncode(
-//                    array(
-//                        'success' => true,
-//                        'payload' => [
-//                            'data' => [
-//
-//                            ]
-//                        ]
-//                    )
-//                );
             }
 
             if (Configuration::get('PAGSEGURO_CHECKOUT') === '1') {
@@ -517,6 +490,17 @@ class ConverterOrderForPaymentRequest
             }
         } catch (Exception $e) {
             throw $e;
+        }
+    }
+
+    private function pagSeguroRequest()
+    {
+        try {
+            return $this->paymentRequest->register(
+                \PagSeguro\Configuration\Configure::getAccountCredentials()
+            );
+        } catch (Exception $exception) {
+            die($exception->getMessage());
         }
     }
 
@@ -625,26 +609,4 @@ class ConverterOrderForPaymentRequest
     {
         return preg_replace('/[^0-9]/', '', $data);
     }
-
-    private function retrievePagSeguroConfiguration()
-    {
-
-        /** Retrieving configurated default charset */
-        //PagSeguroConfig::setApplicationCharset(Configuration::get('PAGSEGURO_CHARSET'));
-
-        /** Retrieving configurated default log info */
-        //if (Configuration::get('PAGSEGURO_LOG_ACTIVE')) {
-        //    PagSeguroConfig::activeLog(_PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION'));
-        //}
-    }
-
-//    private function setPagSeguroModuleVersion()
-//    {
-//        PagSeguroLibrary::setModuleVersion('prestashop-v.' . $this->module->version);
-//    }
-//
-//    private function setPagSeguroCMSVersion()
-//    {
-//        PagSeguroLibrary::setCMSVersion('prestashop-v.' . _PS_VERSION_);
-//    }
 }
