@@ -58,7 +58,6 @@ class ConverterOrderForPaymentRequest
     {
         try {
             $this->setAdditionalRequestData($additional_infos);
-            //$this->setNotificationUrl();//useless?
         } catch (Exception $e) {
             throw $e;
         }
@@ -162,7 +161,7 @@ class ConverterOrderForPaymentRequest
     {
         if (isset($this->context->customer) && ! is_null($this->context->customer)) {
 
-            if (\PagSeguro\Configuration\Configure::getEnvironment() == "sandbox") {
+            if (Configuration::get('PAGSEGURO_ENVIRONMENT') == "sandbox") {
                 $this->paymentRequest->setSender()->setEmail('prestashop@sandbox.pagseguro.com.br');
             } else {
                 $this->paymentRequest->setSender()->setEmail($this->context->customer->email);
@@ -181,11 +180,7 @@ class ConverterOrderForPaymentRequest
 
     private function setSenderPhone()
     {
-
-        $delivery_address = new Address((int) $this->context->cart->id_address_delivery);
-        $phone = preg_replace('/[^a-z_\-0-9]/i', '', $delivery_address->phone);
-        $phone = preg_replace("~[^0-9]~", "", $phone);
-        preg_match('~([0-9]{2})([0-9]{8,9})~', $phone, $senderPhone);
+        $senderPhone = $this->getPhone();
 
         $this->paymentRequest->setSender()->setPhone()->withParameters(
             $senderPhone[1],
@@ -195,14 +190,11 @@ class ConverterOrderForPaymentRequest
 
     private function setHolderPhone()
     {
-        $delivery_address = new Address((int) $this->context->cart->id_address_delivery);
-        $phone = preg_replace('/[^a-z_\-0-9]/i', '', $delivery_address->phone);
-        $phone = preg_replace("~[^0-9]~", "", $phone);
-        preg_match('~([0-9]{2})([0-9]{8,9})~', $phone, $senderPhone);
+        $holderPhone = $this->getPhone();
 
         $this->paymentRequest->setHolder()->setPhone()->withParameters(
-            $senderPhone[1],
-            $senderPhone[2]
+            $holderPhone[1],
+            $holderPhone[2]
         );
     }
 
@@ -262,7 +254,6 @@ class ConverterOrderForPaymentRequest
                 $fullAddress[0];
 
             $number = is_null($fullAddress[1]) ? '' : $fullAddress[1];
-            //$complement = is_null($fullAddress[2]) ? '' : $fullAddress[2];
             $district = is_null($fullAddress[2]) ? '' : $fullAddress[2];
             
             $state = new State((int) $delivery_address->id_state);
@@ -271,12 +262,12 @@ class ConverterOrderForPaymentRequest
             $this->paymentRequest->setShipping()->setAddress()->withParameters(
                 $street,
                 $number,
-                $district,//$delivery_address->address2,
+                (!empty($delivery_address->address2) && isset($delivery_address->address2)) ? $delivery_address->address2 : 'non_informed_address',
                 $delivery_address->postcode,
                 $delivery_address->city,
                 $state->iso_code,
                 $country->iso_code,
-                $delivery_address->address2 //$complement
+                $delivery_address->other
             );
 
         }
@@ -303,15 +294,13 @@ class ConverterOrderForPaymentRequest
             $this->paymentRequest->setBilling()->setAddress()->withParameters(
                 $street,
                 $number,
-                $delivery_address->address2,
+                (!empty($delivery_address->address2) && isset($delivery_address->address2)) ? $delivery_address->address2 : 'non_informed_address',
                 $delivery_address->postcode,
                 $delivery_address->city,
                 $state->iso_code,
                 $country->iso_code,
-                $complement
+                $delivery_address->other
             );
-
-
         }
     }
 
@@ -404,7 +393,6 @@ class ConverterOrderForPaymentRequest
 
     private function performPagSeguroRequest()
     {
-
         $code = "";
         try {
             $credentials = $this->module->getPagSeguroCredentials();
@@ -458,25 +446,19 @@ class ConverterOrderForPaymentRequest
             }
 
             if (Configuration::get('PAGSEGURO_CHECKOUT') === '1') {
-                $url = $this->paymentRequest->register(
-                    $credentials,
-                    false
+                $result = $this->pagSeguroRequest(
+                    $this->module->isLightboxCheckoutType()
                 );
-                $resultado = parse_url($url);
-                parse_str($resultado['query']);
 
                 return Tools::jsonEncode(
                     array(
-                        'code' => $code,
-                        'redirect' => $this->urlToRedirect,
-                        'urlCompleta' => $url
+                        'code' => $result->getCode()
                     )
                 );
             }
 
             if (Configuration::get('PAGSEGURO_CHECKOUT') === '0') {
-                $url = $this->paymentRequest->register(
-                    $credentials,
+                $url = $this->pagSeguroRequest(
                     $this->module->isLightboxCheckoutType()
                 );
                 /** Redirecting to PagSeguro */
@@ -491,13 +473,15 @@ class ConverterOrderForPaymentRequest
 
     /**
      * Request a PagSeguro paymentRequest(Checkout, Boleto, Debit, Credit Card)
+     * @param $onlyCode
      * @return string
      */
-    private function pagSeguroRequest()
+    private function pagSeguroRequest($onlyCode = false)
     {
         try {
             return $this->paymentRequest->register(
-                \PagSeguro\Configuration\Configure::getAccountCredentials()
+                \PagSeguro\Configuration\Configure::getAccountCredentials(),
+                $onlyCode
             );
         } catch (Exception $exception) {
             echo Tools::jsonEncode(
@@ -616,5 +600,37 @@ class ConverterOrderForPaymentRequest
     private function keepOnlyNumbers($data)
     {
         return preg_replace('/[^0-9]/', '', $data);
+    }
+
+    /**
+     * Get the phone from the cart address
+     * @return array
+     * @throws Exception
+     */
+    private function getPhone()
+    {
+        $delivery_address = new Address((int) $this->context->cart->id_address_delivery);
+        if (!empty($delivery_address->phone)) {
+            return $this->formatPhone($delivery_address->phone);
+        }
+
+        if (!empty($delivery_address->phone_mobile)) {
+            return $this->formatPhone($delivery_address->phone_mobile);
+        }
+
+        throw new Exception('Sender phone is required');
+    }
+
+    /**
+     * Treats a phone string to be a pagseguro valid number
+     * @param string $phone
+     * @return array
+     */
+    private function formatPhone($phone)            
+    {
+        $phone = preg_replace('/[^a-z_\-0-9]/i', '', $phone);
+        $phone = preg_replace("~[^0-9]~", "", $phone);
+        preg_match('~([0-9]{2})([0-9]{8,9})~', $phone, $phone);
+        return $phone;
     }
 }
