@@ -66,9 +66,9 @@ class PagSeguro extends PaymentModule {
         $this->currencies_mode = 'checkbox';
 
         \PagSeguro\Library::initialize();
-        
+
         \PagSeguro\Configuration\Configure::setCharset(Configuration::get('PAGSEGURO_CHARSET'));
-        
+
         \PagSeguro\Configuration\Configure::setLog(
             Configuration::get('PAGSEGURO_LOG_ACTIVE'),
             _PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION')
@@ -76,7 +76,7 @@ class PagSeguro extends PaymentModule {
 
         \PagSeguro\Library::cmsVersion()->setName("'prestashop-v.'")->setRelease(_PS_VERSION_);
         \PagSeguro\Library::moduleVersion()->setName('prestashop-v.')->setRelease($this->version);
-        
+
         \PagSeguro\Configuration\Configure::setAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), Configuration::get('PAGSEGURO_TOKEN'));
 
         \PagSeguro\Configuration\Configure::setAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), Configuration::get('PAGSEGURO_TOKEN'));
@@ -98,18 +98,18 @@ class PagSeguro extends PaymentModule {
         $this->setContext();
         $this->modulo = PagSeguroFactoryInstallModule::createModule(_PS_VERSION_);
     }
-    
+
     public function getEnvironment()
     {
         \PagSeguro\Configuration\Configure::setEnvironment($this->getPrestaShopEnvironment());
         return \PagSeguro\Configuration\Configure::getEnvironment();
     }
-    
+
     public function getPagSeguroCredentials()
     {
         return \PagSeguro\Configuration\Configure::getAccountCredentials();
     }
-    
+
     /**
      * @return bool
      */
@@ -288,9 +288,9 @@ class PagSeguro extends PaymentModule {
 
     public function hookHeader($params)
     {
-        $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/pagseguro/views/css/bootstrap.css' );
-        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/pagseguro/views/js/jquery-2.2.4.min.js');
-        $this->context->controller->addJS(__PS_BASE_URI__ . 'modules/pagseguro/views/js/bootstrap.min.js');
+        $this->context->controller->addCSS(__PS_BASE_URI__ . 'modules/pagseguro/views/css/bootstrap.css');
+        $this->context->controller->addJS("https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js");
+        $this->context->controller->addJS("https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/1.4.1/jquery-migrate.min.js");
     }
 
     /**

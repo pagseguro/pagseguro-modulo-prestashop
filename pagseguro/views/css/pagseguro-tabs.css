@@ -1,0 +1,246 @@
+
+/*==================================================================
+    Set to default box sizing for all elements
+==================================================================*/
+.ps-tabs,
+.ps-tabs *,
+.ps-tabs::before,
+.ps-tabs *::before,
+.ps-tabs::after,
+.ps-tabs *::after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.ps-tabs {
+    width: 480px;
+    margin: 0px auto;
+}
+
+
+/*==================================================================
+    Tabs Components Styles
+==================================================================*/
+/* titles */
+.method-payment {
+    font-weight: 700;
+    line-height: 1.1;
+    color: #222;
+    font-size: 15px;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+/* tabs */
+.tabs-pagseguro {
+    width: 100%;
+}
+
+    .tabs-pagseguro > .items {
+        width: 100%;
+    }
+
+    .tabs-pagseguro > .items  > .item {
+        position: relative;
+        float: left;
+        width: 33.33%;
+        /* borders */
+        border-color: #827e7e;
+        border-top-style: solid;
+        border-top-width: 1px;
+        border-bottom-style: solid;
+        border-bottom-width: 1px;
+    }
+    @media (max-width: 767px){
+        .tabs-pagseguro > .items  > .item {
+            height: 125px;
+        }
+    }
+
+    .tabs-pagseguro > .items  > .item:first-child {
+        border-left-style: solid;
+        border-left-width: 1.5px;
+    }
+
+    .tabs-pagseguro > .items  > .item:nth-child(2) {
+        border-left-style: solid;
+        border-left-width: 1.5px;
+        border-right-style: solid;
+        border-right-width: 1.5px;
+    }
+
+    .tabs-pagseguro > .items  > .item:last-child {
+        border-right-style: solid;
+        border-right-width: 1.5px;
+    }
+
+    /* init item active */
+    .tabs-pagseguro > .items  > .item.--active > .action {
+        color: #FFF;
+        background-color: #4F7743;
+    }
+
+
+    .tabs-pagseguro > .items  > .item.--active > .action::after {
+        bottom: -15px; /* subtract the height unit this element */
+        opacity: 1;
+        border-top-color: #4F7743;
+        -webkit-transition-duration: .25s;
+        -moz-transition-duration: .25s;
+        transition-duration: .25s;
+    }
+    /* end item active */
+
+    .tabs-pagseguro > .items  > .item  > .action {
+        text-decoration: none;
+        outline: inherit;
+        padding: .75em 1em;
+        height: 100%;
+    }
+
+    .tabs-pagseguro > .items  > .item > .action::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 0px;
+        height: 0px;
+        border-left: 15px solid transparent;
+        border-right: 15px solid transparent;
+        border-top: 15px solid #827e7e;
+
+        /* style of animation */
+        opacity: 0;
+        bottom: -5px;
+        -webkit-transition: all linear;
+        -moz-transition: all linear;
+        transition: all linear;
+        -webkit-transition-duration: 0s;
+        -moz-transition-duration: 0s;
+        transition-duration: 0s;
+    }
+
+
+    /* action tab + btn-pagseguro */
+    .tabs-pagseguro > .items  > .item  > .action,
+    .btn-pagseguro {
+        text-align: center;
+        display: block;
+        background-color: transparent;
+        -webkit-transition: all 0.25s linear;
+        -moz-transition: all 0.25s linear;
+        transition: all 0.25s linear;
+    }
+
+    .tabs-pagseguro > .items  > .item  > .action {
+        color: #827e7e;
+    }
+
+    .tabs-pagseguro > .items  > .item  > .action:hover,
+    .tabs-pagseguro > .items  > .item  > .action:focus,
+    a.btn-pagseguro:hover,
+    a.btn-pagseguro:focus {
+        text-decoration: none;
+    }
+
+    .tabs-pagseguro > .items  > .item  > .action:hover,
+    .tabs-pagseguro > .items  > .item  > .action:focus,
+    .btn-pagseguro:hover,
+    .btn-pagseguro:focus {
+        color: #FFF;
+        background-color: #4F7743;
+    }
+
+    .tabs-pagseguro > .items  > .item  > .action > .fa {
+        display: block;
+    }
+
+    .tabs-pagseguro > .items  > .item  > .action > .name {
+        display: block;
+        margin-top: .5em;
+    }
+
+/* tabs content */
+.tabs-content {
+    padding: 1em;
+}
+    .title-tab {
+        margin-bottom: 1em;
+    }
+
+    .tabs-content > .item-tab {
+        /* active tab current */
+        display: none;
+        width: 100%;
+    }
+
+    .tabs-content > .item-tab.--current {
+        display: block;
+    }
+
+/* btn-pagseguro */
+button:not(.primary),
+.btn-pagseguro {
+    color: #4F7743;
+    font-size: 1.2em;
+    white-space: nowrap;
+    vertical-align: middle;
+    outline: inherit;
+    cursor: pointer;
+    padding: 1em 2em;
+    background: none;
+    background-image: none;
+    border: 1px solid #4F7743;
+    border-radius: 0px;
+    /* fix native magento style - box-shadow */
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+}
+    .btn-pagseguro.--align-right {
+        float: right;
+        margin-top: 1.5em;
+    }
+
+    .btn-pagseguro:hover,
+    .btn-pagseguro:focus {
+        /* fix native magento style - border hover button */
+        border: 1px solid #4F7743;
+    }
+
+/* list warning */
+.list-warning {
+    display: block;
+    margin-top: 2em;
+    width: 100%;
+}
+
+/* total value */
+.credit-total > .control-label {
+    font-size: 1.4em;
+}
+
+.credit-total > div > span {
+    font-size: 1.15em;
+    line-height: 34px;
+    display: block;
+    padding-top: 5px; /* diferece font-size value at label */
+}
+
+
+@media (max-width: 767px) {
+
+    /* form inline custom config */
+    .form-inline-childs > div{
+        margin-bottom: 15px;
+    }
+}
+
+.display-none {
+    display: none;
+}

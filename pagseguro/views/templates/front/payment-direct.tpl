@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop 
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -23,6 +23,8 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="{$modules_dir}pagseguro/views/css/pagseguro-tabs.css">
 <div style="float: left; width: 100%;">
     {capture name=path}{l s='Pagamento via PagSeguro' mod='pagseguro'}{/capture}
 
@@ -39,29 +41,29 @@
         <h2 class="title-payment">Formas de pagamento</h2>
         <h4 class="method-payment">Escolha o método</h4>
         <nav class="tabs-pagseguro clearfix" id="tabs-payment">
-            <ul class="nav nav-tabs" role="tablist">
-                <li role="presentation" class="active">
-                    <a class="action js-tab-action" href="#credit-card" aria-controls="credit-card" role="tab" data-toggle="tab">
+            <ul class="items clearfix" role="tablist">
+                <li class="item --active" role="presentation">
+                    <a class="action js-tab-action" href="#credit-card" aria-controls="credit-card" role="tab">
                         <i class="fa fa-credit-card fa-4x"></i>
                         <span class="name">Cartão de Crédito</span>
                     </a>
                 </li><!-- /.item -->
-                <li role="presentation">
-                    <a class="action js-tab-action" href="#debit-online" aria-controls="debit-online" role="tab" data-toggle="tab">
+                <li class="item" role="presentation">
+                    <a class="action js-tab-action" href="#debit-online" aria-controls="debit-online" role="tab">
                         <i class="fa fa-money fa-4x"></i>
                         <span class="name">Débito Online</span>
                     </a>
                 </li><!-- /.item -->
-                <li role="presentation">
-                    <a class="action js-tab-action" href="#boleto" aria-controls="boleto" role="tab" data-toggle="tab">
+                <li class="item" role="presentation">
+                    <a class="action js-tab-action" href="#billet" aria-controls="billet" role="tab">
                         <i class="fa fa-barcode fa-4x"></i>
                         <span class="name">Boleto</span>
                     </a>
                 </li><!-- /.item -->
             </ul><!-- /.items -->
         </nav><!-- /.tabs-payment -->
-        <div class="tab-content col-xs-12 col-md-8 col-md-offset-2">
-            <div role="tabpanel" class="tab-pane active" id="credit-card">
+        <div class="tabs-content col-xs-12 col-md-8 col-md-offset-2">
+            <div class="item-tab --current" id="credit-card" role="tabpanel">
                 <h3 class="title-tab">Cartão de Crédito</h3>
                 <form class="form-horizontal clearfix" name="form-credit">
                     <div class="form-group">
@@ -143,7 +145,7 @@
                     <button class="btn-pagseguro --align-right" id="payment-credit-card">Concluir</button>
                 </form>
             </div><!-- /.item-tab#credit-card -->
-            <div role="tabpanel" class="tab-pane" id="debit-online">
+            <div class="item-tab" id="debit-online" role="tabpanel">
                 <h3 class="title-tab">Débito On-line</h3>
                 <form class="form-horizontal clearfix" name="form-debit">
                     <div class="form-group">
@@ -180,7 +182,7 @@
                     <button class="btn-pagseguro --align-right" id="payment-debit">Concluir</button>
                 </form>
             </div><!-- /.item-tab#debit-online -->
-            <div role="tabpanel" class="tab-pane" id="boleto">
+            <div class="item-tab" id="billet" role="tabpanel">
                 <h3 class="title-tab">Boleto</h3>
                 <form class="form-horizontal clearfix" name="form-bilit">
                     <div class="form-group">
@@ -189,7 +191,7 @@
                             <input class="form-control cpf-cnpj-mask" id="document-boleto" name="document" type="text">
                         </div>
                     </div>
-                    <button class="btn-pagseguro cart_navigation clearfix" id="payment-boleto">Concluir</button>
+                    <button class="btn-pagseguro cart_navigation --align-right" id="payment-boleto">Concluir</button>
                 </form>
                 <ul class="list-warning">
                     <li>Imprima o boleto e pague no banco</li>
@@ -204,303 +206,294 @@
 
     <input type="hidden" id="base-url" data-target="{$success_url}"/>
 
-    {*<script type="text/javascript" charset="utf8" src="{$modules_dir}pagseguro/views/js/bootstrap.min.js"></script>*}
     <script type="text/javascript" charset="utf8" src="{$modules_dir}pagseguro/views/js/jquery.mask.min.js"></script>
     <script type="text/javascript" charset="utf8" src="{$pagseguro_direct_js}"></script>
     <script type="text/javascript">
+        ;(function()
+        {
+            $('#card_num').on('paste', function (e) {
+                e.preventDefault();
+                return false;
+            });
+        }($));
+
+        ;(function masksInputs($, undefined) {
+            $('.cpf-mask').mask('000.000.000-00');
+            $('.cnpj-mask').mask('00.000.000/0000-00');
+            $('.credit-card-mask').mask('0000 0000 0000 0000');
+            $('.code-card-mask').mask('000');
+            $('.date-mask').mask('00/00/0000', { placeholder: "__/__/____" });
+            $('.cpf-cnpj-mask').on('keyup', function() {
+                try {
+                    $(this).unmask();
+                } catch(e) {
+                    alert('Ops, algo deu errado!');
+                };
+                var isLength = $(this).val().length;
+                //9 is number optional, is fake the transtion two types mask
+                isLength <= 11 ? $(this).mask('000.000.000-009') : $(this).mask('00.000.000/0000-00');
+            });
+        }($));
+        ;(function tabsPagseguro($, undefined) {
+            var $action = $('.js-tab-action');
+            $action.on('click', function(e){
+                e.preventDefault();
+                var $itemtTab = $(this).parent('.item');
+                var isActive = $itemtTab.hasClass('--active');
+                if(!isActive) {
+                    var $newTabId = $($(this).attr('href'));
+                    $('#tabs-payment .item.--active').removeClass('--active'); //remove class the old tab selected
+                    $('.item-tab.--current').removeClass('--current');
+                    //add new tab selected
+                    $itemtTab.addClass('--active');
+                    $newTabId.addClass('--current');
+                } else {
+                    return false;
+                }
+            });
+        }($));
+
+        function unmaskField($el, val = true) {
+            try {
+                if (val === true) {
+                    var $el = $el.val();
+                }
+                return $el.replace(/[/ -. ]+/g, '').trim();
+            } catch(e) {
+                alert('Ops, algo deu errado! Recarregue a página');
+            };
+        };
 
 
+        //Event buttons methods buy types
+        $('#payment-boleto').on('click', function(e){
+            e.preventDefault();
 
-                    $('#tabs-payment a').click(function (e) {
-                        e.preventDefault()
-                        $(this).tab('show')
-                    })
-
-                    ;(function()
-                    {
-                        $('#card_num').on('paste', function (e) {
-                            e.preventDefault();
-                            return false;
-                        });
-                    }($));
-
-                    ;(function masksInputs($, undefined) {
-                        $('.cpf-mask').mask('000.000.000-00');
-                        $('.cnpj-mask').mask('00.000.000/0000-00');
-                        $('.credit-card-mask').mask('0000 0000 0000 0000');
-                        $('.code-card-mask').mask('000');
-                        $('.date-mask').mask('00/00/0000', { placeholder: "__/__/____" });
-                        $('.cpf-cnpj-mask').on('keyup', function() {
-                            try {
-                                $(this).unmask();
-                            } catch(e) {
-                                alert('Ops, algo deu errado!');
-                            };
-                            var isLength = $(this).val().length;
-                            //9 is number optional, is fake the transtion two types mask
-                            isLength <= 11 ? $(this).mask('000.000.000-009') : $(this).mask('00.000.000/0000-00');
-                        });
-                    }($));
-                    ;(function tabsPagseguro($, undefined) {
-                        var $action = $('.js-tab-action');
-                        $action.on('click', function(e){
-                            e.preventDefault();
-                            var $itemtTab = $(this).parent('.item');
-                            var isActive = $itemtTab.hasClass('--active');
-                            if(!isActive) {
-                                var $newTabId = $($(this).attr('href'));
-                                $('#tabs-payment .item.--active').removeClass('--active'); //remove class the old tab selected
-                                $('.item-tab.--current').removeClass('--current');
-                                //add new tab selected
-                                $itemtTab.addClass('--active');
-                                $newTabId.addClass('--current');
-                            } else {
-                                return false;
-                            }
-                        });
-                    }($));
-
-                    function unmaskField($el, val = true) {
-                        try {
-                            if (val === true) {
-                                var $el = $el.val();
-                            }
-                            return $el.replace(/[/ -. ]+/g, '').trim();
-                        } catch(e) {
-                            alert('Ops, algo deu errado! Recarregue a página');
-                        };
-                    };
+            $(this).attr('disable', 'disable');
 
 
-                    //Event buttons methods buy types
-                    $('#payment-boleto').on('click', function(e){
-                        e.preventDefault();
+            var url = "{$action_url|escape:'htmlall':'UTF-8'}";
+            if (location.protocol === 'https:') {
+                url = url.replace("http", "https");
+            }
+            url = url.replace("&amp;","&");
+            url = url.replace("&amp;","&");
+            var document = unmaskField($('#document-boleto'));
+            var hash = PagSeguroDirectPayment.getSenderHash();
 
-                        $(this).attr('disable', 'disable');
+            var query = $.ajax({
+                type: 'POST',
+                url: url,
+                data : {
+                    type : 'boleto',
+                    document : document,
+                    hash : hash
+                },
+                success: function(response) {
+                    var result = $.parseJSON(response);
+
+                    if (result.success) {
+
+                        var form = $('<form>', {
+                            'action': $('#base-url').attr('data-target'),
+                            'method': 'POST'
+                        }).append(
+                                $('<input>', {
+                                    'id': 'payment_url',
+                                    'name' : 'payment_url',
+                                    'value': result.payload.data.payment_link,
+                                    'type': 'hidden'
+                                })
+                        ).append(
+                                $('<input>', {
+                                    'id': 'payment_type',
+                                    'name' : 'payment_type',
+                                    'value': 'boleto',
+                                    'type': 'hidden'
+                                })
+                        );;
+                        form.submit();
+
+                    }
+                }
+            });
+        });
 
 
-                        var url = "{$action_url|escape:'htmlall':'UTF-8'}";
-                        if (location.protocol === 'https:') {
-                            url = url.replace("http", "https");
-                        }
-                        url = url.replace("&amp;","&");
-                        url = url.replace("&amp;","&");
-                        var document = unmaskField($('#document-boleto'));
-                        var hash = PagSeguroDirectPayment.getSenderHash();
+        //Event buttons methods buy types
+        $('#payment-debit').on('click', function(e){
+            e.preventDefault();
 
-                        var query = $.ajax({
-                            type: 'POST',
-                            url: url,
-                            data : {
-                                type : 'boleto',
-                                document : document,
-                                hash : hash
-                            },
-                            success: function(response) {
-                                var result = $.parseJSON(response);
+            $(this).attr('disable', 'disable');
 
-                                if (result.success) {
+            var bankId = $("#bankList input[type='radio']:checked");
+            if (bankId.length > 0) {
+                bankId = bankId.val();
+            }
 
-                                    var form = $('<form>', {
-                                        'action': $('#base-url').attr('data-target'),
-                                        'method': 'POST'
-                                    }).append(
-                                            $('<input>', {
-                                                'id': 'payment_url',
-                                                'name' : 'payment_url',
-                                                'value': result.payload.data.payment_link,
-                                                'type': 'hidden'
-                                            })
-                                    ).append(
-                                            $('<input>', {
-                                                'id': 'payment_type',
-                                                'name' : 'payment_type',
-                                                'value': 'boleto',
-                                                'type': 'hidden'
-                                            })
-                                    );;
-                                    form.submit();
+            var url = "{$action_url|escape:'htmlall':'UTF-8'}";
+            if (location.protocol === 'https:') {
+                url = url.replace("http", "https");
+            }
+            url = url.replace("&amp;","&");
+            url = url.replace("&amp;","&");
+            var document = unmaskField($('#document-debit'));
+            var hash = PagSeguroDirectPayment.getSenderHash();
 
+            var query = $.ajax({
+                type: 'POST',
+                url: url,
+                data : {
+                    type : 'debit',
+                    document : document,
+                    bankid : bankId,
+                    hash : hash
+                },
+                success: function(response) {
+                    var result = $.parseJSON(response);
+
+                    if (result.success) {
+
+                        var form = $('<form>', {
+                            'action': $('#base-url').attr('data-target'),
+                            'method': 'POST'
+                        }).append(
+                                $('<input>', {
+                                    'id': 'payment_url',
+                                    'name' : 'payment_url',
+                                    'value': result.payload.data.payment_link,
+                                    'type': 'hidden'
+                                })
+                        ).append(
+                                $('<input>', {
+                                    'id': 'payment_type',
+                                    'name' : 'payment_type',
+                                    'value': 'debit',
+                                    'type': 'hidden'
+                                })
+                        );
+                        form.submit();
+
+                    }
+                }
+            });
+        });
+
+        $('#payment-credit-card').on('click', function(e){
+            e.preventDefault();
+
+            var url = "{$action_url|escape:'htmlall':'UTF-8'}";
+            if (location.protocol === 'https:') {
+                url = url.replace("http", "https");
+            }
+            url = url.replace("&amp;","&");
+            url = url.replace("&amp;","&");
+            var document = unmaskField($('#document-credit-card'));
+            var hash = PagSeguroDirectPayment.getSenderHash();
+
+
+            PagSeguroDirectPayment.createCardToken({
+                cardNumber: unmaskField($('#card_num')),
+                brand: $('#card-brand').attr('data-target'),
+                internationalMode: $('#card-international').attr('data-target'),
+                cvv: $('#card_cod').val(),
+                expirationMonth: $('#card_expiration_month').val(),
+                expirationYear: $('#card_expiration_year').val(),
+                success: function(response) {
+
+                    var international = $('#card-international').attr('data-target');
+                    var quantity = $("#card_installments option:selected" ).attr('data-quantity');
+                    var amount = $("#card_installments option:selected" ).attr('data-amount');
+                    var holderName = $('#card_holder_name').val();
+                    var holderBirthdate = $('#card_holder_birthdate').val();
+                    jQuery.ajax({
+                        url: url,
+                        data: {
+                            type : 'credit-card',
+                            document : document,
+                            card_token: response.card.token,
+                            card_international: international,
+                            installment_quantity: quantity,
+                            installment_amount: amount,
+                            holder_name: holderName,
+                            holder_birthdate: holderBirthdate,
+                            hash : hash
+                        },
+                        type: 'POST',
+                    }).success(function (response) {
+
+                        window.location.href = $('#base-url').attr('data-target');
+                    });
+                }
+            });
+        });
+
+        ;(function()
+        {
+            var kbinValue,
+                    klength = 0,
+                    klastLength = 0,
+                    kunMasked;
+            $('#card_num').on('keyup', function () {
+                klastLength = klength;
+                klength = $(this).val().length;
+                //6 number + space of mask
+                if (klength == 7 && klastLength <= 7) {
+                    kunMasked = unmaskField($(this).val(), false);
+                    kbinValue = kunMasked.substring(0,6);
+                    getBrandCard(kbinValue);
+                }
+            });
+        }($));
+
+        //get and showing brand credit card
+        function getBrandCard(cardBinVal) {
+            PagSeguroDirectPayment.setSessionId('{$pagseguro_session}');
+            PagSeguroDirectPayment.getBrand({
+                cardBin: cardBinVal,
+                internationalMode: true,
+                success: function(response) {
+
+                    var query = $.ajax({
+                        type: 'POST',
+                        url: "{$installment_url}",
+                        data: {
+                            amount: {$cart->getOrderTotal(true)},
+                            brand: response.brand.name,
+                            international : response.brand.international
+                        },
+                        success: function (response) {
+
+                            var result = $.parseJSON(response);
+
+                            //remove if already exists installment options
+                            jQuery('#card_installments option').each(function(){
+                                if (!jQuery(this).val() === false) {
+                                    jQuery(this).remove();
                                 }
-                            }
-                        });
-                    });
+                            });
 
-
-                    //Event buttons methods buy types
-                    $('#payment-debit').on('click', function(e){
-                        e.preventDefault();
-
-                        $(this).attr('disable', 'disable');
-
-                        var bankId = $("#bankList input[type='radio']:checked");
-                        if (bankId.length > 0) {
-                            bankId = bankId.val();
+                            //add installments options
+                            jQuery.each(result.payload.data.installments, function (i, item) {
+                                jQuery('#card_installments').append(jQuery('<option>', {
+                                    value: item.totalAmount,
+                                    text : item.text,
+                                    'data-amount': item.amount,
+                                    'data-quantity': item.quantity
+                                }));
+                            });
                         }
-
-                        var url = "{$action_url|escape:'htmlall':'UTF-8'}";
-                        if (location.protocol === 'https:') {
-                            url = url.replace("http", "https");
-                        }
-                        url = url.replace("&amp;","&");
-                        url = url.replace("&amp;","&");
-                        var document = unmaskField($('#document-debit'));
-                        var hash = PagSeguroDirectPayment.getSenderHash();
-
-                        var query = $.ajax({
-                            type: 'POST',
-                            url: url,
-                            data : {
-                                type : 'debit',
-                                document : document,
-                                bankid : bankId,
-                                hash : hash
-                            },
-                            success: function(response) {
-                                var result = $.parseJSON(response);
-
-                                if (result.success) {
-
-                                    var form = $('<form>', {
-                                        'action': $('#base-url').attr('data-target'),
-                                        'method': 'POST'
-                                    }).append(
-                                            $('<input>', {
-                                                'id': 'payment_url',
-                                                'name' : 'payment_url',
-                                                'value': result.payload.data.payment_link,
-                                                'type': 'hidden'
-                                            })
-                                    ).append(
-                                            $('<input>', {
-                                                'id': 'payment_type',
-                                                'name' : 'payment_type',
-                                                'value': 'debit',
-                                                'type': 'hidden'
-                                            })
-                                    );
-                                    form.submit();
-
-                                }
-                            }
-                        });
                     });
+                }
+            });
+        };
 
-                    $('#payment-credit-card').on('click', function(e){
-                        e.preventDefault();
-
-                        var url = "{$action_url|escape:'htmlall':'UTF-8'}";
-                        if (location.protocol === 'https:') {
-                            url = url.replace("http", "https");
-                        }
-                        url = url.replace("&amp;","&");
-                        url = url.replace("&amp;","&");
-                        var document = unmaskField($('#document-credit-card'));
-                        var hash = PagSeguroDirectPayment.getSenderHash();
-
-
-                        PagSeguroDirectPayment.createCardToken({
-                            cardNumber: unmaskField($('#card_num')),
-                            brand: $('#card-brand').attr('data-target'),
-                            internationalMode: $('#card-international').attr('data-target'),
-                            cvv: $('#card_cod').val(),
-                            expirationMonth: $('#card_expiration_month').val(),
-                            expirationYear: $('#card_expiration_year').val(),
-                            success: function(response) {
-
-                                var international = $('#card-international').attr('data-target');
-                                var quantity = $("#card_installments option:selected" ).attr('data-quantity');
-                                var amount = $("#card_installments option:selected" ).attr('data-amount');
-                                var holderName = $('#card_holder_name').val();
-                                var holderBirthdate = $('#card_holder_birthdate').val();
-                                jQuery.ajax({
-                                    url: url,
-                                    data: {
-                                        type : 'credit-card',
-                                        document : document,
-                                        card_token: response.card.token,
-                                        card_international: international,
-                                        installment_quantity: quantity,
-                                        installment_amount: amount,
-                                        holder_name: holderName,
-                                        holder_birthdate: holderBirthdate,
-                                        hash : hash
-                                    },
-                                    type: 'POST',
-                                }).success(function (response) {
-
-                                    window.location.href = $('#base-url').attr('data-target');
-                                });
-                            }
-                        });
-                    });
-
-                    ;(function()
-                    {
-                        var kbinValue,
-                                klength = 0,
-                                klastLength = 0,
-                                kunMasked;
-                        $('#card_num').on('keyup', function () {
-                            klastLength = klength;
-                            klength = $(this).val().length;
-                            //6 number + space of mask
-                            if (klength == 7 && klastLength <= 7) {
-                                kunMasked = unmaskField($(this).val(), false);
-                                kbinValue = kunMasked.substring(0,6);
-                                getBrandCard(kbinValue);
-                            }
-                        });
-                    }($));
-
-                    //get and showing brand credit card
-                    function getBrandCard(cardBinVal) {
-                        PagSeguroDirectPayment.setSessionId('{$pagseguro_session}');
-                        PagSeguroDirectPayment.getBrand({
-                            cardBin: cardBinVal,
-                            internationalMode: true,
-                            success: function(response) {
-
-                                var query = $.ajax({
-                                    type: 'POST',
-                                    url: "{$installment_url}",
-                                    data: {
-                                        amount: {$cart->getOrderTotal(true)},
-                                        brand: response.brand.name,
-                                        international : response.brand.international
-                                    },
-                                    success: function (response) {
-
-                                        var result = $.parseJSON(response);
-
-                                        //remove if already exists installment options
-                                        jQuery('#card_installments option').each(function(){
-                                            if (!jQuery(this).val() === false) {
-                                                jQuery(this).remove();
-                                            }
-                                        });
-
-                                        //add installments options
-                                        jQuery.each(result.payload.data.installments, function (i, item) {
-                                            jQuery('#card_installments').append(jQuery('<option>', {
-                                                value: item.totalAmount,
-                                                text : item.text,
-                                                'data-amount': item.amount,
-                                                'data-quantity': item.quantity
-                                            }));
-                                        });
-                                    }
-                                });
-                            }
-                        });
-                    };
-
-                    ;(function calcTotal($, undefined) {
-                        //Update the total value according with installments
-                        $('#card_installments').on('change', function() {
-                            var currency = parseFloat($(this).val()).toFixed(2);
-                            $('#card_total').text('R$ ' + currency);
-                        });
-                    }($));
+        ;(function calcTotal($, undefined) {
+            //Update the total value according with installments
+            $('#card_installments').on('change', function() {
+                var currency = parseFloat($(this).val()).toFixed(2);
+                $('#card_total').text('R$ ' + currency);
+            });
+        }($));
     </script>
 </div>
