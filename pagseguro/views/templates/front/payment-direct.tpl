@@ -332,6 +332,7 @@
                                 'data-quantity': item.quantity
                             }));
                         });
+                        jQuery('.display-none').show();
                     }
                 });
             }
