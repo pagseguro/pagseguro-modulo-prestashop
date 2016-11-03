@@ -421,7 +421,6 @@
                         },
                         type: 'POST',
                     }).success(function (response) {
-
                         window.location.href = $('#base-url').attr('data-target');
                     });
                 }
