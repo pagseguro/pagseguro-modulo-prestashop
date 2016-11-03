@@ -66,7 +66,7 @@
 ;(function(win, doc, $, undefined) {
     'use strict';
 
-    ;(function(){
+    ;(function() {
         $('#card_num').on('paste', function (e) {
             e.preventDefault();
             return false;
@@ -91,7 +91,7 @@
         });
     }());
 
-    ;(function tabsPagseguro() {
+    ;;(function tabsPagseguro() {
         var $action = $('.js-tab-action');
         $action.on('click', function(e){
             e.preventDefault();
@@ -110,7 +110,6 @@
         });
     }());
 
-
     function unmaskField($el, val = true) {
         try {
             if (val === true) {
@@ -126,7 +125,6 @@
     //Event buttons methods buy types
     $('#payment-boleto').on('click', function(e){
         e.preventDefault();
-
         $(this).attr('disable', 'disable');
 
         var url = "{$action_url|escape:'htmlall':'UTF-8'}";
@@ -136,41 +134,39 @@
         url = url.replace("&amp;","&");
         url = url.replace("&amp;","&");
         var document = unmaskField($('#document-boleto'));
+        var hash = PagSeguroDirectPayment.getSenderHash();
 
         var query = $.ajax({
             type: 'POST',
             url: url,
-            data: {
+            data : {
                 type : 'boleto',
-                document : document
+                document : document,
+                hash : hash
             },
             success: function(response) {
                 var result = $.parseJSON(response);
-
                 if (result.success) {
 
                     var form = $('<form>', {
                         'action': $('#base-url').attr('data-target'),
                         'method': 'POST'
-                    })
-                    .append(
-                        $('<input>', {
-                            'id': 'payment_url',
-                            'name' : 'payment_url',
-                            'value': result.payload.data.payment_link,
-                            'type': 'hidden'
-                        })
-                    )
-                    .append(
-                        $('<input>', {
-                            'id': 'payment_type',
-                            'name' : 'payment_type',
-                            'value': 'boleto',
-                            'type': 'hidden'
-                        })
-                    );
+                    }).append(
+                            $('<input>', {
+                                'id': 'payment_url',
+                                'name' : 'payment_url',
+                                'value': result.payload.data.payment_link,
+                                'type': 'hidden'
+                            })
+                    ).append(
+                            $('<input>', {
+                                'id': 'payment_type',
+                                'name' : 'payment_type',
+                                'value': 'boleto',
+                                'type': 'hidden'
+                            })
+                    );;
                     form.submit();
-
                 }
             }
         });
@@ -180,6 +176,7 @@
     //Event buttons methods buy types
     $('#payment-debit').on('click', function(e){
         e.preventDefault();
+
         $(this).attr('disable', 'disable');
 
         var bankId = $("#bankList input[type='radio']:checked");
@@ -194,6 +191,7 @@
         url = url.replace("&amp;","&");
         url = url.replace("&amp;","&");
         var document = unmaskField($('#document-debit'));
+        var hash = PagSeguroDirectPayment.getSenderHash();
 
         var query = $.ajax({
             type: 'POST',
@@ -201,13 +199,12 @@
             data : {
                 type : 'debit',
                 document : document,
-                bankid : bankId
+                bankid : bankId,
+                hash : hash
             },
             success: function(response) {
                 var result = $.parseJSON(response);
-
                 if (result.success) {
-
                     var form = $('<form>', {
                         'action': $('#base-url').attr('data-target'),
                         'method': 'POST'
@@ -236,7 +233,6 @@
 
     $('#payment-credit-card').on('click', function(e){
         e.preventDefault();
-
         var url = "{$action_url|escape:'htmlall':'UTF-8'}";
         if (location.protocol === 'https:') {
             url = url.replace("http", "https");
@@ -254,7 +250,6 @@
             expirationMonth: $('#card_expiration_month').val(),
             expirationYear: $('#card_expiration_year').val(),
             success: function(response) {
-
                 var international = $('#card-international').attr('data-target');
                 var quantity = $("#card_installments option:selected" ).attr('data-quantity');
                 var amount = $("#card_installments option:selected" ).attr('data-amount');
@@ -274,30 +269,12 @@
                         hash : hash
                     },
                     type: 'POST',
-                })
-                .success(function (response) {
+                }).success(function (response) {
                     window.location.href = $('#base-url').attr('data-target');
                 });
             }
         });
     });
-
-    ;(function() {
-        var kbinValue,
-                klength = 0,
-                klastLength = 0,
-                kunMasked;
-        $('#card_num').on('keyup', function () {
-            klastLength = klength;
-            klength = $(this).val().length;
-            //6 number + space of mask
-            if (klength == 7 && klastLength <= 7) {
-                kunMasked = unmaskField($(this).val(), false);
-                kbinValue = kunMasked.substring(0,6);
-                getBrandCard(kbinValue);
-            }
-        });
-    }());
 
     //get and showing brand credit card
     function getBrandCard(cardBinVal) {
@@ -341,6 +318,23 @@
             }
         });
     };
+
+    ;(function() {
+        var kbinValue,
+                klength = 0,
+                klastLength = 0,
+                kunMasked;
+        $('#card_num').on('keyup', function () {
+            klastLength = klength;
+            klength = $(this).val().length;
+            //6 number + space of mask
+            if (klength == 7 && klastLength <= 7) {
+                kunMasked = unmaskField($(this).val(), false);
+                kbinValue = kunMasked.substring(0,6);
+                getBrandCard(kbinValue);
+            }
+        });
+    }());
 
     ;(function calcTotal() {
         //Update the total value according with installments
