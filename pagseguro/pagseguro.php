@@ -66,19 +66,13 @@ class PagSeguro extends PaymentModule {
         $this->currencies_mode = 'checkbox';
 
         \PagSeguro\Library::initialize();
-
         \PagSeguro\Configuration\Configure::setCharset(Configuration::get('PAGSEGURO_CHARSET'));
-
         \PagSeguro\Configuration\Configure::setLog(
             Configuration::get('PAGSEGURO_LOG_ACTIVE'),
             _PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION')
         );
-
         \PagSeguro\Library::cmsVersion()->setName("'prestashop-v.'")->setRelease(_PS_VERSION_);
         \PagSeguro\Library::moduleVersion()->setName('prestashop-v.')->setRelease($this->version);
-
-        \PagSeguro\Configuration\Configure::setAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), Configuration::get('PAGSEGURO_TOKEN'));
-
         \PagSeguro\Configuration\Configure::setAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), Configuration::get('PAGSEGURO_TOKEN'));
 
         parent::__construct();
@@ -90,7 +84,7 @@ class PagSeguro extends PaymentModule {
         if (version_compare(_PS_VERSION_, '1.5.0.2', '<')) {
             include_once (dirname(__FILE__) . '/backward_compatibility/backward.php');
         }
-        //$this->verifyEnvironment();
+
         //Configura o ambiente pra lib
         if ($this->getPrestaShopEnvironment())
             \PagSeguro\Configuration\Configure::setEnvironment($this->getPrestaShopEnvironment());
@@ -98,18 +92,18 @@ class PagSeguro extends PaymentModule {
         $this->setContext();
         $this->modulo = PagSeguroFactoryInstallModule::createModule(_PS_VERSION_);
     }
-
+    
     public function getEnvironment()
     {
         \PagSeguro\Configuration\Configure::setEnvironment($this->getPrestaShopEnvironment());
         return \PagSeguro\Configuration\Configure::getEnvironment();
     }
-
+    
     public function getPagSeguroCredentials()
     {
         return \PagSeguro\Configuration\Configure::getAccountCredentials();
     }
-
+    
     /**
      * @return bool
      */
@@ -156,11 +150,11 @@ class PagSeguro extends PaymentModule {
             ! Configuration::updateValue('PAGSEGURO_ENVIRONMENT', '') or
             ! Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') or
             ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '') or
-            ! Configuration::updateValue('PAGSEGURO_CHARSET', \PagSeguro\Configuration\Configure::getCharset()) or
-            ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', \PagSeguro\Configuration\Configure::getLog()) or
+            ! Configuration::updateValue('PAGSEGURO_CHARSET', \PagSeguro\Configuration\Configure::getCharset()->getEncoding()) or
+            ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', \PagSeguro\Configuration\Configure::getLog()->getActive()) or
             ! Configuration::updateValue('PAGSEGURO_RECOVERY_ACTIVE', false) or
             ! Configuration::updateValue('PAGSEGURO_CHECKOUT', false) or
-            ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', \PagSeguro\Configuration\Configure::getLog()) or
+            ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', \PagSeguro\Configuration\Configure::getLog()->getActive()) or
             ! Configuration::updateValue('PAGSEGURO_DISCOUNT_CREDITCARD', false) or
             ! Configuration::updateValue('PAGSEGURO_DISCOUNT_CREDITCARD_VL', "00.00") or
             ! Configuration::updateValue('PAGSEGURO_DISCOUNT_BOLETO', false) or
@@ -1300,17 +1294,6 @@ class PagSeguro extends PaymentModule {
         return $version;
     }
 
-//    /**
-//     *
-//     */
-//    private function verifyEnvironment() {
-//        if ($this->getPagSeguroConfigEnvironment()
-//            != $this->getPrestaShopEnvironment())
-//        {
-//            $this->changeEnvironment();
-//        }
-//    }
-
     /**
      * @return mixed
      */
@@ -1318,56 +1301,4 @@ class PagSeguro extends PaymentModule {
     {
         return Configuration::get('PAGSEGURO_ENVIRONMENT');
     }
-
-//    /**
-//     * @return mixed
-//     */
-//    private function getPagSeguroConfigEnvironment()
-//    {
-//        // Include the config file and get it's values
-//        $path = dirname(__FILE__) . '/features/Library/source/Configuration/Wrapper.php';
-//        $fh = fopen($path,'r+');
-//
-//        while(!feof($fh)) {
-//            $lines = explode(',',fgets($fh));
-//            if (strpos($lines[0], "const PAGSEGURO_ENV"))
-//            {
-//                $context = explode("=",$lines[0]);
-//                $environment = preg_replace("/[^a-zA-Z0-9]+/", "", $context[1]);
-//            }
-//        }
-//
-//        fclose($fh);
-//        return $environment;
-//    }
-
-//    /**
-//     *
-//     */
-//    private function changeEnvironment()
-//    {
-//
-//        // File to be changed
-//        $archive = dirname(__FILE__) . '/features/Library/source/Configuration/Wrapper.php';
-//        // Search the current environment of library.
-//        $search = "const PAGSEGURO_ENV";
-//        // Save the file in an array in variable $arrayArchive.
-//        $arrayArchive = file($archive);
-//        $position = 0;
-//        for ($i = 0; $i < sizeof($arrayArchive); $i++) {
-//            // Checks the position of environmental on array, and stores the environment on variable $libEnvironment.
-//            if (strpos($arrayArchive[$i], $search) &&
-//                (strpos($arrayArchive[$i], 'production') || strpos($arrayArchive[$i], 'sandbox'))) {
-//                $fullLine = $arrayArchive[$i];
-//                $position = $i;
-//                if (strpos($fullLine, 'production') == false) {
-//                    $environment = "production";
-//                } else {
-//                    $environment = "sandbox";
-//                }
-//            }
-//        }
-//        $arrayArchive[$position] = str_replace($this->getPagSeguroConfigEnvironment(), $environment, $fullLine);
-//        file_put_contents($archive, implode("", $arrayArchive));
-//    }
 }

@@ -288,7 +288,7 @@
                     type: 'POST',
                     url: "{$installment_url}",
                     data: {
-                        // amount: {$cart->getOrderTotal(true)},
+                        amount: {$cart->getOrderTotal(true)},
                         brand: response.brand.name,
                         international : response.brand.international
                     },

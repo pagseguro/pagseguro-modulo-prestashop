@@ -63,15 +63,15 @@
                 <input class="form-control code-card-mask" id="card_cod" name="card_cod" type="text">
             </div>
         </div><!-- /.form-group -->
-        <div class="form-group display-none">
+        <div class="form-group form-selector display-none">
             <label class="col-xs-12 col-sm-2 control-label" for="card_installments">Parcelas</label>
-            <div class="col-xs-12 col-sm-10">
-                <select id="card_installments" name="card_installments" class="form-control">
-                    <option value="" disabled selected>Escolha o N° de parcelas</option>
-                </select>
-            </div>
+                <div class="col-xs-12 col-sm-6">
+                    <select id="card_installments" name="card_installments" class="form-control">
+                        <option value="" disabled selected>Escolha o N° de parcelas</option>
+                    </select>
+                </div>
         </div>
-        <div class="form-group credit-total display-none">
+        <div class="form-group credit-total display-none form-selector">
             <label class="col-xs-12 col-sm-2 control-label" for="card_installments">Total</label>
             <div class="col-xs-12 col-sm-10">
                 <span id="card_total">R$ 00,00</span>

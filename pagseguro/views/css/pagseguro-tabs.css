@@ -33,6 +33,18 @@
     padding: 1em;
 }
 
+div.selector{
+
+}
+
+.form-selector div.selector,
+.form-selector div.selector span {
+  width: 100% !important;
+}
+
+.form-selector div.selector span {
+  background-position: left 0;
+}
 /*==================================================================
     Tabs Components Styles
 ==================================================================*/
