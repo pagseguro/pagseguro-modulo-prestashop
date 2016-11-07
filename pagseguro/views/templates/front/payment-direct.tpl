@@ -25,7 +25,12 @@
 *}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="{$modules_dir}pagseguro/views/css/pagseguro-tabs.css">
-<div class="">
+<div class="ps-modal-overlay">
+    <div class="ps-loading">
+        <img src="{$modules_dir}pagseguro/views/img/reload.svg" alt="icon loading page">
+    </div>
+</div>
+<div>
     {capture name=path}
         {l s='Pagamento via PagSeguro' mod='pagseguro'}
     {/capture}
@@ -66,6 +71,26 @@
 ;(function(win, doc, $, undefined) {
     'use strict';
 
+    (function(){
+        var psModal = doc.querySelector('.ps-modal-overlay');
+        var modalHTML = psModal.outerHTML;
+
+        $('.ps-modal-overlay').remove();
+        $('body').prepend(modalHTML);
+
+        var Modal = function() {
+            if($('body').hasClass('ps-modal-opened')){
+                setTimeout(function(){
+                    $('body').removeClass('ps-modal-opened');
+                }, 500);
+            } else {
+                $('body').addClass('ps-modal-opened');
+            }
+        };
+        win.Modal = Modal;
+    }());
+
+
     ;(function() {
         $('#card_num').on('paste', function (e) {
             e.preventDefault();
@@ -83,7 +108,7 @@
             try {
                 $(this).unmask();
             } catch(e) {
-                alert('Ops, algo deu errado!');
+                console.info('Ops, algo deu errado!');
             };
             var isLength = $(this).val().length;
             //9 is number optional, is fake the transtion two types mask
@@ -91,7 +116,7 @@
         });
     }());
 
-    ;;(function tabsPagseguro() {
+    ;(function tabsPagseguro() {
         var $action = $('.js-tab-action');
         $action.on('click', function(e){
             e.preventDefault();
@@ -117,7 +142,7 @@
             }
             return $el.replace(/[/ -. ]+/g, '').trim();
         } catch(e) {
-            alert('Ops, algo deu errado! Recarregue a página');
+            console.info('Ops, algo deu errado! Recarregue a página');
         };
     };
 
@@ -125,6 +150,8 @@
     //Event buttons methods buy types
     $('#payment-boleto').on('click', function(e){
         e.preventDefault();
+        Modal();
+
         $(this).attr('disable', 'disable');
 
         var url = "{$action_url|escape:'htmlall':'UTF-8'}";
@@ -151,21 +178,23 @@
                     var form = $('<form>', {
                         'action': $('#base-url').attr('data-target'),
                         'method': 'POST'
-                    }).append(
-                            $('<input>', {
-                                'id': 'payment_url',
-                                'name' : 'payment_url',
-                                'value': result.payload.data.payment_link,
-                                'type': 'hidden'
-                            })
-                    ).append(
-                            $('<input>', {
-                                'id': 'payment_type',
-                                'name' : 'payment_type',
-                                'value': 'boleto',
-                                'type': 'hidden'
-                            })
-                    );;
+                    })
+                    .append(
+                        $('<input>', {
+                            'id': 'payment_url',
+                            'name' : 'payment_url',
+                            'value': result.payload.data.payment_link,
+                            'type': 'hidden'
+                        })
+                    )
+                    .append(
+                        $('<input>', {
+                            'id': 'payment_type',
+                            'name' : 'payment_type',
+                            'value': 'boleto',
+                            'type': 'hidden'
+                        })
+                    );
                     form.submit();
                 }
             }
@@ -176,6 +205,7 @@
     //Event buttons methods buy types
     $('#payment-debit').on('click', function(e){
         e.preventDefault();
+        Modal();
 
         $(this).attr('disable', 'disable');
 
@@ -210,20 +240,20 @@
                         'method': 'POST'
                     })
                     .append(
-                            $('<input>', {
-                                'id': 'payment_url',
-                                'name' : 'payment_url',
-                                'value': result.payload.data.payment_link,
-                                'type': 'hidden'
-                            })
+                        $('<input>', {
+                            'id': 'payment_url',
+                            'name' : 'payment_url',
+                            'value': result.payload.data.payment_link,
+                            'type': 'hidden'
+                        })
                     )
                     .append(
-                            $('<input>', {
-                                'id': 'payment_type',
-                                'name' : 'payment_type',
-                                'value': 'debit',
-                                'type': 'hidden'
-                            })
+                        $('<input>', {
+                            'id': 'payment_type',
+                            'name' : 'payment_type',
+                            'value': 'debit',
+                            'type': 'hidden'
+                        })
                     );
                     form.submit();
                 }
@@ -233,8 +263,10 @@
 
     $('#payment-credit-card').on('click', function(e){
         e.preventDefault();
+        Modal();
+
         var url = "{$action_url|escape:'htmlall':'UTF-8'}";
-        if (location.protocol === 'https:') {
+        if (win.location.protocol === 'https:') {
             url = url.replace("http", "https");
         }
         url = url.replace("&amp;","&");
@@ -269,8 +301,9 @@
                         hash : hash
                     },
                     type: 'POST',
-                }).success(function (response) {
-                    window.location.href = $('#base-url').attr('data-target');
+                })
+                .success(function(response) {
+                    win.location.href = $('#base-url').attr('data-target');
                 });
             }
         });
@@ -278,12 +311,12 @@
 
     //get and showing brand credit card
     function getBrandCard(cardBinVal) {
+        Modal();
         PagSeguroDirectPayment.setSessionId('{$pagseguro_session}');
         PagSeguroDirectPayment.getBrand({
             cardBin: cardBinVal,
             internationalMode: true,
             success: function(response) {
-
                 var query = $.ajax({
                     type: 'POST',
                     url: "{$installment_url}",
@@ -313,6 +346,7 @@
                             }));
                         });
                         jQuery('.display-none').show();
+                        Modal();
                     }
                 });
             }
@@ -320,18 +354,26 @@
     };
 
     ;(function() {
-        var kbinValue,
-                klength = 0,
-                klastLength = 0,
-                kunMasked;
+        var kbinValue;
+        var klength = 0;
+        var klastLength = 0;
+        var kunMasked;
+        var getbin = false;
+
         $('#card_num').on('keyup', function () {
             klastLength = klength;
             klength = $(this).val().length;
+
             //6 number + space of mask
-            if (klength == 7 && klastLength <= 7) {
+            if (klength == 7 && getbin === false) {
+                getbin = true;
                 kunMasked = unmaskField($(this).val(), false);
                 kbinValue = kunMasked.substring(0,6);
                 getBrandCard(kbinValue);
+            }
+
+            if(klength < 7) {
+                getbin = false;
             }
         });
     }());

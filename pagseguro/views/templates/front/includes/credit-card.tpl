@@ -10,7 +10,7 @@
         <div class="form-group">
             <label class="col-xs-12 col-sm-2 control-label" for="card_num">Número do cartão</label>
             <div class="col-xs-12 col-sm-10">
-                <input class="form-control credit-card-mask" id="card_num" name="card_num" type="text" required>
+                <input class="form-control credit-card-mask" id="card_num" name="card_num" pattern="[0-9]*" type="text" required>
             </div>
         </div><!-- /.form-group -->
         <div class="form-group">
