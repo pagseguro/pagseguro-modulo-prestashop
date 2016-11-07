@@ -145,7 +145,7 @@ class doSearch {
                 $this->PagSeguroPaymentList->setCurrentPage($PagSeguroPaymentList->getCurrentPage());
                 $this->PagSeguroPaymentList->setTotalPages($PagSeguroPaymentList->getTotalPages());
                 $this->PagSeguroPaymentList->setResultsInThisPage(
-                    $PagSeguroPaymentList->getResultsInThisPage() + $this->PagSeguroPaymentList->getResultsInThisPage
+                    $PagSeguroPaymentList->getResultsInThisPage() + $this->PagSeguroPaymentList->getResultsInThisPage()
                 );
 
                 $this->PagSeguroPaymentList->setTransactions(
@@ -219,7 +219,7 @@ class doSearch {
                 [
                     'initial_date' => $initialDate,
                     'page' => $pages,
-                    'max_per_page' => $resultsPerPage,
+                    'max_per_page' => $resultsPerPage
                 ]
             );
         } catch (Exception $e) {
