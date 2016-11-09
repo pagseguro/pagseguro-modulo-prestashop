@@ -53,6 +53,5 @@ $context->smarty->assign('environment', $environment);
 $url = "index.php?fc=module&module=pagseguro&controller=error";
 $context->smarty->assign('errurl', $url);
 
-
 $showView->setTemplate(_PS_MODULE_DIR_.'pagseguro/views/templates/front/order-confirmation.tpl');
 $showView->run();

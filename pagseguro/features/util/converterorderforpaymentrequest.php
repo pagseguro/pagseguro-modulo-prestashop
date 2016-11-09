@@ -452,7 +452,8 @@ class ConverterOrderForPaymentRequest
 
                 return Tools::jsonEncode(
                     array(
-                        'code' => $result->getCode()
+                        'code' => $result->getCode(),
+                        'redirect' => $this->urlToRedirect
                     )
                 );
             }

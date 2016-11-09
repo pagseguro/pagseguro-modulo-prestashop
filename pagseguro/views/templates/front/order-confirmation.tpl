@@ -41,7 +41,7 @@
 	<a class="button-exclusive btn btn-default" href="{$link->getPageLink('guest-tracking', true, NULL, "id_order={$reference_order|urlencode}&email={$email|urlencode}")|escape:'html':'UTF-8'}" title="{l s='Follow my order'}"><i class="icon-chevron-left"></i>{l s='Follow my order'}</a>
     </p>
 {else}
-
+<h3>Seu pedido foi realizado com sucesso!</h3>
 {if $smarty.post.payment_type eq 'debit'}
 <a href="{$smarty.post.payment_url}" target="_blank">Ir para o site do banco </a>
 {elseif $smarty.post.payment_type eq 'boleto'}
@@ -49,9 +49,8 @@
 {/if}
 
 <p class="cart_navigation exclusive">
-	<a class="button-exclusive btn btn-default" href="{$link->getPageLink('history', true)|escape:'html':'UTF-8'}" title="{l s='Go to your order history page'}"><i class="icon-chevron-left"></i>{l s='View your order history'}</a>
+	<a class="button-exclusive btn btn-default" href="{$link->getPageLink('history.php', true)|escape:'html':'UTF-8'}" title="{l s='Go to your order history page'}"><i class="icon-chevron-left"></i>{l s='View your order history'}</a>
 </p>
-
 
 {/if}
 

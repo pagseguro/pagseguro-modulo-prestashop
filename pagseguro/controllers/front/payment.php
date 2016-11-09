@@ -46,6 +46,10 @@ class PagSeguroPaymentModuleFrontController extends ModuleFrontController
         $environment = \PagSeguro\Configuration\Configure::getEnvironment();
 
         $this->context = Context::getContext();
+        $this->context->smarty->clearAssign('hide_left_column');
+        $this->context->smarty->clearAssign('display_column_left');
+        $this->context->smarty->assign('hide_left_column', 1);
+        $this->context->smarty->assign('display_column_left', 0);
         $this->context->smarty->assign('environment', $environment);
         if (version_compare(_PS_VERSION_, '1.5.0.1', '>='))
         	$this->context->smarty->assign('width_center_column', '100%');
