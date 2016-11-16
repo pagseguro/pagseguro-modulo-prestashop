@@ -58,6 +58,25 @@ Para acessar e configurar o módulo acesse o menu Módulos -> Modules -> Payment
 - **dias**: defina a quantidade máxima de dias em que a transação foi abandonada. Ex.: se você definir 8, então somente as transações abandonadas nos últimos 8 dias serão exibidas.
 - **requisitos**: exibe se os pré-requisitos básicos para o correto funcionamento do módulo estão sendo atendidos
 
+Inputs
+---------
+---
+| Dados do comprador         |Tipo  | Esperado                                                                       |
+| ---------------------------|:----:|:------------------------------------------------------------------------------:| 
+| Email                      | {Pattern - ^([a-zA-Z0-9_])+([@])+([a-zA-Z0-9_])+([.])+([a-zA-Z0-9_])}| email@email.em |
+| Name / Nome                | {String}                                                             | Nome           | 
+| Last Name  / Sobrenome     | {String}                                                             | Sobrenome      |  
+| Company  / Empresa         | {String}                                                             | Empresa        | 
+| Address / Endereço         | {String, Integer}                                                    |Endereço, Numero| 
+| Address 2 / Bairro /Endereço (Linha 2) | {String}                                                          | Bairro        | 
+| PostCode / CEP              | {Integer or String}                                            | 99999999 / 99999-999 |
+| City / Cidade              | {String}                                                             |    Cidade      |
+| Country / País             | {String}                                                             | País           |
+| State or Province / Estado | {String}                                                             | Estado         |
+| Aditional information / Informações adicionais | {String}                                         |Complemento     |
+| Phone / Telefone residencial | {Integer} - {DDD+NUMBER}                                             | 99999999999  |
+| Cell Phone / Telefone celular | {Integer} - {DDD+NUMBER}                                             | 99999999999  |
+
 Dúvidas?
 ----------
 ---
