@@ -32,7 +32,7 @@ if (function_exists('__autoload')) {
 class PagSeguroOrderConciliation 
 {
     public function __construct() {
-        $this->version = '2.1.0';
+        $this->version = '2.2.0';
 
         \PagSeguro\Library::initialize();
         \PagSeguro\Configuration\Configure::setCharset(Configuration::get('PAGSEGURO_CHARSET'));

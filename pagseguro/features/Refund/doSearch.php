@@ -53,7 +53,7 @@ class doSearch {
      *
      */
     public function __construct() {
-        $this->version = '2.1.0';
+        $this->version = '2.2.0';
 
         \PagSeguro\Library::initialize();
         \PagSeguro\Configuration\Configure::setCharset(Configuration::get('PAGSEGURO_CHARSET'));
@@ -169,8 +169,9 @@ class doSearch {
      * @return array of refundable payment in PrestaShop
      * @throws PrestaShopDatabaseException
      */
-    private function getPrestashopPaymentList() {
-        
+    private function getPrestashopPaymentList() 
+    {
+        $refundableStatus = $this->getRefundableStatusNames();    
         $currentStateCol = ($this->helper->version() === true) ? "" : "psord.`current_state`,";     
         $query = '
             SELECT
@@ -195,7 +196,7 @@ class doSearch {
             WHERE oh.`id_order_history` = (SELECT MAX(`id_order_history`) FROM `'._DB_PREFIX_.'order_history` moh
             WHERE moh.`id_order` = psord.`id_order`
             GROUP BY moh.`id_order`)
-               AND os.`id_order_state` BETWEEN 16 AND 18
+               AND osl.`name` IN (' . $refundableStatus . ')
                AND psord.payment = "PagSeguro"
                AND osl.`id_lang` = psord.id_lang
                AND psord.date_add >= DATE_SUB(CURDATE(),INTERVAL \''.((int)$this->days).'\' DAY)
@@ -252,5 +253,21 @@ class doSearch {
             }
         }
         return $normalizedList;
-    }   
+    }
+
+    /**
+     * Get the name of the refundable statuses and return as a string list
+     * @return string
+     */
+    private function getRefundableStatusNames()
+    {
+        $status = Util::getCustomOrderStatusPagSeguro();
+        $refundableStatus = Array(
+            $status['PAID']['name'],
+            $status['AVAILABLE']['name'],
+            $status['IN_DISPUTE']['name']
+        );
+
+        return "'" . implode("', '", $refundableStatus) . "'";
+    }
 }
