@@ -49,15 +49,7 @@ class Helper {
      * @return PagSeguroAccountCredentials
      */
     public function getPagSeguroCredentials() {
-        
-        if (!$this->credentials) {
-            $email = Configuration::get('PAGSEGURO_EMAIL');
-            $token = Configuration::get('PAGSEGURO_TOKEN');
-            if (!empty($email) && !empty($token)) {
-                $this->credentials = new PagSeguroAccountCredentials($email, $token);
-            }
-        }       
-        return $this->credentials;
+        $this->credentials = \PagSeguro\Configuration\Configure::getAccountCredentials();
     }
 
     /**
@@ -131,9 +123,7 @@ class Helper {
      * Verifies if log service was active
      */
     public function log() {
-        if (Configuration::get('PAGSEGURO_LOG_ACTIVE')) {
-            PagSeguroConfig::setApplicationCharset(Configuration::get('PAGSEGURO_CHARSET'));
-            PagSeguroConfig::activeLog(_PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION'));
+        if (\PagSeguro\Configuration\Configure::getLog()->getActive()) {
             $this->log = true;
         } else {
             $this->log = false;
@@ -146,7 +136,7 @@ class Helper {
      */
     public function info($message) {
         if ($this->log) {
-            LogPagSeguro::info($message);
+            \PagSeguro\Resources\Log\Logger::info($message);
         }
     }
 

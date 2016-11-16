@@ -24,12 +24,14 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-include_once dirname(__FILE__) . '/features/PagSeguroLibrary/PagSeguroLibrary.php';
-include_once dirname(__FILE__) . '/features/modules/pagsegurofactoryinstallmodule.php';
-include_once dirname(__FILE__) . '/features/util/encryptionIdPagSeguro.php';
+require_once dirname(__FILE__).'/Loader.php';
 
 if (!defined('_PS_VERSION_'))
     exit();
+
+if (function_exists('__autoload')) {
+    spl_autoload_register('__autoload');
+}
 
 class PagSeguro extends PaymentModule {
 
@@ -56,13 +58,22 @@ class PagSeguro extends PaymentModule {
      * PagSeguro constructor.
      */
     public function __construct() {
-
         $this->name = 'pagseguro';
         $this->tab = 'payments_gateways';
-        $this->version = '2.1.0';
+        $this->version = '2.2.0';
         $this->author = 'PagSeguro Internet LTDA.';
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
+
+        \PagSeguro\Library::initialize();
+        \PagSeguro\Configuration\Configure::setCharset(Configuration::get('PAGSEGURO_CHARSET'));
+        \PagSeguro\Configuration\Configure::setLog(
+            Configuration::get('PAGSEGURO_LOG_ACTIVE'),
+            _PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION')
+        );
+        \PagSeguro\Library::cmsVersion()->setName("'prestashop-v.'")->setRelease(_PS_VERSION_);
+        \PagSeguro\Library::moduleVersion()->setName('prestashop-v.')->setRelease($this->version);
+        \PagSeguro\Configuration\Configure::setAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), Configuration::get('PAGSEGURO_TOKEN'));
 
         parent::__construct();
 
@@ -74,10 +85,34 @@ class PagSeguro extends PaymentModule {
             include_once (dirname(__FILE__) . '/backward_compatibility/backward.php');
         }
 
-        $this->verifyEnvironment();
-        $this->setContext();
+        //Configura o ambiente pra lib
+        if ($this->getPrestaShopEnvironment())
+            \PagSeguro\Configuration\Configure::setEnvironment($this->getPrestaShopEnvironment());
 
+        $this->setContext();
         $this->modulo = PagSeguroFactoryInstallModule::createModule(_PS_VERSION_);
+    }
+    
+    public function getEnvironment()
+    {
+        \PagSeguro\Configuration\Configure::setEnvironment($this->getPrestaShopEnvironment());
+        return \PagSeguro\Configuration\Configure::getEnvironment();
+    }
+    
+    public function getPagSeguroCredentials()
+    {
+        return \PagSeguro\Configuration\Configure::getAccountCredentials();
+    }
+    
+    /**
+     * @return bool
+     */
+    public function isLightboxCheckoutType()
+    {
+        if (Configuration::get('PAGSEGURO_CHECKOUT')) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -85,12 +120,12 @@ class PagSeguro extends PaymentModule {
      * @throws Exception
      */
     public function install() {
-
-        if (version_compare(PagSeguroLibrary::getVersion(), '2.1.8', '<=')) {
+        if (version_compare(\PagSeguro\Library::libraryVersion(), '2.1.8', '<=')) {
             if (!$this->validatePagSeguroRequirements()) {
                 return false;
             }
         }
+
         if (!$this->validatePagSeguroId()) {
             return false;
         }
@@ -109,16 +144,17 @@ class PagSeguro extends PaymentModule {
         if (!parent::install() or
             ! $this->registerHook('payment') or
             ! $this->registerHook('paymentReturn') or
+            ! $this->registerHook('header') or
             ! Configuration::updateValue('PAGSEGURO_EMAIL', '') or
             ! Configuration::updateValue('PAGSEGURO_TOKEN', '') or
             ! Configuration::updateValue('PAGSEGURO_ENVIRONMENT', '') or
             ! Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') or
             ! Configuration::updateValue('PAGSEGURO_NOTIFICATION_URL', '') or
-            ! Configuration::updateValue('PAGSEGURO_CHARSET', PagSeguroConfig::getData('application', 'charset')) or
-            ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', PagSeguroConfig::getData('log', 'active')) or
+            ! Configuration::updateValue('PAGSEGURO_CHARSET', \PagSeguro\Configuration\Configure::getCharset()->getEncoding()) or
+            ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', \PagSeguro\Configuration\Configure::getLog()->getActive()) or
             ! Configuration::updateValue('PAGSEGURO_RECOVERY_ACTIVE', false) or
             ! Configuration::updateValue('PAGSEGURO_CHECKOUT', false) or
-            ! Configuration::updateValue('PAGSEGURO_LOG_FILELOCATION', PagSeguroConfig::getData('log', 'fileLocation')) or
+            ! Configuration::updateValue('PAGSEGURO_LOG_ACTIVE', \PagSeguro\Configuration\Configure::getLog()->getActive()) or
             ! Configuration::updateValue('PAGSEGURO_DISCOUNT_CREDITCARD', false) or
             ! Configuration::updateValue('PAGSEGURO_DISCOUNT_CREDITCARD_VL', "00.00") or
             ! Configuration::updateValue('PAGSEGURO_DISCOUNT_BOLETO', false) or
@@ -242,6 +278,15 @@ class PagSeguro extends PaymentModule {
     public function hookPaymentReturn($params) {
         $this->modulo->returnPaymentConfiguration($params);
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/hook/payment_return.tpl');
+    }
+
+    public function hookHeader($params)
+    {
+        if (version_compare(_PS_VERSION_, '1.5', '<'))
+        {
+            $this->context->controller->addJS("https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js");
+            $this->context->controller->addJS("https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/1.4.1/jquery-migrate.min.js");
+        }
     }
 
     /**
@@ -453,28 +498,41 @@ class PagSeguro extends PaymentModule {
      */
     private function validateCredentials()
     {
-        if ($this->checkCredentials() instanceof PagSeguroTransactionSearchResult)
+        if ($this->checkCredentials() instanceof \PagSeguro\Parsers\Transaction\Search\Date\Response)
             return true;
         return false;
     }
 
     /**
      * Check in PagSeguro webservice if this credentials are valid.
-     * @return PagSeguroTransactionSearchResult | PagSeguroException
+     * @return string
      */
     private function checkCredentials()
     {
+
+        \PagSeguro\Configuration\Configure::setEnvironment(Tools::getValue('pagseguroEnvironment'));
+
         date_default_timezone_set("America/Sao_Paulo");
         $date = new DateTime("Now");
         $date->sub(new DateInterval('PT10M'));
-        PagSeguroConfig::setEnvironment(Tools::getValue('pagseguroEnvironment'));
+
+        $options = [
+            'initial_date' => $date->format('Y-m-d\TH:i:s'),
+            'page' => 1, //Optional
+            'max_per_page' => 1, //Optional
+        ];
+
         try {
-            return PagSeguroTransactionSearchService::searchByDate(
-                new PagSeguroAccountCredentials(Tools::getValue('pagseguroEmail'),Tools::getValue('pagseguroToken')),
-                1,
-                1,
-                $date->format('Y-m-d\TH:i:s')
+            return \PagSeguro\Services\Transactions\Search\Date::search(
+                new \PagSeguro\Domains\AccountCredentials(Tools::getValue('pagseguroEmail'), Tools::getValue('pagseguroToken')),
+                $options
             );
+//            return PagSeguroTransactionSearchService::searchByDate(
+//                new PagSeguroAccountCredentials(Tools::getValue('pagseguroEmail'),Tools::getValue('pagseguroToken')),
+//                1,
+//                1,
+//
+//            );
         } catch (Exception $e) {
             return $e->getMessage();
         }
@@ -573,7 +631,7 @@ class PagSeguro extends PaymentModule {
             $this->updateDiscountData();
             $this->updateLogData();
             $this->addToView('success', true);
-            $this->verifyEnvironment();
+            //$this->verifyEnvironment();
         }
     }
 
@@ -791,16 +849,22 @@ class PagSeguro extends PaymentModule {
 
         $requirements = array();
 
-        $validation = PagSeguroConfig::validateRequirements();
+//        $validation = PagSeguroConfig::validateRequirements();
+//        foreach ($validation as $key => $value) {
+//            if (Tools::strlen($value) == 0) {
+//                $requirements[$key][0] = true;
+//                $requirements[$key][1] = null;
+//            } else {
+//                $requirements[$key][0] = false;
+//                $requirements[$key][1] = $value;
+//            }
+//        }
 
-        foreach ($validation as $key => $value) {
-            if (Tools::strlen($value) == 0) {
-                $requirements[$key][0] = true;
-                $requirements[$key][1] = null;
-            } else {
-                $requirements[$key][0] = false;
-                $requirements[$key][1] = $value;
-            }
+
+        try {
+            \PagSeguro\Library::validate();
+        } catch (Exception $exception) {
+            //@todo get the exception and send to requirements
         }
 
         $currency = self::returnIdCurrency();
@@ -814,12 +878,12 @@ class PagSeguro extends PaymentModule {
             $requirements['moeda'][1] = $this->missedCurrencyMessage();
         }
 
-        $requirements['curl'][1] = (is_null($requirements['curl'][1]) ? "Biblioteca cURL instalada." : $requirements['curl'][1]);
-        $requirements['dom'][1] = (is_null($requirements['dom'][1]) ? "DOM XML instalado." : $requirements['dom'][1]);
-        $requirements['spl'][1] = (is_null($requirements['spl'][1]) ? "Biblioteca padrão do PHP(SPL) instalada." : $requirements['spl'][1]);
-        $requirements['version'][1] = (is_null($requirements['version'][1]) ? "Versão do PHP superior à 5.3.3." : $requirements['version'][1]);
+//        $requirements['curl'][1] = (is_null($requirements['curl'][1]) ? "Biblioteca cURL instalada." : $requirements['curl'][1]);
+//        $requirements['dom'][1] = (is_null($requirements['dom'][1]) ? "DOM XML instalado." : $requirements['dom'][1]);
+//        $requirements['spl'][1] = (is_null($requirements['spl'][1]) ? "Biblioteca padrão do PHP(SPL) instalada." : $requirements['spl'][1]);
+//        $requirements['version'][1] = (is_null($requirements['version'][1]) ? "Versão do PHP superior à 5.3.3." : $requirements['version'][1]);
 
-        $this->addToView('requirements', $requirements);
+//        $this->addToView('requirements', $requirements);
 
         return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/requirements.tpl');
     }
@@ -837,7 +901,7 @@ class PagSeguro extends PaymentModule {
     private function validatePagSeguroRequirements() {
         $condional = true;
 
-        foreach (PagSeguroConfig::validateRequirements() as $value) {
+        foreach (\PagSeguro\Library::validate() as $value) {
             if (!Tools::isEmpty($value)) {
                 $condional = false;
                 $this->errors[] = Tools::displayError($value);
@@ -1231,73 +1295,10 @@ class PagSeguro extends PaymentModule {
     }
 
     /**
-     *
-     */
-    private function verifyEnvironment() {
-        if ($this->getPagSeguroConfigEnvironment()
-            != $this->getPrestaShopEnvironment())
-        {
-            $this->changeEnvironment();
-        }
-    }
-
-    /**
      * @return mixed
      */
     private function getPrestaShopEnvironment()
     {
         return Configuration::get('PAGSEGURO_ENVIRONMENT');
-    }
-
-    /**
-     * @return mixed
-     */
-    private function getPagSeguroConfigEnvironment()
-    {
-        // Include the config file and get it's values
-        $path = dirname(__FILE__) . '/features/PagSeguroLibrary/config/PagSeguroConfigWrapper.php';
-        $fh = fopen($path,'r+');
-
-        while(!feof($fh)) {
-            $lines = explode(',',fgets($fh));
-            if (strpos($lines[0], "const PAGSEGURO_ENV"))
-            {
-                $context = explode("=",$lines[0]);
-                $environment = preg_replace("/[^a-zA-Z0-9]+/", "", $context[1]);
-            }
-        }
-
-        fclose($fh);
-        return $environment;
-    }
-
-    /**
-     *
-     */
-    private function changeEnvironment()
-    {
-
-        // File to be changed
-        $archive = dirname(__FILE__) . '/features/PagSeguroLibrary/config/PagSeguroConfigWrapper.php';
-        // Search the current environment of library.
-        $search = "const PAGSEGURO_ENV";
-        // Save the file in an array in variable $arrayArchive.
-        $arrayArchive = file($archive);
-        $position = 0;
-        for ($i = 0; $i < sizeof($arrayArchive); $i++) {
-            // Checks the position of environmental on array, and stores the environment on variable $libEnvironment.
-            if (strpos($arrayArchive[$i], $search) &&
-                (strpos($arrayArchive[$i], 'production') || strpos($arrayArchive[$i], 'sandbox'))) {
-                $fullLine = $arrayArchive[$i];
-                $position = $i;
-                if (strpos($fullLine, 'production') == false) {
-                    $environment = "production";
-                } else {
-                    $environment = "sandbox";
-                }
-            }
-        }
-        $arrayArchive[$position] = str_replace($this->getPagSeguroConfigEnvironment(), $environment, $fullLine);
-        file_put_contents($archive, implode("", $arrayArchive));
     }
 }

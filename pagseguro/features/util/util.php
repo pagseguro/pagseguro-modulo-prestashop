@@ -41,7 +41,8 @@ class Util
 
     private static $type_checkout = array(
         '0' => 'PADRÃO',
-        '1' => 'LIGHTBOX'
+        '1' => 'LIGHTBOX',
+        '2' => 'CHECKOUT TRANSPARENTE'
     );
 
     private static $order_status_pagseguro = array(
@@ -388,6 +389,4 @@ class Util
             return Tools::ps_round($amount, 2);
         }
     }
-    
-
 }

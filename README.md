@@ -14,7 +14,7 @@ Requisitos
 ----------
 ---
  - [PrestaShop] 1.4.5.1 a 1.6.0.9
- - [PHP] 5.3.3+
+ - [PHP] 5.4.27+
  - [SPL]
  - [cURL]
  - [DOM]
@@ -46,7 +46,7 @@ Para acessar e configurar o módulo acesse o menu Módulos -> Modules -> Payment
 - **e-mail**: e-mail cadastrado no PagSeguro.
 - **token**: token cadastrado no PagSeguro.
 - **charset**: codificação do seu sistema (ISO-8859-1 ou UTF-8).
-- **checkout**: especifica o modelo de checkout que será utilizado. É possível escolher entre checkout padrão e checkout lightbox.
+- **checkout**: especifica o modelo de checkout que será utilizado. É possível escolher entre checkout padrão, checkout lightbox e checkout transparente.
 - **url de notificação**: sempre que uma transação mudar de status, o PagSeguro envia uma notificação para sua loja ou para a URL que você informar neste campo. Obs.: Esta URL é informada automaticamente e você só deve alterá-la caso deseje receber as notificações em outro local.
 - **url de redirecionamento**: ao final do fluxo de pagamento no PagSeguro, seu cliente será redirecionado automaticamente para a página de confirmação em sua loja ou então para a URL que você informar neste campo. Para ativar o redirecionamento ao final do pagamento é preciso ativar o serviço de [Pagamentos via API]. Obs.: Esta URL é informada automaticamente e você só deve alterá-la caso deseje que seus clientes sejam redirecionados para outro local.
 - **geração de log**: ativa/desativa a geração de logs.
@@ -67,6 +67,11 @@ Caso tenha dúvidas ou precise de suporte, acesse nosso [fórum].
 Changelog
 ---------
 ---
+
+2.2
+
+- Adicionada opção para utilizar o Checkout Transparente. Obs.: Recomenda-se limpar o cache do PrestaShop antes da instalação desta versão.
+- Ajustes e melhorias em geral.
 
 2.1
 

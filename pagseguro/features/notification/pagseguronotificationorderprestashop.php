@@ -23,81 +23,85 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
+include_once dirname(__FILE__) . '/../../features/library/vendor/autoload.php';
 
-include_once dirname(__FILE__) . '/../PagSeguroLibrary/PagSeguroLibrary.php';
+if (function_exists('__autoload')) {
+    spl_autoload_register('__autoload');
+}
 
+/**
+ * Class responsible by handle the pagseguro notifications
+ */
 class PagSeguroNotificationOrderPrestashop
 {
-
     private $obj_transaction;
-
-    private $obj_notification_type;
-
-    private $obj_credential;
-
-    private $notification_type;
-
-    private $notification_code;
-
     private $reference;
+    
+    public function __construct() {
+        $this->version = '2.2.0';
 
+        \PagSeguro\Library::initialize();
+        \PagSeguro\Configuration\Configure::setCharset(Configuration::get('PAGSEGURO_CHARSET'));
+        \PagSeguro\Configuration\Configure::setLog(
+            Configuration::get('PAGSEGURO_LOG_ACTIVE'),
+            _PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION')
+        );
+        \PagSeguro\Library::cmsVersion()->setName("'prestashop-v.'")->setRelease(_PS_VERSION_);
+        \PagSeguro\Library::moduleVersion()->setName('prestashop-v.')->setRelease($this->version);
+        \PagSeguro\Configuration\Configure::setEnvironment(Configuration::get('PAGSEGURO_ENVIRONMENT'));
+        $this->helper = new Helper();
+    }
+
+    /**
+     * Capture and treats the notification http post
+     * @param array $post
+     */
     public function postProcess($post)
     {
-
         try {
-
-            $this->createNotification($post);
             $this->createCredential();
-            $this->inicializeObjects();
-
-            if ($this->obj_notification_type->getValue() == $this->notification_type) {
-                $this->createTransaction();
-            }
+            $this->createTransaction();
 
             if ($this->obj_transaction) {
                 $this->updateCms();
             }
-
         } catch (Exception $e) {
-
             $this->createLog($e->getMessage());
         }
 
     }
 
-    private function createNotification(Array $post)
-    {
-        $this->notification_type = (isset($post['notificationType']) && trim($post['notificationType']) !== '' ?
-            trim($post['notificationType']) : null);
-
-        $this->notification_code = (isset($post['notificationCode']) && trim($post['notificationCode']) !== '' ?
-            trim($post['notificationCode']) : null);
-    }
-
+    /**
+     * Configure the pagseguro credentials
+     * @throws Exception
+     */
     private function createCredential()
     {
-        $email = Configuration::get('PAGSEGURO_EMAIL');
-        $token = Configuration::get('PAGSEGURO_TOKEN');
-        $this->obj_credential = new PagSeguroAccountCredentials($email, $token);
-    }
+        if (!empty(Configuration::get('PAGSEGURO_EMAIL')) 
+            && !empty(Configuration::get('PAGSEGURO_TOKEN'))) {
 
-    private function inicializeObjects()
-    {
-        $this->createNotificationType();
-    }
-
-    private function createNotificationType()
-    {
-        $this->obj_notification_type = new PagSeguroNotificationType();
-        $this->obj_notification_type->setByType('TRANSACTION');
+            \PagSeguro\Configuration\Configure::setAccountCredentials(
+                Configuration::get('PAGSEGURO_EMAIL'),
+                Configuration::get('PAGSEGURO_TOKEN')
+            );
+        } else {
+            throw new Exception('Credenciais inválidas ou não configuradas corretamente.');
+        }
     }
 
     private function createTransaction()
     {
-        $this->obj_transaction = PagSeguroNotificationService::checkTransaction(
-            $this->obj_credential,
-            $this->notification_code
-        );
+        try {
+            if (\PagSeguro\Helpers\Xhr::hasPost()) {
+                $this->obj_transaction = \PagSeguro\Services\Transactions\Notification::check(
+                    \PagSeguro\Configuration\Configure::getAccountCredentials()
+                );
+            } else {
+                throw new \InvalidArgumentException($_POST);
+            }
+        } catch (Exception $exc) {
+            throw $exc;
+        }
 
         $transaction = $this->isNotNull($this->obj_transaction);
 
@@ -108,11 +112,13 @@ class PagSeguroNotificationOrderPrestashop
         $this->reference = $transaction ? (int)EncryptionIdPagSeguro::decrypt($this->obj_transaction->getReference()) : null;
     }
 
+    /**
+     * Updates the CMS pagseguro transaction status
+     */
     private function updateCms()
     {
-
-        $id_status = ($this->isNotNull($this->obj_transaction->getStatus()->getValue())) ?
-        (int) $this->obj_transaction->getStatus()->getValue() : null;
+        $id_status = ($this->isNotNull($this->obj_transaction->getStatus())) ?
+        (int) $this->obj_transaction->getStatus() : null;
 
         if ($this->isNotNull($id_status)) {
             $id_st_transaction = (int) $this->returnIdOrderByStatusPagSeguro(Util::getPagSeguroStatusName($id_status));

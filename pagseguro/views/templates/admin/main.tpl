@@ -25,6 +25,9 @@
 
 <link type="text/css" rel="stylesheet" href="{$module_dir|escape:'htmlall':'UTF-8'}views/css/pagseguro-module.css" />
 <link type="text/css" rel="stylesheet" href="{$module_dir|escape:'htmlall':'UTF-8'}views/css/pagseguro-modal.css" />
+<link type="text/css" rel="stylesheet" href="{$module_dir|escape:'htmlall':'UTF-8'}views/css/font-awesome.min.css" />
+<link type="text/css" rel="stylesheet" href="{$module_dir|escape:'htmlall':'UTF-8'}views/css/styles.css" />
+<link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
 <link type="text/css" rel="stylesheet" href="{$cssFileVersion|escape:'htmlall':'UTF-8'}" />
 
 <div id="pagseguro-module">
