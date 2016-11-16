@@ -21,7 +21,11 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 include_once dirname(__FILE__) .'/Helper.php';
-include_once dirname(__FILE__) .'/../../features/PagSeguroLibrary/PagSeguroLibrary.php';
+include_once dirname(__FILE__) . '/../../features/library/vendor/autoload.php';
+
+if (function_exists('__autoload')) {
+    spl_autoload_register('__autoload');
+}
 
 /**
  * Class doSearch
@@ -49,6 +53,19 @@ class doSearch {
      *
      */
     public function __construct() {
+        $this->version = '2.2.0';
+
+        \PagSeguro\Library::initialize();
+        \PagSeguro\Configuration\Configure::setCharset(Configuration::get('PAGSEGURO_CHARSET'));
+        \PagSeguro\Configuration\Configure::setLog(
+            Configuration::get('PAGSEGURO_LOG_ACTIVE'),
+            _PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION')
+        );
+        \PagSeguro\Library::cmsVersion()->setName("'prestashop-v.'")->setRelease(_PS_VERSION_);
+        \PagSeguro\Library::moduleVersion()->setName('prestashop-v.')->setRelease($this->version);
+        \PagSeguro\Configuration\Configure::setAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), Configuration::get('PAGSEGURO_TOKEN'));
+        \PagSeguro\Configuration\Configure::setEnvironment(Configuration::get('PAGSEGURO_ENVIRONMENT'));
+
         $this->helper = new Helper();
     }
 
@@ -64,11 +81,10 @@ class doSearch {
         
         try {
             $this->getPagSeguroPayments();
-            $paymentPagSeguroList = $this->normalize((array)$this->PagSeguroPaymentList);
+            $paymentPagSeguroList = $this->normalize($this->PagSeguroPaymentList->getTransactions());
             $paymentPrestaShopList = $this->getPrestashopPaymentList();
 
             foreach ($paymentPrestaShopList as $item) {
-                
                 
                 if ($item['environment'] == Configuration::get("PAGSEGURO_ENVIRONMENT")) {
 
@@ -106,24 +122,30 @@ class doSearch {
      */
     private function getPagSeguroPayments($page = null)
     {
-
         if (is_null($page)) {
             $page = 1;
         }
 
         try {
-            
             if (is_null($this->PagSeguroPaymentList)) {
-                $this->PagSeguroPaymentList = $this->searchByDate($page, 1000, $this->helper->subtractDayFromDate($this->days));
+                $this->PagSeguroPaymentList = $this->searchByDate(
+                    $page,
+                    1000,
+                    $this->helper->subtractDayFromDate($this->days)
+                );
                 
             } else {
-                $PagSeguroPaymentList = $this->searchByDate($page, 1000, $this->helper->subtractDayFromDate($this->days));
+                $PagSeguroPaymentList = $this->searchByDate(
+                    $page,
+                    1000,
+                    $this->helper->subtractDayFromDate($this->days)
+                );
 
                 $this->PagSeguroPaymentList->setDate($PagSeguroPaymentList->getDate());
                 $this->PagSeguroPaymentList->setCurrentPage($PagSeguroPaymentList->getCurrentPage());
                 $this->PagSeguroPaymentList->setTotalPages($PagSeguroPaymentList->getTotalPages());
                 $this->PagSeguroPaymentList->setResultsInThisPage(
-                    $PagSeguroPaymentList->getResultsInThisPage() + $this->PagSeguroPaymentList->getResultsInThisPage
+                    $PagSeguroPaymentList->getResultsInThisPage() + $this->PagSeguroPaymentList->getResultsInThisPage()
                 );
 
                 $this->PagSeguroPaymentList->setTransactions(
@@ -133,7 +155,7 @@ class doSearch {
                     )
                 );
             }
-            
+
             if ($this->PagSeguroPaymentList->getTotalPages() > $page) {
                 $this->getPagSeguroPayments(++$page);
             }
@@ -147,8 +169,9 @@ class doSearch {
      * @return array of refundable payment in PrestaShop
      * @throws PrestaShopDatabaseException
      */
-    private function getPrestashopPaymentList() {
-        
+    private function getPrestashopPaymentList() 
+    {
+        $refundableStatus = $this->getRefundableStatusNames();    
         $currentStateCol = ($this->helper->version() === true) ? "" : "psord.`current_state`,";     
         $query = '
             SELECT
@@ -173,7 +196,7 @@ class doSearch {
             WHERE oh.`id_order_history` = (SELECT MAX(`id_order_history`) FROM `'._DB_PREFIX_.'order_history` moh
             WHERE moh.`id_order` = psord.`id_order`
             GROUP BY moh.`id_order`)
-               AND os.`id_order_state` BETWEEN 16 AND 18
+               AND osl.`name` IN (' . $refundableStatus . ')
                AND psord.payment = "PagSeguro"
                AND osl.`id_lang` = psord.id_lang
                AND psord.date_add >= DATE_SUB(CURDATE(),INTERVAL \''.((int)$this->days).'\' DAY)
@@ -192,11 +215,13 @@ class doSearch {
      */
     private function searchByDate($pages, $resultsPerPage, $initialDate) {
         try {
-            return PagSeguroTransactionSearchService::searchByDate(
-                $this->helper->getPagSeguroCredentials(),
-                $pages, // initial page
-                $resultsPerPage, // pages per page
-                $initialDate
+            return \PagSeguro\Services\Transactions\Search\Date::search(
+                \PagSeguro\Configuration\Configure::getAccountCredentials(),
+                [
+                    'initial_date' => $initialDate,
+                    'page' => $pages,
+                    'max_per_page' => $resultsPerPage
+                ]
             );
         } catch (Exception $e) {
             throw $e;
@@ -217,17 +242,32 @@ class doSearch {
         $normalizedList = array();
         $defaultRefPrefix = Configuration::get('PAGSEGURO_ID');
 
-        foreach (current($transactions) as $summary) {
-            $reference = $summary->getReference();
-            $refPrefix = $this->helper->getRefPrefix($reference);
-            $refSuffix = (int)$this->helper->getRefSuffix($reference);
+        foreach ($transactions as $summary) {
+            $refPrefix = $this->helper->getRefPrefix($summary->getReference());
+            $refSuffix = (int)$this->helper->getRefSuffix($summary->getReference());
 
             if ($refPrefix == $defaultRefPrefix) {
-                $normalizedList[$refSuffix]['reference'] = $reference;
+                $normalizedList[$refSuffix]['reference'] = $summary->getReference();
                 $normalizedList[$refSuffix]['code']      = $summary->getCode();
-                $normalizedList[$refSuffix]['status']    = $summary->getStatus()->getValue();
+                $normalizedList[$refSuffix]['status']    = $summary->getStatus();
             }
         }
         return $normalizedList;
-    }   
+    }
+
+    /**
+     * Get the name of the refundable statuses and return as a string list
+     * @return string
+     */
+    private function getRefundableStatusNames()
+    {
+        $status = Util::getCustomOrderStatusPagSeguro();
+        $refundableStatus = Array(
+            $status['PAID']['name'],
+            $status['AVAILABLE']['name'],
+            $status['IN_DISPUTE']['name']
+        );
+
+        return "'" . implode("', '", $refundableStatus) . "'";
+    }
 }

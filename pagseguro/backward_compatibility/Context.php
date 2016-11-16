@@ -174,7 +174,6 @@ class Context
         $this->cart = $cart;
         $this->smarty = $smarty;
         $this->link = $link;
-        
         $this->controller = new ControllerBackwardModule();
         if (is_object($cookie)) {
             $this->currency = new Currency((int) $cookie->id_currency);

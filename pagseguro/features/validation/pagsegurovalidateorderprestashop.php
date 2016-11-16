@@ -23,7 +23,6 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
-
 include_once dirname(__FILE__).'/../../../../init.php';
 include_once dirname(__FILE__) . '/../../../../config/config.inc.php';
 include_once dirname(__FILE__) . '/../../pagseguro.php';
@@ -43,7 +42,45 @@ class PagSeguroValidateOrderPrestashop
     {
         $this->module = $module;
         $this->context = Context::getContext();
-        $this->converter = new ConverterOrderForPaymentRequest($module);
+        /*
+         * Aqui instanciamos a classe que faz a requisição para o pagseguro, previamente instanciava uma request da API
+         * do tipo \PagSEguro\Domains\Requests\Payment apenas, agora aceitamos um parametro $request no construtor
+         * onde podemos passar o tipo da nossa requisição, caso contrário, instancia-se um payment.
+         */
+        $this->loadConverter();
+    }
+
+    private function loadConverter()
+    {
+        if (Configuration::get('PAGSEGURO_CHECKOUT') === '2') {
+
+            if (filter_var($_POST['type']) == 'boleto') {
+
+                $this->converter = new ConverterOrderForPaymentRequest(
+                    $this->module,
+                    new \PagSeguro\Domains\Requests\DirectPayment\Boleto()
+                );
+            }
+
+            if (filter_var($_POST['type']) == 'debit') {
+
+                $this->converter = new ConverterOrderForPaymentRequest(
+                    $this->module,
+                    new \PagSeguro\Domains\Requests\DirectPayment\OnlineDebit()
+                );
+            }
+
+            if (filter_var($_POST['type']) == 'credit-card') {
+
+                $this->converter = new ConverterOrderForPaymentRequest(
+                    $this->module,
+                    new \PagSeguro\Domains\Requests\DirectPayment\CreditCard()
+                );
+            }
+
+        } else {
+            $this->converter = new ConverterOrderForPaymentRequest($this->module);
+        }
     }
 
     public function validate()
@@ -53,21 +90,30 @@ class PagSeguroValidateOrderPrestashop
             $this->validateCart();
             $this->converter->convertToRequestData();
             $this->converter->setAdditionalRequest($this->validateOrder());
-        } catch (PagSeguroServiceException $e) {
-            throw $e;
+
         } catch (Exception $e) {
             throw $e;
         }
     }
 
-    public function request($isLightBox)
+    public function request()
     {
         try {
-            return $this->converter->request($isLightBox);
-        } catch (PagSeguroServiceException $e) {
-            throw $e;
+            return $this->converter->request();
         } catch (Exception $e) {
             throw $e;
+        }
+    }
+
+    /*
+     * Metodo que executa um pagamento foi criado para não precisar mudar a request, precisa melhorar...
+     */
+    public function payment()
+    {
+        try {
+            return $this->converter->payment();
+        } catch (Exception $exception) {
+            throw $exception;
         }
     }
 

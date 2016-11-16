@@ -66,12 +66,23 @@ class PagSeguroPS14 implements PagSeguroModuleConfigurable
         $this->context->smarty->assign(
             array(
                 'version_module' => _PS_VERSION_,
-                'action_url' => _PS_BASE_URL_ . __PS_BASE_URI__ . 'modules/pagseguro/standard/front/payment.php',
+                'action_url' => $this->actionUrl(),
                 'image' => __PS_BASE_URI__ . 'modules/pagseguro/views/img/logops_86x49.png',
                 'this_path' => __PS_BASE_URI__ . 'modules/pagseguro/',
                 'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/pagseguro/'
             )
         );
+    }
+
+    public function actionUrl()
+    {
+        if (Configuration::get('PAGSEGURO_CHECKOUT') === '0' || Configuration::get('PAGSEGURO_CHECKOUT') === '1' ) {
+            return _PS_BASE_URL_ . __PS_BASE_URI__ . 'modules/pagseguro/standard/front/payment.php';
+        }
+
+        if (Configuration::get('PAGSEGURO_CHECKOUT') === '2') {
+            return _PS_BASE_URL_ . __PS_BASE_URI__ . 'modules/pagseguro/standard/front/direct.php';
+        }
     }
 
     public function returnPaymentConfiguration($params)

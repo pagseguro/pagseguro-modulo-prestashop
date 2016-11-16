@@ -27,7 +27,6 @@
 include_once dirname(__FILE__) . '/../../../../config/config.inc.php';
 include_once dirname(__FILE__) . '/../../features/util/util.php';
 include_once dirname(__FILE__) . '/../../features/util/encryptionIdPagSeguro.php';
-include_once dirname(__FILE__) . '/../PagSeguroLibrary/PagSeguroLibrary.php';
 
 class ConverterOrderForPaymentRequest
 {
@@ -40,9 +39,12 @@ class ConverterOrderForPaymentRequest
 
     private $urlToRedirect;
 
-    public function __construct($module)
+    public function __construct($module, $request = null)
     {
-        $this->paymentRequest = new PagSeguroPaymentRequest();
+        if (is_null($request)) {
+            $request = new \PagSeguro\Domains\Requests\Payment();
+        }
+        $this->paymentRequest = $request;
         $this->module = $module;
         $this->context = Context::getContext();
     }
@@ -56,20 +58,15 @@ class ConverterOrderForPaymentRequest
     {
         try {
             $this->setAdditionalRequestData($additional_infos);
-            $this->setNotificationUrl();
-        } catch (PagSeguroServiceException $e) {
-            throw $e;
         } catch (Exception $e) {
             throw $e;
         }
     }
 
-    public function request($isLightBox)
+    public function request()
     {
         try {
-            return $this->performPagSeguroRequest($isLightBox);
-        } catch (PagSeguroServiceException $e) {
-            throw $e;
+            return $this->performPagSeguroRequest();
         } catch (Exception $e) {
             throw $e;
         }
@@ -81,28 +78,28 @@ class ConverterOrderForPaymentRequest
         $redirectURL = Util::getRedirectUrl();
 
         /** Currency */
-        $this->paymentRequest->setCurrency(PagSeguroCurrencies::getIsoCodeByName('REAL'));
+        $this->paymentRequest->setCurrency("BRL");
+
 
         /** Extra amount */
         $this->paymentRequest->setExtraAmount($this->getExtraAmountValues());
 
         /** Products */
-        $this->paymentRequest->setItems($this->generateProductsData());
+        $this->generateProductsData();
 
         /** Sender */
-        $this->paymentRequest->setSender($this->generateSenderData());
+        $this->generateSenderData();
 
         /** Shipping */
-        $this->paymentRequest->setShipping($this->generateShippingData());
+        $this->generateShippingData();
 
         /** Redirect URL */
         if (! Tools::isEmpty($redirectURL)) {
-            $this->paymentRequest->setRedirectURL($redirectURL);
+            $this->paymentRequest->setRedirectUrl($redirectURL);
         }
 
         /** Discount */
         $this->getDiscountData($this->paymentRequest);
-
     }
 
     private function getExtraAmountValues()
@@ -135,59 +132,70 @@ class ConverterOrderForPaymentRequest
 
     private function generateProductsData()
     {
-        $pagseguro_items = array();
-
         $cont = 1;
-
         $id_currency = PagSeguro::returnIdCurrency();
 
         foreach ($this->context->cart->getProducts() as $product) {
-
-            $pagSeguro_item = new PagSeguroItem();
-            $pagSeguro_item->setId($cont ++);
-            $pagSeguro_item->setDescription(Tools::truncate($product['name'], 255));
-            $pagSeguro_item->setQuantity($product['quantity']);
-
             if ($this->context->cart->id_currency != $id_currency && ! is_null($id_currency)) {
-                $pagSeguro_item->setAmount(
-                    Util::convertPriceFull(
-                        $product['price_wt'],
-                        new Currency($this->context->cart->id_currency),
-                        new Currency($id_currency)
-                    )
+                $itemAmount = Util::convertPriceFull(
+                    $product['price_wt'],
+                    new Currency($this->context->cart->id_currency),
+                    new Currency($id_currency)
                 );
             } else {
-                $pagSeguro_item->setAmount($product['price_wt']);
+                $itemAmount = \PagSeguro\Helpers\Currency::toDecimal(round($product['price_wt'], 2));
             }
-
-            /** Defines weight in grams */
-            $pagSeguro_item->setWeight($product['weight'] * 1000);
-
-            if ($product['additional_shipping_cost'] > 0) {
-                $pagSeguro_item->setShippingCost($product['additional_shipping_cost']);
-            }
-            array_push($pagseguro_items, $pagSeguro_item);
+            
+            $this->paymentRequest->addItems()->withParameters(
+                $cont ++,
+                Tools::truncate($product['name'], 255),
+                $product['quantity'],
+                $itemAmount,
+                $product['weight'] * 1000,
+                ($product['additional_shipping_cost'] > 0) ? $product['additional_shipping_cost'] : null
+            );
         }
-        return $pagseguro_items;
     }
 
     private function generateSenderData()
     {
-        $sender = new PagSeguroSender();
-
         if (isset($this->context->customer) && ! is_null($this->context->customer)) {
 
-            $sender->setEmail($this->context->customer->email);
+            if (Configuration::get('PAGSEGURO_ENVIRONMENT') == "sandbox") {
+                $this->paymentRequest->setSender()->setEmail('prestashop@sandbox.pagseguro.com.br');
+            } else {
+                $this->paymentRequest->setSender()->setEmail($this->context->customer->email);
+            }
 
+            $this->setSenderHash();
+            $this->setSenderDocument();
+   
             $firstName = $this->generateName($this->context->customer->firstname);
             $lastName = $this->generateName($this->context->customer->lastname);
-
             $name = $firstName . ' ' . $lastName;
-
-            $sender->setName(Tools::truncate($name, 50));
+            $this->paymentRequest->setSender()->setName(Tools::truncate($name, 50));
+            $this->setSenderPhone();
         }
+    }
 
-        return $sender;
+    private function setSenderPhone()
+    {
+        $senderPhone = $this->getPhone();
+
+        $this->paymentRequest->setSender()->setPhone()->withParameters(
+            $senderPhone[1],
+            $senderPhone[2]
+        );
+    }
+
+    private function setHolderPhone()
+    {
+        $holderPhone = $this->getPhone();
+
+        $this->paymentRequest->setHolder()->setPhone()->withParameters(
+            $holderPhone[1],
+            $holderPhone[2]
+        );
     }
 
     private function generateName($value)
@@ -215,10 +223,8 @@ class ConverterOrderForPaymentRequest
         $cost = 00.00;
 
         $id_currency = PagSeguro::returnIdCurrency();
-
-        $shipping = new PagSeguroShipping();
-        $shipping->setAddress($this->generateShippingAddressData());
-        $shipping->setType($this->generateShippingType());
+        $this->generateShippingAddressData();
+        $this->generateShippingType();
 
         if ($this->context->cart->id_currency != $id_currency && ! is_null($id_currency)) {
 
@@ -231,13 +237,44 @@ class ConverterOrderForPaymentRequest
             $cost = $this->context->cart->getOrderTotal(true, Cart::ONLY_SHIPPING);
         }
 
-        $shipping->setCost(number_format(Tools::ps_round($cost, 2), 2, '.', ''));
-        return $shipping;
+        $this->paymentRequest->setShipping()->setCost()
+            ->withParameters(number_format(Tools::ps_round($cost, 2), 2, '.', ''));
     }
 
     private function generateShippingAddressData()
     {
-        $address = new PagSeguroAddress();
+        $delivery_address = new Address((int) $this->context->cart->id_address_delivery);
+
+        if (! is_null($delivery_address)) {
+
+            $fullAddress = $this->addressConfig($delivery_address->address1);
+
+            $street = (is_null($fullAddress[0]) || empty($fullAddress[0])) ?
+                $delivery_address->address1 :
+                $fullAddress[0];
+
+            $number = is_null($fullAddress[1]) ? '' : $fullAddress[1];
+            $district = is_null($fullAddress[2]) ? '' : $fullAddress[2];
+            
+            $state = new State((int) $delivery_address->id_state);
+            $country = new Country((int) $delivery_address->id_country);
+
+            $this->paymentRequest->setShipping()->setAddress()->withParameters(
+                $street,
+                $number,
+                (!empty($delivery_address->address2) && isset($delivery_address->address2)) ? $delivery_address->address2 : 'non_informed_address',
+                $delivery_address->postcode,
+                $delivery_address->city,
+                $state->iso_code,
+                $country->iso_code,
+                $delivery_address->other
+            );
+
+        }
+    }
+
+    private function generateBillingAddressData()
+    {
         $delivery_address = new Address((int) $this->context->cart->id_address_delivery);
 
         if (! is_null($delivery_address)) {
@@ -251,67 +288,63 @@ class ConverterOrderForPaymentRequest
             $number = is_null($fullAddress[1]) ? '' : $fullAddress[1];
             $complement = is_null($fullAddress[2]) ? '' : $fullAddress[2];
 
-            $address->setCity($delivery_address->city);
-            $address->setPostalCode($delivery_address->postcode);
-            $address->setStreet($street);
-            $address->setComplement($complement);
-            $address->setNumber($number);
-            $address->setDistrict($delivery_address->address2);
-            $address->setCity($delivery_address->city);
-
-            $country = new Country((int) $delivery_address->id_country);
-            $address->setCountry($country->iso_code);
-
             $state = new State((int) $delivery_address->id_state);
-            $address->setState($state->iso_code);
-        }
+            $country = new Country((int) $delivery_address->id_country);
 
-        return $address;
+            $this->paymentRequest->setBilling()->setAddress()->withParameters(
+                $street,
+                $number,
+                (!empty($delivery_address->address2) && isset($delivery_address->address2)) ? $delivery_address->address2 : 'non_informed_address',
+                $delivery_address->postcode,
+                $delivery_address->city,
+                $state->iso_code,
+                $country->iso_code,
+                $delivery_address->other
+            );
+        }
     }
 
     private function getDiscountData($paymentRequest)
     {
         if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_CREDITCARD'))) {
-            $paymentRequest->addPaymentMethodConfig(
-                'CREDIT_CARD',
-                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_CREDITCARD_VL')),
-                'DISCOUNT_PERCENT'
+            $this->paymentRequest->addPaymentMethod()->withParameters(
+                PagSeguro\Enum\PaymentMethod\Group::CREDIT_CARD,
+                PagSeguro\Enum\PaymentMethod\Config\Keys::DISCOUNT_PERCENT,
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_CREDITCARD_VL'))
             );
         }
 
         if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_EFT'))) {
-            $paymentRequest->addPaymentMethodConfig(
-                'EFT',
-                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_EFT_VL')),
-                'DISCOUNT_PERCENT'
+            $this->paymentRequest->addPaymentMethod()->withParameters(
+                PagSeguro\Enum\PaymentMethod\Group::EFT,
+                PagSeguro\Enum\PaymentMethod\Config\Keys::DISCOUNT_PERCENT,
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_EFT_VL'))
             );
         }
 
         if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BOLETO'))) {
-            $paymentRequest->addPaymentMethodConfig(
-                'BOLETO',
-                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BOLETO_VL')),
-                'DISCOUNT_PERCENT'
+            $this->paymentRequest->addPaymentMethod()->withParameters(
+                PagSeguro\Enum\PaymentMethod\Group::BOLETO,
+                PagSeguro\Enum\PaymentMethod\Config\Keys::DISCOUNT_PERCENT,
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BOLETO_VL'))
             );
         }
 
         if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_DEPOSIT'))) {
-            $paymentRequest->addPaymentMethodConfig(
-                'DEPOSIT',
-                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_DEPOSIT_VL')),
-                'DISCOUNT_PERCENT'
+            $this->paymentRequest->addPaymentMethod()->withParameters(
+                PagSeguro\Enum\PaymentMethod\Group::DEPOSIT,
+                PagSeguro\Enum\PaymentMethod\Config\Keys::DISCOUNT_PERCENT,
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_DEPOSIT_VL'))
             );
         }
 
         if (Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BALANCE'))) {
-            $paymentRequest->addPaymentMethodConfig(
-                'BALANCE',
-                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BALANCE_VL')),
-                'DISCOUNT_PERCENT'
+            $this->paymentRequest->addPaymentMethod()->withParameters(
+                PagSeguro\Enum\PaymentMethod\Group::BALANCE,
+                PagSeguro\Enum\PaymentMethod\Config\Keys::DISCOUNT_PERCENT,
+                Tools::safeOutput(Configuration::get('PAGSEGURO_DISCOUNT_BALANCE_VL'))
             );
         }
-
-        return $paymentRequest;
     }
 
     private function addressConfig($fullAddress)
@@ -322,10 +355,8 @@ class ConverterOrderForPaymentRequest
 
     private function generateShippingType()
     {
-        $shipping_type = new PagSeguroShippingType();
-        $shipping_type->setByType('NOT_SPECIFIED');
-
-        return $shipping_type;
+        $this->paymentRequest->setShipping()->setType()
+            ->withParameters(\PagSeguro\Enum\Shipping\Type::NOT_SPECIFIED);
     }
 
     private function setAdditionalRequestData($additionalInfos)
@@ -337,6 +368,7 @@ class ConverterOrderForPaymentRequest
         $this->paymentRequest->setRedirectURL($this->urlToRedirect);
 
         $this->paymentRequest->setNotificationURL($this->setNotificationUrl());
+
     }
 
     private function setNotificationUrl()
@@ -359,71 +391,247 @@ class ConverterOrderForPaymentRequest
          $this->paymentRequest->setReference($referenceToPagSeguro);
     }
 
-    private function performPagSeguroRequest($isLightBox)
+    private function performPagSeguroRequest()
     {
-
         $code = "";
         try {
+            $credentials = $this->module->getPagSeguroCredentials();
 
-            /** Retrieving PagSeguro configurations */
-            $this->retrievePagSeguroConfiguration();
+            if (Configuration::get('PAGSEGURO_CHECKOUT') === '2') {
+                if (filter_var($_POST['type']) == 'debit') {
+                    $this->paymentRequest->setBankName($this->bank());
+                }
 
-            /** Set PagSeguro Prestashop module version */
-            $this->setPagSeguroModuleVersion();
+                if (filter_var($_POST['type']) == 'credit-card') {
 
-            /** Set PagSeguro PrestaShop CMS version */
-            $this->setPagSeguroCMSVersion();
+                    $this->generateBillingAddressData();
 
-            /** Performing request */
-            $credentials = new PagSeguroAccountCredentials(
-                Configuration::get('PAGSEGURO_EMAIL'),
-                Configuration::get('PAGSEGURO_TOKEN')
-            );
+                    $this->paymentRequest->setInstallment()->withParameters(filter_var($_POST['installment_quantity']), filter_var($_POST['installment_amount']));
+                    $this->paymentRequest->setToken(filter_var($_POST['card_token']));
 
-            $url = $this->paymentRequest->register($credentials);
+                    // Set the credit card holder information
+                    $this->paymentRequest->setHolder()->setName(preg_replace('/( )+/', ' ', filter_var($_POST['holder_name']))); // Equals in Credit Card
+                    $this->paymentRequest->setHolder()->setBirthdate(filter_var($_POST['holder_birthdate']));
 
-            if ($isLightBox) {
-                $resultado = parse_url($url);
-                parse_str($resultado['query']);
+                    $this->setHolderDocument();
+
+                    $this->setHolderPhone();
+
+                    $this->pagSeguroRequest();
+
+                    return Tools::jsonEncode(
+                        array(
+                            'success' => true,
+                            'payload' => [
+                                'data' => [
+
+                                ]
+                            ]
+                        )
+                    );
+                }
+
+                $result = $this->pagSeguroRequest();
 
                 return Tools::jsonEncode(
                     array(
-                        'code' => $code,
-                        'redirect' => $this->urlToRedirect,
-                        'urlCompleta' => $url
+                        'success' => true,
+                        'payload' => [
+                            'data' => [
+                                'payment_link' => $result->getPaymentLink()
+                            ]
+                        ]
                     )
                 );
             }
-            /** Redirecting to PagSeguro */
-            if (Validate::isUrl($url)) {
-                return Tools::truncate($url, 255, '');
+
+            if (Configuration::get('PAGSEGURO_CHECKOUT') === '1') {
+                $result = $this->pagSeguroRequest(
+                    $this->module->isLightboxCheckoutType()
+                );
+
+                return Tools::jsonEncode(
+                    array(
+                        'code' => $result->getCode(),
+                        'redirect' => $this->urlToRedirect
+                    )
+                );
             }
-        } catch (PagSeguroServiceException $e) {
-            throw $e;
+
+            if (Configuration::get('PAGSEGURO_CHECKOUT') === '0') {
+                $url = $this->pagSeguroRequest(
+                    $this->module->isLightboxCheckoutType()
+                );
+                /** Redirecting to PagSeguro */
+                if (Validate::isUrl($url)) {
+                    return Tools::truncate($url, 255, '');
+                }
+            }
         } catch (Exception $e) {
             throw $e;
         }
     }
 
-    private function retrievePagSeguroConfiguration()
+    /**
+     * Request a PagSeguro paymentRequest(Checkout, Boleto, Debit, Credit Card)
+     * @param $onlyCode
+     * @return string
+     */
+    private function pagSeguroRequest($onlyCode = false)
     {
-
-        /** Retrieving configurated default charset */
-        PagSeguroConfig::setApplicationCharset(Configuration::get('PAGSEGURO_CHARSET'));
-
-        /** Retrieving configurated default log info */
-        if (Configuration::get('PAGSEGURO_LOG_ACTIVE')) {
-            PagSeguroConfig::activeLog(_PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION'));
+        try {
+            return $this->paymentRequest->register(
+                \PagSeguro\Configuration\Configure::getAccountCredentials(),
+                $onlyCode
+            );
+        } catch (Exception $exception) {
+            echo Tools::jsonEncode(
+                array(
+                    'success' => false,
+                    'payload' => [
+                        'error' => $exception->getMessage()
+                    ]
+                )
+            );
+            exit;
         }
     }
 
-    private function setPagSeguroModuleVersion()
+    /**
+     * Get bank
+     */
+    private function bank()
     {
-        PagSeguroLibrary::setModuleVersion('prestashop-v.' . $this->module->version);
+        return $this->bankList()[$this->bankId()];
     }
 
-    private function setPagSeguroCMSVersion()
+
+    /**
+     * Get bank name
+     */
+    private function bankId()
     {
-        PagSeguroLibrary::setCMSVersion('prestashop-v.' . _PS_VERSION_);
+        return filter_var($_POST['bankid']);
+    }
+    /**
+     * Get bank list
+     *
+     * @return array
+     */
+    private function bankList()
+    {
+        return [
+            1 => 'itau',
+            2 => 'bradesco',
+            3 => 'banrisul',
+            4 => 'bancodobrasil',
+            5 => 'hsbc'
+        ];
+    }
+
+    /**
+     * Set the sender document 
+     */
+    private function setSenderDocument()
+    {
+        if (isset($_POST['document'])) {
+            $this->paymentRequest->setSender()->setDocument()->withArray(
+                $this->formatDocument($_POST['document'])
+            );
+        }
+    }
+    
+    private function setSenderHash()
+    {
+        if (isset($_POST['hash'])) {
+            $this->paymentRequest->setSender()->setHash(htmlentities(filter_var($_POST['hash'])));
+        }
+    }
+
+    /**
+     * Set the holder document 
+     */
+    private function setHolderDocument()
+    {
+        if (isset($_POST['document'])) {
+            $this->paymentRequest->setHolder()->setDocument()->withArray(
+                $this->formatDocument($_POST['document'])
+            );
+        }
+    }
+
+    /**
+     * Remove especial characters and keep only numbers of the $document and
+     * returns it and his type. If it is not a CPF or CNPJ size, 
+     * throws an exception
+     *
+     * @param string $document
+     * @return array
+     * @throws Exception Invalid document
+    */
+    private function formatDocument($document)
+    {
+       $properties = new \PagSeguro\Enum\Properties\Current;
+       $document = $this->keepOnlyNumbers(filter_var($document));
+       switch (strlen($document)) {
+            case 14:
+                return [
+                    $properties::DOCUMENT_VALUE => $document,
+                    $properties::DOCUMENT_TYPE => 'cnpj'
+                ];
+                break;
+            case 11:
+                return [
+                    $properties::DOCUMENT_VALUE => $document,
+                    $properties::DOCUMENT_TYPE => 'cpf'
+                ];
+                break;
+            default:
+                throw new \Exception('Invalid document');
+                break;
+        }
+    }
+    /**
+     * Remove empty spaces and special characters, returning 
+     * only the numbers of the $data
+     *
+     * @param   string $data
+     * @return  string
+    */
+    private function keepOnlyNumbers($data)
+    {
+        return preg_replace('/[^0-9]/', '', $data);
+    }
+
+    /**
+     * Get the phone from the cart address
+     * @return array
+     * @throws Exception
+     */
+    private function getPhone()
+    {
+        $delivery_address = new Address((int) $this->context->cart->id_address_delivery);
+        if (!empty($delivery_address->phone)) {
+            return $this->formatPhone($delivery_address->phone);
+        }
+
+        if (!empty($delivery_address->phone_mobile)) {
+            return $this->formatPhone($delivery_address->phone_mobile);
+        }
+
+        throw new Exception('Sender phone is required');
+    }
+
+    /**
+     * Treats a phone string to be a pagseguro valid number
+     * @param string $phone
+     * @return array
+     */
+    private function formatPhone($phone)            
+    {
+        $phone = preg_replace('/[^a-z_\-0-9]/i', '', $phone);
+        $phone = preg_replace("~[^0-9]~", "", $phone);
+        preg_match('~([0-9]{2})([0-9]{8,9})~', $phone, $phone);
+        return $phone;
     }
 }

@@ -21,7 +21,11 @@
  *  @license   http://www.apache.org/licenses/LICENSE-2.0
  */
 include_once dirname(__FILE__) .'/Helper.php';
-include_once dirname(__FILE__) .'/../../features/PagSeguroLibrary/PagSeguroLibrary.php';
+include_once dirname(__FILE__) . '/../../features/library/vendor/autoload.php';
+
+if (function_exists('__autoload')) {
+    spl_autoload_register('__autoload');
+}
 
 /**
  * Class doSearch
@@ -49,6 +53,19 @@ class doSearch {
      *
      */
     public function __construct() {
+        $this->version = '2.2.0';
+
+        \PagSeguro\Library::initialize();
+        \PagSeguro\Configuration\Configure::setCharset(Configuration::get('PAGSEGURO_CHARSET'));
+        \PagSeguro\Configuration\Configure::setLog(
+            Configuration::get('PAGSEGURO_LOG_ACTIVE'),
+            _PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION')
+        );
+        \PagSeguro\Library::cmsVersion()->setName("'prestashop-v.'")->setRelease(_PS_VERSION_);
+        \PagSeguro\Library::moduleVersion()->setName('prestashop-v.')->setRelease($this->version);
+        \PagSeguro\Configuration\Configure::setAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), Configuration::get('PAGSEGURO_TOKEN'));
+        \PagSeguro\Configuration\Configure::setEnvironment(Configuration::get('PAGSEGURO_ENVIRONMENT'));
+        
         $this->helper = new Helper();
     }
 
@@ -64,11 +81,10 @@ class doSearch {
         
         try {
             $this->getPagSeguroPayments();
-            $paymentPagSeguroList = $this->normalize((array)$this->PagSeguroPaymentList);
+            $paymentPagSeguroList = $this->normalize($this->PagSeguroPaymentList->getTransactions());
             $paymentPrestaShopList = $this->getPrestashopPaymentList();
 
             foreach ($paymentPrestaShopList as $item) {
-                
                 
                 if ($item['environment'] == Configuration::get("PAGSEGURO_ENVIRONMENT")) {
 
@@ -106,18 +122,23 @@ class doSearch {
      */
     private function getPagSeguroPayments($page = null)
     {
-
         if (is_null($page)) {
             $page = 1;
         }
 
-        try {
-            
+        try {       
             if (is_null($this->PagSeguroPaymentList)) {
-                $this->PagSeguroPaymentList = $this->searchByDate($page, 1000, $this->helper->subtractDayFromDate($this->days));
-                
+                $this->PagSeguroPaymentList = $this->searchByDate(
+                    $page,
+                    1000,
+                    $this->helper->subtractDayFromDate($this->days)
+                );
             } else {
-                $PagSeguroPaymentList = $this->searchByDate($page, 1000, $this->helper->subtractDayFromDate($this->days));
+                $PagSeguroPaymentList = $this->searchByDate(
+                    $page,
+                    1000,
+                    $this->helper->subtractDayFromDate($this->days)
+                );
 
                 $this->PagSeguroPaymentList->setDate($PagSeguroPaymentList->getDate());
                 $this->PagSeguroPaymentList->setCurrentPage($PagSeguroPaymentList->getCurrentPage());
@@ -133,7 +154,7 @@ class doSearch {
                     )
                 );
             }
-            
+
             if ($this->PagSeguroPaymentList->getTotalPages() > $page) {
                 $this->getPagSeguroPayments(++$page);
             }
@@ -187,45 +208,44 @@ class doSearch {
      * @param $pages
      * @param $resultsPerPage
      * @param $initialDate
-     * @return PagSeguroTransactionSearchResult
+     * @return \PagSeguro\Parsers\Transaction\Search\Date\Response
      * @throws Exception
      */
     private function searchByDate($pages, $resultsPerPage, $initialDate) {
         try {
-            return PagSeguroTransactionSearchService::searchByDate(
-                $this->helper->getPagSeguroCredentials(),
-                $pages, // initial page
-                $resultsPerPage, // pages per page
-                $initialDate
+            return \PagSeguro\Services\Transactions\Search\Date::search(
+                \PagSeguro\Configuration\Configure::getAccountCredentials(),
+                [
+                    'initial_date' => $initialDate,
+                    'page' => $pages,
+                    'max_per_page' => $resultsPerPage,
+                ]
             );
         } catch (Exception $e) {
             throw $e;
         }
     }
     
-    /****
-    *
-    * checks if the PAGSEGURO_ID is the same and returns the related transactions
-    * @param PagSeguroTransactionSearchResult $transactions
-    */
+    /**
+     * checks if the PAGSEGURO_ID is the same and returns the related transactions
+     * @param array \PagSeguro\Parsers\Transaction\Search\Date\Transaction $transactions
+     */
     private function normalize(array $transactions) {
-
         if (!$transactions) {
             return false;
         }
-        
+
         $normalizedList = array();
         $defaultRefPrefix = Configuration::get('PAGSEGURO_ID');
 
-        foreach (current($transactions) as $summary) {
-            $reference = $summary->getReference();
-            $refPrefix = $this->helper->getRefPrefix($reference);
-            $refSuffix = (int)$this->helper->getRefSuffix($reference);
+        foreach ($transactions as $summary) {
+            $refPrefix = $this->helper->getRefPrefix($summary->getReference());
+            $refSuffix = (int)$this->helper->getRefSuffix($summary->getReference());
 
             if ($refPrefix == $defaultRefPrefix) {
-                $normalizedList[$refSuffix]['reference'] = $reference;
+                $normalizedList[$refSuffix]['reference'] = $summary->getReference();
                 $normalizedList[$refSuffix]['code']      = $summary->getCode();
-                $normalizedList[$refSuffix]['status']    = $summary->getStatus()->getValue();
+                $normalizedList[$refSuffix]['status']    = $summary->getStatus();
             }
         }
         return $normalizedList;

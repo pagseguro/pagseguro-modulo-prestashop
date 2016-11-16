@@ -22,17 +22,28 @@
  */
 
 include_once dirname(__FILE__) .'/../../../../config/config.inc.php';
-include_once dirname(__FILE__) .'/../../features/PagSeguroLibrary/PagSeguroLibrary.php';
 include_once dirname(__FILE__) .'/../../features/validation/pagsegurovalidateorderprestashop.php';
-include_once dirname(__FILE__) .'/../../features/PagSeguroLibrary/domain/PagSeguroTransactionSearchResult.class.php';
-include_once dirname(__FILE__) .'/../../features/PagSeguroLibrary/domain/PagSeguroTransactionStatus.class.php';
+include_once dirname(__FILE__) . '/../../features/library/vendor/autoload.php';
 
-class PagSeguroOrderConciliation {
+if (function_exists('__autoload')) {
+    spl_autoload_register('__autoload');
+}
 
-    private $pagSeguroCredentials;
-    private $logActive;
-
+class PagSeguroOrderConciliation 
+{
     public function __construct() {
+        $this->version = '2.2.0';
+
+        \PagSeguro\Library::initialize();
+        \PagSeguro\Configuration\Configure::setCharset(Configuration::get('PAGSEGURO_CHARSET'));
+        \PagSeguro\Library::cmsVersion()->setName("'prestashop-v.'")->setRelease(_PS_VERSION_);
+        \PagSeguro\Library::moduleVersion()->setName('prestashop-v.')->setRelease($this->version);
+        
+        if (!empty(Configuration::get('PAGSEGURO_EMAIL') && !empty(Configuration::get('PAGSEGURO_TOKEN')))) {
+            \PagSeguro\Configuration\Configure::setAccountCredentials(Configuration::get('PAGSEGURO_EMAIL'), Configuration::get('PAGSEGURO_TOKEN'));
+            \PagSeguro\Configuration\Configure::setEnvironment(Configuration::get('PAGSEGURO_ENVIRONMENT'));
+        }
+
         $this->activeLog();
     }
 
@@ -58,11 +69,9 @@ class PagSeguroOrderConciliation {
                 $updated = false;
                 break;
             }
-
         }
 
         $this->printJson(  $updated ?  Array('success' => true) : Array('error' => true) );
-
     }
 
     public function printConciliationJsonData($searchDays) {
@@ -214,9 +223,7 @@ class PagSeguroOrderConciliation {
         date_default_timezone_set($defaultTimeZone);
 
         try {
-
             $transactionList = Array();
-
             $firstSearch = $this->createPagSeguroTransactionSearch(1, $initialDate, $finalDate);
             $totalPages  = (int)$firstSearch->getTotalPages();
             $this->pushTransactionSummary($transactionList, $firstSearch);
@@ -241,16 +248,18 @@ class PagSeguroOrderConciliation {
 
 
     private function createPagSeguroCredentials() {
-
-        if (!$this->pagSeguroCredentials) {
-            $email = Configuration::get('PAGSEGURO_EMAIL');
-            $token = Configuration::get('PAGSEGURO_TOKEN');
-            if (!empty($email) && !empty($token)) {
-                $this->pagSeguroCredentials = new PagSeguroAccountCredentials($email, $token);
-            }
+        if (empty(Configuration::get('PAGSEGURO_EMAIL'))
+            || empty(Configuration::get('PAGSEGURO_TOKEN'))) {
+            array_push($this->messages, "PagSeguro credentials not set.");
+            return false;
         }
 
-        return $this->pagSeguroCredentials;
+        \PagSeguro\Configuration\Configure::setAccountCredentials(
+            Configuration::get('PAGSEGURO_EMAIL'),
+            Configuration::get('PAGSEGURO_TOKEN')
+        );
+
+        return true;
     }
 
     /****
@@ -276,7 +285,7 @@ class PagSeguroOrderConciliation {
             if ($refPrefix == $defaultRefPrefix) {
                 $normalizedList[$refSuffix]['reference'] = $reference;
                 $normalizedList[$refSuffix]['code']      = $transactionSummary->getCode();
-                $normalizedList[$refSuffix]['status']    = $transactionSummary->getStatus()->getValue();
+                $normalizedList[$refSuffix]['status']    = $transactionSummary->getStatus();
             }
 
         }
@@ -293,16 +302,18 @@ class PagSeguroOrderConciliation {
     }
 
     private function createPagSeguroTransactionSearch($pageNum, $initialDate, $finalDate) {
-        return PagSeguroTransactionSearchService::searchByDate(
-            $this->pagSeguroCredentials,
-            $pageNum, // initial page
-            1000, // pages per page
-            $initialDate,
-            $finalDate
+        return \PagSeguro\Services\Transactions\Search\Date::search(
+            \PagSeguro\Configuration\Configure::getAccountCredentials(),
+            [
+                'initial_date' => $initialDate,
+                'final_date' => $finalDate,
+                'page' => $pageNum,
+                'max_per_page' => 1000
+            ]
         );
     }
 
-    private function pushTransactionSummary(Array &$transactionList, PagSeguroTransactionSearchResult $search) {
+    private function pushTransactionSummary(Array &$transactionList, \PagSeguro\Parsers\Transaction\Search\Date\Response $search) {
         $transactions = $search->getTransactions();
         foreach ($transactions as $transaction) {
             array_push($transactionList, $transaction);
@@ -328,17 +339,19 @@ class PagSeguroOrderConciliation {
         echo Tools::jsonEncode($data);
     }
 
-    private function activeLog() {
+    private function activeLog() 
+    {
         if (Configuration::get('PAGSEGURO_LOG_ACTIVE')) {
-            PagSeguroConfig::setApplicationCharset(Configuration::get('PAGSEGURO_CHARSET'));
-            PagSeguroConfig::activeLog(_PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION'));
-            $this->logActive = true;
+            \PagSeguro\Configuration\Configure::setLog(
+                Configuration::get('PAGSEGURO_LOG_ACTIVE'),
+                _PS_ROOT_DIR_ . Configuration::get('PAGSEGURO_LOG_FILELOCATION')
+            );
         }
     }
 
     private function logInfo($logMessage) {
-        if ($this->logActive) {
-            LogPagSeguro::info($logMessage);
+        if (\PagSeguro\Configuration\Configure::getLog()->getActive()) {
+            \PagSeguro\Resources\Log\Logger::info($logMessage);
         }
     }
 

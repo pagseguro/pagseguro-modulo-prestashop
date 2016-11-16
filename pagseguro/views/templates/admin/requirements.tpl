@@ -26,9 +26,9 @@
 
 <h2 class="title" title="Requisitos">Requisitos</h2>
 <ul class="pagseguro-list">
-    {foreach from=$requirements item=requirement}
-    	
-   		<li {if !$requirement[0]} class="pagseguro-list-item-error" {/if} >{$requirement[1]|escape:'htmlall':'UTF-8'}</li>
+    {*{foreach from=$requirements item=requirement}*}
+    	{**}
+   		{*<li {if !$requirement[0]} class="pagseguro-list-item-error" {/if} >{$requirement[1]|escape:'htmlall':'UTF-8'}</li>*}
 
-    {/foreach}
+    {*{/foreach}*}
 </ul>
