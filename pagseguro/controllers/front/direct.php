@@ -31,11 +31,13 @@ class PagSeguroDirectModuleFrontController extends ModuleFrontController
             $this->context->smarty->assign('width_center_column', '100%');
         }
 
-        if ($environment == 'sandbox') {
+
+        if ($environment != 'sandbox') {
             $this->context->smarty->assign('pagseguro_direct_js', 'https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js');
         } else {
             $this->context->smarty->assign('pagseguro_direct_js', 'https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js');
         }
+
 
         $session = \PagSeguro\Services\Session::create(
             \PagSeguro\Configuration\Configure::getAccountCredentials()
