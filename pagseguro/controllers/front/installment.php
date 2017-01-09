@@ -12,7 +12,9 @@ class PagSeguroInstallmentModuleFrontController extends ModuleFrontController
     public function init()
     {
         try {
+
             $this->setOptions(filter_var($_POST['amount']), filter_var($_POST['brand']));
+
 
             $installments = \PagSeguro\Services\Installment::create(
                 \PagSeguro\Configuration\Configure::getAccountCredentials(),
