@@ -32,6 +32,9 @@
                 </label>
             </div>
         </div><!-- /.form-group -->
+        <div align="right">
+            Esta compra está sendo feita no Brasil <img src="{$modules_dir}/pagseguro/flag-origin-country.png">
+        </div>
         <button class="btn-pagseguro --align-right" id="payment-debit">Concluir</button>
     </form>
 </div><!-- /.item-tab#debit-online -->
