@@ -24,7 +24,7 @@ class PagSeguroDirectModuleFrontController extends ModuleFrontController
         $this->context->smarty->clearAssign('display_column_left');
         $this->context->smarty->assign('hide_left_column', 1);
         $this->context->smarty->assign('display_column_left', 0);
-        $this->context->smarty->assign('environment', $environment);
+        $this->context->smarty->assign('environment', $environment->getEnvironment());
 
         if (version_compare(_PS_VERSION_, '1.5.0.1', '>=')) {
             $this->context->smarty->clearAssign('width_center_column');
@@ -32,7 +32,8 @@ class PagSeguroDirectModuleFrontController extends ModuleFrontController
         }
 
 
-        if ($environment != 'sandbox') {
+
+        if ($environment->getEnvironment() != 'sandbox') {
             $this->context->smarty->assign('pagseguro_direct_js', 'https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js');
         } else {
             $this->context->smarty->assign('pagseguro_direct_js', 'https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js');
