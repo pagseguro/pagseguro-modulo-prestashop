@@ -140,7 +140,8 @@
             if (val === true) {
                 var $el = $el.val();
             }
-            return $el.replace(/[/ -. ]+/g, '').trim();
+            $el = $el.replace('/[/ -. ]+/g', '').trim();
+            return $el.replace(" ","");
         } catch(e) {
             console.info('Ops, algo deu errado! Recarregue a página');
         };
