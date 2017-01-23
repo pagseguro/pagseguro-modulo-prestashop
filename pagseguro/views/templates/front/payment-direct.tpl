@@ -140,12 +140,12 @@
             if (val === true) {
                 var $el = $el.val();
             }
-            return $el.replace(/[/ -. ]+/g, '').trim();
+            $el = $el.replace(/[^0-9]+/g, '').trim();
+            return $el;
         } catch(e) {
             console.info('Ops, algo deu errado! Recarregue a página');
         };
     };
-
 
     //Event buttons methods buy types
     $('#payment-boleto').on('click', function(e){
