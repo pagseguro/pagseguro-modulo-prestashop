@@ -3,9 +3,9 @@
     <environment>production</environment><!-- sandbox or production -->
     <credentials>
         <account>
-            <email>your_pagseguro_email</email>
+            <email>victor.freitas@s2it.com.br</email>
             <production>
-                <token>your_production_token</token>
+                <token>6329BFB289E34F8180F830B6092897D0</token>
             </production>
             <sandbox>
                 <token>your_sandbox_token</token>
