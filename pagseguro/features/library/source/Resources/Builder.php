@@ -58,18 +58,32 @@ class Builder
     }
 
     /**
+     * @return string
+     */
+    protected static function getResourcesFile()
+    {
+        $resources = __DIR__ . '/../Configuration/Properties/Resources.xml';
+
+        if (defined('PS_RESOURCES')) {
+            $resources = PS_RESOURCES;
+        }
+
+        return $resources;
+    }
+
+    /**
      * @param $resource
      * @param null $protocol
      * @return string
      */
     protected static function getUrl($resource, $protocol = null)
     {
-        $xml = simplexml_load_file(RESOURCES);
+        $xml = simplexml_load_file(self::getResourcesFile());
+
         if (is_null($protocol)) {
             $protocol = $xml->path->protocol;
         }
         $environment = Configure::getEnvironment()->getEnvironment();
-
         return sprintf(
             "%s://%s",
             $protocol,
@@ -105,7 +119,7 @@ class Builder
      */
     protected static function getService($url, $service, $http)
     {
-        $xml = simplexml_load_file(RESOURCES);
+        $xml = simplexml_load_file(self::getResourcesFile());
 
         return sprintf(
             "%s/%s",
