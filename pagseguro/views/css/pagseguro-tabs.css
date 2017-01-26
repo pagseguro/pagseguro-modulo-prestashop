@@ -102,13 +102,13 @@ div.selector{
     }
 
     /* init item active */
-    .tabs-pagseguro > .items  > .item.--active > .action {
+    .tabs-pagseguro > .items  > .item.active > .action {
         color: #FFF;
         background-color: #4F7743;
     }
 
 
-    .tabs-pagseguro > .items  > .item.--active > .action::after {
+    .tabs-pagseguro > .items  > .item.active > .action::after {
         bottom: -15px; /* subtract the height unit this element */
         opacity: 1;
         border-top-color: #4F7743;
@@ -202,8 +202,8 @@ div.selector{
         width: 100%;
     }
 
-    .tabs-wrap > .item-tab.--current {
-        display: block;
+    .tabs-wrap > .item-tab.current {
+        display: block !important;
     }
 
 /* btn-pagseguro */

@@ -1,4 +1,4 @@
-<div class="item-tab --current" id="credit-card" role="tabpanel">
+<div class="item-tab current" id="credit-card" role="tabpanel">
     <h3 class="title-tab">Cartão de Crédito</h3>
     <form class="form-horizontal clearfix" name="form-credit">
         <div class="form-group">
