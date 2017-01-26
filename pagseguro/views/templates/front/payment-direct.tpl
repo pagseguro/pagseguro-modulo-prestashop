@@ -66,6 +66,7 @@
 </div>
 
 <script charset="utf8" src="{$modules_dir}pagseguro/views/js/jquery.mask.min.js"></script>
+<script charset="utf8" src="{$modules_dir}pagseguro/views/js/vanilla-masker.min.js"></script>
 <script charset="utf8" src="{$pagseguro_direct_js}"></script>
 <script type="text/javascript" charset="utf8">
 ;(function(win, doc, $, undefined) {
@@ -99,20 +100,20 @@
     }());
 
     ;(function masksInputs() {
-        $('.cpf-mask').mask('000.000.000-00');
-        $('.cnpj-mask').mask('00.000.000/0000-00');
-        $('.credit-card-mask').mask('0000 0000 0000 0000');
-        $('.code-card-mask').mask('000');
-        $('.date-mask').mask('00/00/0000', { placeholder: "__/__/____" });
+        VMasker(document.querySelector('.credit-card-mask')).maskPattern('9999 9999 9999 9999');
+        VMasker(document.querySelector('.code-card-mask')).maskPattern('999');  
+        VMasker(document.querySelector('.date-mask')).maskPattern('99/99/9999');
+
         $('.cpf-cnpj-mask').on('keyup', function() {
             try {
-                $(this).unmask();
+                VMasker($(this)).unMask();
             } catch(e) {
                 console.info('Ops, algo deu errado!');
             };
             var isLength = $(this).val().length;
+            console.log($(this).val().length);
             //9 is number optional, is fake the transtion two types mask
-            isLength <= 11 ? $(this).mask('000.000.000-009') : $(this).mask('00.000.000/0000-00');
+            isLength <= 11 ? VMasker($(this)).maskPattern('999.999.999-999') : VMasker($(this)).maskPattern('99.999.999/9999-99');
         });
     }());
 
@@ -121,14 +122,14 @@
         $action.on('click', function(e){
             e.preventDefault();
             var $itemtTab = $(this).parent('.item');
-            var isActive = $itemtTab.hasClass('--active');
+            var isActive = $itemtTab.hasClass('active');
             if(!isActive) {
                 var $newTabId = $($(this).attr('href'));
-                $('#tabs-payment .item.--active').removeClass('--active'); //remove class the old tab selected
-                $('.item-tab.--current').removeClass('--current');
+                $('#tabs-payment .item.active').removeClass('active'); //remove class the old tab selected
+                $('.item-tab.current').removeClass('current');
                 //add new tab selected
-                $itemtTab.addClass('--active');
-                $newTabId.addClass('--current');
+                $itemtTab.addClass('active');
+                $newTabId.addClass('current');
             } else {
                 return false;
             }
