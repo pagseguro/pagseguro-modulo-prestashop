@@ -111,7 +111,6 @@
                 console.info('Ops, algo deu errado!');
             };
             var isLength = $(this).val().length;
-            console.log($(this).val().length);
             //9 is number optional, is fake the transtion two types mask
             isLength <= 11 ? VMasker($(this)).maskPattern('999.999.999-999') : VMasker($(this)).maskPattern('99.999.999/9999-99');
         });
