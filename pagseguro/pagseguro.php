@@ -24,6 +24,8 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
+use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
+
 require_once dirname(__FILE__).'/Loader.php';
 
 if (!defined('_PS_VERSION_'))
@@ -36,7 +38,7 @@ if (function_exists('__autoload')) {
 class PagSeguro extends PaymentModule {
 
     /**
-     * @var PagSeguroPS15|PagSeguroPS1501ToPS1503|PagSeguroPS16|PagSeguroPS1601
+     * @var PagSeguroPS15|PagSeguroPS1501ToPS1503|PagSeguroPS16|PagSeguroPS1601|PagSeguroPS17
      */
     private $modulo;
     /**
@@ -168,6 +170,13 @@ class PagSeguro extends PaymentModule {
         ) {
             return false;
         }
+
+        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+            if (!$this->registerHook('paymentOptions')) {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -268,7 +277,24 @@ class PagSeguro extends PaymentModule {
 
         $this->addToView('version', $bootstrap);
 
-        return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/hook/payment.tpl');
+        return $this->context->smarty->fetch('module:pagseguro/views/templates/hook/payment.tpl');
+        //return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/hook/payment.tpl');
+    }
+
+    public function hookPaymentOptions($params) {
+
+        if (!$this->active) {
+            return;
+        }
+
+        if (!$this->checkCurrency($params['cart'])) {
+            return;
+        }
+
+        // apenas checkout padrão PagSeguro
+        return [
+            $this->getExternalPaymentOption()
+        ];
     }
 
     /**
@@ -277,7 +303,8 @@ class PagSeguro extends PaymentModule {
      */
     public function hookPaymentReturn($params) {
         $this->modulo->returnPaymentConfiguration($params);
-        return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/hook/payment_return.tpl');
+        return $this->context->smarty->fetch('module:pagseguro/views/templates/hook/payment_return.tpl');
+        //return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/hook/payment_return.tpl');
     }
 
     public function hookHeader($params)
@@ -287,6 +314,20 @@ class PagSeguro extends PaymentModule {
             $this->context->controller->addJS("https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js");
             $this->context->controller->addJS("https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/1.4.1/jquery-migrate.min.js");
         }
+    }
+
+    /**
+     * Prestashop 1.7 external payment option
+     * 
+     * @return PaymentOption
+     */
+    public function getExternalPaymentOption() {
+        $externalOption = new PaymentOption();
+        $externalOption->setCallToActionText($this->l('Pague com PagSeguro'))
+           ->setAction($this->context->link->getModuleLink($this->name, 'validation', array(), true))
+           ->setAdditionalInformation($this->context->smarty->fetch('module:pspagseguro/views/templates/front/payment_infos.tpl'))
+           ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/logo.png'));
+        return $externalOption;
     }
 
     /**
