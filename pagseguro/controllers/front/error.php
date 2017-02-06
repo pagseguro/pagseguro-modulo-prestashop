@@ -40,13 +40,15 @@ class PagSeguroErrorModuleFrontController extends ModuleFrontController
 
         $this->context = Context::getContext();
         $this->context->smarty->assign('version', $this->_whichVersion());
-        
+
         $this->setTemplate('error.tpl');
     }
 
     private function _whichVersion()
     {
-    	if(version_compare(_PS_VERSION_, '1.6.0.1', ">=")){
+    	if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+            $version = '7';
+        } else if (version_compare(_PS_VERSION_, '1.6.0.1', ">=") && version_compare(_PS_VERSION_, '1.7.0.0', "<")) {
     		$version = '6';
     	} else if(version_compare(_PS_VERSION_, '1.5.0.1', "<")){
     		$version = '4';

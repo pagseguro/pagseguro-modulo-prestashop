@@ -94,18 +94,18 @@ class PagSeguro extends PaymentModule {
         $this->setContext();
         $this->modulo = PagSeguroFactoryInstallModule::createModule(_PS_VERSION_);
     }
-    
+
     public function getEnvironment()
     {
         \PagSeguro\Configuration\Configure::setEnvironment($this->getPrestaShopEnvironment());
         return \PagSeguro\Configuration\Configure::getEnvironment();
     }
-    
+
     public function getPagSeguroCredentials()
     {
         return \PagSeguro\Configuration\Configure::getAccountCredentials();
     }
-    
+
     /**
      * @return bool
      */
@@ -316,9 +316,22 @@ class PagSeguro extends PaymentModule {
         }
     }
 
+    public function checkCurrency($cart) {
+        $currency_order = new Currency($cart->id_currency);
+        $currencies_module = $this->getCurrency($cart->id_currency);
+        if (is_array($currencies_module)) {
+            foreach ($currencies_module as $currency_module) {
+                if ($currency_order->id == $currency_module['id_currency']) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * Prestashop 1.7 external payment option
-     * 
+     *
      * @return PaymentOption
      */
     public function getExternalPaymentOption() {
@@ -768,7 +781,8 @@ class PagSeguro extends PaymentModule {
 
         $this->addToView('pages', $pages);
 
-        return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', 'views/templates/admin/main.tpl');
+        return $this->context->smarty->fetch('module:pagseguro/views/templates/admin/main.tpl');
+        //return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', 'views/templates/admin/main.tpl');
     }
 
     /**
@@ -813,7 +827,8 @@ class PagSeguro extends PaymentModule {
         $this->addToView('discountBalance', Configuration::get('PAGSEGURO_DISCOUNT_BALANCE'));
         $this->addToView('discountBalanceValue', Configuration::get('PAGSEGURO_DISCOUNT_BALANCE_VL'));
 
-        return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/settings.tpl');
+        return $this->context->smarty->fetch('module:pagseguro/views/templates/admin/settings.tpl');
+        //return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/settings.tpl');
     }
 
     /**
@@ -828,7 +843,8 @@ class PagSeguro extends PaymentModule {
             $this->addToView('conciliationSearchValues', array_values($conciliationSearch));
         }
 
-        return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/conciliation.tpl');
+        return $this->context->smarty->fetch('module:pagseguro/views/templates/admin/conciliation.tpl');
+        //return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/conciliation.tpl');
     }
 
     /**
@@ -850,7 +866,8 @@ class PagSeguro extends PaymentModule {
             }
         }
 
-        return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/abandoned.tpl');
+        return $this->context->smarty->fetch('module:pagseguro/views/templates/admin/abandoned.tpl');
+        //return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/abandoned.tpl');
     }
 
     /**
@@ -865,7 +882,8 @@ class PagSeguro extends PaymentModule {
             $this->addToView('searchValues', array_values($search));
         }
 
-        return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/refund.tpl');
+        return $this->context->smarty->fetch('module:pagseguro/views/templates/admin/refund.tpl');
+        //return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/refund.tpl');
     }
 
     /**
@@ -880,7 +898,8 @@ class PagSeguro extends PaymentModule {
             $this->addToView('searchValues', array_values($search));
         }
 
-        return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/cancel.tpl');
+        return $this->context->smarty->fetch('module:pagseguro/views/templates/admin/cancel.tpl');
+        //return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/cancel.tpl');
     }
 
     /**
@@ -926,7 +945,8 @@ class PagSeguro extends PaymentModule {
 
 //        $this->addToView('requirements', $requirements);
 
-        return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/requirements.tpl');
+        return $this->context->smarty->fetch('module:pagseguro/views/templates/admin/requirements.tpl');
+        //return $this->display(__PS_BASE_URI__ . 'modules/pagseguro', '/views/templates/admin/requirements.tpl');
     }
 
     /**
