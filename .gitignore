@@ -104,6 +104,7 @@ publish
 
 # Others
 *~
+.phpintel
 [Bb]in
 [Oo]bj
 sql
