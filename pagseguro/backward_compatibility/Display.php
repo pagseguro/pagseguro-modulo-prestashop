@@ -30,7 +30,7 @@
 class BWDisplay extends FrontController
 {
     // Assign template, on 1.4 create it else assign for 1.5
-    public function setTemplate($template)
+    public function setTemplate($template, $params = array(), $locale = null)
     {
         if (_PS_VERSION_ >= '1.5') {
             parent::setTemplate($template);
@@ -38,12 +38,12 @@ class BWDisplay extends FrontController
             $this->template = $template;
         }
     }
-    
+
     // Overload displayContent for 1.4
     public function displayContent()
     {
         parent::displayContent();
-        
+
         echo Context::getContext()->smarty->fetch($this->template);
     }
 }
