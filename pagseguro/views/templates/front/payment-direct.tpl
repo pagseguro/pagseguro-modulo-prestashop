@@ -101,7 +101,7 @@
 
     ;(function masksInputs() {
         VMasker(document.querySelector('.credit-card-mask')).maskPattern('9999 9999 9999 9999');
-        VMasker(document.querySelector('.code-card-mask')).maskPattern('999');  
+        VMasker(document.querySelector('.code-card-mask')).maskPattern('9999');  
         VMasker(document.querySelector('.date-mask')).maskPattern('99/99/9999');
 
         $('.cpf-cnpj-mask').on('keyup', function() {
