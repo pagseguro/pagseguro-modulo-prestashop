@@ -5,6 +5,7 @@
             <label class="col-xs-12 col-sm-2 control-label" for="card_cod">CPF/CNPJ</label>
             <div class="col-xs-12 col-sm-10">
                 <input class="form-control cpf-cnpj-mask" id="document-boleto" name="document" type="text">
+                <span class="display-none help-block document-boleto-error-message">Insira um CPF ou CNPJ válido</span>
             </div>
         </div>
         <div align="right">
