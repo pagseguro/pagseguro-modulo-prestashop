@@ -38,4 +38,9 @@ class PagSeguroNotificationModuleFrontController extends ModuleFrontController
         $pagNotification = new PagSeguroNotificationOrderPrestashop();
         $pagNotification->postProcess($_POST);
     }
+
+    public function display()
+    {
+        return 'OK';
+    }
 }

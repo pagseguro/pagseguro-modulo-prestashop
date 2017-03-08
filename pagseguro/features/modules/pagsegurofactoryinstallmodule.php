@@ -29,6 +29,7 @@ include_once dirname(__FILE__) . '/pagseguroPS15.php';
 include_once dirname(__FILE__) . '/pagseguroPS16.php';
 include_once dirname(__FILE__) . '/pagseguroPS1601.php';
 include_once dirname(__FILE__) . '/pagseguroPS1501toPS1503.php';
+include_once dirname(__FILE__) . '/pagseguroPS17.php';
 
 class PagSeguroFactoryInstallModule
 {
@@ -47,6 +48,8 @@ class PagSeguroFactoryInstallModule
                 return new PagSeguroPS1601();
             case version_compare($version, '1.6.0.2', '>='):
                 return new PagSeguroPS16();
+            case version_compare($version, '1.7.0.0', '>='):
+                return new PagSeguroPS17();
         }
     }
 }
