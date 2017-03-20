@@ -5,10 +5,12 @@
             <label class="col-xs-12 col-sm-2 control-label" for="card_cod">CPF/CNPJ</label>
             <div class="col-xs-12 col-sm-10">
                 <input class="form-control cpf-cnpj-mask" id="document-debit" name="document" type="text">
+                <span class="display-none help-block document-debit-error-message">Insira um CPF ou CNPJ válido</span>
             </div>
         </div><!-- /.form-group -->
         <div class="form-group">
             <label class="col-xs-12 col-sm-6 control-label">Escolha seu banco abaixo onde deverá fazer o pagamento online.</label>
+            <span class="display-none help-block bankList-error-message">Escolha um banco</span>
             <div id="bankList" class="col-xs-12 col-sm-5 col-sm-offset-1">
                 <label class="radio">
                     <input type="radio" name="bank" id="optionsRadios1" value="1">
