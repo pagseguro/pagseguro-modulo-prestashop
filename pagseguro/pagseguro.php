@@ -144,7 +144,6 @@ class PagSeguro extends PaymentModule {
             return false;
         }
         if (!parent::install() or
-            ! $this->registerHook('payment') or
             ! $this->registerHook('paymentReturn') or
             ! $this->registerHook('header') or
             ! Configuration::updateValue('PAGSEGURO_EMAIL', '') or
@@ -172,7 +171,11 @@ class PagSeguro extends PaymentModule {
         }
 
         if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
-            if (!$this->registerHook('paymentOptions')) {
+            if (!$this->unregisterHook('payment') or !$this->registerHook('paymentOptions')) {
+                return false;
+            }
+        } else {
+            if (!$this->registerHook('payment')) {
                 return false;
             }
         }
@@ -336,7 +339,7 @@ class PagSeguro extends PaymentModule {
         $externalOption = new PaymentOption();
         $externalOption->setCallToActionText($this->l('Pague com PagSeguro'))
            ->setAction($this->context->link->getModuleLink($this->name, 'validation', array(), true))
-           ->setAdditionalInformation($this->context->smarty->fetch('module:pspagseguro/views/templates/front/payment_infos.tpl'))
+           ->setAdditionalInformation($this->context->smarty->fetch('module:pagseguro/views/templates/front/payment_infos.tpl'))
            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/logo.png'));
         return $externalOption;
     }
@@ -1350,7 +1353,9 @@ class PagSeguro extends PaymentModule {
      * @return string
      */
     private function _whichVersion() {
-        if (version_compare(_PS_VERSION_, '1.6.0.1', ">=")) {
+        if (version_compare(_PS_VERSION_, '1.7.0.0', ">=")) {
+            $version = '7';
+        } else if (version_compare(_PS_VERSION_, '1.6.0.1', ">=") && version_compare(_PS_VERSION_, '1.7.0.0', "<")) {
             $version = '6';
         } else if (version_compare(_PS_VERSION_, '1.5.0.1', "<")) {
             $version = '4';
