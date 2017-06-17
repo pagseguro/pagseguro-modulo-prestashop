@@ -55,10 +55,18 @@ class Library
     final public static function initialize()
     {
         //Basic configuration
-        define('PS_BASEPATH', __DIR__);
-        define('PS_CONFIG_PATH', PS_BASEPATH. "/Configuration/");
-        define('PS_CONFIG', PS_CONFIG_PATH."Properties/Conf.xml");
-        define('PS_RESOURCES', PS_CONFIG_PATH."Properties/Resources.xml");
+        if (!defined('PS_BASEPATH')) {
+            define('PS_BASEPATH', __DIR__);
+        }
+        if (!defined('PS_CONFIG_PATH')) {
+            define('PS_CONFIG_PATH', PS_BASEPATH. "/Configuration/");            
+        }
+        if (!defined('PS_CONFIG')) {
+            define('PS_CONFIG', PS_CONFIG_PATH."Properties/Conf.xml");
+        }        
+        if (!defined('PS_RESOURCES')) {
+            define('PS_RESOURCES', PS_CONFIG_PATH."Properties/Resources.xml");
+        }        
         //Validates for cUrl and SimpleXml.
         self::validate();
         //Garbage Collection
