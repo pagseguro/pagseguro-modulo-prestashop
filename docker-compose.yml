@@ -3,6 +3,9 @@
 # 
 # Altere como quiser
 # 
+# Após docker-compose up -d e PS ser instalado copie a pasta /pagseguro para a pasta /www/modules
+# e instale o módulo
+# 
 # @Author Glauber Portella <glauberportella@gmail.com>
 # 
 version: '3'

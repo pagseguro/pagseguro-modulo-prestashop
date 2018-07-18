@@ -33,6 +33,8 @@ class PagSeguroValidationModuleFrontController extends ModuleFrontController {
     private $checkout;
 
     public function __construct() {
+        parent::__construct();
+
         $this->pagSeguro = new PagSeguro();
         $this->checkout = Configuration::get('PAGSEGURO_CHECKOUT');
         $this->context = Context::getContext();

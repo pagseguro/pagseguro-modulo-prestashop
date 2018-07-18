@@ -129,24 +129,46 @@ class PagSeguro extends PaymentModule {
         }
 
         if (!$this->validatePagSeguroId()) {
+            $this->_errors[] = 'Erro ao validar PagSeguro ID.';
             return false;
         }
         if (!$this->validateOrderMessage()) {
+            $this->_errors[] = 'Erro ao validar Mensagem de Pedido.';
             return false;
         }
         if (!$this->generatePagSeguroOrderStatus()) {
+            $this->_errors[] = 'Erro ao gerar Status de Pedidos PagSeguro.';
             return false;
         }
         if (!$this->createTables()) {
+            $this->_errors[] = 'Erro ao criar tabelas de suporte para o módulo.';
             return false;
         }
         if (!$this->modulo->installConfiguration()) {
+            $this->_errors[] = 'Erro ao instalar configurações PagSeguro.';
             return false;
         }
+
         if (!parent::install() or
-            ! $this->registerHook('paymentReturn') or
-            ! $this->registerHook('header') or
-            ! Configuration::updateValue('PAGSEGURO_EMAIL', '') or
+            !$this->registerHook('paymentReturn') or
+            !$this->registerHook('header')) {
+            $this->_errors[] = 'Erro ao instalar e registrar hooks (header e paymentReturn).';
+            return false;
+        }
+
+        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+            if (!$this->registerHook('paymentOptions')) {
+                $this->_errors[] = 'Erro ao registrar hook (paymentOptions).';
+                return false;
+            }
+        } else {
+            if (!$this->registerHook('payment')) {
+                $this->_errors[] = 'Erro ao registrar hook (payment).';
+                return false;
+            }
+        }
+
+        if (! Configuration::updateValue('PAGSEGURO_EMAIL', '') or
             ! Configuration::updateValue('PAGSEGURO_TOKEN', '') or
             ! Configuration::updateValue('PAGSEGURO_ENVIRONMENT', '') or
             ! Configuration::updateValue('PAGSEGURO_URL_REDIRECT', '') or
@@ -167,17 +189,8 @@ class PagSeguro extends PaymentModule {
             ! Configuration::updateValue('PAGSEGURO_DISCOUNT_BALANCE', false) or
             ! Configuration::updateValue('PAGSEGURO_DISCOUNT_BALANCE_VL', "00.00")
         ) {
+            $this->_errors[] = 'Erro ao iniciar as configurações padrões do módulo.';
             return false;
-        }
-
-        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
-            if (!$this->unregisterHook('payment') or !$this->registerHook('paymentOptions')) {
-                return false;
-            }
-        } else {
-            if (!$this->registerHook('payment')) {
-                return false;
-            }
         }
 
         return true;
