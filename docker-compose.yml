@@ -1,0 +1,50 @@
+#
+# Docker compose para instalar uma versão do Prestashop para teste do módulo
+# 
+# Altere como quiser
+# 
+# @Author Glauber Portella <glauberportella@gmail.com>
+# 
+version: '3'
+
+services:
+  db:
+    image: mysql:5.7
+    volumes:
+      - ./.data/db:/var/lib/mysql
+    ports:
+      - 3366:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 1q2w3e4r
+      MYSQL_DATABASE: prestashop
+      MYSQL_USER: prestashop
+      MYSQL_PASSWORD: 1q2w3e4r
+
+
+  ps:
+    build: ./docker/prestashop-1.7
+    depends_on:
+      - db
+    ports:
+      - "80:80"
+    volumes:
+      - ./www:/var/www/html
+    environment:
+      XDEBUG_CONFIG: remote_host=10.0.75.1 #docker network ip, troque para seu IP da rede docker.
+      # Especifico para PHPStorm
+      PHP_IDE_CONFIG: "serverName=pagseguro-prestashop" #phpstorm variavel de ambiente com o nome do server configurado no PHPStorm.
+      DB_SERVER: db
+      DB_USER: prestashop
+      DB_PASSWD: 1q2w3e4r
+      DB_NAME: prestashop
+      DB_PREFIX: ps_
+      PS_DEV_MODE: 1
+      PS_LANGUAGE: pt
+      PS_COUNTRY: br
+      ADMIN_MAIL: admin@prestashop.com
+      ADMIN_PASSWD: 1q2w3e4r
+      #PS_HANDLE_DYNAMIC_DOMAIN: 0
+      PS_INSTALL_AUTO: 1
+      PS_DOMAIN: localhost
+      PS_FOLDER_ADMIN: admin123
+      PS_FOLDER_INSTALL: installedOK
