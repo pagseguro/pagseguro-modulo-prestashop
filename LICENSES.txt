@@ -1,3 +1,0 @@
-Este módulo inclui software desenvolvido por PagSeguro Internet LTDA (http://www.pagseguro.com.br), licenciado sobre os termos da Apache Software License 2.0.
-Este módulo inclui software desenvolvido por PrestaShop SA (http://www.prestashop.com), licenciado sobre os termos da Academic Free License 3.0.
-Este módulo inclui software desenvolvido por Nicola Hibbert (http://nicolahibbert.com/liteaccordion-v2), licenciado sobre os termos da MIT License.
