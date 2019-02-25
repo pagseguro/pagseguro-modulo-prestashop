@@ -1,4 +1,4 @@
-![](https://prestabr.com.br/docpagseguropro/head_github_checkout_transparente.jpg)
+![](https://prestabr.com.br/docpagseguropro/head_github_checkout_transparente_v110.jpg)
 
 ## Introdução
 
