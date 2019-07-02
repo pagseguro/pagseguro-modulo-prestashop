@@ -60,7 +60,7 @@ class PagSeguro extends PaymentModule {
     public function __construct() {
         $this->name = 'pagseguro';
         $this->tab = 'payments_gateways';
-        $this->version = '2.2.0';
+        $this->version = '2.2.1';
         $this->author = 'PagSeguro Internet LTDA.';
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
@@ -344,7 +344,7 @@ class PagSeguro extends PaymentModule {
 
             /** Token validation */
             $token = Tools::getValue('pagseguroToken');
-            if (empty($token) && Tools::strlen($token) != 32) {
+            if (empty($token)) {
                 $errors[] = $this->invalidFieldSizeMessage('TOKEN');
             }
 
