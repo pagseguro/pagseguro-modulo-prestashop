@@ -60,7 +60,7 @@
                 Para utilizar qualquer serviço de integração do PagSeguro, é necessário ter um token de segurança. O token é um código único, gerado pelo PagSeguro. Caso não tenha um token <a href="https://pagseguro.uol.com.br/integracao/token-de-seguranca.jhtml" target="_blank"> clique aqui</a>, para gerar.
             </p>
             <div class="config-field">
-                <input type="text" class="pagseguro-field" name="pagseguroToken" id="pagseguro-token-input" value="{$token|escape:'htmlall':'UTF-8'}" maxlength="32">
+                <input type="text" class="pagseguro-field" name="pagseguroToken" id="pagseguro-token-input" value="{$token|escape:'htmlall':'UTF-8'}">
             </div>
         </div>
 
