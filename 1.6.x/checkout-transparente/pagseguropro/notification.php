@@ -26,7 +26,7 @@ $id_lang = $context->language->id;
 $type = Tools::getValue('notificationType');
 $code = Tools::getValue('notificationCode');
 
-if (!isset($type) || empty($type) || !isset($code) || empty($code) {
+if (!isset($type) || empty($type) || !isset($code) || empty($code)) {
 	$pagseguro->saveLog('error', 'callback', NULL, 'Parâmetros ausentes', '');
 	die('Parâmetros ausentes');
 }
