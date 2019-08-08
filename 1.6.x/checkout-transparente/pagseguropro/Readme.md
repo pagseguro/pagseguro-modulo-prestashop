@@ -219,4 +219,4 @@ Com esta opção ativa todos os registros de Logs serão completamente removidos
 
 **v.1.1.5**
 
-- Correções gerais de bugs;
+- Fix Bug callback updateOrderStatus p/ Boleto Pendente (Status 2 - Aguardando Pgto);
