@@ -8,6 +8,9 @@ Em seguida, acesse a Aba Módulos, localize o módulo pesquisando pelo nome e cl
 
 ![](https://prestabr.com.br/docpagseguropro/16/img01.jpg)
 
+Veja a documentação completa: [PagSeguroPro - Checkout Transparente - PS 1.6.x](https://github.com/pagseguro/prestashop/tree/master/1.6.x/checkout-transparente/pagseguropro)
+
+
 ## Instalação - PrestaShop 1.7.x
 
 Extraia o arquivo "prestashop-master.zip" em seu computador:
@@ -25,3 +28,5 @@ Acesse a Aba "Módulos > Module Manager", clique em "Enviar um módulo", e envie
 ![](https://prestabr.com.br/docpagseguropro/17/inst04.jpg)
 
 Pronto, o módulo está instalado!
+
+Veja a documentação completa: [PagSeguroPro - Checkout Transparente - PS 1.7.x](https://github.com/pagseguro/prestashop/tree/master/1.7.x/checkout-transparente/pagseguropro)
