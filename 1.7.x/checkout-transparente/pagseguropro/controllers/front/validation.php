@@ -356,9 +356,9 @@ class PagSeguroProValidationModuleFrontController extends ModuleFrontController
 		}
 		if (Configuration::get('PAGSEGUROPRO_MODO') == 0) {
 			echo "<br/><br/><h3 style='color:red'><b>Iniciando debug...</b><br/><br/><b>Sistema executando em modo de TESTES!</b></h3><br/><br/>";
-			Tools::dieObject($this->autorizacao);
-			Tools::dieObject($this->insert_data);
-			Tools::dieObject($this->pedido);
+			Tools::dieObject($this->autorizacao, false);
+			Tools::dieObject($this->insert_data, false);
+			Tools::dieObject($this->pedido, false);
 			if (!$bd) {
 				echo "<font color=\"red\"><b>Banco de Dados não atualizado!</b></font><br/><br/>";
 			}
