@@ -111,7 +111,7 @@ Defina o máximo de parcelas aceitas pela loja, coloque 1 para à vista ou de 2 
 
 Defina a quantidade de parcelas sem juros, coloque de 1 até 12 parcelas.
 
-![](https://prestabr.com.br/docpagseguropro/16/img08.jpg "Configuração - Parcelamento - Módulo PagSeguroPro")
+![](https://prestabr.com.br/docpagseguropro/16/img08-parcelas.jpg "Configuração - Parcelamento - Módulo PagSeguroPro")
 
 **`Observação:`**
 
