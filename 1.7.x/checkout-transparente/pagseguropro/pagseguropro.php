@@ -453,6 +453,7 @@ class PagSeguroPro extends PaymentModule
                     array(
                         'type' => 'select',
                         'label' => $this->trans('Quantidade máxima de parcelas', array(), 'Modules.PagSeguroPro.Admin'),
+			'class' => 'fixed-width-xs',
                         'name' => 'PAGSEGUROPRO_MAX_PARCELAS',
                         'desc' => $this->trans('Defina a quantidade máxima de parcelas para seus clientes.', array(), 'Modules.PagSeguroPro.Admin'),
 						'options' => array(
@@ -464,7 +465,7 @@ class PagSeguroPro extends PaymentModule
                     array(
                         'type' => 'select',
                         'label' => $this->trans('Quantidade de parcelas sem juros', array(), 'Modules.PagSeguroPro.Admin'),
-						'class' => 'fixed-width-xs',
+			'class' => 'fixed-width-xs',
                         'name' => 'PAGSEGUROPRO_PARCELAS_SEM_JUROS',
                         'desc' => $this->trans('Defina a quantidade de parcelas sem juros para seus clientes.', array(), 'Modules.PagSeguroPro.Admin'),
 						'options' => array(
