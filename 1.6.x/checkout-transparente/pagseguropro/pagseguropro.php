@@ -120,8 +120,8 @@ class PagSeguroPro extends PaymentModule {
         Configuration::updateValue('PAGSEGUROPRO_EMAIL', '', false);
         Configuration::updateValue('PAGSEGUROPRO_TOKEN', '', false);
         Configuration::updateValue('PAGSEGUROPRO_PAGAMENTO', 'cartao, boleto, transf', false);
-        Configuration::updateValue('PAGSEGUROPRO_MAX_PARCELAS', '0', false);
-        Configuration::updateValue('PAGSEGUROPRO_PARCELAS_SEM_JUROS', '0', false);
+        Configuration::updateValue('PAGSEGUROPRO_MAX_PARCELAS', '1', false);
+        Configuration::updateValue('PAGSEGUROPRO_PARCELAS_SEM_JUROS', '1', false);
         Configuration::updateValue('PAGSEGUROPRO_AUTORIZADO', _PS_OS_PAYMENT_, false);
         Configuration::updateValue('PAGSEGUROPRO_CANCELADO', _PS_OS_CANCELED_, false);
 	Configuration::updateValue('PAGSEGUROPRO_ESTORNADO', _PS_OS_REFUND_, false);
@@ -584,6 +584,14 @@ class PagSeguroPro extends PaymentModule {
     protected function getConfigForm()
     {
 		$statuses = OrderState::getOrderStates($this->context->language->id);
+		$array_parcelas = array();
+		for ($x = 1; $x <= 12; $x++) {
+			$array_parcelas[] = array(
+				'id' => $x,
+				'name' => $x.'x',
+			);
+		} 
+
 		$array_credentials = array();
 		$array_credentials[] = array(
 			'id' => 'TOKEN',
@@ -758,18 +766,27 @@ class PagSeguroPro extends PaymentModule {
 						),
                     ),
                     array(
-                        'type' => 'text',
+                        'type' => 'select',
                         'label' => $this->l('Quantidade máxima de parcelas'),
-						'class' => 'fixed-width-xs',
                         'name' => 'PAGSEGUROPRO_MAX_PARCELAS',
                         'desc' => $this->l('Defina a quantidade máxima de parcelas para seus clientes.'),
+						'options' => array(
+							'query' => $array_parcelas,
+							'id' => 'id',
+							'name' => 'name',
+						),
                     ),
                     array(
-                        'type' => 'text',
+                        'type' => 'select',
                         'label' => $this->l('Quantidade de parcelas sem juros'),
 						'class' => 'fixed-width-xs',
                         'name' => 'PAGSEGUROPRO_PARCELAS_SEM_JUROS',
                         'desc' => $this->l('Defina a quantidade de parcelas sem juros para seus clientes.'),
+						'options' => array(
+							'query' => $array_parcelas,
+							'id' => 'id',
+							'name' => 'name',
+						),
                     ),
                     array(
                         'type' => 'select',
