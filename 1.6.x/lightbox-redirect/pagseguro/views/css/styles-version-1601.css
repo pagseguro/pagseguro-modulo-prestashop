@@ -1,0 +1,47 @@
+#pagseguro-module *, #pagseguro-module *:before, #pagseguro-module *:after {
+    box-sizing: content-box!important;
+}
+#pagseguro-module-menu.fixed{
+    top:100px;
+}
+#pagseguro-module p{
+    margin: 1em 0!important;
+}
+#pagseguro-module-menu li a:hover {
+    text-decoration: none!important;
+}
+#pagseguro-module-menu li.selected a{
+    color: #FFF!important;
+}
+#pagseguro-module .link {
+    color: #025ec7!important;
+}
+#pagseguro-module .title {
+	padding: 0.3em 0!important;
+    font-weight: inherit!important;
+    line-height: 1em!important;
+    text-transform: inherit!important;
+    margin: 0 0 1em!important;
+    border-bottom: 1px solid #dedede!important;
+}
+#pagseguro-module h2.title{
+	font-size: 1.8em!important;
+}
+#pagseguro-module h3.title{
+	font-size: 1.4em!important;
+	padding-bottom: 0.1em!important;
+}
+#nobootstrap #pagseguro-module .config-area input[type="text"]{
+    max-width: 600px !important;
+    width: 50% !important;	
+}
+#nobootstrap #pagseguro-module .pagseguro-field {
+    display: inline-block!important;
+    font-size: 1.2em!important;
+    padding: 8px 4px!important;
+    height: 1.4em!important;
+    line-height: normal!important;
+    transition: none!important;
+    vertical-align: none!important;
+    width: auto!important;
+}
