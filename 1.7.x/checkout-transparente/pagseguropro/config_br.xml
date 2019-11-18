@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>pagseguropro</name>
+	<displayName><![CDATA[PagSeguro - Checkout Transparente]]></displayName>
+	<version><![CDATA[1.0.3]]></version>
+	<description><![CDATA[PagSeguro - Checkout Transparente - Módulo Oficial - PS 1.7.x]]></description>
+	<author><![CDATA[PrestaBR]]></author>
+	<tab><![CDATA[payments_gateways]]></tab>
+	<confirmUninstall><![CDATA[Tem certeza que deseja desinstalar o módulo PagSeguro - Checkout Transparente?]]></confirmUninstall>
+	<is_configurable>1</is_configurable>
+	<need_instance>1</need_instance>
+	<limited_countries>BR</limited_countries>
+</module>

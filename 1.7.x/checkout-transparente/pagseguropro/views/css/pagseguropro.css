@@ -1,0 +1,703 @@
+/*
+ * 2019 PrestaBR
+ * 
+ * Módulo de Pagamento para Integração com o PagSeguro
+ *
+ * Pagamento com Cartão de Crédito, Boleto e Transferência Bancária
+ * Checkout Transparente - Módulo Oficial - PS 1.7.x
+ *
+ */
+
+@import url('https://fonts.googleapis.com/css?family=Anonymous+Pro:400,700&subset=latin-ext');
+.opaque {
+	opacity: 0.5;
+}
+
+#card_list ul li.selected {
+	box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 1px 8px 0 rgba(0, 0, 0, 0.19);
+}
+
+.checkout_pagseguro {
+	max-width: 800px;
+}
+
+.checkout_pagseguro .nav-tabs {
+	border-bottom: none;
+	margin-bottom: -1px !important;
+	margin-top: 20px;
+}
+
+.checkout_pagseguro .nav-tabs>li>a {
+	font-size: 16px;
+	border-radius: 5px 5px 0 0;
+	position: relative;
+	bottom: -1px;
+}
+
+.checkout_pagseguro .nav-tabs>li.active>a,
+.checkout_pagseguro .nav-tabs>li.active>a:focus,
+.checkout_pagseguro .nav-tabs>li>a:hover {
+	background: #f8f8f8 !important;
+	color: #555 !important;
+	border: 1px solid #ddd !important;
+	border-bottom: 0 none !important;
+	border-radius: 5px 5px 0 0;
+}
+.checkout_pagseguro .nav-tabs>li.active>a { font-weight:bold; }
+@media only screen and (min-width: 480px) {
+	.checkout_pagseguro .nav-tabs>li#cartao-tab { width:27%; }
+}
+
+.checkout_pagseguro img.pagseguro-logo {
+	margin: 7px;
+}
+
+.checkout_pagseguro.opc-checkout {
+	max-width: 675px;
+}
+
+.checkout_pagseguro.opc-checkout .nav-tabs>li>a {
+	font-size: 14px;
+}
+
+.checkout_pagseguro .cart_navigation {
+	margin: 20px 0;
+}
+
+.checkout_pagseguro .tab-content {
+	border: 1px solid #ddd;
+	border-radius: 0 5px 5px 5px;
+	padding-top: 15px;
+	margin-top: 0 !important;
+	background: #f8f8f8;
+}
+
+.checkout_pagseguro .form-control {
+	height: 28px;
+}
+
+.checkout_pagseguro #credit-icon {
+	padding:1px 5px 2px 6px;	
+}
+.checkout_pagseguro #credit-icon .material-icons {
+	font-size:22px;	
+}
+.checkout_pagseguro #credit-icon img {
+	max-height: 18px;
+}
+
+.checkout_pagseguro .form-group.has-success input {
+	background-position: 96% center;
+}
+
+.checkout_pagseguro .form-group.has-danger input {
+	background-position: 96% center;
+}
+
+.checkout_pagseguro {}
+
+.checkout_pagseguro .form-group { margin-bottom:10px; }
+
+.checkout_pagseguro .form-group label,
+.checkout_pagseguro .form-group .input-group {
+	padding-left: 15px !important;
+	padding-right: 15px !important;
+	font-size:14px;
+	max-width:320px;
+}
+.checkout_pagseguro input.form-control {
+	font-size:14px;
+	padding:5px 10px;
+}
+.checkout_pagseguro select.form-control {
+	font-size:14px;
+	padding:2px 8px;
+	height:28px !important;
+}
+
+/*Fix Order Opc*/
+#order-opc .checkout_pagseguro .form-group .form-control{ max-width:100%; }
+
+/* Uniform Fields */
+.checkout_pagseguro .selector span {
+	min-width: 55px;
+}
+
+.checkout_pagseguro .selector,
+.checkout_pagseguro .selector select {
+	min-width: 60px;
+}
+
+.checkout_pagseguro .selector #card_inst {
+	min-width: 275px;
+	max-width: 100%;
+}
+
+/* Loader Background */
+#fancy_load {}
+
+#fancy_load #pagseguroproproccess #pagseguromsg {
+	font-size: 15px;
+	color: #555;
+	line-height: 50px;
+}
+
+#fancy_load.loading #pagseguroproproccess #loader {
+	display: none;
+}
+
+#fancy_load #pagseguroproproccess #pagseguro_logo {
+	padding-top: 7px;
+}
+
+/* Após clique */
+#fancy_load.loading {
+	width: 100%;
+	height: 100%;
+	min-height: 400px;
+	background-color: rgba(0, 0, 0, 0.5) !important;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 100000;
+	text-align: center;
+}
+
+#fancy_load.loading #pagseguroproproccess {
+	width: 500px;
+	max-width: 100%;
+	background: #fff;
+	border: 5px solid #e0e0e0;
+	height: 100px;
+	padding: 15px;
+	display: block;
+	margin: auto;
+	position: relative;
+	top: 30%;
+}
+
+#fancy_load.loading #pagseguroproproccess #loader {
+	display: block;
+}
+
+/*Fix Bug Theme Classic*/
+body#checkout #fancy_load .container{min-height:1px!important}
+
+.nopadding {
+	padding-right: 0 !important;
+	padding-left: 0 !important;
+}
+
+.nopadding-left {
+	padding-left: 0 !important;
+}
+
+.nopadding-right {
+	padding-right: 0 !important;
+}
+.space{margin:0 0 0 10px}
+
+.col-xs-1.nopadding {
+	min-width: 20px !important;
+	line-height: 28px;
+	/*margin-left:20px !important; */
+	display: inline-block !important;
+}
+.text-left { text-align:left !important; margin-bottom:2px; }
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	margin: 0;
+}
+
+.checkout_pagseguro #boleto_pagseguropro .form-group,
+.checkout_pagseguro #debito_pagseguropro .form-group {
+	padding: 5px 5px 15px;
+	margin: 0;
+	text-align:center;
+}
+.checkout_pagseguro #debito_pagseguropro .form-group label {
+	text-align:center;
+	padding:0 !important;
+	margin:5px auto;
+	display:block !important;
+}
+
+.checkout_pagseguro .anonymous {
+	font-family: 'Anonymous Pro', monospace;
+}
+
+#debito_pagseguropro .form-group div.radio,
+#debito_pagseguropro .form-group img {
+	display: block;
+	margin: 0 auto;
+	float: none;
+	clear: both;
+	cursor: pointer;
+}
+
+#debito_pagseguropro .pagseguropro_transf {
+	display: contents;
+}
+
+/* Cartão de exemplo */
+#card_wrapper {
+	width: 300px;
+	max-width: 100%;
+	height: 192px;
+	max-height: 194px;
+	text-align: center;
+	margin: 0px;
+	position: relative;
+	overflow: hidden;
+	z-index: 100;
+}
+
+.container-credito,
+.container-boleto,
+.container-debito{
+background: #F1F1F1;
+-webkit-border-radius: 6px;
+-moz-border-radius: 6px;
+border-radius: 6px;
+padding: 15px;
+margin: 15px 0 15px 0;
+box-shadow: 2px 2px 8px 0 rgba(0,0,0,.2);
+border-bottom: 1px solid rgba(0,0,0,.25);
+}
+.container-credito .pull-right{float:right;}
+.container-credito .pull-left{float:left;}
+.container-credito #card_show{padding:0;}
+
+#card_wrapper #card_container {
+	background-image: url('../img/credit-card.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center top;
+	-webkit-perspective: 1000;
+	-moz-perspective: 1000;
+	-o-perspective: 1000;
+	perspective: 1000;
+	height: 390px;
+	z-index: 50;
+}
+
+#card_wrapper #card_container>div.card-number {
+	position: absolute;
+	z-index: 150;
+	top: 105px;
+	left: 30px;
+	color: #fff;
+	text-shadow: 1px 1px 1px #333;
+	font-size: 20px;
+	font-weight: bold;
+	font-family: 'Anonymous Pro';
+}
+
+#card_wrapper #card_container>div.card-name {
+    position: absolute;
+    z-index: 150;
+    top: 160px;
+    left: 15px;
+    color: #fff;
+    text-shadow: 1px 1px 1px #333;
+    text-transform: uppercase;
+    font-size: 14px;
+    letter-spacing: 1px;
+    font-family: 'Anonymous Pro';
+    font-weight: bold;
+}
+
+#card_wrapper #card_container>div.card-expiry {
+	position: absolute;
+	z-index: 150;
+	top: 136px;
+	left: 160px;
+	color: #fff;
+	text-shadow: 1px 1px 1px #333;
+	font-family: 'Anonymous Pro';
+	font-size: 14px;
+}
+
+#card_wrapper #card_container>div.card-brand {
+    position: absolute;
+    z-index: 150;
+    top: 156px;
+    right: 6px;
+    display: block;
+    width: 60px;
+    max-width: 60px;
+    height: 40px;
+    max-height: 40px;
+    overflow: hidden;
+}
+
+#card_wrapper #card_container>span.card-cvv {
+	position: absolute;
+	display: none;
+	z-index: 150;
+	top: 97px;
+	right: 52px;
+	color: #333;
+}
+
+#card_wrapper #card_container.verso {
+	background-position: center -195px;
+}
+
+#card_wrapper #card_container.verso>div {
+	display: none;
+}
+
+#card_wrapper #card_container.verso>span.card-cvv {
+	display: block;
+}
+
+.flipper {
+	-webkit-transition: 0.6s;
+	-webkit-transform-style: preserve-3d;
+	-moz-transition: 0.6s;
+	-moz-transform-style: preserve-3d;
+	-o-transition: 0.6s;
+	-o-transform-style: preserve-3d;
+	transition: 0.6s;
+	transform-style: preserve-3d;
+	position: relative;
+}
+
+#order-confirmation #logo-pagseguro {}
+
+.checkout_pagseguro .nofloat {
+	float: none !important;
+	display: inline-block;
+	margin: 0 auto;
+}
+
+.checkout_pagseguro .nofloat-block {
+	float: none !important;
+	display: block;
+	margin: 10px auto;
+}
+
+.checkout_pagseguro .clearfix {
+	clear: both;
+}
+
+.checkout_pagseguro .cart_navigation button {
+	float: right;
+}
+
+
+/* Confirmação do pedido */
+#ps_confirmacao {}
+
+#ps_confirmacao .table tfoot>tr>td {
+	font-weight: bold;
+}
+
+#ps_confirmacao .table tfoot>tr.total>td {
+	font-size: 14px;
+}
+
+#ps_confirmacao h3 {
+	padding: 7px 10px 6px;
+}
+
+#ps_confirmacao h3.boleto,
+#ps_confirmacao h3.transfer {
+	font-size: 18px;
+	background: #F90;
+}
+
+#ps_confirmacao h3.status_aguardando {
+	font-size: 18px;
+	background: #F90;
+}
+
+#ps_confirmacao h3.status_analise {
+	font-size: 18px;
+	background: #F90;
+}
+
+#ps_confirmacao h3.status_confirmado {
+	font-size: 18px;
+	background: #060;
+	color: #fff;
+}
+
+#ps_confirmacao h3.status_cancelado {
+	font-size: 18px;
+	background: #900;
+	color: #fff;
+}
+
+
+/* Tablet Class */
+.checkout_pagseguro.dev_t {}
+
+@media only screen and (min-width: 480px) and (max-width: 960px) {
+}
+
+/* Mobile Class */
+.checkout_pagseguro.dev_m {}
+
+@media (max-width: 767px) {
+	.checkout_pagseguro .nav-tabs {
+		border-bottom: none;
+		margin-bottom: 5% !important;
+		margin-top: 5%
+	}
+	.checkout_pagseguro .nav-tabs>li.active>a,
+	.checkout_pagseguro .nav-tabs>li.active>a:focus,
+	.checkout_pagseguro .nav-tabs>li>a:hover {
+		background: #f8f8f8 !important;
+		color: #555 !important;
+		border: 1px solid #ddd !important;
+		border-radius: 5px;
+	}
+	.checkout_pagseguro .nav-tabs>li.active>a i.icon-check {
+		color: #00d14e
+	}
+	.checkout_pagseguro .selector,
+	.checkout_pagseguro .selector select {}
+	.checkout_pagseguro #boleto_pagseguropro .form-group,
+	.checkout_pagseguro #debito_pagseguropro .form-group {
+		padding-bottom: 15px;
+		margin: 0
+	}
+	#debito_pagseguropro .form-group div.radio,
+	#debito_pagseguropro .form-group img {
+		display: inline-block;
+		margin: 0 auto;
+		float: none;
+		clear: both;
+		width: 48px;
+	}
+	#debito_pagseguropro .pagseguropro_transf .form-group label span {
+		display: none
+	}
+	#order-confirmation #logo-pagseguro {
+		width: 100% !important;
+		float: none !important;
+		margin: 0 auto 20px !important;
+		text-align: center !important;
+	}
+	.checkout_pagseguro .nav-tabs>li>a {
+		font-size: 13px !important;
+		padding: 7px 9px;
+	}
+	#fancy_load #pagseguroproproccess #pagseguromsg {
+		font-size: 12px;
+		line-height: 25px;
+	}
+}
+
+@media (max-width: 1024px){
+	#card_wrapper{
+		display:none !important;
+	}
+}
+
+@media (max-width: 375px) {
+}
+
+@media(max-width: 360px) {
+}
+
+@media(max-width: 320px) {
+	.checkout_pagseguro .selector,
+	.checkout_pagseguro .selector select {
+		min-width: 73px;
+	}
+	#order-confirmation #logo-pagseguro {
+		width: 100% !important;
+		float: none !important;
+		margin: 0 auto 20px !important;
+		text-align: center !important;
+	}
+	.checkout_pagseguro .nav-tabs>li>a {
+		font-size: 13px !important;
+		padding: 7px 9px;
+	}
+	#fancy_load #pagseguroproproccess #pagseguromsg {
+		font-size: 10px;
+		line-height: 25px;
+	}
+}
+
+/* modal */
+#order .modal-open,
+#order-opc .modal-open{
+	overflow: hidden;
+}
+
+#order .modal,
+#order-opc .modal{
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 100050;
+	display: none;
+	overflow: hidden;
+	-webkit-overflow-scrolling: touch;
+	outline: 0;
+}
+
+#order .modal.fade .modal-dialog,
+#order-opc .modal.fade .modal-dialog {
+	-webkit-transition: -webkit-transform .3s ease-out;
+	-o-transition: -o-transform .3s ease-out;
+	transition: transform .3s ease-out;
+	-webkit-transform: translate(0, -25%);
+	-ms-transform: translate(0, -25%);
+	-o-transform: translate(0, -25%);
+	transform: translate(0, -25%);
+}
+
+#order .modal.in .modal-dialog,
+#order-opc .modal.in .modal-dialog {
+	-webkit-transform: translate(0, 0);
+	-ms-transform: translate(0, 0);
+	-o-transform: translate(0, 0);
+	transform: translate(0, 0);
+}
+
+#order .modal-open .modal,
+#order-opc .modal-open .modal {
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+#order .modal-dialog,
+#order-opc .modal-dialog {
+	position: relative;
+	width: auto;
+	margin: 10px;
+}
+
+#order .modal-content,
+#order-opc .modal-content {
+	position: relative;
+	background-color: #fff;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	border: 1px solid #999;
+	border: 1px solid rgba(0, 0, 0, .2);
+	border-radius: 6px;
+	outline: 0;
+	-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+	box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+}
+
+#order .modal-backdrop,
+#order-opc .modal-backdrop {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 100040;
+	background-color: #000;
+}
+
+#order .modal-backdrop.fade,
+#order-opc .modal-backdrop.fade {
+	filter: alpha(opacity=0);
+	opacity: 0;
+}
+
+#order .modal-backdrop.in,
+#order-opc .modal-backdrop.in {
+	filter: alpha(opacity=50);
+	opacity: .5;
+}
+
+#order .modal-header,
+#order-opc .modal-header {
+	min-height: 14px;
+	padding: 7px 10px 5px;
+	border-bottom: 1px solid #e5e5e5;
+}
+
+#order .modal-header .close,
+#order-opc .modal-header .close {
+	margin-top: -2px;
+}
+
+#order .modal-title,
+#order-opc .modal-title {
+	margin: 0;
+	line-height: 1.42857143;
+}
+
+#order .modal-body,
+#order-opc .modal-body {
+	position: relative;
+	padding: 10px;
+}
+
+#order .modal-body p,
+#order-opc .modal-body p {
+	margin: 0 !important;
+}
+
+#order .modal-footer,
+#order-opc .modal-footer {
+	padding: 10px;
+	text-align: right;
+	border-top: 1px solid #e5e5e5;
+}
+
+#order .modal-footer .btn+.btn,
+#order-opc .modal-footer .btn+.btn {
+	margin-bottom: 0;
+	margin-left: 5px;
+}
+
+#order .modal-footer .btn-group .btn+.btn,
+#order-opc .modal-footer .btn-group .btn+.btn {
+	;
+}
+
+#order .modal-footer .btn-block+.btn-block,
+#order-opc .modal-footer .btn-block+.btn-block {
+	margin-left: 0;
+}
+
+#order .modal-scrollbar-measure,
+#order-opc .modal-scrollbar-measure {
+	position: absolute;
+	top: -9999px;
+	width: 50px;
+	height: 50px;
+	overflow: scroll;
+}
+
+@media (min-width: 768px) {
+	#order .modal-dialog,
+	#order-opc .modal-dialog {
+		width: 600px;
+		margin: 30px auto;
+	}
+	#order .modal-content,
+	#order-opc .modal-content {
+		-webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
+		box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
+	}
+	#order .modal-sm,
+	#order-opc .modal-sm {
+		width: 300px;
+	}
+}
+
+@media (min-width: 992px) {
+	#order .modal-lg,
+	#order-opc .modal-lg {
+		width: 900px;
+	}
+}
