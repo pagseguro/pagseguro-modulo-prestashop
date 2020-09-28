@@ -1,0 +1,224 @@
+/*
+ * 2020 PrestaBR
+ * 
+ * Módulo de Pagamento para Integração com o PagSeguro
+ *
+ * Pagamento com Cartão de Crédito, Boleto e Transferência Bancária
+ * Checkout Transparente - Módulo Oficial - PS 1.7.x
+ *
+ */
+
+.moduleconfig-header {}
+.moduleconfig-header .text-center a {display:inline-block; float:none; margin:auto;}
+.payment_options {}
+.payment_options .panel .panel-body { padding:0; }
+.nopadding { padding:0 !important;}
+.nopadding-left { padding-left:0 !important;}
+.nopadding-right { padding-right:0 !important;}
+@media(max-width:1400px){
+.ajust{min-height:168px}
+}
+.itens{padding:20px 0 0 0;border-top: 1px solid #ddd;}
+
+.documentacao{
+	padding: 0 0 20px 0;
+}
+.documentacao a{
+    background: #326cc4;
+    color: #fff;
+    box-shadow: 0 0 2px #222;
+    font-size: 17px;
+    line-height: 1.33;
+    border-radius: 6px;
+    padding:10px;
+    font-weight:bold;
+}
+.documentacao a.a:link,
+.documentacao a:visited,
+.documentacao a:hover,
+.documentacao a:active{color:#fff}
+.icon-sliders,
+.icon-database{font-size:22px}
+
+.brand-logo {
+	background-image: url(../img/ps-brands-x30.png);
+	display: none;
+	width: 45px;
+	height: 30px;
+	background-size: 420px 280px;
+	text-indent:-9999px;
+}
+.brand-logo.alelo {
+	background-position: -65px 0;
+	display: inline-block
+}
+.brand-logo.amex {
+	background-position: -130px -200px;
+	display: inline-block
+}
+.brand-logo.aura {
+	background-position: 0 -50px;
+	display: inline-block
+}
+.brand-logo.balance {
+	background-position: -65px -50px;
+	display: inline-block
+}
+.brand-logo.banesecard {
+	background-position: -130px 0;
+	display: inline-block
+}
+.brand-logo.banri-compras {
+	background-position: -130px -50px;
+	display: inline-block
+}
+.brand-logo.banrisul {
+	background-position: 0 -100px;
+	display: inline-block
+}
+.brand-logo.bb {
+	background-position: -65px -100px;
+	display: inline-block
+}
+.brand-logo.boleto {
+	background-position: -130px -100px;
+	display: inline-block
+}
+.brand-logo.bradesco {
+	background-position: -195px 0;
+	display: inline-block
+}
+.brand-logo.brasilcard {
+	background-position: -195px -50px;
+	display: inline-block
+}
+.brand-logo.cabal-debito {
+	background-position: -195px -100px;
+	display: inline-block
+}
+.brand-logo.cabal {
+	background-position: 0 -150px;
+	display: inline-block
+}
+.brand-logo.caixa {
+	background-position: -65px -150px;
+	display: inline-block
+}
+.brand-logo.default {
+	background-position: -130px -150px;
+	display: inline-block
+}
+.brand-logo.diners {
+	background-position: -195px -150px;
+	display: inline-block
+}
+.brand-logo.elo {
+	background-position: 0 -200px;
+	display: inline-block
+}
+.brand-logo.fortbrasil {
+	background-position: -65px -200px;
+	display: inline-block
+}
+.brand-logo.grandcard {
+	background-position: 0 0;
+	display: inline-block
+}
+.brand-logo.hiper {
+	background-position: -195px -200px;
+	display: inline-block
+}
+.brand-logo.hipercard {
+	background-position: -260px 0;
+	display: inline-block
+}
+.brand-logo.itau {
+	background-position: -260px -50px;
+	display: inline-block
+}
+.brand-logo.maestro {
+	background-position: -260px -100px;
+	display: inline-block
+}
+.brand-logo.mais {
+	background-position: -260px -150px;
+	display: inline-block
+}
+.brand-logo.mastercard {
+	background-position: -260px -200px;
+	display: inline-block
+}
+.brand-logo.personalcard {
+	background-position: 0 -250px;
+	display: inline-block
+}
+.brand-logo.santander {
+	background-position: -65px -250px;
+	display: inline-block
+}
+.brand-logo.sodexo {
+	background-position: -130px -250px;
+	display: inline-block
+}
+.brand-logo.sorocred {
+	background-position: -195px -250px;
+	display: inline-block
+}
+.brand-logo.ticket {
+	background-position: -260px -250px;
+	display: inline-block
+}
+.brand-logo.upbrasil {
+	background-position: -325px 0;
+	display: inline-block
+}
+.brand-logo.valecard {
+	background-position: -325px -50px;
+	display: inline-block
+}
+.brand-logo.visa-electron {
+	background-position: -325px -100px;
+	display: inline-block
+}
+.brand-logo.hsbc {
+	background-position: -376px 0;
+	display: inline-block
+}
+.brand-logo.visa {
+	background-position: -325px -150px;
+	display: inline-block
+}
+.brand-logo.vr {
+	background-position: -325px -200px;
+	display: inline-block
+}
+.brand-logo.policard {
+	background-position: -325px -250px;
+	display: inline-block
+}
+/* APP */
+#app-rates h2.app-bigtitle,
+#app-rates #app-steps h2,
+h2.app-faq{color: #EC9121;margin: 0;padding: 2% 0 2% 0;text-align: center;line-height: 1.4;}
+#app-rates .allapps{margin: 0 0 3% 0;}
+#app-rates .allapps .appd14{border-right: 1px solid #D6D6D6;}
+#app-rates .allapps .appd30{border-left: 1px solid #D6D6D6;}
+#app-rates .allapps .signit{padding: 15px 15px;font-weight: bold;font-size: 15px;}
+#accordionApp h5{background: #DFDFDF;}
+#accordionApp button{font-size:17px;color:#0075ff;}
+#accordionApp .card-body{font-size: 15px;line-height: 1.6;}
+div#app-steps{}
+div#app-steps img{max-width:150px}
+div#app-steps ul li{margin:0 2px 0 2px}
+div.info-app{font-size:10px;color:#000;text-align:center;padding:2% 0 2% 0}
+/* Inputs */
+#PAGSEGUROPRO_CREDENTIAL { width:300px !important; }
+#PAGSEGUROPRO_EMAIL, #PAGSEGUROPRO_TOKEN{max-width: 70%}
+
+/* Menu Item */
+i.mi-pagseguro {
+	background: url(../img/pagseguro-icone.png) no-repeat center center;
+	width:18px;
+	height:18px;
+	display:inline-block;
+}
