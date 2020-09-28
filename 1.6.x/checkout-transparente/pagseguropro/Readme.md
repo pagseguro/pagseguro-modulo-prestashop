@@ -274,6 +274,6 @@ Só é possível realizar o estorno se o pedido estiver em um destes status:
 
 - Correções gerais de bugs;
 - Add opção p/ definir o comportamento da Parcela Mínima aceita no cartão;
-- Add tutorial para orientar o lojista durante o setup inicial da loja, c/ validações e informações gerais sobre o cadastro do cliente, configurações da loja, etc;
+- Add tutorial para orientar o lojista durante o setup inicial da loja, c/ validações e informações gerais sobre o cadastro do cliente, configurações diversas, etc;
 - Melhorias na validação e criação de histórico local de pedidos que receberem reebolso parcial ou total;
 - Revisão detalhada, melhorias e otimizações na validação dos dados para a interação com o cliente na opção de pagamento via Cartão de Crédito;
