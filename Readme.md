@@ -8,9 +8,9 @@ Em seguida, acesse a Aba Módulos, localize o módulo pesquisando pelo nome e cl
 
 ![](https://prestabr.com.br/docpagseguropro/16/img01.jpg)
 
-Veja a documentação completa: [PagSeguroPro - Checkout Transparente - PS 1.6.x](https://github.com/pagseguro/pagseguro-modulo-prestashop/tree/master/1.6.x/checkout-transparente/pagseguropro)
+Veja a documentação completa: [Documentação - Checkout Transparente - PS 1.6.x](https://github.com/pagseguro/pagseguro-modulo-prestashop/tree/master/1.6.x/checkout-transparente/pagseguropro)
 
-Veja o changelog das versões: [PagSeguroPro - Checkout Transparente - PS 1.6.x](https://github.com/pagseguro/pagseguro-modulo-prestashop/tree/master/1.6.x/checkout-transparente/pagseguropro#changelog)
+Veja o changelog das versões: [Changelog - Checkout Transparente - PS 1.6.x](https://github.com/pagseguro/pagseguro-modulo-prestashop/tree/master/1.6.x/checkout-transparente/pagseguropro#changelog)
 
 ## Instalação - PrestaShop 1.7.x
 
@@ -30,6 +30,6 @@ Acesse a Aba "Módulos > Module Manager", clique em "Enviar um módulo", e envie
 
 Pronto, o módulo está instalado!
 
-Veja a documentação completa: [PagSeguroPro - Checkout Transparente - PS 1.7.x](https://github.com/pagseguro/pagseguro-modulo-prestashop/tree/master/1.7.x/checkout-transparente/pagseguropro)
+Veja a documentação completa: [Documentação - Checkout Transparente - PS 1.7.x](https://github.com/pagseguro/pagseguro-modulo-prestashop/tree/master/1.7.x/checkout-transparente/pagseguropro)
 
-Veja o changelog das versões: [PagSeguroPro - Checkout Transparente - PS 1.7.x](https://github.com/pagseguro/pagseguro-modulo-prestashop/tree/master/1.7.x/checkout-transparente/pagseguropro#changelog)
+Veja o changelog das versões: [Changelog - Checkout Transparente - PS 1.7.x](https://github.com/pagseguro/pagseguro-modulo-prestashop/tree/master/1.7.x/checkout-transparente/pagseguropro#changelog)
