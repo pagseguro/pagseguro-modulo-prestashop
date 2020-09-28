@@ -193,8 +193,6 @@ Este recurso serve para evitar a perda de dados ao desinstalar o módulo por aci
 
 Na PrestaShop, no menu "Compras ou Pedidos", acesse o pedido a ser estornado, role a página até localizar "DADOS DO PEDIDO (PAGSEGURO)". Ao clicar em "Estornar Transação no PagSeguro", em tempo real, o módulo transmitirá a requisição para o PagSeguro.
 
-[imagem]
-
 Após realizar o estorno, para mais detalhes acesse a sua conta no PagSeguro, no menu, "Extratos e Relatórios > Extrato de Transações".
 
 Ao acessar a transação role a página para localizar "Extrato de movimentações da transação".
