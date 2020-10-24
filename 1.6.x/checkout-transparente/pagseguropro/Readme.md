@@ -21,7 +21,7 @@ Extraia o arquivo .ZIP em seu computador e envie a pasta do módulo desejado par
 
 Em seguida, acesse a Aba Módulos, localize o módulo pesquisando por "pagseguropro" e clique no botão "Instalar".
 
-![](https://prestabr.com.br/docpagseguropro/16/image01_1.jpg "Instalação - Módulo PagSeguroPro")
+![](https://prestabr.com.br/docpagseguropro/16/img01.jpg "Instalação - Módulo PagSeguroPro")
 
 ## Configuração
 
