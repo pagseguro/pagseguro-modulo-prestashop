@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>pagseguropro</name>
+	<displayName><![CDATA[PagSeguro - Checkout Transparente]]></displayName>
+	<version><![CDATA[1.6.0]]></version>
+	<description><![CDATA[PagSeguro - Checkout Transparente - M&oacute;dulo Oficial - PS 1.6.x]]></description>
+	<author><![CDATA[PrestaBR]]></author>
+	<tab><![CDATA[payments_gateways]]></tab>
+	<is_configurable>1</is_configurable>
+	<need_instance>1</need_instance>
+	<limited_countries>BR</limited_countries>
+</module>
