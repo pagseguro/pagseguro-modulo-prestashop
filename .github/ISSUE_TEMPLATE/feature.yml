@@ -1,0 +1,24 @@
+name: 🚀 Quero um novo recurso
+description: Conte pra gente o que você está pensando.
+title: "[Feature]: "
+labels: ["enhancement"]
+assignees:
+  - prestabr
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reservar um tempo para preencher este formulário!
+  - type: input
+    id: contact
+    attributes:
+      label: E-mail de contato
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Qual é o novo recurso que você gostaria de ver?
+    validations:
+      required: true
