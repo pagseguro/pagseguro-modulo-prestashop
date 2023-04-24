@@ -1,0 +1,61 @@
+name: 🐞 Reportar um Problema
+description: Informe um problema técnico ou de configuração.
+title: "[Bug]: "
+labels: ["bug"]
+assignees:
+  - prestabr
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reservar um tempo para preencher este formulário!
+  - type: input
+    id: contact
+    attributes:
+      label: E-mail de contato
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: O que aconteceu?
+    validations:
+      required: true
+  - type: dropdown
+    id: version
+    attributes:
+      label: Versão da PrestaShop?
+      options:
+        - PS 1.6
+        - PS 1.7
+        - PS 8.0
+    validations:
+      required: true
+  - type: dropdown
+    id: php
+    attributes:
+      label: Versão do PHP?
+      options:
+        - PHP 5.6
+        - PHP 7.0
+        - PHP 7.1
+        - PHP 7.2
+        - PHP 7.3
+        - PHP 7.4
+        - PHP 8.0
+        - PHP 8.1
+    validations:
+      required: true
+  - type: dropdown
+    id: Severity
+    attributes:
+      label: Qual a gravidade do problema?
+      multiple: true
+      options:
+        - Não consegui instalar o modulo
+        - Não consegui configurar o modulo
+        - Nenhum cliente pode fazer um pagamento
+        - Um dos métodos de pagamento não está funcionando
+    validations:
+      required: true
