@@ -230,3 +230,11 @@ Só é possível realizar o estorno se o pedido estiver em um destes status:
 **v.1.0.0**
 
 - Lançamento;
+
+**v.1.1.0**
+
+- Correção da validação do JavaScript no Checkout para o CPF/CNPJ;
+- Correção da associação automática de mapeamento de Status na instalação (Em Análise e Aguardando Pagamento);
+- Correção p/ remover os Status na desinstalação;
+- Correção p/ exibir somente 1 ou 2 meios de pagamento quando selecionado - Só p/ PrestaShop 1.6;
+- Ajustes de layout para o Back e FrontOffice;
