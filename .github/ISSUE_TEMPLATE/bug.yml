@@ -55,7 +55,7 @@ body:
       options:
         - Não consegui instalar o modulo
         - Não consegui configurar o modulo
-        - Nenhum cliente consegue fazer um pagamentos
+        - Nenhum cliente consegue fazer pagamentos
         - Um dos métodos de pagamento não está funcionando
     validations:
       required: true
