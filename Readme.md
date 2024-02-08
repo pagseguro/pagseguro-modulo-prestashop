@@ -1,6 +1,6 @@
 ![](https://prestabr.com.br/docpagbank/head_git_pagbank.jpg)
 
-<p align="center">PagBank - Checkout Transparente - v.1.5.0</p>
+<p align="center">PagBank - Checkout Transparente - v.1.5.1</p>
 
 ## Enquete
 
@@ -264,3 +264,6 @@ Só é possível realizar o estorno se o pedido estiver em um destes status:
 - Add NSU no banco de dados e histórico do pedido
 - Melhorias na usabilidade do checkout
 - Correção da validação dos campos c/ e s/ Termos de Serviço Ativo
+
+**v.1.5.1**
+- Atualização do payload do Cartão de Crédito para a nova regra da API - Log: FIELD BUYER CANNOT BE EMPTY;
