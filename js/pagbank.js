@@ -2,14 +2,14 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Pagamento com Pix, Boleto e Cartão de Crédito
+ * Pagamento com Cartão de Crédito, Boleto, Pix e super app PagBank
  * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
  * 
  * @author
- * 2011-2024 PrestaBR - https://prestabr.com.br
+ * 2011-2025 PrestaBR - https://prestabr.com.br
  * 
  * @copyright
- * 1996-2024 PagBank - https://pagseguro.uol.com.br
+ * 1996-2025 PagBank - https://pagseguro.uol.com.br
  * 
  * @license
  * Open Software License 3.0 (OSL 3.0) - https://opensource.org/license/osl-3-0-php/
@@ -33,6 +33,7 @@ $(document).ready(function() {
 	var card_form = $('#card_pagbank');
 	var bankslip_form = $('#bankslip_pagbank');
 	var pix_form = $('#pix_pagbank');
+	var wallet_form = $('#wallet_pagbank');
 	var pagbank_module = false;
 	if (conditions_to_approve != null) {
 		conditions_to_approve.addEventListener('change', function() {
@@ -61,6 +62,12 @@ $(document).ready(function() {
 							this.checked = false;
 						}
 					}
+					if (wallet_form.is(":visible")) {
+						if (ps_validateWallet() == false) {
+							document.getElementById('pagbank-container').scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
+							this.checked = false;
+						}
+					}
 				}
 			}
 		});
@@ -79,6 +86,9 @@ $(document).ready(function() {
 			}
 			if (pix_form.is(":visible")) {
 				ps_validatePix();
+			}
+			if (wallet_form.is(":visible")) {
+				ps_validateWallet();
 			}
 		}
 	}
@@ -116,6 +126,13 @@ $(document).ready(function() {
 		submitPixButton.addEventListener('click', function (e) {
 			e.preventDefault();
 			ps_pixCheckout(e);
+		});
+	}
+	var submitWalletButton = document.getElementById('submitWallet');
+	if (submitWalletButton != null) {
+		submitWalletButton.addEventListener('click', function (e) {
+			e.preventDefault();
+			ps_walletCheckout(e);
 		});
 	}
 	
@@ -214,7 +231,7 @@ function ps_getInstallments(card_number) {
 					} else {
 						strInterest = '';
 					}
-					var optionLabel = (optionQty + ' x ' + formatMoney(optionValue) + strInterest + ' Total: ' + formatMoney(optionTotal)); // Label do option
+					var optionLabel = (optionQty + ' x ' + formatMoney(optionValue) + strInterest + ' Total: ' + formatMoney(optionTotal));
 					var formattedValue = Number(optionValue).toMoney(2, '.', ',');
 
 					if (installmentsMinValue == 0) {
@@ -291,6 +308,20 @@ function ps_pixCheckout(e) {
 		showLoading();
 		var formData = getFormData('pix_pagbank');
 		return sendAjaxCall('processPix', formData);
+    }else{
+		document.getElementById('pagbank-container').scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
+		return false;
+	}
+}
+
+function ps_walletCheckout(e) {
+	e.preventDefault();
+	window.onbeforeunload = function(){ return true; }
+	document.getElementsByTagName('body')[0].style = 'overscroll-behavior: contain';
+	if (ps_validateWallet() !== false){
+		showLoading();
+		var formData = getFormData('wallet_pagbank');
+		return sendAjaxCall('processWallet', formData);
     }else{
 		document.getElementById('pagbank-container').scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
 		return false;
@@ -725,6 +756,109 @@ function ps_validatePix() {
     }
 }
 
+function ps_validateWallet() {
+    var html = '';
+    var errorFields = [];
+	var wallet_adress_error = false;
+
+    var telephone = document.getElementById('wallet_phone').value.replace(/[^0-9]/g, '');
+    if (telephone.length == 0) {
+        html += 'Telefone não preenchido. <br>';
+		errorFields.push('wallet_phone');
+    } else if (!validatePhoneNumber('wallet_phone')) {
+        html += 'Telefone inválido. <br>';
+		errorFields.push('wallet_phone');
+    }
+
+    var cpf = document.getElementById('wallet_doc').value.replace(/[^0-9]/g, '');
+    if (cpf.length == 0) {
+        html += 'CPF/CNPJ é obrigatório. <br>';
+		errorFields.push('wallet_doc');
+    } else {
+        if (!verifyDoc('wallet_doc')) {
+            html += 'CPF/CNPJ inválido. <br>';
+			errorFields.push('wallet_doc');
+        }
+    }
+
+    var nome = document.getElementById('wallet_name').value;
+    if (nome.length == 0) {
+        html += 'Nome é obrigatório. <br>';
+		errorFields.push('wallet_name');
+    }
+    if (nome.length < 4) {
+        html += 'Nome Inválido. <br>';
+		errorFields.push('wallet_name');
+    }
+
+	var invoiceAddress = document.getElementById('ps_wallet_address_invoice').value.trim();
+	if (invoiceAddress.length == 0) {
+		html += 'Endereço de Cobrança não preenchido. <br>';
+		errorFields.push('ps_wallet_address_invoice');
+		wallet_adress_error = true;
+	}
+
+	var postcodeNumber = document.getElementById('ps_wallet_postcode_invoice').value.trim();
+	if (postcodeNumber.length < 7) {
+		html += 'CEP não preenchido ou inválido. <br>';
+		errorFields.push('ps_wallet_postcode_invoice');
+		wallet_adress_error = true;
+	}
+
+	var invoiceNumber = document.getElementById('ps_wallet_number_invoice').value.trim();
+	if (invoiceNumber.length == 0) {
+		html += 'Número do Endereço não preenchido. <br>';
+		errorFields.push('ps_wallet_number_invoice');
+		wallet_adress_error = true;
+	}
+
+	var invoiceDistrict = document.getElementById('ps_wallet_address2_invoice').value.trim();
+	if (invoiceDistrict.length == 0) {
+		html += 'Bairro do Endereço não preenchido. <br>';
+		errorFields.push('ps_wallet_address2_invoice');
+		wallet_adress_error = true;
+	}
+
+	var invoiceCity = document.getElementById('ps_wallet_city_invoice').value.trim();
+	if (invoiceCity.length == 0) {
+		html += 'Cidade do Endereço não preenchido. <br>';
+		errorFields.push('ps_wallet_city_invoice');
+		wallet_adress_error = true;
+	}
+
+	var invoiceState = document.getElementById('ps_wallet_state_invoice').value;
+	if (invoiceState.length == 0) {
+		html += 'Estado do Endereço não preenchido. <br>';
+		errorFields.push('ps_wallet_state_invoice');
+		wallet_adress_error = true;
+	}
+
+	if (typeof errorFields !== 'undefined' && errorFields.length > 0) {
+		for (var i = 0; i < errorFields.length; i++) {
+			if (msg_console === 1) {
+				console.log(errorFields[i]);
+			}
+			changeFieldClassName(errorFields[i], true);
+		}
+	}
+
+    if (html.length > 0) {
+        showError(html, 5);
+		if (wallet_adress_error === true) {
+			$('#ps_wallet_address').collapse('show');
+		}
+		if (ps_version >= '1.7') {
+			checkTos(false);
+		}
+        return false;
+    } else {
+		if (ps_version >= '1.7') {
+			checkTos(true);
+		}
+        return true;
+    }
+}
+
 var formatMoney = function (value) {
     var valueAsNumber = Number(value);
     return 'R$ ' + valueAsNumber.toMoney(2, ',', '.');
@@ -902,6 +1036,7 @@ function showLoading(hide, id) {
 	var submitCard = document.getElementById('submitCard');
 	var submitBankSlip = document.getElementById('submitBankSlip');
 	var submitPix = document.getElementById('submitPix');
+	var submitWallet = document.getElementById('submitWallet');
 	
 	if (!hide || hide == ''){
 		if (id == 'installments' || id == 'delete_card') {
@@ -919,6 +1054,9 @@ function showLoading(hide, id) {
 			if (submitPix != null) {
 				submitPix.disabled = true;
 			}
+			if (submitWallet != null) {
+				submitWallet.disabled = true;
+			}
 		}
 		document.getElementById('pagbankproccess').style.display = 'block';
 		document.getElementById('fancy_load').classList.add('loading');
@@ -933,6 +1071,9 @@ function showLoading(hide, id) {
 			}
 			if (submitPix != null) {
 				submitPix.disabled = false;
+			}
+			if (submitWallet != null) {
+				submitWallet.disabled = false;
 			}
 		}
 		document.getElementById('pagbankproccess').style.display = 'none';
@@ -1097,13 +1238,11 @@ function sendAjaxCall(actionCalled, formData, id = false) {
 					pagbankmsg.innerHTML = DOMPurify.sanitize(resp_string, { SAFE_FOR_JQUERY: true });
 					
 					if (charge.status == 'AVAILABLE' || charge.status == 'AUTHORIZED' || charge.status == 'PAID' || charge.status == 'WAITING' || charge.status == 'IN_ANALYSIS') {
-						//Success
 						setTimeout(function () {
 							redirectValidation();
 						}, 2000);
 						ret = true;
 					}else{
-						//Declined / Canceled
 						setTimeout(function () {
 							pagbankmsg.innerHTML = DOMPurify.sanitize('Por favor, verifique os dados do cartão e tente novamente, ou escolha outra opção de pagamento.', { SAFE_FOR_JQUERY: true });
 						}, 2000);
@@ -1112,7 +1251,7 @@ function sendAjaxCall(actionCalled, formData, id = false) {
 						}, 5000);
 						ret = false;
 					}
-				}else if(resp.hasOwnProperty('qr_codes')){
+				}else if(resp.hasOwnProperty('qr_codes') || resp.hasOwnProperty('deep_links')){
 					var resp_string = 'Pedido Processado!<br/>Aguardando Pagamento!';
 					var pagbankmsg = document.getElementById('pagbankmsg');
 					pagbankmsg.innerHTML = DOMPurify.sanitize(resp_string, { SAFE_FOR_JQUERY: true });
@@ -1123,7 +1262,6 @@ function sendAjaxCall(actionCalled, formData, id = false) {
 					ret = true;
 				}
 			}else{
-				//Erros
 				var resp_string = 'Houve um erro ao processar seu pagamento. Por favor, tente novamente.';
 				var pagbankmsg = document.getElementById('pagbankmsg');
 				pagbankmsg.innerHTML = DOMPurify.sanitize(resp_string, { SAFE_FOR_JQUERY: true });

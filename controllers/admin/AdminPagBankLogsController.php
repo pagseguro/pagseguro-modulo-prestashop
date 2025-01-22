@@ -3,14 +3,14 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Pagamento com Pix, Boleto e Cartão de Crédito
+ * Pagamento com Cartão de Crédito, Boleto, Pix e super app PagBank
  * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
  * 
  * @author
- * 2011-2024 PrestaBR - https://prestabr.com.br
+ * 2011-2025 PrestaBR - https://prestabr.com.br
  * 
  * @copyright
- * 1996-2024 PagBank - https://pagseguro.uol.com.br
+ * 1996-2025 PagBank - https://pagseguro.uol.com.br
  * 
  * @license
  * Open Software License 3.0 (OSL 3.0) - https://opensource.org/license/osl-3-0-php/
@@ -38,6 +38,17 @@ class AdminPagBankLogsController extends ModuleAdminController
         $this->allow_export = true;
         $this->addRowAction('view');
         $this->addRowAction('delete');
+        $this->default_form_language = $this->context->language->id;
+        $this->_use_found_rows = false;
+        $type = Tools::getValue('type');
+        if (Tools::getIsset('type')) {
+            if ($type == 'other') {
+                $this->_select .= ' WHERE `type` != "error" AND `type` != "curl";';
+            } elseif ($type == 'other') {
+                $this->_select .= ' WHERE `type` == "' . $type . '";';
+            }
+        }
+        $this->_filter = 'AND (a.id_shop = ' . (int)$this->context->shop->id . ' OR a.id_shop IS NULL)';
         $this->bulk_actions = array(
             'delete' => array(
                 'text' => $this->l('Delete selected'),
@@ -45,9 +56,6 @@ class AdminPagBankLogsController extends ModuleAdminController
                 'icon' => 'icon-trash'
             )
         );
-
-        $this->default_form_language = $this->context->language->id;
-        $this->_use_found_rows = true;
         $this->fields_list = array(
             'id_log' => array(
                 'title' => $this->l('ID'),
@@ -83,19 +91,9 @@ class AdminPagBankLogsController extends ModuleAdminController
                 "type" => "text",
                 'class' => 'fixed-width-sm',
                 "orderby" => true,
-                //"callback" => stripslashes(),
             )
         );
-
-        $type = Tools::getValue('type');
-        if (Tools::getIsset('type')) {
-            if ($type == 'other') {
-                $this->_select .= ' WHERE `type` != "error" AND `type` != "curl";';
-            } elseif ($type == 'other') {
-                $this->_select .= ' WHERE `type` == "' . $type . '";';
-            }
-        }
-        $this->_use_found_rows = false;
+        AdminController::initShopContext();
         parent::__construct();
     }
 

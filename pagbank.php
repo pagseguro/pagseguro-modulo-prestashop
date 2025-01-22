@@ -3,14 +3,14 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Pagamento com Pix, Boleto e Cartão de Crédito
+ * Pagamento com Cartão de Crédito, Boleto, Pix e super app PagBank
  * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
  * 
  * @author
- * 2011-2024 PrestaBR - https://prestabr.com.br
+ * 2011-2025 PrestaBR - https://prestabr.com.br
  * 
  * @copyright
- * 1996-2024 PagBank - https://pagseguro.uol.com.br
+ * 1996-2025 PagBank - https://pagseguro.uol.com.br
  * 
  * @license
  * Open Software License 3.0 (OSL 3.0) - https://opensource.org/license/osl-3-0-php/
@@ -47,6 +47,7 @@ class PagBank extends PaymentModule
 	public $public_key;
 	public $ready;
 	public $device;
+	public $shop_id;
 
 	/*
 	 * Função inicial da classe
@@ -56,7 +57,7 @@ class PagBank extends PaymentModule
 	{
 		$this->name = 'pagbank';
 		$this->tab = 'payments_gateways';
-		$this->version = '1.7.2';
+		$this->version = '1.8.0';
 		$this->author = 'PrestaBR';
 		$this->urls = array(
 			'notification' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/notify.php',
@@ -133,6 +134,13 @@ class PagBank extends PaymentModule
 			$this->device = "d";
 		}
 
+		$this->context = Context::getContext();
+		$shop_id = 1;
+		if (!is_null($this->context->shop->id)) {
+			$shop_id = (int)$this->context->shop->id;
+			$this->shop_id = $shop_id;
+		}
+
 		parent::__construct();
 
 		$this->displayName = $this->l('PagBank - Checkout Transparente');
@@ -191,6 +199,8 @@ class PagBank extends PaymentModule
 			Configuration::updateValue('PAGBANK_BANKSLIP_TEXT', 'Pedido realizado na loja ' . Configuration::get("PS_SHOP_NAME"), false);
 			Configuration::updateValue('PAGBANK_PIX', '1', false);
 			Configuration::updateValue('PAGBANK_PIX_TIME_LIMIT', 30, false);
+			Configuration::updateValue('PAGBANK_WALLET', 1, false);
+			Configuration::updateValue('PAGBANK_WALLET_TIME_LIMIT', 1440, false);
 
 			//Status dos pedido
 			Configuration::updateValue('PAGBANK_PAID', _PS_OS_PAYMENT_, false);
@@ -206,6 +216,7 @@ class PagBank extends PaymentModule
 			Configuration::updateValue('PAGBANK_DISCOUNT_CREDIT', 0, false);
 			Configuration::updateValue('PAGBANK_DISCOUNT_BANKSLIP', 0, false);
 			Configuration::updateValue('PAGBANK_DISCOUNT_PIX', 0, false);
+			Configuration::updateValue('PAGBANK_DISCOUNT_WALLET', 0, false);
 
 			//Gerenciamento de Banco de Dados, Log e Erros
 			Configuration::updateValue('PAGBANK_SHOW_CONSOLE', 0, false);
@@ -339,7 +350,8 @@ class PagBank extends PaymentModule
 		if (
 			(int)Configuration::get('PAGBANK_CREDIT_CARD') +
 			(int)Configuration::get('PAGBANK_BANKSLIP') +
-			(int)Configuration::get('PAGBANK_PIX') == 0
+			(int)Configuration::get('PAGBANK_PIX') +
+			(int)Configuration::get('PAGBANK_WALLET') == 0
 		) {
 			$output .= $this->displayError('Pelo menos 1 opção de pagamento deve estar ativa para este módulo funcionar.');
 		}
@@ -528,6 +540,7 @@ class PagBank extends PaymentModule
 		$states = State::getStatesByIdCountry($id_country);
 
 		$pix_expiration = Configuration::get('PAGBANK_PIX_TIME_LIMIT');
+		$wallet_expiration = Configuration::get('PAGBANK_WALLET_TIME_LIMIT');
 		$current_hour = date("H", time());
 
 		$alternate_time = false;
@@ -538,18 +551,21 @@ class PagBank extends PaymentModule
 		$active_payments = array(
 			'credit_card' => (bool)Configuration::get('PAGBANK_CREDIT_CARD'),
 			'bankslip' => (bool)Configuration::get('PAGBANK_BANKSLIP'),
-			'pix' => (bool)Configuration::get('PAGBANK_PIX')
+			'pix' => (bool)Configuration::get('PAGBANK_PIX'),
+			'wallet' => (bool)Configuration::get('PAGBANK_WALLET')
 		);
 
 		$discounts = array(
 			'credit_card' => Configuration::get('PAGBANK_DISCOUNT_CREDIT') > 0 ? (bool)Configuration::get('PAGBANK_DISCOUNT_CREDIT') : false,
 			'bankslip' => Configuration::get('PAGBANK_DISCOUNT_BANKSLIP') > 0 ? (bool)Configuration::get('PAGBANK_DISCOUNT_BANKSLIP') : false,
 			'pix' => Configuration::get('PAGBANK_DISCOUNT_PIX') > 0 ? (bool)Configuration::get('PAGBANK_DISCOUNT_PIX') : false,
+			'wallet' => Configuration::get('PAGBANK_DISCOUNT_WALLET') > 0 ? (bool)Configuration::get('PAGBANK_DISCOUNT_WALLET') : false,
 			'discount_type' => Configuration::get('PAGBANK_DISCOUNT_TYPE'),
 			'discount_value' => Configuration::get('PAGBANK_DISCOUNT_VALUE'),
 			'credit_card_value' => $this->calculateDiscounts('credit_card', 1),
 			'bankslip_value' => $this->calculateDiscounts('bankslip'),
-			'pix_value' => $this->calculateDiscounts('pix')
+			'pix_value' => $this->calculateDiscounts('pix'),
+			'wallet_value' => $this->calculateDiscounts('wallet')
 		);
 
 		$this->smarty->assign(array(
@@ -570,6 +586,7 @@ class PagBank extends PaymentModule
 			'idmodule' => $this->id,
 			'checkout' => (bool)Configuration::get('PS_ORDER_PROCESS_TYPE'),
 			'pix_timeout' => $this->calculateDeadline((int)$pix_expiration),
+			'wallet_timeout' => $this->calculateDeadline((int)$wallet_expiration),
 			'alternate_time' => $alternate_time,
 			'bankslip_date_limit' => (int)Configuration::get('PAGBANK_BANKSLIP_DATE_LIMIT'),
 			'bankslip_text' => (int)Configuration::get('PAGBANK_BANKSLIP_TEXT'),
@@ -605,7 +622,8 @@ class PagBank extends PaymentModule
 		$active_payments = array(
 			'credit_card' => (bool)Configuration::get('PAGBANK_CREDIT_CARD'),
 			'bankslip' => (bool)Configuration::get('PAGBANK_BANKSLIP'),
-			'pix' => (bool)Configuration::get('PAGBANK_PIX')
+			'pix' => (bool)Configuration::get('PAGBANK_PIX'),
+			'wallet' => (bool)Configuration::get('PAGBANK_WALLET')
 		);
 
 		$pay_options = array();
@@ -646,6 +664,18 @@ class PagBank extends PaymentModule
 			$pay_options[] = $ps_option;
 		}
 
+		if ($active_payments['wallet']) {
+			$pay_text = 'Pagar com PagBank'.$this->messageDiscounts('wallet');
+			$pay_tpl = 'wallet.tpl';
+			$ps_option = new PrestaShop\PrestaShop\Core\Payment\PaymentOption();
+			$ps_option->setModuleName($this->name)
+				->setCallToActionText($pay_text)
+				->setLogo($this->urls['img'] . 'pagbank-logo-animado_35px.gif')
+				->setAction($this->context->link->getModuleLink($this->name, 'validation', array('ptype' => 'wallet'), true))
+				->setForm($this->fetch('module:pagbank/views/templates/v8/hook/' . $pay_tpl));
+			$pay_options[] = $ps_option;
+		}
+
 		return $pay_options;
 	}
 
@@ -676,18 +706,21 @@ class PagBank extends PaymentModule
 			$active_payments = array(
 				'credit_card' => (bool)Configuration::get('PAGBANK_CREDIT_CARD'),
 				'bankslip' => (bool)Configuration::get('PAGBANK_BANKSLIP'),
-				'pix' => (bool)Configuration::get('PAGBANK_PIX')
+				'pix' => (bool)Configuration::get('PAGBANK_PIX'),
+				'wallet' => (bool)Configuration::get('PAGBANK_WALLET')
 			);
 
 			$discounts = array(
 				'credit_card' => Configuration::get('PAGBANK_DISCOUNT_CREDIT') > 0 ? (bool)Configuration::get('PAGBANK_DISCOUNT_CREDIT') : false,
 				'bankslip' => Configuration::get('PAGBANK_DISCOUNT_BANKSLIP') > 0 ? (bool)Configuration::get('PAGBANK_DISCOUNT_BANKSLIP') : false,
 				'pix' => Configuration::get('PAGBANK_DISCOUNT_PIX') > 0 ? (bool)Configuration::get('PAGBANK_DISCOUNT_PIX') : false,
+				'wallet' => Configuration::get('PAGBANK_DISCOUNT_WALLET') > 0 ? (bool)Configuration::get('PAGBANK_DISCOUNT_WALLET') : false,
 				'discount_type' => Configuration::get('PAGBANK_DISCOUNT_TYPE'),
 				'discount_value' => Configuration::get('PAGBANK_DISCOUNT_VALUE'),
 				'credit_card_value' => $this->calculateDiscounts('credit_card', 1),
 				'bankslip_value' => $this->calculateDiscounts('bankslip'),
-				'pix_value' => $this->calculateDiscounts('pix')
+				'pix_value' => $this->calculateDiscounts('pix'),
+				'wallet_value' => $this->calculateDiscounts('wallet')
 			);
 
 			$method = false;
@@ -749,7 +782,6 @@ class PagBank extends PaymentModule
 
 		$transaction = $this->getTransaction($transaction_code, $id_cart);
 
-		//Charges
 		if (isset($transaction->charges)) {
 			$payment = end($transaction->charges);
 			$payment_type = $payment->payment_method->type;
@@ -773,6 +805,27 @@ class PagBank extends PaymentModule
 					if ($qr_link->media == 'image/png') {
 						$pix['link'] = $qr_link->href;
 					}
+				}
+			} elseif (isset($transaction->qr_codes) && $transaction->qr_codes[0]->arrangements[0] == 'PAGBANK' || 
+			isset($transaction->deep_links) && $transaction->deep_links[0]->url){
+				$wallet = array();
+				$payment_type = 'WALLET';
+				$wallet_expiration = Configuration::get('PAGBANK_WALLET_TIME_LIMIT');
+				if(isset($transaction->qr_codes) && $transaction->qr_codes[0]->arrangements[0] == 'PAGBANK'){
+					$qr = end($transaction->qr_codes);
+					$wallet['id'] = $qr->id;
+					$wallet['text'] = $qr->text;
+					$wallet['deadline'] = $this->calculateDeadline($wallet_expiration);
+					$wallet['expiration_date'] = $qr->expiration_date;
+					foreach ($qr->links as $qr_link) {
+						if ($qr_link->media == 'image/png') {
+							$wallet['link'] = $qr_link->href;
+						}
+					}
+				} else {
+					$wallet['deadline'] = $this->calculateDeadline($wallet_expiration);
+					$wallet['expiration_date'] = date(DATE_ATOM, strtotime("+{$wallet_expiration} minutes"));
+					$wallet['link'] = $transaction->deep_links[0]->url;
 				}
 			}
 		}
@@ -799,6 +852,7 @@ class PagBank extends PaymentModule
 			'transaction' => $transaction,
 			'payment_status' => $this->parseStatus($payment_status),
 			'pix' => isset($pix) && is_array($pix) ? $pix : false,
+			'wallet' => isset($wallet) && is_array($wallet) ? $wallet : false,
 			'current_hour' => $current_hour,
 			'alternate_time' => $alternate_time,
 			'payment_type' => $payment_type,
@@ -973,6 +1027,7 @@ class PagBank extends PaymentModule
 			'PAGBANK_BANKSLIP_TEXT' => Tools::getValue('PAGBANK_BANKSLIP_TEXT', Configuration::get('PAGBANK_BANKSLIP_TEXT')),
 			'PAGBANK_PIX' => Tools::getValue('PAGBANK_PIX', Configuration::get('PAGBANK_PIX')),
 			'PAGBANK_PIX_TIME_LIMIT' => Tools::getValue('PAGBANK_PIX_TIME_LIMIT', Configuration::get('PAGBANK_PIX_TIME_LIMIT')),
+			'PAGBANK_WALLET' => Tools::getValue('PAGBANK_WALLET', Configuration::get('PAGBANK_WALLET')),
 
 			'PAGBANK_PAID' => Tools::getValue('PAGBANK_PAID', Configuration::get('PAGBANK_PAID')),
 			'PAGBANK_AUTHORIZED' => Tools::getValue('PAGBANK_AUTHORIZED', Configuration::get('PAGBANK_AUTHORIZED')),
@@ -1115,11 +1170,6 @@ class PagBank extends PaymentModule
 				}
 			}
 
-			$shop_id = 1;
-			if (!is_null($this->context->shop->id)) {
-				$shop_id = $this->context->shop->id;
-			}
-
 			if($data['payment_type'] == "CREDIT_CARD") {
 				$capture = (int)Configuration::get('PAGBANK_CAPTURE_METHOD');
 			} else {
@@ -1127,7 +1177,7 @@ class PagBank extends PaymentModule
 			}
 
 			$ins_query = 'INSERT INTO `' . _DB_PREFIX_ . 'pagbank` (`id_shop`, `id_customer`, `cpf_cnpj`, `id_cart`, `id_order`, `reference`, `transaction_code`, `buyer_ip`, `status`, `status_description`, `payment_type`, `payment_description`, `installments`, `nsu`, `url`, `credential`, `capture`, `environment`, `date_add`, `date_upd`)';
-			$ins_query .= ' VALUES (' . (int)$shop_id . ', "' . (int)$data['id_customer'] . '", "' . pSQL($data['cpf_cnpj']) . '", ' . (int)$data['id_cart'] . ', ' . (int)$data['id_order'] . ', "' . pSQL($data['reference']) . '", "' . pSQL($data['transaction_code']) . '", "' . pSQL($data['buyer_ip']) . '", "' . pSQL($data['status']) . '", "' . pSQL($data['status_description']) . '", "' . pSQL($data['payment_type']) . '", "' . pSQL($data['payment_description']) . '", ' . (int)$data['installments'] . ', "' . pSQL($data['nsu']) . '", "' . pSQL($data['url']) . '", "' . pSQL($this->credential_type) . '", "' .(int)$capture. '", "' .(int)$data['environment']. '", "' . pSQL($data['date_add']) . '", "' . date("Y-m-d H:i:s") . '")';
+			$ins_query .= ' VALUES (' . (int)$this->shop_id . ', "' . (int)$data['id_customer'] . '", "' . pSQL($data['cpf_cnpj']) . '", ' . (int)$data['id_cart'] . ', ' . (int)$data['id_order'] . ', "' . pSQL($data['reference']) . '", "' . pSQL($data['transaction_code']) . '", "' . pSQL($data['buyer_ip']) . '", "' . pSQL($data['status']) . '", "' . pSQL($data['status_description']) . '", "' . pSQL($data['payment_type']) . '", "' . pSQL($data['payment_description']) . '", ' . (int)$data['installments'] . ', "' . pSQL($data['nsu']) . '", "' . pSQL($data['url']) . '", "' . pSQL($this->credential_type) . '", "' . (int)$capture . '", "' . (int)$this->environment . '", "' . pSQL($data['date_add']) . '", "' . date("Y-m-d H:i:s") . '")';
 			$insert = Db::getInstance()->execute($ins_query);
 			if (!$insert || (bool)$insert !== true) {
 				$this->saveLog('error', 'insertPagBankData', $data['id_cart'], $ins_query, 'Pedido nao inserido no banco.');
@@ -1152,7 +1202,9 @@ class PagBank extends PaymentModule
 		if ((int)Configuration::get('PAGBANK_DISCOUNT_PIX') == 1) {
 			$discount_options[] = 'pix';
 		}
-
+		if ((int)Configuration::get('PAGBANK_DISCOUNT_WALLET') == 1) {
+			$discount_options[] = 'wallet';
+		}
 		$discount_type = Configuration::get('PAGBANK_DISCOUNT_TYPE');
 		$discount_value = (float)Configuration::get('PAGBANK_DISCOUNT_VALUE');
 		$total_products = $this->context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS);
@@ -1191,7 +1243,9 @@ class PagBank extends PaymentModule
 		if ((int)Configuration::get('PAGBANK_DISCOUNT_PIX') == 1) {
 			$discount_options[] = 'pix';
 		}
-
+		if ((int)Configuration::get('PAGBANK_DISCOUNT_WALLET') == 1) {
+			$discount_options[] = 'wallet';
+		}
 		$discount_type = Configuration::get('PAGBANK_DISCOUNT_TYPE');
 		$discount_value = (float)Configuration::get('PAGBANK_DISCOUNT_VALUE');
 		if (in_array($payment_type, $discount_options) && $discount_type >= 1 && $discount_value >= 1) {
@@ -1214,7 +1268,7 @@ class PagBank extends PaymentModule
 	{
 		$this->ps_errors = array();
 		$this->ps_params = array();
-		$this->processBasicData();
+		$this->processReference();
 		$this->processFormData($form_data);
 		$order_products = $this->processOrderProducts();
 		$pix_expiration = Configuration::get('PAGBANK_PIX_TIME_LIMIT');
@@ -1265,7 +1319,7 @@ class PagBank extends PaymentModule
 				}
 			},
 			"notification_urls": [
-				"' . $this->ps_params['notificationURL'] . '"
+				"' . $this->urls['notification'] . '"
 			]
 		}';
 
@@ -1274,6 +1328,87 @@ class PagBank extends PaymentModule
 			return $api_response;
 		} else {
 			$this->ps_errors[] = 'Erro no processamento do PIX.';
+			return $api_response;
+		}
+	}
+
+	/*
+	 * Processa pagamento com o super app PagBank
+	*/
+	public function processWalletPayment($form_data)
+	{
+		$this->ps_errors = array();
+		$this->ps_params = array();
+		$this->processReference();
+		$this->processFormData($form_data);
+		$order_products = $this->processOrderProducts();
+
+		$total_paid = $this->calculateDiscounts('wallet');
+
+		if($this->device == 't' || $this->device == 'm'){
+			$link = new Link();
+			$qr_deep = '
+			"deep_links": [
+				{
+					"amount": {
+						"value": ' . number_format($total_paid, 2, "", "") . '
+					},
+					"redirect_url": "' . $link->getPageLink('history', true) . '"
+				}
+			]';
+		} else {
+			$qr_deep = '
+			"qr_codes": [
+				{
+					"amount": {
+						"value": ' . number_format($total_paid, 2, "", "") . '
+					},
+					"arrangements": ["PAGBANK"]
+				}
+			]';
+		}
+
+		$json_wallet = '{
+			"reference_id": "' . $this->ps_params['reference'] . '",
+			"customer": {
+				"name": "' . $this->ps_params['holderName'] . '",
+				"email": "' . $this->ps_params['senderEmail'] . '",
+				"tax_id": "' . $this->ps_params['senderCPFCNPJ'] . '", 
+				"phones": [
+					{
+						"country": "+55",
+						"area": "' . $this->ps_params['senderAreaCode'] . '",
+						"number": "' . $this->ps_params['senderPhone'] . '",
+						"type": "' . $this->ps_params['senderPhoneType'] . '"
+					}
+				]
+				  
+			},
+			"items": ' . $order_products . ',
+			' . $qr_deep . ',
+			"shipping": {
+				"address": {
+					"street": "' . $this->ps_params['billingAddressStreet'] . '",
+					"number": "' . $this->ps_params['billingAddressNumber'] . '",
+					"complement": "' . $this->ps_params['billingAddressComplement'] . '",
+					"locality": "' . $this->ps_params['billingAddressDistrict'] . '",
+					"city": "' . $this->ps_params['billingAddressCity'] . '",
+					"region": "' . $this->ps_params['billingAddressState'] . '",
+					"region_code": "' . $this->ps_params['billingAddressStateCode'] . '",
+					"country": "BRA",
+					"postal_code": "' . $this->ps_params['billingAddressPostalCode'] . '"
+				}
+			},
+			"notification_urls": [
+				"' . $this->urls['notification'] . '"
+			]
+		}';
+
+		$api_response = $this->curl_send('POST', $this->urls['api'] . 'orders', preg_replace('!\?\\n?\\t!', "", $json_wallet), 30, $this->context->cart->id);
+		if (!$api_response['errors']) {
+			return $api_response;
+		} else {
+			$this->ps_errors[] = 'Erro no processamento via Carteira Digital.';
 			return $api_response;
 		}
 	}
@@ -1308,7 +1443,7 @@ class PagBank extends PaymentModule
 	{
 		$this->ps_errors = array();
 		$this->ps_params = array();
-		$this->processBasicData();
+		$this->processReference();
 		$this->processFormData($form_data);
 		$this->processCreditCardData($form_data);
 		$order_products = $this->processOrderProducts();
@@ -1421,7 +1556,7 @@ class PagBank extends PaymentModule
 				}
 			},
 			"notification_urls": [
-				"' . $this->ps_params['notificationURL'] . '"
+				"' . $this->urls['notification'] . '"
 			],
 			"charges": [
 				{
@@ -1436,7 +1571,7 @@ class PagBank extends PaymentModule
 					},
 					"metadata": {},
 					"notification_urls": [
-						"' . $this->ps_params['notificationURL'] . '"
+						"' . $this->urls['notification'] . '"
 					]
 				}
 			]
@@ -1481,7 +1616,7 @@ class PagBank extends PaymentModule
 	{
 		$this->ps_errors = array();
 		$this->ps_params = array();
-		$this->processBasicData();
+		$this->processReference();
 		$this->processFormData($form_data);
 		$order_products = $this->processOrderProducts();
 
@@ -1526,7 +1661,7 @@ class PagBank extends PaymentModule
 				}
 			},
 			"notification_urls": [
-				"' . $this->ps_params['notificationURL'] . '"
+				"' . $this->urls['notification'] . '"
 			],
 			"charges": [
 				{
@@ -1563,7 +1698,7 @@ class PagBank extends PaymentModule
 						}
 					},
 					"notification_urls": [
-						"' . $this->ps_params['notificationURL'] . '"
+						"' . $this->urls['notification'] . '"
 					]
 				}
 			]
@@ -1722,18 +1857,13 @@ class PagBank extends PaymentModule
 	}
 
 	/* 
-	 * Processa parâmetros comuns de envio de transações
+	 * Gera referência única pra tentativa de pagamento
 	 */
-	private function processBasicData()
+	private function processReference()
 	{
-		$this->ps_params['receiverEmail'] = Configuration::get('PAGBANK_EMAIL');
-		$this->ps_params['notificationURL'] = $this->urls['notification'];
-		$this->ps_params['currency'] = 'BRL';
-		$this->ps_params['paymentMode'] = 'default';
-		$this->ps_params['reference'] = $this->context->cart->id . '.' . Configuration::get('PAGBANK_CREDENTIAL') . '.' . $this->sortRefNumber();
-		if (empty($this->ps_params['receiverEmail']) || empty($this->ps_params['notificationURL']) || empty($this->ps_params['currency']) || empty($this->ps_params['paymentMode']) || empty($this->ps_params['reference'])) {
-			$this->ps_errors[] = 'Erro ao Processar Padrões.';
-		}
+
+		$this->ps_params['reference'] = $this->context->cart->id . '.' . $this->credential_type . '.' . $this->sortRefNumber();
+
 	}
 
 	/*
@@ -1790,6 +1920,8 @@ class PagBank extends PaymentModule
 			$holder_name = trim($form_data['bankslip_name']);
 		} elseif (isset($form_data['pix_name']) && strlen($form_data['pix_name']) > 3) {
 			$holder_name = trim($form_data['pix_name']);
+		} elseif (isset($form_data['wallet_name']) && strlen($form_data['wallet_name']) > 3) {
+			$holder_name = trim($form_data['wallet_name']);
 		}
 		$holder_name = preg_replace('/\s(?=\s)/', '', $holder_name);
 		if (strlen($holder_name) > 50) {
@@ -2142,9 +2274,9 @@ class PagBank extends PaymentModule
 			$public_key_obj = $api_response['response'];
 			if ($public_key_obj->public_key != '') {
 				if ($this->environment == 1) {
-					Configuration::updateValue('PAGBANK_PUBLIC_KEY', $public_key_obj->public_key);
+					Configuration::updateValue('PAGBANK_PUBLIC_KEY', $public_key_obj->public_key, false);
 				} else {
-					Configuration::updateValue('PAGBANK_PUBLIC_KEY_SANDBOX', $public_key_obj->public_key);
+					Configuration::updateValue('PAGBANK_PUBLIC_KEY_SANDBOX', $public_key_obj->public_key, false);
 				}
 				return true;
 			} else {
@@ -2181,8 +2313,8 @@ class PagBank extends PaymentModule
 		$clear_data = $this->removeSensitiveData($data);
 		$clear_response = $this->removeSensitiveData($response);
 
-		$query = 'INSERT INTO `' . _DB_PREFIX_ . 'pagbank_logs` (`datetime`, `type`, `method`, `id_cart`, `data`, `response`, `url`, `cron`) VALUES ';
-		$query .= ' (NOW(), "' . pSQL($type) . '", "' . pSQL($method) . '", ' . $id_cart . ', "' . addslashes($clear_data) . '", "' . addslashes($clear_response) . '" , "' . pSQL(addslashes($url)) . '", ' . $cron . ')';
+		$query = 'INSERT INTO `' . _DB_PREFIX_ . 'pagbank_logs` (`datetime`, `type`, `method`, `id_shop`, `id_cart`, `data`, `response`, `url`, `cron`) VALUES ';
+		$query .= ' (NOW(), "' . pSQL($type) . '", "' . pSQL($method) . '", ' . (int)$this->shop_id . ', ' . $id_cart . ', "' . addslashes($clear_data) . '", "' . addslashes($clear_response) . '" , "' . pSQL(addslashes($url)) . '", ' . $cron . ')';
 		if (Db::getInstance()->execute($query) === false) {
 			return false;
 		}
@@ -2282,7 +2414,7 @@ class PagBank extends PaymentModule
 		if (!$cart) {
 			$cart = $this->context->cart;
 		}
-		$code = (int)($cart->id_customer) . 'PAGBANK_' . $cart->id;
+		$code = (int)($cart->id_customer) . '_PAGBANK_' . $cart->id;
 
 		if (CartRule::cartRuleExists($code))
 			return;
@@ -2408,8 +2540,6 @@ class PagBank extends PaymentModule
 			}
 
 			$this->saveLog('app authorization', $app, false, $json_authorization, $resp, $post_url);
-
-			$this->getPublicKey();
 
 			return array(
 				'info' => $info,
@@ -2614,8 +2744,8 @@ class PagBank extends PaymentModule
 	*/
 	public function insertCustomerToken($info)
 	{
-		$ins_query = 'INSERT INTO `' . _DB_PREFIX_ . 'pagbank_customer_token` (`id_customer`, `card_name`, `card_brand`, `card_first_digits`, `card_last_digits`, `card_month`, `card_year`, `card_token`, `date_add`) ';
-		$ins_query .= ' VALUES (' . (int)$info['id_customer'] . ', "' . pSQL($info['card_name']) . '", "' . pSQL($info['card_brand']) . '", ' . (int)$info['card_first_digits'] . ', ' . (int)$info['card_last_digits'] . ', "' . pSQL($info['card_month']) . '", ' . (int)$info['card_year'] . ', "' . pSQL($info['card_token']) . '", "' . date("Y-m-d H:i:s") . '")';
+		$ins_query = 'INSERT INTO `' . _DB_PREFIX_ . 'pagbank_customer_token` (`id_shop`, `id_customer`, `card_name`, `card_brand`, `card_first_digits`, `card_last_digits`, `card_month`, `card_year`, `card_token`, `date_add`) ';
+		$ins_query .= ' VALUES (' . (int)$this->shop_id . ', ' . (int)$info['id_customer'] . ', "' . pSQL($info['card_name']) . '", "' . pSQL($info['card_brand']) . '", ' . (int)$info['card_first_digits'] . ', ' . (int)$info['card_last_digits'] . ', "' . pSQL($info['card_month']) . '", ' . (int)$info['card_year'] . ', "' . pSQL($info['card_token']) . '", "' . date("Y-m-d H:i:s") . '")';
 		if (!Db::getInstance()->execute($ins_query)) {
 			$this->saveLog('error', 'insertCustomerToken', $info['id_customer'], $ins_query, 'Cartão Criptografado não salvo no banco.');
 			return false;
@@ -2626,11 +2756,11 @@ class PagBank extends PaymentModule
 	/*
 	* Seleciona o cliente pelo cartão criptografado
 	*/
-	public function getCustomerToken($id_customer, $id_card_token = false)
+	public function getCustomerToken($id_customer, $id_customer_token = false)
 	{
-		$get_query = 'SELECT * FROM `' . _DB_PREFIX_ . 'pagbank_customer_token` WHERE `id_customer` = ' . (int)$id_customer;
-		if ($id_card_token && (int)$id_card_token > 0) {
-			$get_query .= ' AND `id_customer_token` = ' . (int)$id_card_token;
+		$get_query = 'SELECT * FROM `' . _DB_PREFIX_ . 'pagbank_customer_token` WHERE (`id_shop` = ' . (int)$this->shop_id . ' OR `id_shop` IS NULL) AND `id_customer` = ' . (int)$id_customer;
+		if ($id_customer_token && (int)$id_customer_token > 0) {
+			$get_query .= ' AND `id_customer_token` = ' . (int)$id_customer_token;
 		}
 		$return = Db::getInstance()->executeS($get_query);
 		if (!$return) {
@@ -2642,12 +2772,12 @@ class PagBank extends PaymentModule
 	/*
 	* Seleciona o cartão criptografado do cliente
 	*/
-	public function getCardToken($id_card_token)
+	public function getCardToken($id_customer_token)
 	{
-		$get_query = 'SELECT `card_token` FROM `' . _DB_PREFIX_ . 'pagbank_customer_token` WHERE `id_customer_token` = ' . (int)$id_card_token;
+		$get_query = 'SELECT `card_token` FROM `' . _DB_PREFIX_ . 'pagbank_customer_token` WHERE `id_customer_token` = ' . (int)$id_customer_token;
 		$return = Db::getInstance()->getValue($get_query);
 		if (!$return) {
-			$this->saveLog('error', 'getCardToken', $id_card_token, $get_query, 'Erro ao consultar os dados de cartão salvos para o cliente.');
+			$this->saveLog('error', 'getCardToken', $id_customer_token, $get_query, 'Erro ao consultar os dados de cartão salvos para o cliente.');
 			return false;
 		}
 		return $return;
@@ -2700,7 +2830,7 @@ class PagBank extends PaymentModule
 			'Ţ', 'ţ', 'Ť', 'ť', 'Ŧ', 'ŧ', 'Ũ', 'ũ', 'Ū', 'ū', 'Ŭ', 'ŭ', 'Ů', 'ů', 'Ű', 'ű', 'Ų', 'ų', 'Ŵ', 'ŵ', 'Ŷ', 'ŷ',
 			'Ÿ', 'Ź', 'ź', 'Ż', 'ż', 'Ž', 'ž', 'ſ', 'ƒ', 'Ơ', 'ơ', 'Ư', 'ư', 'Ǎ', 'ǎ', 'Ǐ', 'ǐ', 'Ǒ', 'ǒ', 'Ǔ', 'ǔ', 'Ǖ',
 			'ǖ', 'Ǘ', 'ǘ', 'Ǚ', 'ǚ', 'Ǜ', 'ǜ', 'Ǻ', 'ǻ', 'Ǽ', 'ǽ', 'Ǿ', 'ǿ', 'Ά', 'ά', 'Έ', 'έ', 'Ό', 'ό', 'Ώ', 'ώ', 'Ί',
-			'ί', 'ϊ', 'ΐ', 'Ύ', 'ύ', 'ϋ', 'ΰ', 'Ή', 'ή', '(', ')', 'º', 'ª', '"'
+			'ί', 'ϊ', 'ΐ', 'Ύ', 'ύ', 'ϋ', 'ΰ', 'Ή', 'ή', '(', ')', 'º', 'ª', '"', '°'
 		);
 
 		$b = array(
@@ -2714,7 +2844,7 @@ class PagBank extends PaymentModule
 			'T', 't', 'T', 't', 'T', 't', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'W', 'w', 'Y', 'y',
 			'Y', 'Z', 'z', 'Z', 'z', 'Z', 'z', 's', 'f', 'O', 'o', 'U', 'u', 'A', 'a', 'I', 'i', 'O', 'o', 'U', 'u', 'U',
 			'u', 'U', 'u', 'U', 'u', 'U', 'u', 'A', 'a', 'AE', 'ae', 'O', 'o', 'Α', 'α', 'Ε', 'ε', 'Ο', 'ο', 'Ω', 'ω', 'Ι',
-			'ι', 'ι', 'ι', 'Υ', 'υ', 'υ', 'υ', 'Η', 'η', '- ', '', 'o', 'a', ''
+			'ι', 'ι', 'ι', 'Υ', 'υ', 'υ', 'υ', 'Η', 'η', '- ', '', 'o', 'a', '', ''
 		);
 
 		return str_replace($a, $b, $str);

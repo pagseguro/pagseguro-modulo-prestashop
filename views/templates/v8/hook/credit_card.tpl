@@ -2,14 +2,14 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Pagamento com Pix, Boleto e Cartão de Crédito
+ * Pagamento com Cartão de Crédito, Boleto, Pix e super app PagBank
  * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
  * 
  * @author
- * 2011-2024 PrestaBR - https://prestabr.com.br
+ * 2011-2025 PrestaBR - https://prestabr.com.br
  * 
  * @copyright
- * 1996-2024 PagBank - https://pagseguro.uol.com.br
+ * 1996-2025 PagBank - https://pagseguro.uol.com.br
  * 
  * @license
  * Open Software License 3.0 (OSL 3.0) - https://opensource.org/license/osl-3-0-php/
@@ -60,6 +60,7 @@
 						onblur="checkField(this.id);" value="" size="30"
 						placeholder="{l s='Somente números' d='Modules.PagBank.Shop'}" required />
 				</div>
+				<span class="col-sm-12 form-control-comment">{l s='(cpf do titular do cartão)' d='Modules.PagBank.Shop'}</span>
 			</div>
 			<div class="form-group clearfix row text-xs-left text-sm-left" align="center">
 				<label class="text-xs-left text-sm-left col-xs-12 col-sm-12"

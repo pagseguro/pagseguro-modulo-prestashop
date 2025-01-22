@@ -1,6 +1,6 @@
 ![](https://prestabr.com.br/docpagbank/head_git_pagbank.jpg)
 
-<p align="center">PagBank - Checkout Transparente - v.1.7.2</p>
+<p align="center">PagBank - Checkout Transparente - v.1.8.0</p>
 
 ## Taxas Reduzidas!
 
@@ -75,11 +75,12 @@ Após se cadastrar no(s) App(s) desejado(s), marque a opção "Ambiente de Produ
 ---
 #### 3 - Configurações de Pagamento
 
-O módulo disponibiliza três opções de pagamento via Checkout Transparente: 
+O módulo disponibiliza quatro opções de pagamento via Checkout Transparente: 
 
 - Cartão de Crédito (+30 bandeiras)
 - Boleto Bancário
 - Pix
+- Pagar com PagBank
 
 ![](https://prestabr.com.br/docpagbank/3_configuracoes_de_pagamento_0.jpg "Configurações de Pagamento - Módulo PagBank")
 
@@ -140,7 +141,24 @@ Marque a opção "PIX" como SIM para ativar o meio de pagamento e visualizar as 
 
 ![](https://prestabr.com.br/docpagbank/3_configuracoes_de_pagamento_3.jpg "Configurações de Pagamento - Módulo PagBank")
 
-**3.4 - Opções de Descontos**
+**3.4 - Pagar com PagBank**
+
+Marque a opção "Pagar com PagBank" como SIM para ativar o meio de pagamento e visualizar as configurações relacionadas.
+Nesta opção de pagamento o cliente poderá realizar o pagamento com o saldo em conta ou cartão de crédito salvo no super app PagBank.
+
+**`Nota:`**
+
+> Não esqueça de configurar a Tarefa Cron para o cancelamento do pagamento via Pagar com PagBank.
+
+> Por enquanto, esta opção de pagamento tem algumas limitações:
+> - Não é possível especificar o prazo de expiração do qrcode/link de pagamento, o prazo padrão é de 24hs.
+> - Não é possível oferecer desconto no pagamento à vista.
+> - Não é possível especificar se o pagamento via cartão de crédito será com Pré-autorização.
+> - Não é possível especificar se o cliente poderá pagar somente com saldo em conta ou somente com cartão de crédito. As duas opções estarão disponíveis.
+
+![](https://prestabr.com.br/docpagbank/3_configuracoes_de_pagamento_3_4.jpg "Configurações de Pagamento - Módulo PagBank")
+
+**3.5 - Opções de Descontos**
 
 - Desconto de valor fixo ou percentual.
 - Valor do desconto.
@@ -149,6 +167,7 @@ Marque a opção "PIX" como SIM para ativar o meio de pagamento e visualizar as 
 - Desconto no Pix.
 
 > No Cartão e Crédito o desconto é calculado e exibido na primeira parcela.
+> Por enquanto, a opção de desconto não está disponível na modalidade: Pagar com PagBank.
 
 ![](https://prestabr.com.br/docpagbank/3_configuracoes_de_pagamento_4.jpg "Configurações de Pagamento - Módulo PagBank")
 
@@ -318,3 +337,8 @@ Só é possível realizar o estorno se o pedido estiver em um destes status:
 **v.1.7.2**
 - Correções de bugs;
 - Add mecanismo p/ informar sobre novas updates na Tab de Módulos no Admin;
+
+**v.1.8.0**
+- Otimizações e correções de bugs;
+- Melhorias de compatibilidade com Multilojas;
+- Add nova opção de pagamento: pagar com PagBank;

@@ -2,14 +2,14 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Pagamento com Cartão de Crédito, Boleto Bancário e Pix
+ * Pagamento com Cartão de Crédito, Boleto, Pix e super app PagBank
  * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
  * 
  * @author
- * 2011-2024 PrestaBR - https://prestabr.com.br
+ * 2011-2025 PrestaBR - https://prestabr.com.br
  * 
  * @copyright
- * 1996-2024 PagBank - https://pagseguro.uol.com.br
+ * 1996-2025 PagBank - https://pagseguro.uol.com.br
  * 
  * @license
  * Open Software License 3.0 (OSL 3.0) - https://opensource.org/license/osl-3-0-php/
@@ -34,7 +34,8 @@
 
 .container-card,
 .container-bankslip,
-.container-pix {
+.container-pix,
+.container-wallet {
   margin-top: 15px;
 }
 
@@ -64,9 +65,10 @@
   font-weight: bold;
 }
 
-#pagbank-container #cartao-tab.active a,
-#pagbank-container #boleto-tab.active a,
-#pagbank-container #pix-tab.active a {
+#pagbank-container #credit-tab.active a,
+#pagbank-container #bankslip-tab.active a,
+#pagbank-container #pix-tab.active a,
+#pagbank-container #wallet-tab.active a {
   color: #118cc3;
 }
 
@@ -99,7 +101,8 @@
   }
   .container-card,
   .container-bankslip,
-  .container-pix {
+  .container-pix,
+  .container-wallet {
     border: 1px solid #e0e0e0;
     padding: 15px 0;
     margin-top: 0;
@@ -130,7 +133,8 @@
 #pagbank-container .form-control,
 .container-card .form-control,
 .container-bankslip .form-control,
-.container-pix .form-control {
+.container-pix .form-control,
+.container-wallet .form-control {
   height: 45px !important;
   border-radius: 7px;
   padding-left: 8px;
@@ -167,28 +171,32 @@
 #pagbank-container .form-group.form-ok input,
 .container-card .form-group.form-ok input,
 .container-bankslip .form-group.form-ok input,
-.container-pix .form-group.form-ok input {
+.container-pix .form-group.form-ok input,
+.container-wallet .form-group.form-ok input {
   background-position: 96% center;
 }
 
 #pagbank-container .form-group.form-error input,
 .container-card .form-group.form-error input,
 .container-bankslip .form-group.form-error input,
-.container-pix .form-group.form-error input {
+.container-pix .form-group.form-error input,
+.container-wallet .form-group.form-error input {
   background-position: 96% center;
 }
 
 #pagbank-container .form-group.row,
 .container-card .form-group.row,
 .container-bankslip .form-group.row,
-.container-pix .form-group.row {
+.container-pix .form-group.row,
+.container-wallet .form-group.row {
   margin-bottom: 15px;
 }
 
 #pagbank-container .form-group label,
 .container-card .form-group label,
 .container-bankslip .form-group label,
-.container-pix .form-group label {
+.container-pix .form-group label,
+.container-wallet .form-group label {
   margin-bottom: 1px;
   margin-left: 3px;
 }
@@ -196,7 +204,8 @@
 #pagbank-container .alert-success,
 .container-card .alert-success,
 .container-bankslip .alert-success,
-.container-pix .alert-success {
+.container-pix .alert-success,
+.container-wallet .alert-success {
   padding-top: 5px;
   padding-bottom: 5px;
   font-size: 12px;
@@ -206,7 +215,8 @@
 #pagbank-container .alert-success:before,
 .container-card .alert-success:before,
 .container-bankslip .alert-success:before,
-.container-pix .alert-success:before {
+.container-pix .alert-success:before,
+.container-wallet .alert-success:before {
   font-size: 16px;
   vertical-align: -1px;
 }
@@ -260,7 +270,8 @@
 #pagbank-container .form-group.row .input-group,
 .container-card .form-group.row .input-group,
 .container-bankslip .form-group.row .input-group,
-.container-pix .form-group.row .input-group {
+.container-pix .form-group.row .input-group,
+.container-wallet .form-group.row .input-group {
   padding-left: 15px !important;
   padding-right: 15px !important;
 }
@@ -268,7 +279,8 @@
 #pagbank-container .info-discount,
 .container-card .info-discount,
 .container-bankslip .info-discount,
-.container-pix .info-discount {
+.container-pix .info-discount,
+.container-wallet .info-discount {
   margin: 10px 0 0 0;
   font-size: 13px;
 }
@@ -291,20 +303,23 @@
 }
 
 body#checkout section.checkout-step #ps_pix_address.address,
-body#checkout section.checkout-step #ps_bankslip_address.address {
+body#checkout section.checkout-step #ps_bankslip_address.address,
+body#checkout section.checkout-step #ps_walet_address.address {
   padding: 0 !important;
   margin: 15px 0 0 15px;
 }
 
 body#checkout section.checkout-step #ps_card_address.address,
 body#checkout section.checkout-step #ps_bankslip_address.address,
-body#checkout section.checkout-step #ps_pix_address.address {
+body#checkout section.checkout-step #ps_pix_address.address,
+body#checkout section.checkout-step #ps_wallet_address.address {
   padding: 0 !important;
   margin: 15px 0 0 0;
 }
 
 body#checkout .container #fancy_load #pagbankproccess,
-body#checkout .container #pix_success #proccess_pix {
+body#checkout .container #pix_success #proccess_pix,
+body#checkout .container #wallet_success #proccess_wallet {
   height: 140px;
   min-height: 140px;
 }
@@ -318,7 +333,8 @@ body#checkout .container #pix_success #proccess_pix {
 #pagbank-container .selector span,
 .container-card .selector span,
 .container-bankslip .selector span,
-.container-pix .selector span {
+.container-pix .selector span,
+.container-wallet .selector span {
   min-width: 49px;
 }
 
@@ -345,7 +361,8 @@ body#checkout .container #pix_success #proccess_pix {
 #pagbank-container .form-ok .selector span,
 .container-card .form-ok .selector span,
 .container-bankslip .form-ok .selector span,
-.container-pix .form-ok .selector span {
+.container-pix .form-ok .selector span,
+.container-wallet .form-ok .selector span {
   color: #35b33f;
 }
 
@@ -369,7 +386,8 @@ body#checkout .container #pix_success #proccess_pix {
 #pagbank-container .alert-info,
 .container-card .alert-info,
 .container-bankslip .alert-info,
-.container-pix .alert-info {
+.container-pix .alert-info,
+.container-wallet .alert-info {
   margin: 10px 0;
   padding: 5px;
   background-color: #428bca !important;
@@ -399,7 +417,11 @@ body#checkout .container #pix_success #proccess_pix {
 .container-pix .btn-info,
 .container-pix .btn-info:focus,
 .container-pix .btn-info:active,
-.container-pix .btn-info.active {
+.container-pix .btn-info.active,
+.container-wallet .btn-info,
+.container-wallet .btn-info:focus,
+.container-wallet .btn-info:active,
+.container-wallet .btn-info.active{
   color: #fff;
   background-color: #428bca !important;
   border-color: #428bca !important;
@@ -408,14 +430,16 @@ body#checkout .container #pix_success #proccess_pix {
 #pagbank-container .btn-info:hover,
 .container-card .btn-info:hover,
 .container-bankslip .btn-info:hover,
-.container-pix .btn-info:hover {
+.container-pix .btn-info:hover,
+.container-wallet .btn-info:hover {
   background-color: #2ea1d5 !important;
   border-color: #2ea1d5 !important;
 }
 
 /* Loader Background */
 #fancy_load #pagbankproccess #pagbankmsg,
-#pix_success #proccess_pix #pagbankmsg {
+#pix_success #proccess_pix #pagbankmsg,
+#wallet_success #proccess_wallet #pagbankmsg {
   font-size: 15px;
   color: #555;
   line-height: 1.6;
@@ -423,17 +447,20 @@ body#checkout .container #pix_success #proccess_pix {
 }
 
 #fancy_load.loading #pagbankproccess #loader,
-#pix_success.loading #proccess_pix #loader {
+#pix_success.loading #proccess_pix #loader,
+#wallet_success.loading #proccess_wallet #loader {
   display: none;
 }
 
 #fancy_load #pagbankproccess #pagbank_logo,
-#pix_success #proccess_pix #pagbank_logo {
+#pix_success #proccess_pix #pagbank_logo,
+#wallet_success #proccess_wallet #pagbank_logo {
   padding-top: 5%;
 }
 
 #fancy_load #pagbankproccess #pagbank_load img,
-#pix_success #proccess_pix img {
+#pix_success #proccess_pix img,
+#wallet_success #proccess_wallet img {
   max-width: 100px;
 }
 
@@ -450,7 +477,8 @@ body#checkout .container #pix_success #proccess_pix {
   text-align: center;
 }
 
-#pix_success.loading {
+#pix_success.loading,
+#wallet_success.loading {
   width: 100%;
   height: 100%;
   min-height: 400px;
@@ -463,7 +491,8 @@ body#checkout .container #pix_success #proccess_pix {
 }
 
 #fancy_load.loading #pagbankproccess,
-#pix_success.loading #proccess_pix {
+#pix_success.loading #proccess_pix,
+#wallet_success.loading #proccess_wallet {
   width: 600px;
   max-width: 92%;
   background: #fff;
@@ -477,7 +506,8 @@ body#checkout .container #pix_success #proccess_pix {
 }
 
 #fancy_load.loading #pagbankproccess #loader,
-#pix_success.loading #proccess_pix #loader {
+#pix_success.loading #proccess_pix #loader,
+#wallet_success.loading #proccess_wallet #loader {
   display: block;
 }
 
@@ -485,6 +515,7 @@ body#checkout .container #pix_success #proccess_pix {
 .container-card .nopadding,
 .container-bankslip .nopadding,
 .container-pix .nopadding,
+.container-wallet .nopadding,
 #pagbank-confirmation .nopadding,
 #fancy_load .nopadding {
   padding-right: 0 !important;
@@ -495,6 +526,7 @@ body#checkout .container #pix_success #proccess_pix {
 .container-card .nopadding-left,
 .container-bankslip .nopadding-left,
 .container-pix .nopadding-left,
+.container-wallet .nopadding-left,
 #fancy_load .nopadding-left {
   padding-left: 0 !important;
 }
@@ -503,6 +535,7 @@ body#checkout .container #pix_success #proccess_pix {
 .container-card .nopadding-right,
 .container-bankslip .nopadding-right,
 .container-pix .nopadding-right,
+.container-wallet .nopadding-right,
 #fancy_load .nopadding-right {
   padding-right: 0 !important;
 }
@@ -651,7 +684,8 @@ input[type="number"]::-webkit-outer-spin-button {
 #pagbank-container .nofloat,
 .container-card .nofloat,
 .container-bankslip .nofloat,
-.container-pix .nofloat {
+.container-pix .nofloat,
+.container-wallet .nofloat {
   float: none !important;
   display: inline-block;
   margin: 0 auto 10px;
@@ -660,7 +694,8 @@ input[type="number"]::-webkit-outer-spin-button {
 #pagbank-container .nofloat-block,
 .container-card .nofloat-block,
 .container-bankslip .nofloat-block,
-.container-pix .nofloat-block {
+.container-pix .nofloat-block,
+.container-wallet .nofloat-block {
   float: none !important;
   display: block;
   margin: 10px auto;
@@ -669,14 +704,16 @@ input[type="number"]::-webkit-outer-spin-button {
 #pagbank-container .clearfix,
 .container-card .clearfix,
 .container-bankslip .clearfix,
-.container-pix .clearfix {
+.container-pix .clearfix,
+.container-wallet .clearfix {
   clear: both;
 }
 
 #pagbank-container .cart_navigation button,
 .container-card .cart_navigation button,
 .container-bankslip .cart_navigation button,
-.container-pix .cart_navigation button {
+.container-pix .cart_navigation button,
+.container-wallet .cart_navigation button {
   float: right;
 }
 
@@ -725,7 +762,8 @@ input[type="number"]::-webkit-outer-spin-button {
 #pagbank-container img.logo-pg-mini,
 .container-card img.logo-pg-mini,
 .container-bankslip img.logo-pg-mini,
-.container-pix img.logo-pg-mini {
+.container-pix img.logo-pg-mini,
+.container-wallet img.logo-pg-mini {
   width: 17px;
   margin: 0 5px 0 0;
 }
@@ -756,7 +794,8 @@ input[type="number"]::-webkit-outer-spin-button {
   }
 
   #fancy_load #pagbankproccess #pagbankmsg,
-  #fancy_load #pix_success #pagbankmsg {
+  #fancy_load #pix_success #pagbankmsg,
+  #fancy_load #wallet_success #pagbankmsg {
     font-size: 12px;
   }
 }
@@ -781,7 +820,8 @@ input[type="number"]::-webkit-outer-spin-button {
   }
 
   #fancy_load #pagbankproccess #pagbankmsg,
-  #fancy_load #pix_success #pagbankmsg {
+  #fancy_load #pix_success #pagbankmsg,
+  #fancy_load #wallet_success #pagbankmsg {
     font-size: 10px;
   }
 }
@@ -957,7 +997,8 @@ input[type="number"]::-webkit-outer-spin-button {
   }
 }
 
-#pagbank-confirmation .heading-pix {
+#pagbank-confirmation .heading-pix,
+#pagbank-confirmation .heading-wallet {
   text-align: center;
   font-size: 14px;
   font-weight: bold;
@@ -967,32 +1008,38 @@ input[type="number"]::-webkit-outer-spin-button {
   line-height: 1.6;
 }
 
-#pagbank-confirmation #pay_links #pix_counter {
+#pagbank-confirmation #pay_links #pix_counter,
+#pagbank-confirmation #pay_links #wallet_counter {
   margin: 10px 0 0 0;
   font-size: 14px;
 }
 
-#pix_deadline {
+#pix_deadline,
+#wallet_deadline {
   color: #ff0000;
   font-weight: bold;
 }
 
-#pix_text_button {
+#pix_text_button,
+#wallet_text_button {
   font-weight: bold;
 }
 
-#pagbank-confirmation #pix_window.card {
+#pagbank-confirmation #pix_window.card,
+#pagbank-confirmation #wallet_window.card {
   border: 1px solid #4cbb6c;
 }
 
-#pagbank-confirmation #pix_window .alert-warning {
+#pagbank-confirmation #pix_window .alert-warning,
+#pagbank-confirmation #wallet_window .alert-warning {
   margin: 0;
 }
 
 /* Select Override Uniform */
 .container-card div.selector,
 .container-bankslip div.selector,
-.container-pix div.selector {
+.container-pix div.selector,
+.container-wallet div.selector {
   font-size: 14px !important;
   background: none !important;
   line-height: 43px !important;
@@ -1004,7 +1051,8 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .container-card div.selector select,
 .container-bankslip div.selector select,
-.container-pix div.selector select {
+.container-pix div.selector select,
+.container-wallet div.selector select {
   opacity: 1 !important;
   filter: alpha(opacity=1) !important;
   -moz-opacity: 1 !important;
@@ -1040,13 +1088,21 @@ input[type="number"]::-webkit-outer-spin-button {
 .container-pix div.selector.hover.active span,
 .container-pix div.selector.focus.active span,
 .container-pix div.selector.disabled span,
-.container-pix div.selector.disabled.active span {
+.container-pix div.selector.disabled.active span,
+.container-wallet div.selector.active span,
+.container-wallet div.selector.hover span,
+.container-wallet div.selector.focus span,
+.container-wallet div.selector.hover.active span,
+.container-wallet div.selector.focus.active span,
+.container-wallet div.selector.disabled span,
+.container-wallet div.selector.disabled.active span {
   background: none !important;
 }
 
 .container-card div.selector span,
 .container-bankslip div.selector span,
-.container-pix div.selector span {
+.container-pix div.selector span,
+.container-wallet div.selector span {
   display: none !important;
   background: none !important;
   height: 0 !important;
@@ -1057,6 +1113,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .container-card fieldset.address .input-group,
 .container-bankslip fieldset.address .input-group,
-.container-pix fieldset.address .input-group {
+.container-pix fieldset.address .input-group,
+.container-wallet fieldset.address .input-group {
   width: 100%;
 }

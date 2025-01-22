@@ -3,14 +3,14 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Pagamento com Pix, Boleto e Cartão de Crédito
+ * Pagamento com Cartão de Crédito, Boleto, Pix e super app PagBank
  * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
  * 
  * @author
- * 2011-2024 PrestaBR - https://prestabr.com.br
+ * 2011-2025 PrestaBR - https://prestabr.com.br
  * 
  * @copyright
- * 1996-2024 PagBank - https://pagseguro.uol.com.br
+ * 1996-2025 PagBank - https://pagseguro.uol.com.br
  * 
  * @license
  * Open Software License 3.0 (OSL 3.0) - https://opensource.org/license/osl-3-0-php/
@@ -223,7 +223,7 @@ class PagBankV8 extends Module
 		if ($user_credential) {
 			$text_credential .= '<br /><div class="alert alert-info"><p>' . $this->module->trans('Você está utilizando a credencial ', array(), 'Modules.PagBank.Admin') . ' <b>PrestaShop - App ' . $user_credential . '.</b></p></div>';
 		} else {
-			$text_credential .= '<br /><div class="alert alert-info"><p>' . $this->module->trans('Se você trocou de ambiente, por favor, confira a credencial e salve novamente.', array(), 'Modules.PagBank.Admin') . '';
+			$text_credential .= '<br /><div class="alert alert-info"><p>' . $this->module->trans('Se você trocou de ambiente, por favor, confira a credencial e salve novamente.', array(), 'Modules.PagBank.Admin') . '</div>';
 		}
 
 		$text_sandbox = '';
@@ -254,7 +254,7 @@ class PagBankV8 extends Module
 						'type' => 'switch',
 						'label' =>  $this->module->trans('Ambiente de Produção?', array(), 'Modules.PagBank.Admin'),
 						'name' => 'PAGBANK_ENVIRONMENT',
-						'bool' => false,
+						'is_bool' => true,
 						'desc' =>  $this->module->trans('Você pode utilizar o Ambiente de Testes (Sandbox) e testar tudo antes de colocar em Produção.', array(), 'Modules.PagBank.Admin') . $text_sandbox,
 						'values' => array(
 							array(
@@ -296,7 +296,7 @@ class PagBankV8 extends Module
 						'type' => 'switch',
 						'label' =>  $this->module->trans('Cartão de Crédito', array(), 'Modules.PagBank.Admin'),
 						'name' => 'PAGBANK_CREDIT_CARD',
-						'bool' => false,
+						'is_bool' => true,
 						'values' => array(
 							array(
 								'id' => 'PAGBANK_CREDIT_CARD_on',
@@ -365,7 +365,7 @@ class PagBankV8 extends Module
 						'class' => 'credit_card_option',
 						'label' =>  $this->module->trans('Compra com 1 Click', array(), 'Modules.PagBank.Admin'),
 						'name' => 'PAGBANK_SAVE_CREDIT_CARD',
-						'bool' => false,
+						'is_bool' => true,
 						'desc' =>  $this->module->trans('O cliente poderá salvar o Cartão de Crédito para futuras compras. O Cartão é criptografado e armazenado pelo PagBank através do processo de Tokenização', array(), 'Modules.PagBank.Admin'),
 						'values' => array(
 							array(
@@ -385,7 +385,7 @@ class PagBankV8 extends Module
 						'class' => 'credit_card_option',
 						'label' =>  $this->module->trans('Tipo de Captura', array(), 'Modules.PagBank.Admin'),
 						'name' => 'PAGBANK_CAPTURE_METHOD',
-						'bool' => false,
+						'is_bool' => true,
 						'desc' =>  $this->module->trans('Na captura automática o pagamento é debitado imeditamente do cartão de crédito.', array(), 'Modules.PagBank.Admin') . $text_capture,
 						'values' => array(
 							array(
@@ -404,7 +404,7 @@ class PagBankV8 extends Module
 						'type' => 'switch',
 						'label' =>  $this->module->trans('Boleto Bancário', array(), 'Modules.PagBank.Admin'),
 						'name' => 'PAGBANK_BANKSLIP',
-						'bool' => false,
+						'is_bool' => true,
 						'values' => array(
 							array(
 								'id' => 'PAGBANK_BANKSLIP_on',
@@ -438,7 +438,7 @@ class PagBankV8 extends Module
 						'type' => 'switch',
 						'label' =>  $this->module->trans('PIX', array(), 'Modules.PagBank.Admin'),
 						'name' => 'PAGBANK_PIX',
-						'bool' => false,
+						'is_bool' => true,
 						'values' => array(
 							array(
 								'id' => 'PAGBANK_PIX_on',
@@ -451,6 +451,7 @@ class PagBankV8 extends Module
 								'label' =>  $this->module->trans('Não', array(), 'Modules.PagBank.Admin'),
 							),
 						),
+						'desc' =>  $this->module->trans('Atenção: Não esqueça de cadastrar uma chave PIX no super app PagBank', array(), 'Modules.PagBank.Admin'),
 					),
 					array(
 						'type' => 'text',
@@ -459,6 +460,25 @@ class PagBankV8 extends Module
 						'name' => 'PAGBANK_PIX_TIME_LIMIT',
 						'suffix' =>  $this->module->trans('minutos', array(), 'Modules.PagBank.Admin'),
 						'desc' =>  $this->module->trans('Defina o tempo máximo, em minutos, que o usuário terá para realizar o pagamento via PIX.', array(), 'Modules.PagBank.Admin'),
+					),
+					array(
+						'type' => 'switch',
+						'label' =>  $this->module->trans('Pagar com PagBank', array(), 'Modules.PagBank.Admin'),
+						'name' => 'PAGBANK_WALLET',
+						'is_bool' => true,
+						'desc' =>  $this->module->trans('Pagamento com saldo ou cartão de crédito cadastrado no super app PagBank', array(), 'Modules.PagBank.Admin'),
+						'values' => array(
+							array(
+								'id' => 'PAGBANK_WALLET_on',
+								'value' => 1,
+								'label' =>  $this->module->trans('Sim', array(), 'Modules.PagBank.Admin'),
+							),
+							array(
+								'id' => 'PAGBANK_WALLET_off',
+								'value' => 0,
+								'label' =>  $this->module->trans('Não', array(), 'Modules.PagBank.Admin'),
+							),
+						),
 					),
 					array(
 						'type' => 'select',
@@ -498,7 +518,7 @@ class PagBankV8 extends Module
 						'label' =>  $this->module->trans('Desconto no Cartão de Crédito (1x)', array(), 'Modules.PagBank.Admin'),
 						'class' => 'credit_card_option',
 						'name' => 'PAGBANK_DISCOUNT_CREDIT',
-						'bool' => false,
+						'is_bool' => true,
 						'desc' =>  $this->module->trans('Atenção: O valor mínimo da transação no Cartão de Crédito é de R$ 1.00.', array(), 'Modules.PagBank.Admin'),
 						'values' => array(
 							array(
@@ -518,7 +538,7 @@ class PagBankV8 extends Module
 						'label' =>  $this->module->trans('Desconto no Boleto Bancário', array(), 'Modules.PagBank.Admin'),
 						'class' => 'bankslip_option',
 						'name' => 'PAGBANK_DISCOUNT_BANKSLIP',
-						'bool' => false,
+						'is_bool' => true,
 						'desc' =>  $this->module->trans('Atenção: O valor mínimo da transação via Boleto Bancário é de R$ 1.00.', array(), 'Modules.PagBank.Admin'),
 						'values' => array(
 							array(
@@ -538,7 +558,7 @@ class PagBankV8 extends Module
 						'label' =>  $this->module->trans('Desconto no Pix', array(), 'Modules.PagBank.Admin'),
 						'class' => 'pix_option',
 						'name' => 'PAGBANK_DISCOUNT_PIX',
-						'bool' => false,
+						'is_bool' => true,
 						'desc' =>  $this->module->trans('Atenção: O valor mínimo da transação via Pix é de R$ 1.00.', array(), 'Modules.PagBank.Admin'),
 						'values' => array(
 							array(
@@ -646,7 +666,7 @@ class PagBankV8 extends Module
 						'label' =>  $this->module->trans('Exibir parâmetros no Console do navegador?', array(), 'Modules.PagBank.Admin'),
 						'name' => 'PAGBANK_SHOW_CONSOLE',
 						'is_bool' => true,
-						'desc' =>  $this->module->trans('Mostrar mensagens do JavaScript no console do navegador para fins de depuração.', array(), 'Modules.PagBank.Admin'),
+						'desc' =>  $this->module->trans('Mostrar mensagens do JavaScript no console do navegador para fins de depuração no checkout.', array(), 'Modules.PagBank.Admin'),
 						'values' => array(
 							array(
 								'id' => 'console_on',
@@ -715,7 +735,7 @@ class PagBankV8 extends Module
 		);
 
 		$helper = new HelperForm();
-
+		$helper->name_controller = "pagbank-form";
 		$helper->show_toolbar = false;
 		$helper->table = $this->module->table;
 		$helper->module = $this->module;

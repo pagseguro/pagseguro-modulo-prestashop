@@ -2,14 +2,14 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Pagamento com Pix, Boleto e Cartão de Crédito
+ * Pagamento com Cartão de Crédito, Boleto, Pix e super app PagBank
  * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
  * 
  * @author
- * 2011-2024 PrestaBR - https://prestabr.com.br
+ * 2011-2025 PrestaBR - https://prestabr.com.br
  * 
  * @copyright
- * 1996-2024 PagBank - https://pagseguro.uol.com.br
+ * 1996-2025 PagBank - https://pagseguro.uol.com.br
  * 
  * @license
  * Open Software License 3.0 (OSL 3.0) - https://opensource.org/license/osl-3-0-php/
@@ -83,6 +83,7 @@
 		var credit_card_value = {/literal}{$discounts.credit_card_value|floatval}{literal};
 		var discount_bankslip = {/literal}{$discounts.bankslip|intval}{literal};
 		var discount_pix = {/literal}{$discounts.pix|intval}{literal};
+		var discount_wallet = {/literal}{$discounts.wallet|intval}{literal};
 		var msg_console = {/literal}{$msg_console|intval}{literal};
 		var ps_version = '{/literal}{$ps_version}{literal}';
 		var pagbank_version = '{/literal}{$pagbank_version}{literal}';

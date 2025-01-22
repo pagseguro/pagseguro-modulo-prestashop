@@ -3,14 +3,14 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Pagamento com Pix, Boleto e Cartão de Crédito
+ * Pagamento com Cartão de Crédito, Boleto, Pix e super app PagBank
  * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
  * 
  * @author
- * 2011-2024 PrestaBR - https://prestabr.com.br
+ * 2011-2025 PrestaBR - https://prestabr.com.br
  * 
  * @copyright
- * 1996-2024 PagBank - https://pagseguro.uol.com.br
+ * 1996-2025 PagBank - https://pagseguro.uol.com.br
  * 
  * @license
  * Open Software License 3.0 (OSL 3.0) - https://opensource.org/license/osl-3-0-php/
@@ -38,14 +38,17 @@ class PagBankModel extends ObjectModel
 			'reference' 			=>	array('type' => self::TYPE_STRING, 'validate' => 'isCleanHtml'),
 			'transaction_code' 		=>	array('type' => self::TYPE_STRING, 'validate' => 'isCleanHtml'),
 			'buyer_ip'	 			=>	array('type' => self::TYPE_STRING, 'validate' => 'isCleanHtml'),
-			'status'	 			=>	array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+			'status'	 			=>	array('type' => self::TYPE_INT, 'validate' => 'isCleanHtml'),
 			'status_description'	=>	array('type' => self::TYPE_STRING, 'validate' => 'isCleanHtml'),
-			'payment_type'			=>	array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+			'payment_type'			=>	array('type' => self::TYPE_INT, 'validate' => 'isCleanHtml'),
 			'payment_description'	=>	array('type' => self::TYPE_STRING, 'validate' => 'isCleanHtml'),
 			'installments'			=>	array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+			'nsu'					=>	array('type' => self::TYPE_STRING, 'validate' => 'isCleanHtml'),
 			'url' 					=>	array('type' => self::TYPE_STRING, 'validate' => 'isUrl'),
 			'credential' 			=>	array('type' => self::TYPE_STRING, 'validate' => 'isCleanHtml'),
-			'token_code' 			=>	array('type' => self::TYPE_STRING, 'validate' => 'isCleanHtml'),
+			'capture'				=>	array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+			'refund'				=>	array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice'),
+			'environment'			=>	array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
 			'date_add'	 			=>	array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
 			'date_upd' 				=>	array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
 		)

@@ -3,14 +3,14 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Pagamento com Pix, Boleto e Cartão de Crédito
+ * Pagamento com Cartão de Crédito, Boleto, Pix e super app PagBank
  * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
  * 
  * @author
- * 2011-2024 PrestaBR - https://prestabr.com.br
+ * 2011-2025 PrestaBR - https://prestabr.com.br
  * 
  * @copyright
- * 1996-2024 PagBank - https://pagseguro.uol.com.br
+ * 1996-2025 PagBank - https://pagseguro.uol.com.br
  * 
  * @license
  * Open Software License 3.0 (OSL 3.0) - https://opensource.org/license/osl-3-0-php/
@@ -43,11 +43,14 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'pagbank` (
 		`date_add`		        datetime NULL,
 		`date_upd`		        datetime NULL,
 		PRIMARY KEY(`id_pagbank`),
-		INDEX (id_cart)
+        INDEX (id_shop),
+		INDEX (id_cart),
+        INDEX (transaction_code)
 	) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
 
 $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'pagbank_logs` (
     `id_log` int(11) NOT NULL AUTO_INCREMENT,
+    `id_shop` int(3) NULL,
     `id_cart` int(11) NULL,
     `datetime` DATETIME NULL,
     `type` varchar(64) NULL,
@@ -56,11 +59,14 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'pagbank_logs` (
     `response` MEDIUMTEXT NULL,
     `url` varchar(128) NULL,
     `cron` int(11) NULL DEFAULT 0,
-    PRIMARY KEY (`id_log`)
+    PRIMARY KEY (`id_log`),
+    INDEX (id_shop),
+    INDEX (id_cart)
 ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
 
 $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'pagbank_customer_token` (
     `id_customer_token` int(11) NOT NULL AUTO_INCREMENT,
+    `id_shop` int(3) NULL,
     `id_customer` int(11) NOT NULL,
     `card_name` varchar(128) NOT NULL,
     `card_brand` varchar(32) NOT NULL,
@@ -70,7 +76,9 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'pagbank_customer_token`
 	`card_year` int(4) NOT NULL,
     `card_token` varchar(512) NOT NULL,
     `date_add` DATETIME NOT NULL,
-    PRIMARY KEY (`id_customer_token`)
+    PRIMARY KEY (`id_customer_token`),
+    INDEX (id_shop),
+    INDEX (id_customer)
 ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
 
 $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'pagbank_api_credentials` (

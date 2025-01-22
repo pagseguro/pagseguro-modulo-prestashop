@@ -3,14 +3,14 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Pagamento com Pix, Boleto e Cartão de Crédito
+ * Pagamento com Cartão de Crédito, Boleto, Pix e super app PagBank
  * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
  * 
  * @author
- * 2011-2024 PrestaBR - https://prestabr.com.br
+ * 2011-2025 PrestaBR - https://prestabr.com.br
  * 
  * @copyright
- * 1996-2024 PagBank - https://pagseguro.uol.com.br
+ * 1996-2025 PagBank - https://pagseguro.uol.com.br
  * 
  * @license
  * Open Software License 3.0 (OSL 3.0) - https://opensource.org/license/osl-3-0-php/
@@ -223,7 +223,7 @@ class PagBankV6 extends Module
 		if ($user_credential) {
 			$text_credential .= '<br /><div class="alert alert-info"><p>' . $this->l('Você está utilizando a credencial ') . ' <b>PrestaShop - App ' . $user_credential . '.</b></p></div>';
 		} else {
-			$text_credential .= '<br /><div class="alert alert-info"><p>' . $this->l('Se você trocou de ambiente, por favor, confira a credencial e salve novamente.') . '';
+			$text_credential .= '<br /><div class="alert alert-info"><p>' . $this->l('Se você trocou de ambiente, por favor, confira a credencial e salve novamente.') . '</div>';
 		}
 
 		$text_sandbox = '';
@@ -254,7 +254,7 @@ class PagBankV6 extends Module
 						'type' => 'switch',
 						'label' => $this->l('Ambiente de Produção?'),
 						'name' => 'PAGBANK_ENVIRONMENT',
-						'bool' => false,
+						'is_bool' => true,
 						'desc' => $this->l('Você pode utilizar o Ambiente de Testes (Sandbox) e testar tudo antes de colocar em Produção.') . $text_sandbox,
 						'values' => array(
 							array(
@@ -296,7 +296,7 @@ class PagBankV6 extends Module
 						'type' => 'switch',
 						'label' => $this->l('Cartão de Crédito'),
 						'name' => 'PAGBANK_CREDIT_CARD',
-						'bool' => false,
+						'is_bool' => true,
 						'values' => array(
 							array(
 								'id' => 'PAGBANK_CREDIT_CARD_on',
@@ -365,7 +365,7 @@ class PagBankV6 extends Module
 						'class' => 'credit_card_option fixed-width-xs fixed-width-sm',
 						'label' => $this->l('Compra com 1 Click'),
 						'name' => 'PAGBANK_SAVE_CREDIT_CARD',
-						'bool' => false,
+						'is_bool' => true,
 						'desc' => $this->l('O cliente poderá salvar o Cartão de Crédito para futuras compras. O Cartão é criptografado e armazenado pelo PagBank através do processo de Tokenização'),
 						'values' => array(
 							array(
@@ -405,7 +405,7 @@ class PagBankV6 extends Module
 						'type' => 'switch',
 						'label' => $this->l('Boleto Bancário'),
 						'name' => 'PAGBANK_BANKSLIP',
-						'bool' => false,
+						'is_bool' => true,
 						'values' => array(
 							array(
 								'id' => 'PAGBANK_BANKSLIP_on',
@@ -439,7 +439,7 @@ class PagBankV6 extends Module
 						'type' => 'switch',
 						'label' => $this->l('PIX'),
 						'name' => 'PAGBANK_PIX',
-						'bool' => false,
+						'is_bool' => true,
 						'values' => array(
 							array(
 								'id' => 'PAGBANK_PIX_on',
@@ -452,6 +452,7 @@ class PagBankV6 extends Module
 								'label' => $this->l('Não'),
 							),
 						),
+						'desc' => $this->l('Atenção: Não esqueça de cadastrar uma chave PIX no super app PagBank'),
 					),
 					array(
 						'type' => 'text',
@@ -460,6 +461,25 @@ class PagBankV6 extends Module
 						'name' => 'PAGBANK_PIX_TIME_LIMIT',
 						'suffix' => $this->l('minutos'),
 						'desc' => $this->l('Defina o tempo máximo, em minutos, que o usuário terá para realizar o pagamento via PIX.'),
+					),
+					array(
+						'type' => 'switch',
+						'label' => $this->l('Pagar com PagBank'),
+						'name' => 'PAGBANK_WALLET',
+						'is_bool' => true,
+						'desc' => $this->l('Pagamento com saldo ou cartão de crédito cadastrado no super app PagBank'),
+						'values' => array(
+							array(
+								'id' => 'PAGBANK_WALLET_on',
+								'value' => 1,
+								'label' => $this->l('Sim'),
+							),
+							array(
+								'id' => 'PAGBANK_WALLET_off',
+								'value' => 0,
+								'label' => $this->l('Não'),
+							),
+						),
 					),
 					array(
 						'type' => 'select',
@@ -499,7 +519,7 @@ class PagBankV6 extends Module
 						'label' => $this->l('Desconto no Cartão de Crédito (1x)'),
 						'class' => 'credit_card_option',
 						'name' => 'PAGBANK_DISCOUNT_CREDIT',
-						'bool' => false,
+						'is_bool' => true,
 						'desc' => $this->l('Atenção: O valor mínimo da transação via Cartão de Crédito é de R$ 1.00.'),
 						'values' => array(
 							array(
@@ -519,7 +539,7 @@ class PagBankV6 extends Module
 						'label' => $this->l('Desconto no Boleto Bancário'),
 						'class' => 'bankslip_option',
 						'name' => 'PAGBANK_DISCOUNT_BANKSLIP',
-						'bool' => false,
+						'is_bool' => true,
 						'desc' => $this->l('Atenção: O valor mínimo da transação via Boleto Bancário é de R$ 1.00.'),
 						'values' => array(
 							array(
@@ -539,7 +559,7 @@ class PagBankV6 extends Module
 						'label' => $this->l('Desconto no Pix'),
 						'class' => 'pix_option',
 						'name' => 'PAGBANK_DISCOUNT_PIX',
-						'bool' => false,
+						'is_bool' => true,
 						'desc' => $this->l('Atenção: O valor mínimo da transação via Pix é de R$ 1.00.'),
 						'values' => array(
 							array(
@@ -647,7 +667,7 @@ class PagBankV6 extends Module
 						'label' => $this->l('Exibir parâmetros no Console do navegador?'),
 						'name' => 'PAGBANK_SHOW_CONSOLE',
 						'is_bool' => true,
-						'desc' => $this->l('Mostrar mensagens do JavaScript no console do navegador para fins de depuração.'),
+						'desc' => $this->l('Mostrar mensagens do JavaScript no console do navegador para fins de depuração no checkout.'),
 						'values' => array(
 							array(
 								'id' => 'console_on',
@@ -716,7 +736,7 @@ class PagBankV6 extends Module
 		);
 
 		$helper = new HelperForm();
-
+		$helper->name_controller = "pagbank-form";
 		$helper->show_toolbar = false;
 		$helper->table = $this->module->table;
 		$helper->module = $this->module;

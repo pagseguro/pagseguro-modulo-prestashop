@@ -2,7 +2,7 @@
 <module>
     <name>pagbank</name>
     <displayName><![CDATA[PagBank - Checkout Transparente]]></displayName>
-    <version><![CDATA[1.7.2]]></version>
+    <version><![CDATA[1.8.0]]></version>
     <description><![CDATA[Módulo Oficial API v.4 - PrestaShop 1.6, 1.7 e 8.0]]></description>
     <author><![CDATA[PrestaBR]]></author>
     <tab><![CDATA[payments_gateways]]></tab>

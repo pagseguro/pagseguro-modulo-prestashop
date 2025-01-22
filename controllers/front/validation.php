@@ -3,14 +3,14 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Pagamento com Pix, Boleto e Cartão de Crédito
+ * Pagamento com Cartão de Crédito, Boleto, Pix e super app PagBank
  * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
  * 
  * @author
- * 2011-2024 PrestaBR - https://prestabr.com.br
+ * 2011-2025 PrestaBR - https://prestabr.com.br
  * 
  * @copyright
- * 1996-2024 PagBank - https://pagseguro.uol.com.br
+ * 1996-2025 PagBank - https://pagseguro.uol.com.br
  * 
  * @license
  * Open Software License 3.0 (OSL 3.0) - https://opensource.org/license/osl-3-0-php/
@@ -68,8 +68,10 @@ class PagBankValidationModuleFrontController extends ModuleFrontController
 		if ((int)Configuration::get('PAGBANK_DISCOUNT_PIX') == 1) {
 			$discount_options[] = 'pix';
 		}
+		if ((int)Configuration::get('PAGBANK_DISCOUNT_WALLET') == 1) {
+			$discount_options[] = 'wallet';
+		}
 
-		//Charges
 		if (isset($this->pag_response->charges)) {
 			$payment = end($this->pag_response->charges);
 			$this->status = $payment->status;
@@ -85,7 +87,6 @@ class PagBankValidationModuleFrontController extends ModuleFrontController
 			$boleto = isset($payment->payment_method->boleto) && is_object($payment->payment_method->boleto) ? $payment->payment_method->boleto : false;
 			$this->pag_data['boleto'] = $boleto;
 
-			//Parse Payment Option
 			if ($payment_method->type == 'CREDIT_CARD') {
 				$this->payment_option = "Cartão de Crédito " . strtoupper($card->brand) . " (Final: " . $card->last_digits . ") - PagBank";
 				if (
@@ -129,13 +130,31 @@ class PagBankValidationModuleFrontController extends ModuleFrontController
 						$this->pag_data['payment_link'] = $link->href;
 					}
 				}
-			}
+			} elseif (isset($this->pag_response->qr_codes) && $this->pag_response->qr_codes[0]->arrangements[0] == 'PAGBANK' ||
+			isset($this->pag_response->deep_links) && $this->pag_response->deep_links[0]->url) {
+			   $this->payment_option = "Pagar com PagBank";
+			   if (
+				   in_array('wallet', $discount_options) &&
+				   Configuration::get('PAGBANK_DISCOUNT_TYPE') >= 1 &&
+				   Configuration::get('PAGBANK_DISCOUNT_VALUE') >= 1
+			   ) {
+				   $this->module->generateCartRule($this->context->cart);
+			   }
+			   if(isset($this->pag_response->qr_codes) && $this->pag_response->qr_codes[0]->arrangements[0] == 'PAGBANK'){
+				   foreach ($this->pag_response->qr_codes[0]->links as $link) {
+					   if ($link->media == 'image/png') {
+						   $this->pag_data['payment_link'] = $link->href;
+					   }
+				   }
+			   } else {
+				   $this->pag_data['payment_link'] = $this->pag_response->deep_links[0]->url;
+			   }
+		   }
 		}
 		$this->cart_id = (int)$this->context->cart->id;
 		$secure_key = $this->context->customer->secure_key;
 		$order_total = (float)$this->context->cart->getOrderTotal(true, Cart::BOTH);
 
-		//Create Order
 		if (!$this->module->validateOrder($this->cart_id, Configuration::get('_PS_OS_PAGBANK_0'), $order_total, $this->payment_option, NULL, [], $this->context->currency->id, false, $secure_key)) {
 			$this->module->saveLog('error', 'Criar Pedido', $this->cart_id, json_encode($this->pag_response), 'Erro ao criar pedido inicial.');
 		} else {
@@ -158,7 +177,6 @@ class PagBankValidationModuleFrontController extends ModuleFrontController
 	 */
 	public function redirectFinal()
 	{
-		// Charges
 		if (isset($this->pag_response->charges)) {
 			$payment = end($this->pag_response->charges);
 			$payment_method = $payment->payment_method;
@@ -166,6 +184,9 @@ class PagBankValidationModuleFrontController extends ModuleFrontController
 		} else {
 			if (isset($this->pag_response->qr_codes) && $this->pag_response->qr_codes[0]->arrangements[0] == 'PIX'){
 				$payment_type = "PIX";
+			} elseif (isset($this->pag_response->qr_codes) && $this->pag_response->qr_codes[0]->arrangements[0] == 'PAGBANK' || 
+			isset($this->pag_response->deep_links) && $this->pag_response->deep_links[0]->url){
+				$payment_type = "WALLET";
 			}
 		}
 
@@ -182,12 +203,8 @@ class PagBankValidationModuleFrontController extends ModuleFrontController
 		if (!$id_customer || (int)$id_customer < 1) {
 			$id_customer = $cart->id_customer;
 		}
-		$credential_type = Configuration::get('PAGBANK_CREDENTIAL');
-		$environment = Configuration::get('PAGBANK_ENVIRONMENT');
-		$installments_qty = (int)Tools::getValue('ps_card_installments');
 		
 		$insert_data = array(
-			"id_shop" => (int)$this->context->shop->id,
 			"id_customer" => (int)$id_customer,
 			"cpf_cnpj" => $this->pag_data['tax_id'],
 			"id_cart" => (int)$id_cart,
@@ -202,27 +219,13 @@ class PagBankValidationModuleFrontController extends ModuleFrontController
 			"installments" => isset($this->pag_data['installments']) && (int)$this->pag_data['installments'] > 0 ? $this->pag_data['installments'] : 1,
 			"nsu" => isset($this->pag_data['nsu']) && $this->pag_data['nsu'] != '' ? (string)$this->pag_data['nsu'] : '',
 			"url" => isset($this->pag_data['payment_link']) && $this->pag_data['payment_link'] != '' ? (string)$this->pag_data['payment_link'] : '',
-			"credential" => $credential_type,
-			"environment" => $environment,
-			"date_add" => $this->pag_data['create_date'],
-			"date_upd" => date("Y-m-d H:i:s"),
+			"date_add" => $this->pag_data['create_date']
 		);
 		$bd = $this->module->insertPagBankData($insert_data);
 		if (!$bd) {
 			$this->module->saveLog('error', 'Inserir Dados', $this->context->cart->id, json_encode($this->pag_response), 'Banco de Dados não atualizado.');
 			echo "<font color=\"red\"><b>Banco de Dados não atualizado!</b></font><br/><br/>";
 		}
-		if (Configuration::get('PAGBANK_ENVIRONMENT') == 0) {
-			echo "<br/><br/><h3 style='color:red'><b>Iniciando debug...</b><br/><br/><b>Sistema executando em modo de TESTES!</b></h3><br/><br/>";
-			var_dump($insert_data);
-			var_dump($this->current_order);
-			if (!$bd) {
-				echo "<font color=\"red\"><b>Banco de Dados não atualizado!</b></font><br/><br/>";
-			}
-			echo "<font color=\"red\"><b>Finalizando debug!</b></font><br/><br/>";
-			echo "<a class='btn btn-lg' href='" . Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . $this->redirect_link . "'>Clique aqui e verifique se a página final do pedido será exibida corretamente</a><br/>";
-		} else {
-			Tools::redirectLink($this->redirect_link);
-		}
+		Tools::redirectLink($this->redirect_link);
 	}
 }

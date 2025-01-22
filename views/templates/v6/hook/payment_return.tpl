@@ -2,14 +2,14 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Pagamento com Pix, Boleto e Cartão de Crédito
+ * Pagamento com Cartão de Crédito, Boleto, Pix e super app PagBank
  * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
  * 
  * @author
- * 2011-2024 PrestaBR - https://prestabr.com.br
+ * 2011-2025 PrestaBR - https://prestabr.com.br
  * 
  * @copyright
- * 1996-2024 PagBank - https://pagseguro.uol.com.br
+ * 1996-2025 PagBank - https://pagseguro.uol.com.br
  * 
  * @license
  * Open Software License 3.0 (OSL 3.0) - https://opensource.org/license/osl-3-0-php/
@@ -78,6 +78,49 @@
 								<br>
 								{l s='Você deve efetuar o pagamento até:' mod='pagbank'} <button id="pix_deadline"
 									class="btn btn-default btn-sm">{$pix.expiration_date|date_format:"%d/%m/%Y %H:%M"}</button>
+								<br>
+								<br>
+								{l s='Seu pedido só será processado pelo PagBank e pela loja após a confirmação do pagamento.' mod='pagbank'}
+							</p>
+						</div>
+					</div>
+				{elseif ($payment_type == 'WALLET')}
+					<div class="panel panel-success" id="wallet_window">
+						<div class="panel-heading heading-wallet">
+							{if $customer_name|strstr:' '}
+							{$customer_name|strstr:' ':true}{else}{$customer_name}
+								{l s=','}
+							{/if}
+							{l s='recebemos o seu pedido.' mod='pagbank'} <br />
+							{if $device == 'd' || $device == 't'}
+								{l s='Para finalizar sua compra, escaneie o QR Code abaixo através do app PagBank e escolha se deseja pagar com o saldo ou cartão cadastrado.' mod='pagbank'}
+							{else}
+								{l s='Para finalizar sua compra, clique no botão abaixo para realizar o pagamento através do app PagBank, utilizando o seu saldo ou cartão cadastrado.' mod='pagbank'}
+							{/if}
+						</div>
+						<div class="panel-body">
+							<p class="text-center">
+								{if $device == 'd'}
+									<img src="{$wallet.link}" alt="{$wallet.text}" class="img-responsive"
+										style="margin:auto; max-width:220px;" />
+									<br />
+									<input type="text" id="wallet_text" value="{$wallet.text}" onClick="this.select();"
+										style="width:50%" />
+									<br /><br />
+									<button id="wallet_text_button" class="btn btn-info border" data-clipboard-target="#wallet_text"
+										data-clipboard-action="copy">Copiar código</button>
+								{else}
+									<a href="{$wallet.link}" target="_blank" class="btn-pagbank">
+										<img src="{$this_path}img/btn_green_pagbank.png" class="img-responsive" />
+									</a>
+								{/if}
+							</p>
+							<p class="alert alert-warning text-center">
+								{l s='Efetue o pagamento imediatamente, pois o pedido tem um prazo de' mod='pagbank'}
+								<span>{if {$wallet.prazo.hours} > 0}{$wallet.prazo.hours} {l s='horas' mod='pagbank'}{/if}{if {$wallet.prazo.minutes} > 0} {$wallet.prazo.minutes} {l s='minutos' mod='pagbank'}{/if}</span>.
+								<br>
+								{l s='Você deve efetuar o pagamento até:' mod='pagbank'} <button id="wallet_deadline"
+									class="btn btn-default btn-sm">{$wallet.expiration_date|date_format:"%d/%m/%Y %H:%M"}</button>
 								<br>
 								<br>
 								{l s='Seu pedido só será processado pelo PagBank e pela loja após a confirmação do pagamento.' mod='pagbank'}
@@ -233,6 +276,77 @@
 									document.getElementById('pix_success').classList.add('loading');
 									document.getElementById('pix_success').style.width = window.innerWidth;
 									document.getElementById('proccess_pix').style.display = 'block';
+									setInterval(function() {
+										window.location.href = my_orders;
+										console.log(my_orders);
+									}, 4000);
+								}
+							});
+						},
+						complete: function() {},
+						error: function(xhr) {
+							console.log(xhr.status);
+						}
+					});
+				}
+
+				window.onload = function() {
+					setTimeout(function() {
+						window.scroll(0, 200);
+					}, 500);
+
+					setInterval('getOrderStatus()', 10000);
+				}
+			</script>
+		{/literal}
+	{/if}
+	{if ($payment_type == 'WALLET')}
+		<div id="wallet_success" class="form-group clearfix row" align="center">
+			<div id="proccess_wallet" style="height:auto; width:600px; max-width:100%; display:none;"
+				class="container clearfix">
+				<div class="row">
+					<div class="col-xs-3 col-sm-2 nopadding" align="center">
+						<img src="{$this_path}img/loading.gif" class="img-responsive" />
+					</div>
+					<div class="col-xs-6 col-sm-7 text-center" id="pagbankmsg">
+						{l s='PIX Recebido! Redirecionando...' mod='pagbank'}
+					</div>
+					<div class="hidden-xs col-sm-3 nopadding-left" id="pagbank_logo" align="center">
+						<img src="{$this_path}img/pagbank-logo-animado_35px.gif" class="img-responsive" />
+					</div>
+					<div class="hidden-lg hidden-md hidden-sm col-xs-3 nopadding-left" id="pagbank_logo" align="center">
+						<img src="{$this_path}img/logo_pagbank_mini_mobile.png" class="img-responsive" />
+					</div>
+				</div>
+			</div>
+		</div>
+
+		{literal}
+			<script type="text/javascript">
+				var clipboard = new ClipboardJS('#wallet_text_button');
+				clipboard.on('success', function(e) {
+					window.alert('Código Pix copiado!');
+					console.log(e);
+				});
+				clipboard.on('error', function(e) {
+					console.log(e);
+				});
+
+				function getOrderStatus() {
+					var order_id = {/literal}{$ps_order_id}{literal};
+					var ps_paid_state = {/literal}{$ps_paid_state}{literal};
+					var my_orders = '{/literal}{$link->getPageLink('history')}?id_order={$ps_order_id}{literal}';
+					$.ajax({
+						url: '{/literal}{$url_update}{literal}?action=checkOrder&id_order='+order_id,
+						cache: false,
+						success: function(data) {
+							//var json = $.parseJSON(data);
+							var json = data;
+							$.each(json, function(i, item) {
+								if (item.id_order_state == ps_paid_state) {
+									document.getElementById('wallet_success').classList.add('loading');
+									document.getElementById('wallet_success').style.width = window.innerWidth;
+									document.getElementById('proccess_wallet').style.display = 'block';
 									setInterval(function() {
 										window.location.href = my_orders;
 										console.log(my_orders);

@@ -2,14 +2,14 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Pagamento com Pix, Boleto e Cartão de Crédito
+ * Pagamento com Cartão de Crédito, Boleto, Pix e super app PagBank
  * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
  * 
  * @author
- * 2011-2024 PrestaBR - https://prestabr.com.br
+ * 2011-2025 PrestaBR - https://prestabr.com.br
  * 
  * @copyright
- * 1996-2024 PagBank - https://pagseguro.uol.com.br
+ * 1996-2025 PagBank - https://pagseguro.uol.com.br
  * 
  * @license
  * Open Software License 3.0 (OSL 3.0) - https://opensource.org/license/osl-3-0-php/
@@ -27,6 +27,10 @@
 		class="container nopadding dev_{$device}{if isset($checkout) && $checkout != false && $checkout != 0} opc-checkout{/if}">
 		<input type="hidden" name="order_value" id="order_value" value="{$total}" />
 		<input type="hidden" name="msg_console" id="msg_console" value="{$msg_console}" />
+
+		<img title="{l s='PagBank' mod='pagbank'}" class="pagbank-logo pull-right hidden-xs"
+			src="{$this_path}img/pagbank-logo-animado_35px.gif" alt="{l s='PagBank' mod='pagbank'}"
+			ondrag="return false" onselec="return false" oncontextmenu="return false" /><br /><br />
 
 		<ul class="nav nav-tabs" tabindex="-1">
 			{if $payments.credit_card}
@@ -84,11 +88,25 @@
 					</a>
 				</li>
 			{/if}
-			<li class="nopadding hidden-xs col-sm-2 pull-right">
-				<img title="{l s='PagBank' mod='pagbank'}" class="pagbank-logo pull-right hidden-xs"
-					src="{$this_path}img/pagbank-logo-animado_35px.gif" alt="{l s='PagBank' mod='pagbank'}"
-					ondrag="return false" onselec="return false" oncontextmenu="return false" />
-			</li>
+			{if $payments.wallet}
+				<li id="wallet-tab" class="nopadding col-xs-12 col-sm-4 {if (!$payments.credit_card && !$payments.bankslip && !$payments.pix)}active{/if}">
+					<a class="{if (!$payments.credit_card && !$payments.bankslip && !$payments.pix)}active{/if}" data-toggle="tab" href="#pagbank-wallet">
+						<img src="{$this_path}img/logo_pagbank_mini_mobile.png"
+							class="logo-pg-mini pull-left hidden-xs" />
+						{l s='Pagar com PagBank' mod='pagbank'}
+						<img src="{$this_path}img/logo_pagbank_mini_mobile.png"
+							class="logo-pg-mini pull-left hidden-lg hidden-md hidden-sm" />
+						{if $discounts.discount_type > 0 && $discounts.discount_value > 0 && $discounts.wallet && $device == 'm'}
+							{if ($discounts.discount_type == 1)}
+								(- {$discounts.discount_value}%)
+							{else}
+								(- {displayPrice price=($discounts.wallet_value) currency=$currency->id})
+							{/if}
+						{/if}
+						<i class="icon icon-check fa fa-check pull-right hidden-lg hidden-md hidden-sm"></i>
+					</a>
+				</li>
+			{/if}
 		</ul>
 		<div id="pagbank-content" class="tab-content">
 			<a href="#fancy_load" id="fancy_btn" style="display:none;"></a>
@@ -107,6 +125,11 @@
 			{if $payments.pix}
 				<div class="tab-pane {if (!$payments.pix && !$payments.bankslip)}active in{/if}" id="pagbank-pix" class="clearfix">
 					{include file="$tpl_dir/pix.tpl"}
+				</div>
+			{/if}
+			{if $payments.wallet}
+				<div class="tab-pane {if (!$payments.credit_card && !$payments.bankslip && !$payments.pix)}active in{/if}" id="pagbank-wallet" class="clearfix">
+					{include file="$tpl_dir/wallet.tpl"}
 				</div>
 			{/if}
 		</div>
@@ -148,6 +171,7 @@
 			var credit_card_value = {/literal}{$discounts.credit_card_value|floatval}{literal};
 			var discount_bankslip = {/literal}{$discounts.bankslip|intval}{literal};
 			var discount_pix = {/literal}{$discounts.pix|intval}{literal};
+			var discount_wallet = {/literal}{$discounts.wallet|intval}{literal};
 			var msg_console = {/literal}{$msg_console|intval}{literal};
 			var ps_version = '{/literal}{$ps_version}{literal}';
 			var pagbank_version = '{/literal}{$pagbank_version}{literal}';

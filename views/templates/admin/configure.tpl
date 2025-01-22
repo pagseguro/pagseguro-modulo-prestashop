@@ -2,14 +2,14 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Pagamento com Pix, Boleto e Cartão de Crédito
+ * Pagamento com Cartão de Crédito, Boleto, Pix e super app PagBank
  * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
  * 
  * @author
- * 2011-2024 PrestaBR - https://prestabr.com.br
+ * 2011-2025 PrestaBR - https://prestabr.com.br
  * 
  * @copyright
- * 1996-2024 PagBank - https://pagseguro.uol.com.br
+ * 1996-2025 PagBank - https://pagseguro.uol.com.br
  * 
  * @license
  * Open Software License 3.0 (OSL 3.0) - https://opensource.org/license/osl-3-0-php/
@@ -67,9 +67,6 @@
 		</div>
 		<div id="collapseCron" class="collapse" data-parent="#accordionCron">
 			<div class="info-cron">
-				<p class="comment">
-					{l s='Recomendamos que configure a Tarefa Cron para ser executada a cada 1x ao dia.' mod='pagbank'}
-				</p>
 				<h2>{l s='Pix' mod='pagbank'}</h2>
 				<p>
 					<b>{l s='URL:' mod='pagbank'}</b> {$callback_url}?action=cancelNotPaidPix&token={$token_cron}
@@ -83,6 +80,13 @@
 				</p>
 				<p class="comment">
 					{l s='Recomendamos que configure a Tarefa Cron para ser executara 1x ao dia.' mod='pagbank'}
+				</p>
+				<h2>{l s='Pagar com PagBank' mod='pagbank'}</h2>
+				<p>
+					<b>{l s='URL:' mod='pagbank'}</b> {$callback_url}?action=cancelNotPaidWallet&token={$token_cron}
+				</p>
+				<p class="comment">
+					{l s='Recomendamos que configure a Tarefa Cron para ser executada a cada 1x ao dia.' mod='pagbank'}
 				</p>
 				<h2>{l s='Nota:' mod='pagbank'}</h2>
 				<p>
@@ -101,7 +105,7 @@
 			{l s='Boleto Bancário e Pix.' mod='pagbank'}</h2>
 		<div class="allapps col-xs-12 col-sm-12">
 			<div class="row">
-				<div class="col-xs 12 col-sm-4">
+				<div class="col-xs-12 col-sm-4">
 					<h2 class="text-center">{l s='App D14' mod='pagbank'}</h2>
 					<div class="card {if (isset($tokenD14) && $tokenD14 != false)}already-registered{/if}">
 						<div class="card-body text-center">
@@ -142,7 +146,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-xs 12 col-sm-4">
+				<div class="col-xs-12 col-sm-4">
 					<h2 class="text-center">{l s='App D30' mod='pagbank'}</h2>
 					<div class="card {if (isset($tokenD30) && $tokenD30 != false)}already-registered{/if}">
 						<div class="card-body text-center">
@@ -183,7 +187,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-xs 12 col-sm-4">
+				<div class="col-xs-12 col-sm-4">
 					<h2 class="text-center">{l s='App Tax' mod='pagbank'}</h2>
 					<div class="card {if (isset($tokenTax) && $tokenTax != false)}already-registered{/if}">
 						<div class="card-body text-center">

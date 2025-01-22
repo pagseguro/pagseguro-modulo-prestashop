@@ -3,14 +3,14 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Pagamento com Pix, Boleto e Cartão de Crédito
+ * Pagamento com Cartão de Crédito, Boleto, Pix e super app PagBank
  * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
  * 
  * @author
- * 2011-2024 PrestaBR - https://prestabr.com.br
+ * 2011-2025 PrestaBR - https://prestabr.com.br
  * 
  * @copyright
- * 1996-2024 PagBank - https://pagseguro.uol.com.br
+ * 1996-2025 PagBank - https://pagseguro.uol.com.br
  * 
  * @license
  * Open Software License 3.0 (OSL 3.0) - https://opensource.org/license/osl-3-0-php/
@@ -105,6 +105,21 @@ if ($action == "processCard") {
 		'invoice_state' => Tools::getValue('ps_state_invoice'),
 	);
 	$api_response = $pagbank->processPixPayment($form_data);
+} elseif ($action == "processWallet") {
+	$form_data = array(
+		'payment_type' => 'wallet',
+		'wallet_name' => Tools::getValue('wallet_name'),
+		'cpf_cnpj' => Tools::getValue('cpf_cnpj'),
+		'telephone' => Tools::getValue('telephone'),
+		'invoice_postcode' => Tools::getValue('ps_postcode_invoice'),
+		'invoice_address' => Tools::getValue('ps_address_invoice'),
+		'invoice_number' => Tools::getValue('ps_number_invoice'),
+		'invoice_complement' => Tools::getValue('ps_other_invoice'),
+		'invoice_district' => Tools::getValue('ps_address2_invoice'),
+		'invoice_city' => Tools::getValue('ps_city_invoice'),
+		'invoice_state' => Tools::getValue('ps_state_invoice'),
+	);
+	$api_response = $pagbank->processWalletPayment($form_data);
 } elseif ($action == "installments") {
 	$value = Tools::getValue("value");
 	$bin = Tools::getValue("credit_card_bin");
@@ -159,7 +174,7 @@ if ($action == "processCard") {
 } elseif ($action == "cancelNotPaidBankslip" && $token_valid === true) {
 	$awaiting_payment = Configuration::get('PAGBANK_AWAITING_PAYMENT');
 	$payment_deadline = Configuration::get('PAGBANK_BANKSLIP_DATE_LIMIT');
-	$queryStr = 'SELECT `id_order`, `id_cart` FROM `' . _DB_PREFIX_ . 'orders` WHERE `payment` like "Boleto%" AND `current_state` = ' . (int)$awaiting_payment . ' AND `date_add` < DATE_SUB(NOW(),INTERVAL ' . $payment_deadline . ' DAY) AND DAYOFWEEK(NOW()) NOT IN (1,7)';
+	$queryStr = 'SELECT `id_order`, `id_cart` FROM `' . _DB_PREFIX_ . 'orders` WHERE `payment` like "BOLETO%" AND `current_state` = ' . (int)$awaiting_payment . ' AND `date_add` < DATE_SUB(NOW(),INTERVAL ' . $payment_deadline . ' DAY) AND DAYOFWEEK(NOW()) NOT IN (1,7)';
 	$ordersToCancel = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS($queryStr);
 
 	if (!empty($ordersToCancel)) {
@@ -174,6 +189,29 @@ if ($action == "processCard") {
 			} else {
 				$api_response = 'Status do pedido ' . $order['id_order'] . ' não atualizado na loja';
 				$pagbank->saveLog('error', 'Cancela Pedido Boleto Não Pago', $order['id_card'], '', 'Status do pedido não atualizado na loja.', false, 1);
+			}
+		}
+	} else {
+		$api_response = 'Sem pedidos para cancelar!';
+	}
+} elseif ($action == "cancelNotPaidWallet" && $token_valid === true) {
+	$awaiting_payment = Configuration::get('PAGBANK_AWAITING_PAYMENT');
+	$payment_deadline = Configuration::get('PAGBANK_WALLET_TIME_LIMIT');
+	$queryStr = 'SELECT `id_order`, `id_cart` FROM `' . _DB_PREFIX_ . 'orders` WHERE `payment` like "WALLET%" AND `current_state` = ' . (int)$awaiting_payment . ' AND `date_add` < DATE_SUB(NOW(),INTERVAL ' . $payment_deadline . ' MINUTE)';
+	$ordersToCancel = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS($queryStr);
+
+	if (!empty($ordersToCancel)) {
+		$cancelStatus = Configuration::get('PAGBANK_CANCELED');
+		$history = new OrderHistory();
+		foreach ($ordersToCancel as $order) {
+			$history->id_order = (int)$order['id_order'];
+			$history->changeIdOrderState((int)$cancelStatus, (int)$order['id_order']);
+			if ($history->addWithemail(true)) {
+				$api_response = 'Status do pedido ' . $order['id_order'] . ' atualizado na loja';
+				$pagbank->saveLog('success', 'Cancela Pedido Carteira Digital Não Pago', $order['id_card'], '', 'Status do pedido atualizado na loja.', false, 1);
+			} else {
+				$api_response = 'Status do pedido ' . $order['id_order'] . ' não atualizado na loja';
+				$pagbank->saveLog('error', 'Cancela Pedido Carteira Digital Não Pago', $order['id_card'], '', 'Status do pedido não atualizado na loja.', false, 1);
 			}
 		}
 	} else {

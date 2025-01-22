@@ -3,14 +3,14 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Pagamento com Pix, Boleto e Cartão de Crédito
+ * Pagamento com Cartão de Crédito, Boleto, Pix e super app PagBank
  * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
  * 
  * @author
- * 2011-2024 PrestaBR - https://prestabr.com.br
+ * 2011-2025 PrestaBR - https://prestabr.com.br
  * 
  * @copyright
- * 1996-2024 PagBank - https://pagseguro.uol.com.br
+ * 1996-2025 PagBank - https://pagseguro.uol.com.br
  * 
  * @license
  * Open Software License 3.0 (OSL 3.0) - https://opensource.org/license/osl-3-0-php/
@@ -35,7 +35,6 @@ class AdminPagBankController extends ModuleAdminController
         $this->_use_found_rows = false;
         $this->list_no_link = true;
         $this->token = Tools::getAdminTokenLite("AdminPagBank");
-
         $this->templateDir = _PS_MODULE_DIR_ . "pagbank/views/templates/admin/";
         $this->allow_export = true;
         $this->addRowAction('view');
@@ -43,10 +42,9 @@ class AdminPagBankController extends ModuleAdminController
         $this->_select = 'CONCAT(b.firstname, " ", b.lastname) as cliente, c.id_order, c.reference, c.total_paid_tax_incl';
         $this->_join = 'LEFT JOIN ' . _DB_PREFIX_ . 'customer b ON (b.id_customer = a.id_customer)
                         LEFT JOIN ' . _DB_PREFIX_ . 'orders c ON (c.id_cart = a.id_cart)';
-        $this->_filter = 'AND a.id_shop = ' . (int)$this->context->shop->id;
+        $this->_filter = 'AND (a.id_shop = ' . (int)$this->context->shop->id . ' OR a.id_shop IS NULL)';
         $this->_orderBy = 'c.id_order';
         $this->_orderWay = 'DESC';
-
         $this->fields_list = array(
             'id_cart' => array(
                 'title' => $this->l('Carrinho'),
@@ -104,6 +102,7 @@ class AdminPagBankController extends ModuleAdminController
                 'type' => 'datetime'
             )
         );
+        AdminController::initShopContext();
         parent::__construct();
     }
 
