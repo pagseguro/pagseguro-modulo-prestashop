@@ -2,7 +2,7 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
+ * Checkout Transparente para PrestaShop 1.6.x ao 9.x
  * Pagamento com Cartão de Crédito, Google Pay, Pix, Boleto e Pagar com PagBank
  * 
  * @author
@@ -111,7 +111,7 @@
 										data-clipboard-action="copy">Copiar código</button>
 								{else}
 									<a href="{$wallet.link}" target="_blank" class="btn-pagbank">
-										<img src="{$this_path}img/btn_green_pagbank.png" class="img-responsive" />
+										<img src="{$img_path}btn_green_pagbank.png" class="img-responsive" />
 									</a>
 								{/if}
 							</p>
@@ -239,18 +239,18 @@
 				class="container clearfix">
 				<div class="row">
 					<div class="col-xs-3 col-sm-2 nopadding" align="center">
-						<img src="{$this_path}img/loading.gif" class="img-responsive" />
+						<img src="{$img_path}loading.gif" class="img-responsive" />
 					</div>
 					<div class="col-xs-6 col-sm-7 text-center" id="pagbankmsg">
 						{l s='PIX Recebido! Redirecionando...' mod='pagbank'}
 					</div>
 					{if $device == 'd' || $device == 't'}
 						<div class="col-sm-3 nopadding-left" id="pagbank_logo" align="center">
-							<img src="{$this_path}img/pagbank-logo-animado_35px.gif" class="img-responsive" />
+							<img src="{$img_path}pagbank-logo-animado_35px.gif" class="img-responsive" />
 						</div>
 					{else}
 						<div class="col-xs-3 nopadding-left" id="pagbank_logo" align="center">
-							<img src="{$this_path}img/logo_pagbank_mini_mobile.png" class="img-responsive" />
+							<img src="{$img_path}logo_pagbank_mini_mobile.png" class="img-responsive" />
 						</div>
 					{/if}
 				</div>
@@ -273,7 +273,7 @@
 					var paid_state = {/literal}{$paid_state}{literal};
 					var my_orders = '{/literal}{$link->getPageLink('history')}?id_order={$order_id}{literal}';
 					$.ajax({
-						url: '{/literal}{$url_update}{literal}?action=checkOrder&id_order='+order_id,
+						url: '{/literal}{$url_update}{literal}&action=checkOrder&id_order='+order_id,
 						cache: false,
 						success: function(data) {
 							var json = data;
@@ -312,16 +312,16 @@
 				class="container clearfix">
 				<div class="row">
 					<div class="col-xs-3 col-sm-2 nopadding" align="center">
-						<img src="{$this_path}img/loading.gif" class="img-responsive" />
+						<img src="{$img_path}loading.gif" class="img-responsive" />
 					</div>
 					<div class="col-xs-6 col-sm-7 text-center" id="pagbankmsg">
 						{l s='PIX Recebido! Redirecionando...' mod='pagbank'}
 					</div>
 					<div class="hidden-xs col-sm-3 nopadding-left" id="pagbank_logo" align="center">
-						<img src="{$this_path}img/pagbank-logo-animado_35px.gif" class="img-responsive" />
+						<img src="{$img_path}pagbank-logo-animado_35px.gif" class="img-responsive" />
 					</div>
 					<div class="hidden-lg hidden-md hidden-sm col-xs-3 nopadding-left" id="pagbank_logo" align="center">
-						<img src="{$this_path}img/logo_pagbank_mini_mobile.png" class="img-responsive" />
+						<img src="{$img_path}logo_pagbank_mini_mobile.png" class="img-responsive" />
 					</div>
 				</div>
 			</div>
@@ -343,10 +343,9 @@
 					var paid_state = {/literal}{$paid_state}{literal};
 					var my_orders = '{/literal}{$link->getPageLink('history')}?id_order={$order_id}{literal}';
 					$.ajax({
-						url: '{/literal}{$url_update}{literal}?action=checkOrder&id_order='+order_id,
+						url: '{/literal}{$url_update}{literal}&action=checkOrder&id_order='+order_id,
 						cache: false,
 						success: function(data) {
-							//var json = $.parseJSON(data);
 							var json = data;
 							$.each(json, function(i, item) {
 								if (item.id_order_state == paid_state) {

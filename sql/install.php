@@ -3,7 +3,7 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
+ * Checkout Transparente para PrestaShop 1.6.x ao 9.x
  * Pagamento com Cartão de Crédito, Google Pay, Pix, Boleto e Pagar com PagBank
  * 
  * @author
@@ -57,7 +57,7 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'pagbank_logs` (
     `method` varchar(64) NULL,
     `data` MEDIUMTEXT NULL,
     `response` MEDIUMTEXT NULL,
-    `url` varchar(128) NULL,
+    `url` varchar(196) NULL,
     `cron` int(11) NULL DEFAULT 0,
     PRIMARY KEY (`id_log`),
     INDEX (id_shop),

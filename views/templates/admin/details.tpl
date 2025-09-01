@@ -2,7 +2,7 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
+ * Checkout Transparente para PrestaShop 1.6.x ao 9.x
  * Pagamento com Cartão de Crédito, Google Pay, Pix, Boleto e Pagar com PagBank
  * 
  * @author
@@ -34,7 +34,7 @@
 			<div class="panel-heading card-header">
 				{l s='Dados Cadastrais' mod='pagbank'}
 			</div>
-			<div class="panel-body card-body nopadding">
+			<div class="panel-body card-body">
 				<ul class="list list-unstyled">
 					<li><b>{l s='Id:' mod='pagbank'}</b> <span>{$customer->id}</span></li>
 					<li><b>{l s='Nome:' mod='pagbank'}</b> <span>{$customer->firstname} {$customer->lastname}</span>
@@ -63,7 +63,7 @@
 			<div class="panel-heading card-header">
 				{l s='Endereço de entrega:' mod='pagbank'} {$customer_address->alias}
 			</div>
-			<div class="panel-body card-body nopadding">
+			<div class="panel-body card-body">
 				<ul class="list list-unstyled">
 					<li><b>{l s='CEP:' mod='pagbank'}</b> <span>{$customer_address->postcode}</span></li>
 					<li><b>{l s='Endereço:' mod='pagbank'}</b> <span>{$customer_address->address1}</span></li>
@@ -84,7 +84,7 @@
 			<div class="panel-heading card-header">
 				{l s='Dados do Pedido - Loja:' mod='pagbank'} {$order->id} ({$order->reference})
 			</div>
-			<div class="panel-body card-body nopadding">
+			<div class="panel-body card-body">
 				<ul class="list list-unstyled">
 					<li><b>{l s='Data do pedido:' mod='pagbank'}</b>
 						<span>{$order->date_add|date_format:'%d/%m/%Y %H:%M'}</span></li>
@@ -112,7 +112,7 @@
 					<div class="panel-heading card-header">
 						{l s='Produtos' mod='pagbank'}
 					</div>
-					<div class="panel-body card-body nopadding">
+					<div class="panel-body card-body">
 						<table class="table table-striped table-hover">
 							<thead>
 								<th>{l s='Id' mod='pagbank'}</th>
@@ -159,7 +159,7 @@
 		<div class="panel-heading card-header">
 			{l s='Dados do Pedido - PagBank:' mod='pagbank'}
 		</div>
-		<div class="panel-body card-body nopadding">
+		<div class="panel-body card-body">
 			<div class="row">
 				<div class="col-xs-12 col-sm-6">
 					<ul class="list list-unstyled">

@@ -3,7 +3,7 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
+ * Checkout Transparente para PrestaShop 1.6.x ao 9.x
  * Pagamento com Cartão de Crédito, Google Pay, Pix, Boleto e Pagar com PagBank
  * 
  * @author
@@ -56,10 +56,16 @@ class PagBank extends PaymentModule
 	{
 		$this->name = 'pagbank';
 		$this->tab = 'payments_gateways';
-		$this->version = '1.9.2';
+		$this->version = '2.0.0';
 		$this->author = 'PrestaBR';
+		$this->displayName = $this->l('PagBank - Checkout Transparente');
+		$this->description = $this->l('Módulo Oficial API v.4 - PrestaShop 1.6.x ao 9.x');
+		$this->limited_countries = array('BR');
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+		$this->bootstrap = true;
 		$this->urls = array(
-			'notification' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/notify.php',
+			'notification' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'module/' . $this->name . '/notify',
+			'update' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'module/' . $this->name . '/update',
 			'img' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/img/',
 		);
 		$this->credential_type = Configuration::get('PAGBANK_CREDENTIAL');
@@ -126,30 +132,30 @@ class PagBank extends PaymentModule
 			$this->ready = true;
 		}
 
-		$this->bootstrap = true;
-
 		if (_PS_VERSION_ >= '1.7.0') {
 			$this->pag_controller = new PagBankV8();
 		} else {
 			$this->pag_controller = new PagBankV6();
 		}
 
-		$dev_type = new Mobile_Detect();
-		if ($dev_type->isTablet()) {
-			$this->device = "t";
-		} elseif ($dev_type->isMobile()) {
-			$this->device = "m";
+		if (_PS_VERSION_ >= '9.0.0') {
+			if ($this->context->isTablet()) {
+				$this->device = "t";
+			} elseif ($this->context->isMobile()) {
+				$this->device = "m";
+			} else {
+				$this->device = "d";
+			}
 		} else {
-			$this->device = "d";
+			$dev_type = new Mobile_Detect();
+			if ($dev_type->isTablet()) {
+				$this->device = "t";
+			} elseif ($dev_type->isMobile()) {
+				$this->device = "m";
+			} else {
+				$this->device = "d";
+			}
 		}
-
-		parent::__construct();
-
-		$this->displayName = $this->l('PagBank - Checkout Transparente');
-		$this->description = $this->l('Módulo Oficial API v.4 - PrestaShop 1.6, 1.7 e 8.0');
-
-		$this->limited_countries = array('BR');
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 
 		$this->number_field = 'company';
 		if (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('SELECT * FROM information_schema.COLUMNS WHERE TABLE_NAME = "' . _DB_PREFIX_ . 'address" AND COLUMN_NAME = "number"')) {
@@ -158,6 +164,8 @@ class PagBank extends PaymentModule
 			$this->number_field = 'numend';
 		}
 		$this->compl_field = ($this->number_field == 'numend' ? 'compl' : 'other');
+
+		parent::__construct();
 	}
 
 	/*
@@ -304,6 +312,8 @@ class PagBank extends PaymentModule
 		Configuration::updateValue('PAGBANK_CODE_VERIFIER_D30', $this->getPkceData('D30', 'code_verifier'), false);
 		Configuration::updateValue('PAGBANK_CODE_CHALLENGE_D30', $this->getPkceData('D30', 'code_challenge'), false);
 
+		Configuration::updateValue('PAGBANK_PS_SESSION', Tools::getAdminTokenLite('AdminModules'), false);
+
 		if (_PS_VERSION_ >= '1.7.0') {
 			$transactions_link = $this->context->link->getAdminLink("AdminPagBank8", false) . '&token=' . Tools::getAdminTokenLite("AdminPagBank8");
 			$logs_link = $this->context->link->getAdminLink("AdminPagBank8Logs", false) . '&token=' . Tools::getAdminTokenLite("AdminPagBank8Logs");
@@ -312,21 +322,28 @@ class PagBank extends PaymentModule
 			$logs_link = $this->context->link->getAdminLink("AdminPagBankLogs", false) . '&token=' . Tools::getAdminTokenLite("AdminPagBankLogs");
 		}
 
+		if($this->version >= '2.0.0'){
+			$msg_cron = true;
+		} else {
+			$msg_cron = false;
+		}
+
 		$this->context->smarty->assign(array(
 			'module_dir' => $this->_path,
 			'module_version' => $this->version,
+			'msg_cron' => $msg_cron,
 			'transactions_link' => $transactions_link,
 			'logs_link' => $logs_link,
 			'environment' => $this->environment,
 			'new_user_code' => 'prestabr_code_' . $this->environment . '_' . $this->sortRefNumber(),
-			'new_user_state_d14' => urlencode(basename(_PS_ADMIN_DIR_) . '/' . Tools::getValue('token') . '/registerUser/D14'),
-			'new_user_state_d30' => urlencode(basename(_PS_ADMIN_DIR_) . '/' . Tools::getValue('token') . '/registerUser/D30'),
-			'new_user_state_tax' => urlencode(basename(_PS_ADMIN_DIR_) . '/' . Tools::getValue('token') . '/registerUser/TAX'),
+			'new_user_state_d14' => urlencode(basename(_PS_ADMIN_DIR_) . '/registerUser/D14'),
+			'new_user_state_d30' => urlencode(basename(_PS_ADMIN_DIR_) . '/registerUser/D30'),
+			'new_user_state_tax' => urlencode(basename(_PS_ADMIN_DIR_) . '/registerUser/TAX'),
 			'client_id_tax' => $client_id_tax,
 			'client_id_d14' => $client_id_d14,
 			'client_id_d30' => $client_id_d30,
 			'signin_connect_url' => $signin_connect_url,
-			'callback_url' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/update.php',
+			'callback_url' => $this->urls['update'],
 			'scope' => 'payments.read+payments.create+payments.refund+accounts.read',
 			'code_verifier_tax' => Configuration::get('PAGBANK_CODE_VERIFIER_TAX'),
 			'code_challenge_tax' => Configuration::get('PAGBANK_CODE_CHALLENGE_TAX'),
@@ -375,26 +392,62 @@ class PagBank extends PaymentModule
 	}
 
 	/*
-	* Define alguns elementos no header do back
+	* Define alguns elementos no header do backoffice
 	*/
 	public function hookDisplayBackOfficeHeader()
 	{
 		$this->context->controller->addCSS($this->_path . 'css/pagbank_admin.css');
 		$this->context->controller->addJS($this->_path . 'js/mascara.js');
-
 		$this->callRefreshToken();
-		
-		if(Tools::getValue('controller') == 'AdminModulesManage' || Tools::getValue('controller') == 'AdminModules') {
-			$this->checkForUpdates();
-			if (_PS_VERSION_ >= '1.7.0') {
-				$get_restr_carrier = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('SELECT `id_module` FROM `' . _DB_PREFIX_ . 'module_carrier` WHERE `id_module`=' . $this->id . '');
-				$set_url_restr_carrier = 'index.php?controller=AdminPaymentPreferences&token=' . Tools::getAdminTokenLite('AdminPaymentPreferences');
 
-				if (empty($get_restr_carrier)) {
-					$this->context->controller->warnings[] = '<p><b>PagBank - Restrições de transportadora: </b></p> <p>Verifique se as transportadoras estão vinculadas à forma de pagamento. Isso vai garantir que o módulo seja exibido e esteja disponível para processar pagamentos na tela de checkout.</p> <p>Para ver as configurações de Restrições de transportadora <a href="' . $set_url_restr_carrier . '">Clique aqui</a> (role até o final da página)</p>';
+		if (_PS_VERSION_ < '9.0.0') {
+			$this->checkWarningsAndUpdates();
+		}
+	}
+
+	public function hookDisplayDashboardTop()
+	{
+		if (_PS_VERSION_ >= '9.0.0') {
+			return $this->checkWarningsAndUpdates();
+		}
+	}
+
+	public function checkWarningsAndUpdates()
+	{
+		if(Tools::getValue('controller') == 'AdminModulesManage' || Tools::getValue('controller') == 'AdminModules') {
+			if (_PS_VERSION_ >= '1.7.0') {
+				$check_carrier = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('SELECT `id_module` FROM `' . _DB_PREFIX_ . 'module_carrier` WHERE `id_module`=' . $this->id . '');
+				if (_PS_VERSION_ >= '9.0.0') {
+					$set_url = 'index.php/improve/payment/preferences?_token=' . Tools::getAdminTokenLite('AdminPaymentPreferences');
+				} else {
+					$set_url = 'index.php?controller=AdminPaymentPreferences&token=' . Tools::getAdminTokenLite('AdminPaymentPreferences');
 				}
 			}
-		}	
+
+			$file_version = Tools::file_get_contents('https://raw.githubusercontent.com/pagseguro/pagseguro-modulo-prestashop/master/VERSION');
+			if($this->version < $file_version){
+				$check_update = true;
+			} else {
+				$check_update = false;
+			}
+
+			if (_PS_VERSION_ >= '9.0.0') {
+				$this->context->smarty->assign([
+					'check_update' => $check_update,
+					'check_carrier' => $check_carrier,
+					'set_url' => $set_url,
+					'file_version' => $file_version
+				]);
+				return $this->display(__FILE__, 'views/templates/admin/info.tpl');
+			} else {
+				if ($check_update) {
+					$this->context->controller->warnings[] = '<p><b>Módulo PagBank - Atualização disponível! Nova Versão: v.'.$file_version.' <br /> Acesse: <a href="https://github.com/pagseguro/pagseguro-modulo-prestashop" target="_blank">https://github.com/pagseguro/pagseguro-modulo-prestashop</a> </b></p>';
+				}
+				if (isset($check_carrier) && empty($check_carrier)) {
+					$this->context->controller->warnings[] = '<p><b>Módulo PagBank - Restrições de transportadora: </b></p> <p>Verifique se as transportadoras estão vinculadas à forma de pagamento. Isso vai garantir que o módulo seja exibido e esteja disponível para processar pagamentos na tela de checkout. Para ver as configurações de Restrições de transportadora <a href="' . $set_url . '">Clique aqui</a> (role até o final da página)</p>';
+				}
+			}
+		}
 	}
 
 	/*
@@ -595,7 +648,6 @@ class PagBank extends PaymentModule
 		);
 
 		$this->smarty->assign(array(
-			'self' => $this->context->controller->php_self,
 			'page_name' => $page_name,
 			'msg_console' => (bool)$msg_console,
 			'payments' => $active_payments,
@@ -609,9 +661,7 @@ class PagBank extends PaymentModule
 			'google_merchant_id' => trim(Configuration::get('PAGBANK_GOOGLE_MERCHANT_ID')),
 			'google_environment' => $this->google_environment,
 			'device' => $this->device,
-			'module_dir' => $this->_path,
 			'tpl_dir' => _PS_MODULE_DIR_ . $this->name . '/views/templates/v6/hook',
-			'url_img' => $this->urls['img'],
 			'currency' => $currency,
 			'idmodule' => $this->id,
 			'checkout' => (bool)Configuration::get('PS_ORDER_PROCESS_TYPE'),
@@ -631,10 +681,10 @@ class PagBank extends PaymentModule
 			'sender_name' => $sender_name,
 			'birthday' => isset($birthday_string) && $birthday_string != '' ? $birthday_string : '',
 			'customer_token' => $this->getCustomerToken((int)($cart->id_customer)),
-			'ps_version' => substr(_PS_VERSION_, 0, 3),
+			'ps_version' => _PS_VERSION_,
 			'pagbank_version' => $this->version,
-			'this_path' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/',
-			'url_update' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/update.php'
+			'img_path' => $this->urls['img'],
+			'url_update' => Context::getContext()->link->getModuleLink($this->name, 'update', ['ajax' => true])
 		));
 	}
 
@@ -795,14 +845,12 @@ class PagBank extends PaymentModule
 				'google_merchant_id' => trim(Configuration::get('PAGBANK_GOOGLE_MERCHANT_ID')),
 				'google_environment' => $this->google_environment,
 				'device' => $this->device,
-				'module_dir' => $this->_path,
-				'url_img' => $this->urls['img'],
 				'currency' => $currency,
 				'ps_version' => substr(_PS_VERSION_, 0, 3),
 				'pagbank_version' => $this->version,
 				'total' => number_format($total, 2, '.', ''),
-				'this_path' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/',
-				'url_update' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/update.php'
+				'img_path' => $this->urls['img'],
+				'url_update' => Context::getContext()->link->getModuleLink($this->name, 'update', ['ajax' => true])
 			));
 			$this->context->cookie->pagbank_msg = false;
 			return $this->display(__FILE__, '/views/templates/v8/hook/payment_top.tpl');
@@ -826,7 +874,7 @@ class PagBank extends PaymentModule
 		}
 
 		$id_cart = Tools::getValue('id_cart');
-		$id_order = Order::getOrderByCartId($id_cart);
+		$id_order = Tools::getValue('id_order');
 		$order = new Order($id_order);
 
 		$info = $this->getOrderData($id_cart, 'id_cart');
@@ -893,13 +941,14 @@ class PagBank extends PaymentModule
 
 		$this->smarty->assign(array(
 			'device' => $this->device,
+			'ps_version' => _PS_VERSION_,
 			'customer_name' => $customer_name,
 			'info' => $info,
 			'pay_link' => isset($info['url']) && $info['url'] != '' ? $info['url'] : false,
 			'transaction_code' => $transaction_code,
 			'order_id' => $id_order,
 			'order_reference' => $order->reference,
-			'order_value' => number_format($order->total_paid, 2, ',', '.'),
+			'order_value' => $order->total_paid,
 			'order_products' => $order->getProducts(),
 			'transaction' => $transaction,
 			'payment_status' => $this->parseStatus($payment_status),
@@ -909,9 +958,10 @@ class PagBank extends PaymentModule
 			'alternate_time' => $alternate_time,
 			'payment_type' => isset($payment_type) && $payment_type != '' ? $payment_type : false,
 			'order' => $order,
+			'currency' => new Currency($this->context->currency->id),
 			'paid_state' => Configuration::get('PAGBANK_PAID'),
-			'this_path' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/',
-			'url_update' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/update.php',
+			'img_path' => $this->urls['img'],
+			'url_update' => Context::getContext()->link->getModuleLink($this->name, 'update', ['ajax' => true])
 		));
 
 		if (_PS_VERSION_ >= '1.7.0') {
@@ -1008,9 +1058,7 @@ class PagBank extends PaymentModule
 			'status' => $status_pagbank,
 			'desc_status' => $this->parseStatus($status_pagbank),
 			'currency' => new Currency($this->context->currency->id),
-			'this_page' => $_SERVER['REQUEST_URI'],
-			'this_path' => $this->_path,
-			'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/'
+			'this_page' => $_SERVER['REQUEST_URI']
 		));
 
 		if (_PS_VERSION_ >= '1.7.0') {
@@ -2231,16 +2279,6 @@ class PagBank extends PaymentModule
 	}
 
 	/* 
-	 * Pega ID do Carrinho a partir da referência do pedido no PagBank
-	 */
-	public function getIdCart($reference)
-	{
-		$ref_array = explode(".", $reference);
-		$id_cart = $ref_array[0];
-		return $id_cart;
-	}
-
-	/* 
 	 * Parse HTTP Status
 	 */
 	public function parseHttpStatus($http)
@@ -2651,7 +2689,7 @@ class PagBank extends PaymentModule
 		}
 		$api_info = $this->getApiInfo((int)$this->environment, $app);
 		$criptogram = $api_info['cipher_text'];
-		$redirect_uri = Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/update.php';
+		$redirect_uri = $this->urls['update'];
 		$json_authorization = '{
 			"grant_type": "authorization_code",
 			"code": "' . $code . '",
@@ -2981,16 +3019,5 @@ class PagBank extends PaymentModule
 		);
 
 		return str_replace($a, $b, $str);
-	}
-
-	/*
-	* Verifica se existe update disponível
-	*/
-	public function checkForUpdates()
-	{
-		$file_version = file_get_contents('https://raw.githubusercontent.com/pagseguro/pagseguro-modulo-prestashop/master/VERSION');
-		if($this->version < $file_version){
-			$this->context->controller->warnings[] = '<p><b>Módulo PagBank - Atualização disponível! Nova Versão: v.'.$file_version.' <br /> Acesse: <a href="https://github.com/pagseguro/pagseguro-modulo-prestashop" target="_blank">https://github.com/pagseguro/pagseguro-modulo-prestashop</a> </b></p>';
-		}
 	}
 }

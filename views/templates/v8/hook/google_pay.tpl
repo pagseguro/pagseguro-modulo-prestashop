@@ -2,7 +2,7 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
+ * Checkout Transparente para PrestaShop 1.6.x ao 9.x
  * Pagamento com Cartão de Crédito, Google Pay, Pix, Boleto e Pagar com PagBank
  * 
  * @author
@@ -74,7 +74,11 @@
 							{if ($discounts.discount_type == 1)}
 								{$discounts.discount_value}%
 							{else}
-								{Tools::displayPrice($discounts.discount_value|escape:'htmlall':'UTF-8')}
+								{if $ps_version >= '9.0.0'}
+									{Context::getContext()->currentLocale->formatPrice($discounts.discount_value, $currency->iso_code)}
+								{else}
+									{Tools::displayPrice($discounts.discount_value|escape:'htmlall':'UTF-8')}
+								{/if}
 							{/if}
 						</span>
 					</div>

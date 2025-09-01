@@ -1,6 +1,6 @@
 ![](https://prestabr.com.br/docpagbank/0525/head_git_pagbank.jpg)
 
-<p align="center">PagBank - Checkout Transparente - v.1.9.2</p>
+<p align="center">PagBank - Checkout Transparente - v.2.0.0</p>
 
 ## Taxas Reduzidas!
 
@@ -22,8 +22,8 @@ Este módulo foi desenvolvido rigorosamente dentro dos padrões de segurança PC
 ## Compatibilidade
 
 - Este módulo não utiliza Override;
-- Compatível com PrestaShop 1.6.x, 1.7.x e 8.x;
-- Compatível com PHP 5.2.0 ao 8.3.10;
+- Compatível com PrestaShop 1.6.x ao 9.x;
+- Compatível com PHP 5.2.0 ao 8.4.11;
 - Desenvolvido, testado e homologado com base na API v.4 do PagBank;
 - Requer a biblioteca cURL ativa na hospedagem.
 - Obrigatório o uso de certificado SSL com o protocolo TLS 1.2 ou superior;
@@ -317,7 +317,11 @@ Para maiores detalhes a respeito do pedido acesse **PagBank > PagBank - Transaç
 
 A **Tarefa Cron** serve para cancelar os pedidos que não forem pagos dentro do prazo estipulado para Boleto Bancário, Pix e Pagar com PagBank, também é útil para o seu gerenciamento de estoque. Para configurar a **Tarefa Cron** entre em contato com o suporte técnico do seu servidor de hospedagem e informe as URLs geradas para a sua loja.
 
-![](https://prestabr.com.br/docpagbank/0525/12_tarefa_cron_0.jpg "Tarefa Cron - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0525/12_tarefa_cron_31.jpg "Tarefa Cron - Módulo PagBank")
+
+**`Nota:`**
+
+> - As URLs de Tarefa Cron mudaram a partir da versão 2.0.0. Por favor, verifique e atualize junto ao seu servidor de hospedagem.
 
 ---
 #### 13 - Extra - Estorno Parcial ou Total de um Pedido
@@ -428,3 +432,7 @@ Só é possível realizar o estorno se o pedido estiver em um destes status:
 **v.1.9.2**
 - Correções de bugs p/ o Google Pay;
 - Correção de bug da Tarefa Cron do Pagar com PagBank (cancelNotPaidWallet);
+
+**v.2.0.0**
+- Otimizações e correções de bugs;
+- Compatibilidade com PrestaShop 9;

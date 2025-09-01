@@ -3,7 +3,7 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
+ * Checkout Transparente para PrestaShop 1.6.x ao 9.x
  * Pagamento com Cartão de Crédito, Google Pay, Pix, Boleto e Pagar com PagBank
  * 
  * @author
@@ -93,7 +93,7 @@ class PagBankValidationModuleFrontController extends ModuleFrontController
 				}
 			}
 			$this->context->cookie->pagbank_msg = $pagbank_msg;
-			Tools::redirectLink($this->redirect_link);
+			Tools::redirect($this->redirect_link);
 		} elseif (isset($this->pag_response->charges) && $this->pag_response->charges[0]->status == 'DECLINED') {
 			$pagbank_msg = 'Pagamento não autorizado.<br />Motivo: '.$this->pag_response->charges[0]->payment_response->message.'<br />(Código: '.$this->pag_response->charges[0]->payment_response->code.')';
 			if (_PS_VERSION_ >= '1.7.0') {
@@ -106,7 +106,7 @@ class PagBankValidationModuleFrontController extends ModuleFrontController
 				}
 			}
 			$this->context->cookie->pagbank_msg = $pagbank_msg;
-			Tools::redirectLink($this->redirect_link);
+			Tools::redirect($this->redirect_link);
 		} else {
 			$this->pag_data['id'] = $this->pag_response->id;
 			$this->pag_data['reference_id'] = $this->pag_response->reference_id;
@@ -392,6 +392,6 @@ class PagBankValidationModuleFrontController extends ModuleFrontController
 		if (!$bd) {
 			$this->module->saveLog('error', 'Inserir Dados', $this->context->cart->id, json_encode($this->pag_response), 'Banco de Dados não atualizado.');
 		}
-		Tools::redirectLink($this->redirect_link);
+		Tools::redirect($this->redirect_link);
 	}
 }

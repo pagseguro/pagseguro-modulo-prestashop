@@ -2,7 +2,7 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
+ * Checkout Transparente para PrestaShop 1.6.x ao 9.x
  * Pagamento com Cartão de Crédito, Google Pay, Pix, Boleto e Pagar com PagBank
  * 
  * @author
@@ -106,7 +106,7 @@ $(document).ready(function() {
 	var orderValueField = document.getElementById('order_value');
 	if (orderValueField != null) {
 		orderValueField.addEventListener('change', function() {
-			if (ps_version == '1.6') {
+			if (pgb_ps_version == '1.6') {
 				window.location.reload(true);
 			}
 		});
@@ -191,15 +191,15 @@ $(document).ready(function() {
 		$('.fancy-button').fancybox();
 	}
 
-	if(typeof payment_google_pay !== 'undefined' && payment_google_pay == 1 &&
-	typeof google_merchant_id.length !== 'undefined' && google_merchant_id.length >= 13){
+	if(typeof pgb_payment_google_pay !== 'undefined' && pgb_payment_google_pay == 1 &&
+	typeof pgb_google_merchant_id.length !== 'undefined' && pgb_google_merchant_id.length >= 13){
 		getGooglePaymentsClient();
 		onGooglePayLoaded();
 	}
 });
 
 function getGooglePaymentsClient() {
-	if (google_environment == 1) {
+	if (pgb_google_environment == 1) {
 		var google_env = 'PRODUCTION';
 	} else {
 		var google_env = 'TEST';
@@ -217,7 +217,7 @@ function getGooglePaymentDataRequest() {
 		type: 'PAYMENT_GATEWAY',
 			parameters: {
 			'gateway': 'pagbank',
-			'gatewayMerchantId': account_id
+			'gatewayMerchantId': pgb_account_id
 			}
 		};
 	var	baseCardPaymentMethod = {
@@ -243,8 +243,8 @@ function getGooglePaymentDataRequest() {
 			totalPrice: orderValue
 		};
 		paymentDataRequest.merchantInfo = {
-			merchantName: shop_name,
-			merchantId: google_merchant_id
+			merchantName: pgb_shop_name,
+			merchantId: pgb_google_merchant_id
 		};
 
 	return paymentDataRequest;
@@ -285,13 +285,13 @@ function onGooglePaymentButtonClicked() {
 		var paymentBrand = paymentData.paymentMethodData.info.cardNetwork;
 		var paymentLastDigits = paymentData.paymentMethodData.info.cardDetails
 		infoAndBrandGooglePayment(paymentBrand, paymentLastDigits, paymentToken);
-		if (msg_console == 1) {
+		if (pgb_msg_console == 1) {
 			console.log(paymentToken);
 			console.log(paymentBrand);
 			console.log(paymentLastDigits);
 		}
 	}).catch(function(err){
-		if (msg_console == 1) {
+		if (pgb_msg_console == 1) {
 			console.log('Verifique se o Merchant ID está correto.');
 			console.error(err);
 		}
@@ -336,7 +336,7 @@ function ps_getInstallments(card_number, google_pay = false) {
 		'credit_card_bin': card_bin,
 	};
 	$.ajax({
-		url: functionUrl,
+		url: pgb_function_url,
 		cache: false,
 		dataType: 'Json',
 		data: params,
@@ -376,10 +376,10 @@ function ps_getInstallments(card_number, google_pay = false) {
 					var optionQty = parc.installments;
 					var optionValue = Number(parc.installment_value/100);
 
-					if (!google_pay && optionQty == 1 && discount_type > 0 && credit_card_value > 0 && discount_card == 1) {
-						optionValue = credit_card_value;
-					} else if (google_pay && optionQty == 1 && discount_type > 0 && google_pay_value > 0 && discount_google == 1) {
-						optionValue = google_pay_value;
+					if (!google_pay && optionQty == 1 && pgb_discount_type > 0 && pgb_credit_card_value > 0 && pgb_discount_card == 1) {
+						optionValue = pgb_credit_card_value;
+					} else if (google_pay && optionQty == 1 && pgb_discount_type > 0 && pgb_google_pay_value > 0 && pgb_discount_google == 1) {
+						optionValue = pgb_google_pay_value;
 					}
 
 					var optionTotal = Number((optionQty * optionValue));
@@ -428,7 +428,7 @@ function ps_getInstallments(card_number, google_pay = false) {
 			showLoading('hide');
 		},
 		error: function (xhr) {
-			if (msg_console == 1) {
+			if (pgb_msg_console == 1) {
 				console.log(xhr.status);
 			}
 			showLoading('hide');
@@ -566,7 +566,7 @@ function ps_validateCard() {
 	}
 
 	if (cardTokenId.value > 0) {
-		if (msg_console == 1) {
+		if (pgb_msg_console == 1) {
 			console.log('cartão tokenizado.');
 		}
 	} else {
@@ -647,7 +647,7 @@ function ps_validateCard() {
 
 	if (typeof errorFields !== 'undefined' && errorFields.length > 0) {
 		for (var i = 0; i < errorFields.length; i++) {
-			if (msg_console == 1) {
+			if (pgb_msg_console == 1) {
 				console.log(errorFields[i]);
 			}
 			changeFieldClassName(errorFields[i], true);
@@ -655,19 +655,19 @@ function ps_validateCard() {
 	}
 
 	if (html.length > 0) {
-		if (msg_console == 1) {
+		if (pgb_msg_console == 1) {
 			console.log(html);
 		}
 		showError(html, 5);
 		if (address_error === true) {
 			$('#card_address').collapse('show');
 		}
-		if (ps_version >= '1.7') {
+		if (pgb_ps_version >= '1.7') {
 			checkTos(false);
 		}
 		return false;
 	} else {
-		if (ps_version >= '1.7') {
+		if (pgb_ps_version >= '1.7') {
 			checkTos(true);
 		}
 		return true;
@@ -846,7 +846,7 @@ function ps_validateBankslip() {
 
 	if (typeof errorFields !== 'undefined' && errorFields.length > 0) {
 		for (var i = 0; i < errorFields.length; i++) {
-			if (msg_console == 1) {
+			if (pgb_msg_console == 1) {
 				console.log(errorFields[i]);
 			}
 			changeFieldClassName(errorFields[i], true);
@@ -858,12 +858,12 @@ function ps_validateBankslip() {
 		if (adress_error === true) {
 			$('#bankslip_address').collapse('show');
 		}
-		if (ps_version >= '1.7') {
+		if (pgb_ps_version >= '1.7') {
 			checkTos(false);
 		}
         return false;
     } else {
-		if (ps_version >= '1.7') {
+		if (pgb_ps_version >= '1.7') {
 			checkTos(true);
 		}
         return true;
@@ -949,7 +949,7 @@ function ps_validatePix() {
 
 	if (typeof errorFields !== 'undefined' && errorFields.length > 0) {
 		for (var i = 0; i < errorFields.length; i++) {
-			if (msg_console == 1) {
+			if (pgb_msg_console == 1) {
 				console.log(errorFields[i]);
 			}
 			changeFieldClassName(errorFields[i], true);
@@ -961,12 +961,12 @@ function ps_validatePix() {
 		if (pix_adress_error === true) {
 			$('#pix_address').collapse('show');
 		}
-		if (ps_version >= '1.7') {
+		if (pgb_ps_version >= '1.7') {
 			checkTos(false);
 		}
         return false;
     } else {
-		if (ps_version >= '1.7') {
+		if (pgb_ps_version >= '1.7') {
 			checkTos(true);
 		}
         return true;
@@ -1052,7 +1052,7 @@ function ps_validateWallet() {
 
 	if (typeof errorFields !== 'undefined' && errorFields.length > 0) {
 		for (var i = 0; i < errorFields.length; i++) {
-			if (msg_console == 1) {
+			if (pgb_msg_console == 1) {
 				console.log(errorFields[i]);
 			}
 			changeFieldClassName(errorFields[i], true);
@@ -1064,12 +1064,12 @@ function ps_validateWallet() {
 		if (wallet_adress_error === true) {
 			$('#wallet_address').collapse('show');
 		}
-		if (ps_version >= '1.7') {
+		if (pgb_ps_version >= '1.7') {
 			checkTos(false);
 		}
         return false;
     } else {
-		if (ps_version >= '1.7') {
+		if (pgb_ps_version >= '1.7') {
 			checkTos(true);
 		}
         return true;
@@ -1157,7 +1157,7 @@ function ps_validateGoogle() {
 
 	if (typeof errorFields !== 'undefined' && errorFields.length > 0) {
 		for (var i = 0; i < errorFields.length; i++) {
-			if (msg_console == 1) {
+			if (pgb_msg_console == 1) {
 				console.log(errorFields[i]);
 			}
 			changeFieldClassName(errorFields[i], true);
@@ -1165,19 +1165,19 @@ function ps_validateGoogle() {
 	}
 
 	if (html.length > 0) {
-		if (msg_console == 1) {
+		if (pgb_msg_console == 1) {
 			console.log(html);
 		}
 		showError(html, 5);
 		if (address_error === true) {
 			$('#google_address').collapse('show');
 		}
-		if (ps_version >= '1.7') {
+		if (pgb_ps_version >= '1.7') {
 			checkTos(false);
 		}
 		return false;
 	} else {
-		if (ps_version >= '1.7') {
+		if (pgb_ps_version >= '1.7') {
 			checkTos(true);
 		}
 		return true;
@@ -1285,7 +1285,7 @@ function checkCVV(card_brand) {
 			if (fone === '') {
 				changeFieldClassName('card_cvv', true);
 			}
-            if (msg_console == 1) {
+            if (pgb_msg_console == 1) {
                 console.log('CVV inválido. ' + brand + ' com ' + cvvField.value.length + ' caracteres.');
             }
             showError('Código de Validação inválido. ' + brand.toUpperCase() + ' com ' + cvvField.value.length + ' caracteres.', 7);
@@ -1320,14 +1320,14 @@ function validatePhoneNumber(fieldId) {
     if (reg.test(clean)) {
         var areaCodeExists = inArray(areaCode, valid_area_codes);
         if (areaCodeExists < 0) {
-            if (msg_console == 1) {
+            if (pgb_msg_console == 1) {
                 console.log('DDD não encontrado (' + areaCode + ')');
             }
 			changeFieldClassName(fieldId, true);
             showError('DDD não encontrado (' + areaCode + ')', 5);
             return false;
         } else {
-            if (msg_console == 1) {
+            if (pgb_msg_console == 1) {
                 console.log('(' + areaCode + ') DDD válido!');
             }
 			changeFieldClassName(fieldId);
@@ -1345,7 +1345,7 @@ function validatePhoneNumber(fieldId) {
             return true;
         }
     } else {
-        if (msg_console == 1) {
+        if (pgb_msg_console == 1) {
             console.log('Fone: ' + clean);
         }
 		changeFieldClassName(fieldId, true);
@@ -1370,7 +1370,7 @@ function showLoading(hide, id) {
 		} else {
 			document.getElementById('pagbankmsg').innerHTML = DOMPurify.sanitize('Processando pagamento...', { SAFE_FOR_JQUERY: true });
 		}
-		if (ps_version < '1.7') {
+		if (pgb_ps_version < '1.7') {
 			if (submitCard != null) {
 				submitCard.disabled = true;
 			}
@@ -1391,7 +1391,7 @@ function showLoading(hide, id) {
 		document.getElementById('fancy_load').classList.add('loading');
 		document.getElementById('fancy_load').style.width = window.innerWidth;
 	}else{
-		if (ps_version < '1.7') {
+		if (pgb_ps_version < '1.7') {
 			if (submitCard != null) {
 				submitCard.disabled = false;
 			}
@@ -1419,8 +1419,8 @@ function populateCard(brand) {
 		document.querySelector('#card_container .card-brand').innerHTML = DOMPurify.sanitize('<i class="icon-credit-card material-icons"></i>', { SAFE_FOR_JQUERY: true });
 	} else {
 		document.getElementById('card_brand').value = brand;
-		document.getElementById('credit-icon').innerHTML = DOMPurify.sanitize('<img class="addon-img" src="' + this_path + 'img/' + brand.toLowerCase() + '-mini.png" alt="' + brand + '" />', { SAFE_FOR_JQUERY: true });
-		document.querySelector('#card_container .card-brand').innerHTML = DOMPurify.sanitize('<img class="addon-img" src="' + this_path + 'img/' + brand.toLowerCase() + '-mini.png" alt="' + brand + '" />', { SAFE_FOR_JQUERY: true });
+		document.getElementById('credit-icon').innerHTML = DOMPurify.sanitize('<img class="addon-img" src="' + pgb_img_path + brand.toLowerCase() + '-mini.png" alt="' + brand + '" />', { SAFE_FOR_JQUERY: true });
+		document.querySelector('#card_container .card-brand').innerHTML = DOMPurify.sanitize('<img class="addon-img" src="' + pgb_img_path + brand.toLowerCase() + '-mini.png" alt="' + brand + '" />', { SAFE_FOR_JQUERY: true });
 	}
 }
 
@@ -1534,7 +1534,7 @@ function sendAjaxCall(actionCalled, formData, id = false) {
 	formData.action = actionCalled;
 	var ret;
 	$.ajax({
-		url: functionUrl,
+		url: pgb_function_url,
 		cache: false,
 		dataType: 'Json',
 		data: formData,
@@ -1571,7 +1571,7 @@ function sendAjaxCall(actionCalled, formData, id = false) {
 			}, 5000);
 		},
 		error: function (xhr) {
-			if (msg_console == 1) {
+			if (pgb_msg_console == 1) {
 				console.log(xhr.status);
 			}
 		}
@@ -1704,7 +1704,7 @@ function inArray(elem, array, i) {
 }
 
 function changeFieldClassName(field, error, remove, add, all) {
-	if (ps_version >= '1.7') {
+	if (pgb_ps_version >= '1.7') {
 		if(error === true) {
 			document.getElementById(field).parentElement.parentElement.classList.remove('has-success');
 			document.getElementById(field).parentElement.parentElement.classList.add('has-danger');

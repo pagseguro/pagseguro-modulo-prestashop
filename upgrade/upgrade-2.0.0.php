@@ -21,15 +21,17 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_1_6_0($module)
+function upgrade_module_2_0_0($module)
 {
-	$sql = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '"._DB_PREFIX_."pagbank' AND column_name = 'environment' AND table_schema = '"._DB_NAME_."'";
-	$environment = Db::getInstance()->getRow($sql);
-	if (!$environment) {
-		if (!Db::getInstance()->execute("ALTER TABLE `"._DB_PREFIX_."pagbank` ADD `environment` int(1) NULL AFTER `refund`;")){
+    if (_PS_VERSION_ >= '9.0.0') {
+        $module->registerHook('displayDashboardTop');
+    }
+	$sql = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '"._DB_PREFIX_."pagbank_logs' AND column_name = 'url' AND table_schema = '"._DB_NAME_."'";
+	$url = Db::getInstance()->getRow($sql);
+	if ($url) {
+		if (!Db::getInstance()->execute("ALTER TABLE `"._DB_PREFIX_."pagbank_logs` MODIFY `url` VARCHAR(196);")){
 			return false;
 		}
 	}
-	Configuration::updateValue('PAGBANK_TOKEN_SANDBOX_TAX', '', false);
 	return true;
 }

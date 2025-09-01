@@ -2,7 +2,7 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
+ * Checkout Transparente para PrestaShop 1.6.x ao 9.x
  * Pagamento com Cartão de Crédito, Google Pay, Pix, Boleto e Pagar com PagBank
  * 
  * @author
@@ -51,7 +51,7 @@
 						target="_blank">{l s='Suporte Técnico' mod='pagbank'}</a>
 				</li>
 				<li>
-					<button class="btn btn-primary collapsed" type="button" data-toggle="collapse"
+					<button class="btn btn-primary" type="button" data-toggle="collapse"
 						data-target="#collapseCron" aria-expanded="false" aria-controls="collapseCron">
 						{l s='Tarefa Cron' mod='pagbank'}
 					</button>
@@ -65,14 +65,17 @@
 				</li>
 			</ul>
 		</div>
-		<div id="collapseCron" class="collapse" data-parent="#accordionCron">
+		<div id="collapseCron" {if $msg_cron}class="collapse in"{else}class="collapse"{/if} data-parent="#accordionCron">
 			<div class="info-cron">
+				{if $msg_cron}
+					<center><h2><u>{l s='As URLs de Tarefa Cron mudaram a partir da versão 2.0.0.' mod='pagbank'}<br />{l s='Por favor, verifique e atualize junto ao seu servidor de hospedagem.' mod='pagbank'}</u></h2></center>
+				{/if}
 				<h2>{l s='Pix' mod='pagbank'}</h2>
 				<p>
 					<b>{l s='URL:' mod='pagbank'}</b> {$callback_url}?action=cancelNotPaidPix&token={$token_cron}
 				</p>
 				<p class="comment">
-					{l s='Recomendamos que configure a Tarefa Cron para ser executada a cada 1hr.' mod='pagbank'}
+					{l s='Recomendamos que configure a Tarefa Cron para ser executada a cada 1hr ou 2hrs.' mod='pagbank'}
 				</p>
 				<h2>{l s='Boleto' mod='pagbank'}</h2>
 				<p>

@@ -2,7 +2,7 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
+ * Checkout Transparente para PrestaShop 1.6.x ao 9.x
  * Pagamento com Cartão de Crédito, Google Pay, Pix, Boleto e Pagar com PagBank
  * 
  * @author
@@ -66,8 +66,10 @@
 				<div class="row">
 					<div class="col-xs-12 col-sm-6">
 						<ul class="list list-unstyled">
-							<li><b>{l s='Data do pedido:' d='Modules.PagBank.Admin'}</b>
-								<span>{$transaction->created_at|date_format:'%d/%m/%Y %H:%M'}</span></li>
+							<li>
+								<b>{l s='Data do pedido:' d='Modules.PagBank.Admin'}</b>
+								<span>{$transaction->created_at|date_format:'%d/%m/%Y %H:%M'}</span>
+							</li>
 							<li>
 								<b>{l s='Código no PagBank:' d='Modules.PagBank.Admin'}</b>
 								{if (isset($transaction->charges))}
@@ -156,7 +158,8 @@
 										<td>{$product->name}</td>
 										<td>{$product->quantity}</td>
 										<td class="text-right">
-											{Tools::displayPrice(($product->unit_amount/100)|escape:'htmlall':'UTF-8')}</td>
+											{displayPrice price=($product->unit_amount/100) currency=$order->id_currency}
+										</td>
 									</tr>
 								{/foreach}
 							</tbody>

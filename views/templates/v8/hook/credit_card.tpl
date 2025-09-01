@@ -2,7 +2,7 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
+ * Checkout Transparente para PrestaShop 1.6.x ao 9.x
  * Pagamento com Cartão de Crédito, Google Pay, Pix, Boleto e Pagar com PagBank
  * 
  * @author
@@ -115,7 +115,7 @@
 						{if $device == 'm'}type="tel" {else}type="text" {/if} maxlength="16" min="0" 
 						onkeydown="javascript:if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
 						autocomplete="off" onpaste="return false" size="16" value="" />
-					{if ($ps_version >= '8.0')}
+					{if $ps_version >= '8.0.0'}
 						<div>
 							<span class="input-group-addon" id="credit-icon">
 								<i class="icon icon-credit-card fa fa-credit-card material-icons"></i>
@@ -177,7 +177,7 @@
 							<input id="save_customer_card" type="checkbox" name="save_customer_card" value="1"
 								class="form-checkbox" />
 							<b>{l s='Salvar este cartão?' d='Modules.PagBank.Shop'}</b>
-							<a href="#save-card-faq" class="fancy-button"><img src="{$this_path}img/faq.png"
+							<a href="#save-card-faq" class="fancy-button"><img src="{$img_path}faq.png"
 									title="{l s='Clique e saiba mais.' d='Modules.PagBank.Shop'}" /></a>
 						</label>
 					</div>
@@ -191,7 +191,11 @@
 							{if ($discounts.discount_type == 1)}
 								{$discounts.discount_value}%
 							{else}
-								{Tools::displayPrice($discounts.discount_value|escape:'htmlall':'UTF-8')}
+								{if $ps_version >= '9.0.0'}
+									{Context::getContext()->currentLocale->formatPrice($discounts.discount_value, $currency->iso_code)}
+								{else}
+									{Tools::displayPrice($discounts.discount_value|escape:'htmlall':'UTF-8')}
+								{/if}
 							{/if}
 						</span>
 					</div>
@@ -313,7 +317,7 @@
 		<div class="clear clearfix"></div>
 	</form>
 	<div id="save-card-faq" style="display:none;">
-		<img src="{$this_path}img/saved-card-faq.jpg"
+		<img src="{$img_path}saved-card-faq.jpg"
 			title="{l s='Salvar este cartão para futuras compras?' d='Modules.PagBank.Shop'}" />
 	</div>
 </div>

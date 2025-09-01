@@ -2,7 +2,7 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
+ * Checkout Transparente para PrestaShop 1.6.x ao 9.x
  * Pagamento com Cartão de Crédito, Google Pay, Pix, Boleto e Pagar com PagBank
  * 
  * @author
@@ -118,7 +118,7 @@
 										data-clipboard-action="copy">Copiar código</button>
 								{else}
 									<a href="{$wallet.link}" target="_blank" class="btn-pagbank">
-										<img src="{$this_path}img/btn_green_pagbank.png" class="img-responsive" />
+										<img src="{$img_path}btn_green_pagbank.png" class="img-responsive" />
 									</a>
 								{/if}
 							</p>
@@ -150,7 +150,12 @@
 							<li><b>Número do pedido:</b> {$info.reference}</li>
 							<li><b>Referência do pedido:</b> {$order_reference}</li>
 							<li>
-								<b>Valor do pedido:</b> {Tools::displayPrice($order_value)}
+								<b>Valor do pedido:</b> 
+								{if $ps_version >= '9.0.0'}
+									{Context::getContext()->currentLocale->formatPrice($order_value, $currency->iso_code)}
+								{else}
+									{Tools::displayPrice($order_value)}
+								{/if}
 								{if (isset($transaction->charges)) && $transaction->charges[0]->payment_method->type == 'CREDIT_CARD'}
 									{if $transaction->charges[0]->payment_method->installments >= 2}
 										(parcelado em {$transaction->charges[0]->payment_method->installments}x)
@@ -180,10 +185,21 @@
 							<tr>
 								<td>{$produto.product_id}</td>
 								<td>{$produto.product_name}</td>
-								<td>{Tools::displayPrice($produto.product_price)}</td>
+								<td>
+									{if $ps_version >= '9.0.0'}
+										{Context::getContext()->currentLocale->formatPrice($produto.product_price, $currency->iso_code)}
+									{else}
+										{Tools::displayPrice($produto.product_price)}
+									{/if}
+								</td>
 								<td>{$produto.product_quantity}</td>
 								<td class="price text-xs-right">
-									{Tools::displayPrice($produto.total_price_tax_incl|escape:'htmlall':'UTF-8')}</td>
+									{if $ps_version >= '9.0.0'}
+										{Context::getContext()->currentLocale->formatPrice($produto.total_price_tax_incl, $currency->iso_code)}
+									{else}
+										{Tools::displayPrice($produto.total_price_tax_incl|escape:'htmlall':'UTF-8')}
+									{/if}
+								</td>
 							</tr>
 						{/foreach}
 					</tbody>
@@ -191,31 +207,56 @@
 						<tr class="total_prods">
 							<td colspan="3">{l s='Total de Produtos' d='Modules.PagBank.Shop'}</td>
 							<td colspan="2" class="price text-xs-right">
-								{Tools::displayPrice($order->total_products|escape:'htmlall':'UTF-8')}</td>
+								{if $ps_version >= '9.0.0'}
+									{Context::getContext()->currentLocale->formatPrice($order->total_products, $currency->iso_code)}
+								{else}
+									{Tools::displayPrice($order->total_products|escape:'htmlall':'UTF-8')}
+								{/if}
+							</td>
 						</tr>
 						{if ($order->total_discounts) > 0}
 							<tr class="extra">
 								<td colspan="3">{l s='Descontos' d='Modules.PagBank.Shop'}</td>
 								<td colspan="2" class="price text-xs-right">
-									{Tools::displayPrice($order->total_discounts|escape:'htmlall':'UTF-8')}</td>
+									{if $ps_version >= '9.0.0'}
+										{Context::getContext()->currentLocale->formatPrice($order->total_discounts, $currency->iso_code)}
+									{else}
+										{Tools::displayPrice($order->total_discounts|escape:'htmlall':'UTF-8')}
+									{/if}
+								</td>
 							</tr>
 						{/if}
 						{if ($order->total_wrapping) > 0}
 							<tr class="extra">
 								<td colspan="3">{l s='Embalagem de presente' d='Modules.PagBank.Shop'}</td>
 								<td colspan="2" class="price text-xs-right">
-									{Tools::displayPrice($order->total_wrapping|escape:'htmlall':'UTF-8')}</td>
+									{if $ps_version >= '9.0.0'}
+										{Context::getContext()->currentLocale->formatPrice($order->total_wrapping, $currency->iso_code)}
+									{else}
+										{Tools::displayPrice($order->total_wrapping|escape:'htmlall':'UTF-8')}
+									{/if}
+								</td>
 							</tr>
 						{/if}
 						<tr class="frete">
 							<td colspan="3">{l s='Frete' d='Modules.PagBank.Shop'}</td>
 							<td colspan="2" class="price text-xs-right">
-								{Tools::displayPrice($order->total_shipping|escape:'htmlall':'UTF-8')}</td>
+								{if $ps_version >= '9.0.0'}
+									{Context::getContext()->currentLocale->formatPrice($order->total_shipping, $currency->iso_code)}
+								{else}
+									{Tools::displayPrice($order->total_shipping|escape:'htmlall':'UTF-8')}
+								{/if}
+							</td>
 						</tr>
 						<tr class="total">
 							<td colspan="3">{l s='Total do Pedido' d='Modules.PagBank.Shop'}</td>
 							<td colspan="2" class="price text-xs-right">
-								{Tools::displayPrice($order->total_paid|escape:'htmlall':'UTF-8')}</td>
+								{if $ps_version >= '9.0.0'}
+									{Context::getContext()->currentLocale->formatPrice($order->total_paid, $currency->iso_code)}
+								{else}
+									{Tools::displayPrice($order->total_paid|escape:'htmlall':'UTF-8')}
+								{/if}
+							</td>
 						</tr>
 					</tfoot>
 				</table>
@@ -254,18 +295,18 @@
 			<div id="proccess_pix" style="display:none;" class="container clearfix">
 				<div class="row">
 					<div class="col-xs-3 col-sm-2 nopadding" align="center">
-						<img src="{$this_path}img/loading.gif" class="img-responsive" />
+						<img src="{$img_path}loading.gif" class="img-responsive" />
 					</div>
 					<div class="col-xs-6 col-sm-7 text-center" id="pagbankmsg">
 						{l s='PIX Recebido! Redirecionando...' d='Modules.PagBank.Shop'}
 					</div>
 					{if $device == 'd' || $device == 't'}
 						<div class="col-sm-3 nopadding-left" id="pagbank_logo" align="center">
-							<img src="{$this_path}img/pagbank-logo-animado_35px.gif" class="img-responsive" />
+							<img src="{$img_path}pagbank-logo-animado_35px.gif" class="img-responsive" />
 						</div>
 					{else}
 						<div class="col-xs-3 nopadding-left" id="pagbank_logo" align="center">
-							<img src="{$this_path}img/logo_pagbank_mini_mobile.png" class="img-responsive" />
+							<img src="{$img_path}logo_pagbank_mini_mobile.png" class="img-responsive" />
 						</div>
 					{/if}
 				</div>
@@ -279,7 +320,7 @@
 					var paid_state = {/literal}{$paid_state}{literal};
 					var my_orders = '{/literal}{$link->getPageLink('history')}?id_order={$order_id}{literal}';
 					$.ajax({
-						url: '{/literal}{$url_update}{literal}?action=checkOrder&id_order='+order_id,
+						url: '{/literal}{$url_update}{literal}&action=checkOrder&id_order='+order_id,
 						cache: false,
 						success: function(data) {
 							var json = data;
@@ -326,18 +367,18 @@
 			<div id="proccess_wallet" style="display:none;" class="container clearfix">
 				<div class="row">
 					<div class="col-xs-3 col-sm-2 nopadding" align="center">
-						<img src="{$this_path}img/loading.gif" class="img-responsive" />
+						<img src="{$img_path}loading.gif" class="img-responsive" />
 					</div>
 					<div class="col-xs-6 col-sm-7 text-center" id="pagbankmsg">
 						{l s='Pagamento Recebido! Redirecionando...' d='Modules.PagBank.Shop'}
 					</div>
 					{if $device == 'd' || $device == 't'}
 						<div class="col-sm-3 nopadding-left" id="pagbank_logo" align="center">
-							<img src="{$this_path}img/pagbank-logo-animado_35px.gif" class="img-responsive" />
+							<img src="{$img_path}pagbank-logo-animado_35px.gif" class="img-responsive" />
 						</div>
 					{else}
 						<div class="col-xs-3 nopadding-left" id="pagbank_logo" align="center">
-							<img src="{$this_path}img/logo_pagbank_mini_mobile.png" class="img-responsive" />
+							<img src="{$img_path}logo_pagbank_mini_mobile.png" class="img-responsive" />
 						</div>
 					{/if}
 				</div>
@@ -351,7 +392,7 @@
 					var paid_state = {/literal}{$paid_state}{literal};
 					var my_orders = '{/literal}{$link->getPageLink('history')}?id_order={$order_id}{literal}';
 					$.ajax({
-						url: '{/literal}{$url_update}{literal}?action=checkOrder&id_order='+order_id,
+						url: '{/literal}{$url_update}{literal}&action=checkOrder&id_order='+order_id,
 						cache: false,
 						success: function(data) {
 							var json = data;

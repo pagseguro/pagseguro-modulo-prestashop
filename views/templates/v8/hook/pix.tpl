@@ -2,7 +2,7 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
+ * Checkout Transparente para PrestaShop 1.6.x ao 9.x
  * Pagamento com Cartão de Crédito, Google Pay, Pix, Boleto e Pagar com PagBank
  * 
  * @author
@@ -60,7 +60,7 @@
 			</div>
 		</fieldset>
 		<div class="logo-pix col-xs-12 col-sm-6" align="center">
-			<img title="Pix" src="{$this_path}img/pix.png" alt="{l s='Pix' d='Modules.PagBank.Shop'}"
+			<img title="Pix" src="{$img_path}pix.png" alt="{l s='Pix' d='Modules.PagBank.Shop'}"
 				ondrag="return false" onselec="return false" oncontextmenu="return false" />
 		</div>
 		{if ($discounts.discount_type > 0 && $discounts.discount_value > 0) && $discounts.pix}
@@ -70,13 +70,21 @@
 					{if ($discounts.discount_type == 1)}
 						{$discounts.discount_value}%
 					{else}
-						{Tools::displayPrice($discounts.discount_value|escape:'htmlall':'UTF-8')}
+						{if $ps_version >= '9.0.0'}
+							{Context::getContext()->currentLocale->formatPrice($discounts.discount_value, $currency->iso_code)}
+						{else}
+							{Tools::displayPrice($discounts.discount_value|escape:'htmlall':'UTF-8')}
+						{/if}
 					{/if}
 				</span>
 				<br />
 				<b>{l s='Total:' d='Modules.PagBank.Shop'}</b>
 				<span class="total_discount">
-					{Tools::displayPrice($discounts.pix_value|escape:'htmlall':'UTF-8')}
+					{if $ps_version >= '9.0.0'}
+						{Context::getContext()->currentLocale->formatPrice($discounts.pix_value, $currency->iso_code)}
+					{else}
+						{Tools::displayPrice($discounts.pix_value|escape:'htmlall':'UTF-8')}
+					{/if}
 				</span>
 			</div>
 		{/if}

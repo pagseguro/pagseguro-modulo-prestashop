@@ -2,7 +2,7 @@
  * PagBank
  * 
  * Módulo Oficial para Integração com o PagBank via API v.4
- * Checkout Transparente para PrestaShop 1.6.x, 1.7.x e 8.x
+ * Checkout Transparente para PrestaShop 1.6.x ao 9.x
  * Pagamento com Cartão de Crédito, Google Pay, Pix, Boleto e Pagar com PagBank
  * 
  * @author
@@ -54,18 +54,18 @@
 	<div id="pagbankproccess" style="display:none;" class="container clearfix">
 		<div class="row">
 			<div class="col-xs-3 col-sm-2 nopadding" id="pagbank_load" align="center">
-				<img src="{$this_path}img/loading.gif" class="img-responsive" />
+				<img src="{$img_path}loading.gif" class="img-responsive" />
 			</div>
 			<div class="col-xs-6 col-sm-7 text-center" id="pagbankmsg">
 				{l s='Por favor aguarde. Processando pagamento...' d='Modules.PagBank.Shop'}
 			</div>
 			{if $device == 'd' || $device == 't'}
 				<div class="col-sm-3 nopadding-left" id="pagbank_logo" align="center">
-					<img src="{$this_path}img/pagbank-logo-animado_35px.gif" class="img-responsive" />
+					<img src="{$img_path}pagbank-logo-animado_35px.gif" class="img-responsive" />
 				</div>
 			{else}
 				<div class="col-xs-3 nopadding-left" id="pagbank_logo" align="center">
-					<img src="{$this_path}img/logo_pagbank_mini_mobile.png" class="img-responsive" />
+					<img src="{$img_path}logo_pagbank_mini_mobile.png" class="img-responsive" />
 				</div>
 			{/if}
 		</div>
@@ -73,25 +73,24 @@
 </div>
 {literal}
 	<script type="text/javascript">
-		var urlImg = '{/literal}{$url_img}{literal}';
-		var functionUrl = '{/literal}{$url_update}{literal}';
-		var this_path = '{/literal}{$this_path}{literal}';
-		var shop_name = '{/literal}{$shop_name}{literal}';
-		var discount_type = {/literal}{$discounts.discount_type}{literal};
-		var discount_value = {/literal}{if $discounts.discount_value}{$discounts.discount_value}{else}0{/if}{literal};
-		var discount_card = {/literal}{$discounts.credit_card|intval}{literal};
-		var credit_card_value = {/literal}{$discounts.credit_card_value|floatval}{literal};
-		var discount_bankslip = {/literal}{$discounts.bankslip|intval}{literal};
-		var discount_pix = {/literal}{$discounts.pix|intval}{literal};
-		var discount_wallet = {/literal}{$discounts.wallet|intval}{literal};
-		var discount_google = {/literal}{$discounts.google_pay|intval}{literal};
-		var google_pay_value = {/literal}{$discounts.google_pay_value|floatval}{literal};
-		var account_id = '{/literal}{$account_id}{literal}';
-		var payment_google_pay = '{/literal}{$payments.google_pay}{literal}';
-		var google_merchant_id = '{/literal}{$google_merchant_id}{literal}';
-		var google_environment = '{/literal}{$google_environment}{literal}';
-		var msg_console = {/literal}{$msg_console|intval}{literal};
-		var ps_version = '{/literal}{$ps_version}{literal}';
-		var pagbank_version = '{/literal}{$pagbank_version}{literal}';
+		var pgb_function_url = '{/literal}{$url_update}{literal}';
+		var pgb_img_path = '{/literal}{$img_path}{literal}';
+		var pgb_shop_name = '{/literal}{$shop_name}{literal}';
+		var pgb_discount_type = {/literal}{$discounts.discount_type}{literal};
+		var pgb_discount_value = {/literal}{if $discounts.discount_value}{$discounts.discount_value}{else}0{/if}{literal};
+		var pgb_discount_card = {/literal}{$discounts.credit_card|intval}{literal};
+		var pgb_credit_card_value = {/literal}{$discounts.credit_card_value|floatval}{literal};
+		var pgb_discount_bankslip = {/literal}{$discounts.bankslip|intval}{literal};
+		var pgb_discount_pix = {/literal}{$discounts.pix|intval}{literal};
+		var pgb_discount_wallet = {/literal}{$discounts.wallet|intval}{literal};
+		var pgb_discount_google = {/literal}{$discounts.google_pay|intval}{literal};
+		var pgb_google_pay_value = {/literal}{$discounts.google_pay_value|floatval}{literal};
+		var pgb_account_id = '{/literal}{$account_id}{literal}';
+		var pgb_payment_google_pay = '{/literal}{$payments.google_pay}{literal}';
+		var pgb_google_merchant_id = '{/literal}{$google_merchant_id}{literal}';
+		var pgb_google_environment = '{/literal}{$google_environment}{literal}';
+		var pgb_msg_console = {/literal}{$msg_console|intval}{literal};
+		var pgb_ps_version = '{/literal}{$ps_version}{literal}';
+		var pgb_pagbank_version = '{/literal}{$pagbank_version}{literal}';
 	</script>
 {/literal}
