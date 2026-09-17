@@ -20,9 +20,10 @@ body:
     attributes:
       label: Versão da PrestaShop?
       options:
-        - PS 1.6
-        - PS 1.7
-        - PS 8.0
+        - PS 1.6.x
+        - PS 1.7.x
+        - PS 8.x
+        - PS 9.x
     validations:
       required: true
   - type: dropdown
@@ -30,14 +31,10 @@ body:
     attributes:
       label: Versão do PHP?
       options:
-        - PHP 5.6
-        - PHP 7.0
-        - PHP 7.1
-        - PHP 7.2
-        - PHP 7.3
-        - PHP 7.4
-        - PHP 8.0
-        - PHP 8.1
+        - PHP 5.x
+        - PHP 6.x
+        - PHP 7.x
+        - PHP 8.x
     validations:
       required: true
   - type: dropdown
@@ -49,6 +46,7 @@ body:
         - Não consegui instalar o modulo
         - Não consegui configurar o modulo
         - Nenhum cliente consegue fazer pagamentos
-        - Um dos métodos de pagamento não está funcionando
+        - Uma das opções pagamentos não está funcionando
     validations:
       required: true
+
