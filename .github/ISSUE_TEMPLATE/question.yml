@@ -20,8 +20,9 @@ body:
     attributes:
       label: Versão da PrestaShop
       options:
-        - PS 1.6
-        - PS 1.7
-        - PS 8.0
+        - PS 1.6.x
+        - PS 1.7.x
+        - PS 8.x
+        - PS 9.x
     validations:
       required: true

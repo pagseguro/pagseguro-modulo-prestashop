@@ -56,7 +56,7 @@ class PagBank extends PaymentModule
 	{
 		$this->name = 'pagbank';
 		$this->tab = 'payments_gateways';
-		$this->version = '2.1.0';
+		$this->version = '2.2.0';
 		$this->author = 'PrestaBR';
 		$this->displayName = $this->l('PagBank - Checkout Transparente');
 		$this->description = $this->l('Módulo Oficial API v.4 - PrestaShop 1.6.x ao 9.x');
@@ -64,9 +64,9 @@ class PagBank extends PaymentModule
 		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 		$this->bootstrap = true;
 		$this->urls = array(
-			'notification' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'module/' . $this->name . '/notify',
+			'notification' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'module/' . $this->name . '/notify?token='.$this->getTokenHash(),
 			'update' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'module/' . $this->name . '/update',
-			'img' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/img/',
+			'img' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/img/'
 		);
 		$this->credential_type = Configuration::get('PAGBANK_CREDENTIAL');
 		$this->environment = Configuration::get('PAGBANK_ENVIRONMENT');
@@ -78,11 +78,11 @@ class PagBank extends PaymentModule
 			$this->urls['refresh'] = 'https://api.pagseguro.com/oauth2/refresh';
 			$this->urls['appauth'] = 'https://api.pagseguro.com/oauth2/token';
 
-			if ($this->credential_type == 'TAX' || !$this->credential_type || $this->credential_type == '') {
+			if ($this->credential_type === 'TAX' || !$this->credential_type || $this->credential_type === '') {
 				$this->token = Configuration::get('PAGBANK_TOKEN_TAX');
-			} elseif ($this->credential_type == 'D14') {
+			} elseif ($this->credential_type === 'D14') {
 				$this->token = Configuration::get('PAGBANK_TOKEN_D14');
-			} elseif ($this->credential_type == 'D30') {
+			} elseif ($this->credential_type === 'D30') {
 				$this->token = Configuration::get('PAGBANK_TOKEN_D30');
 			} else {
 				$this->token = '';
@@ -96,11 +96,11 @@ class PagBank extends PaymentModule
 			$this->urls['refresh'] = 'https://sandbox.api.pagseguro.com/oauth2/refresh';
 			$this->urls['appauth'] = 'https://sandbox.api.pagseguro.com/oauth2/token';
 
-			if ($this->credential_type == 'TAX' || !$this->credential_type || $this->credential_type == '') {
+			if ($this->credential_type === 'TAX' || !$this->credential_type || $this->credential_type === '') {
 				$this->token = Configuration::get('PAGBANK_TOKEN_SANDBOX_TAX');
-			} elseif ($this->credential_type == 'D14') {
+			} elseif ($this->credential_type === 'D14') {
 				$this->token = Configuration::get('PAGBANK_TOKEN_SANDBOX_D14');
-			} elseif ($this->credential_type == 'D30') {
+			} elseif ($this->credential_type === 'D30') {
 				$this->token = Configuration::get('PAGBANK_TOKEN_SANDBOX_D30');
 			} else {
 				$this->token = '';
@@ -122,11 +122,11 @@ class PagBank extends PaymentModule
 			$this->shop_id = $shop_id;
 		}
 
-		if ($this->token != '' && (!$this->public_key || $this->public_key == '')) {
+		if ($this->token != '' && (!$this->public_key || $this->public_key === '')) {
 			$this->getPublicKey();
 		}
 
-		if (!$this->token || $this->token == '' || !$this->public_key || $this->public_key == '' || !$this->credential_type) {
+		if (!$this->token || $this->token === '' || !$this->public_key || $this->public_key === '' || !$this->credential_type) {
 			$this->ready = false;
 		} else {
 			$this->ready = true;
@@ -152,7 +152,7 @@ class PagBank extends PaymentModule
 		} elseif (Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('SELECT * FROM information_schema.COLUMNS WHERE TABLE_NAME = "' . _DB_PREFIX_ . 'address" AND COLUMN_NAME = "numend"')) {
 			$this->number_field = 'numend';
 		}
-		$this->compl_field = ($this->number_field == 'numend' ? 'compl' : 'other');
+		$this->compl_field = ($this->number_field === 'numend' ? 'compl' : 'other');
 
 		parent::__construct();
 	}
@@ -189,6 +189,8 @@ class PagBank extends PaymentModule
 			Configuration::updateValue('PAGBANK_GOOGLE_MERCHANT_ID', '', false);
 			Configuration::updateValue('PAGBANK_GOOGLE_ENVIRONMENT', 0, false);
 			Configuration::updateValue('PAGBANK_GOOGLE_ORDER_DEMO', 1, false);
+			Configuration::updateValue('PAGBANK_RECAPTCHA_SITE_KEY', '', false);
+			Configuration::updateValue('PAGBANK_RECAPTCHA_API_KEY', '', false);
 
 			//Opções de Pagamento
 			Configuration::updateValue('PAGBANK_CREDIT_CARD', 1, false);
@@ -197,6 +199,8 @@ class PagBank extends PaymentModule
 			Configuration::updateValue('PAGBANK_MINIMUM_INSTALLMENTS', '1.00', false);
 			Configuration::updateValue('PAGBANK_INSTALLMENTS_TYPE', 1, false);
 			Configuration::updateValue('PAGBANK_SAVE_CREDIT_CARD', 1, false);
+			Configuration::updateValue('PAGBANK_TWO_CREDIT_CARD', 0, false);
+			Configuration::updateValue('PAGBANK_TWO_CREDIT_CARD_INST', 0, false);
 			Configuration::updateValue('PAGBANK_CAPTURE_METHOD', 1, false);
 			Configuration::updateValue('PAGBANK_BANKSLIP', 1, false);
 			Configuration::updateValue('PAGBANK_BANKSLIP_DATE_LIMIT', 2, false);
@@ -206,6 +210,9 @@ class PagBank extends PaymentModule
 			Configuration::updateValue('PAGBANK_WALLET', 1, false);
 			Configuration::updateValue('PAGBANK_WALLET_TIME_LIMIT', 1440, false);
 			Configuration::updateValue('PAGBANK_GOOGLE_PAY', 0, false);
+			Configuration::updateValue('PAGBANK_RECAPTCHA', 0, false);
+			Configuration::updateValue('PAGBANK_RACAPTCHA_CRITERIA', 'MEDIUM', false);
+			Configuration::updateValue('PAGBANK_RECAPTCHA_URL', '', false);
 
 			//Status dos pedido
 			Configuration::updateValue('PAGBANK_PAID', _PS_OS_PAYMENT_, false);
@@ -304,12 +311,12 @@ class PagBank extends PaymentModule
 
 		Configuration::updateValue('PAGBANK_PS_SESSION', Tools::getAdminTokenLite('AdminModules'), false);
 
+		$token_cron = $this->getTokenHash();
+		
 		if (_PS_VERSION_ >= '1.7.0') {
-			$token_cron = Tools::hashIV(_COOKIE_IV_);
 			$transactions_link = $this->context->link->getAdminLink("AdminPagBank8", false) . '&token=' . Tools::getAdminTokenLite("AdminPagBank8");
 			$logs_link = $this->context->link->getAdminLink("AdminPagBank8Logs", false) . '&token=' . Tools::getAdminTokenLite("AdminPagBank8Logs");
 		}else{
-			$token_cron = Tools::encryptIV(_COOKIE_IV_);
 			$transactions_link = $this->context->link->getAdminLink("AdminPagBank", false) . '&token=' . Tools::getAdminTokenLite("AdminPagBank");
 			$logs_link = $this->context->link->getAdminLink("AdminPagBankLogs", false) . '&token=' . Tools::getAdminTokenLite("AdminPagBankLogs");
 		}
@@ -355,7 +362,7 @@ class PagBank extends PaymentModule
 		if (!function_exists('curl_init')) {
 			$output .= $this->displayError('Este módulo requer CURL ativado no servidor para funcionar corretamente.');
 		}
-		if (Configuration::get('PS_DISABLE_NON_NATIVE_MODULE') == '1') {
+		if ((int)Configuration::get('PS_DISABLE_NON_NATIVE_MODULE') == '1') {
 			$output .= $this->displayError('Este módulo requer a execução de Módulos não Nativos.');
 		}
 		if (
@@ -369,6 +376,10 @@ class PagBank extends PaymentModule
 		}
 		if ((int)Configuration::get('PAGBANK_GOOGLE_PAY') == 1 && strlen(Configuration::get('PAGBANK_GOOGLE_MERCHANT_ID')) <= 12) {
 			$output .= $this->displayError('Com o Google Pay ativo é preciso informar o Merchant ID');
+		}
+		if ((int)Configuration::get('PAGBANK_RECAPTCHA') == 1 && strlen(Configuration::get('PAGBANK_RECAPTCHA_SITE_KEY')) <= 39
+			&& strlen(Configuration::get('PAGBANK_RECAPTCHA_API_KEY')) <= 39) {
+			$output .= $this->displayError('Com o reCaptcha ativo é preciso informar o Site Key e Api Key');
 		}
 
 		$output .= $this->context->smarty->fetch($this->local_path . 'views/templates/admin/configure.tpl');
@@ -399,11 +410,10 @@ class PagBank extends PaymentModule
 
 	public function checkWarningsAndUpdates()
 	{
-		if(Tools::getValue('controller') == 'AdminModulesManage' || Tools::getValue('controller') == 'AdminModules') {
+		if(Tools::getValue('controller') === 'AdminModulesManage' || Tools::getValue('controller') === 'AdminModules') {
 			if (_PS_VERSION_ >= '1.7.0') {
 				if (empty(Configuration::get('PAGBANK_CRON_WARNING'))
-					|| Configuration::get('PAGBANK_CRON_WARNING') == 0 
-					|| Configuration::get('PAGBANK_CRON_WARNING') == 'NULL') {
+					|| Configuration::get('PAGBANK_CRON_WARNING') === 'NULL') {
 					$check_cron = true;
 				} else {
 					$check_cron = false;
@@ -417,8 +427,7 @@ class PagBank extends PaymentModule
 			}
 
 			if (empty(Configuration::get('PS_REWRITING_SETTINGS'))
-				|| Configuration::get('PS_REWRITING_SETTINGS') == 0
-				|| Configuration::get('PS_REWRITING_SETTINGS') == 'NULL') {
+				|| Configuration::get('PS_REWRITING_SETTINGS') === 'NULL') {
 				$check_rewriting = true;
 				if (_PS_VERSION_ >= '9.0.0') {
 					$url_rewriting = Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . basename(_PS_ADMIN_DIR_) . '/index.php/configure/shop/seo-urls/?_token=' . Tools::getAdminTokenLite('AdminShopUrl');
@@ -451,17 +460,25 @@ class PagBank extends PaymentModule
 			} else {
 				if (_PS_VERSION_ >= '1.7.0' && _PS_VERSION_ < '9.0.0') {
 					if ($check_cron) {
-						$this->context->controller->warnings[] = '<p><b>Módulo PagBank - Tarefa Cron: </b></p> <p>As URLs de Tarefa Cron mudaram. Por favor, verifique e atualize em seu servidor de hospedagem. <br /> Para remover este alerta acesse as configurações do módulo em "Debug & Logs" e marque a opção "Desativar aviso Cron?".</p>';
+						$this->context->controller->warnings[] = '<p><b>Módulo PagBank - Tarefa Cron: </b></p> <p>As URLs de Tarefa Cron mudaram. 
+						Por favor, verifique e atualize em seu servidor de hospedagem. <br /> 
+						Para remover este alerta acesse as configurações do módulo em "Debug & Logs" e marque a opção "Desativar aviso Cron?".</p>';
 					}
 				}
 				if (isset($check_carrier) && empty($check_carrier)) {
-					$this->context->controller->warnings[] = '<p><b>Módulo PagBank - Restrições de transportadora: </b></p> <p>Verifique se as transportadoras estão vinculadas à forma de pagamento. Isso vai garantir que o módulo seja exibido e esteja disponível para processar pagamentos na tela de checkout. Para ver as configurações de Restrições de transportadora <u><a href="' . $url_carrier . '">Clique aqui</a></u> (role até o final da página)</p>';
+					$this->context->controller->warnings[] = '<p><b>Módulo PagBank - Restrições de transportadora: </b></p> 
+					<p>Verifique se as transportadoras estão vinculadas à forma de pagamento. 
+					Isso vai garantir que o módulo seja exibido e esteja disponível para processar pagamentos na tela de checkout. 
+					Para ver as configurações de Restrições de transportadora <u><a href="' . $url_carrier . '">Clique aqui</a></u> (role até o final da página)</p>';
 				}
 				if ($check_rewriting) {
-					$this->context->controller->warnings[] = '<p><b>Módulo PagBank - URL Amigável: </b></p> <p>Ative a opção de reescrita de url para que o módulo possa funcionar corretamente. Para ativar a URL Amigável <u><a href="' . $url_rewriting . '">Clique aqui</a></u></p>';
+					$this->context->controller->warnings[] = '<p><b>Módulo PagBank - URL Amigável: </b></p> 
+					<p>Ative a opção de reescrita de url para que o módulo possa funcionar corretamente. 
+					Para ativar a URL Amigável <u><a href="' . $url_rewriting . '">Clique aqui</a></u></p>';
 				}
 				if ($check_update) {
-					$this->context->controller->warnings[] = '<p><b>Módulo PagBank - Atualização disponível! Nova Versão: v.'.$file_version.' <br /> Acesse: <a href="https://github.com/pagseguro/pagseguro-modulo-prestashop" target="_blank">https://github.com/pagseguro/pagseguro-modulo-prestashop</a> </b></p>';
+					$this->context->controller->warnings[] = '<p><b>Módulo PagBank - Atualização disponível! Nova Versão: v.'.$file_version.' <br /> 
+					Acesse: <a href="https://github.com/pagseguro/pagseguro-modulo-prestashop" target="_blank">https://github.com/pagseguro/pagseguro-modulo-prestashop</a> </b></p>';
 				}
 			}
 		}
@@ -474,10 +491,10 @@ class PagBank extends PaymentModule
 	{
 		if (_PS_VERSION_ >= '1.7.0') {
 			if (
-				$this->context->controller->php_self == 'order'
-				|| $this->context->controller->php_self == 'orderopc'
-				|| $this->context->controller->php_self == 'order-opc'
-				|| $this->context->controller->php_self == 'order-confirmation'
+				$this->context->controller->php_self === 'order'
+				|| $this->context->controller->php_self === 'orderopc'
+				|| $this->context->controller->php_self === 'order-opc'
+				|| $this->context->controller->php_self === 'order-confirmation'
 			) {
 				$this->context->controller->registerStylesheet(
 					'pagbank-css',
@@ -538,34 +555,63 @@ class PagBank extends PaymentModule
 						'priority' => 150
 					]
 				);
-				$this->context->controller->registerJavascript(
-					'google-pay',
-					'https://pay.google.com/gp/p/js/pay.js',
-					[
-						'server' => 'remote',
-						'media' => 'all',
-						'priority' => 150
-					]
-				);
+				if ((int)Configuration::get('PAGBANK_GOOGLE_PAY') == 1 && strlen(Configuration::get('PAGBANK_GOOGLE_MERCHANT_ID')) >= 13) {
+					$this->context->controller->registerJavascript(
+						'google-pay',
+						'https://pay.google.com/gp/p/js/pay.js',
+						[
+							'server' => 'remote',
+							'media' => 'all',
+							'priority' => 150
+						]
+					);
+				}
+				if ((int)Configuration::get('PAGBANK_RECAPTCHA') == 1 && strlen(Configuration::get('PAGBANK_RECAPTCHA_SITE_KEY')) >= 32
+					&& strlen(Configuration::get('PAGBANK_RECAPTCHA_API_KEY')) >= 32) {
+					$recaptcha_site_key = trim(Configuration::get('PAGBANK_RECAPTCHA_SITE_KEY'));
+					$recaptcha_js = 'https://www.google.com/recaptcha/enterprise.js?render='.$recaptcha_site_key;
+					$this->context->controller->registerJavascript(
+						'google-recaptcha-v3',
+						$recaptcha_js,
+						[
+							'server' => 'remote',
+							'media' => 'all',
+							'priority' => 150
+						]
+					);
+				}
 			}
 		} else {
 			if (
-				$this->context->controller->php_self == 'order'
-				|| $this->context->controller->php_self == 'orderopc'
-				|| $this->context->controller->php_self == 'order-opc'
-				|| $this->context->controller->php_self == 'order-confirmation'
+				$this->context->controller->php_self === 'order'
+				|| $this->context->controller->php_self === 'orderopc'
+				|| $this->context->controller->php_self === 'order-opc'
+				|| $this->context->controller->php_self === 'order-confirmation'
 			) {
 				$this->context->controller->addCSS(array(
 					$this->_path . 'css/pagbank.css',
 					'https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap'
 				));
+				if ((int)Configuration::get('PAGBANK_GOOGLE_PAY') == 1 && strlen(Configuration::get('PAGBANK_GOOGLE_MERCHANT_ID')) >= 13) {
+					$google_pay_js = 'https://pay.google.com/gp/p/js/pay.js';
+				} else {
+					$google_pay_js = '';
+				}
+				if ((int)Configuration::get('PAGBANK_RECAPTCHA') == 1 && strlen(Configuration::get('PAGBANK_RECAPTCHA_SITE_KEY')) >= 32
+					&& strlen(Configuration::get('PAGBANK_RECAPTCHA_API_KEY')) >= 32) {
+					$recaptcha_site_key = trim(Configuration::get('PAGBANK_RECAPTCHA_SITE_KEY'));
+					$recaptcha_js = 'https://www.google.com/recaptcha/enterprise.js?render='.$recaptcha_site_key;
+				} else {
+					$recaptcha_js = '';
+				}
 				$this->context->controller->addJS(array(
 					$this->_path . 'js/mascara.js',
 					$this->_path . 'js/clipboard.min.js',
 					$this->_path . 'js/purify.min.js',
 					'https://assets.pagseguro.com.br/checkout-sdk-js/rc/dist/browser/pagseguro.min.js',
 					$this->_path . 'js/pagbank.js',
-					'https://pay.google.com/gp/p/js/pay.js',
+					$google_pay_js,
+					$recaptcha_js
 				));
 			}
 		}
@@ -645,7 +691,7 @@ class PagBank extends PaymentModule
 		$method = false;
 		if (Tools::isSubmit('method')) {
 			$method = Tools::getValue('method');
-			if ($method == 'updateCarrierAndGetPayments') {
+			if ($method === 'updateCarrierAndGetPayments') {
 				$method = true;
 			}
 		}
@@ -665,7 +711,6 @@ class PagBank extends PaymentModule
 		$pix_expiration = Configuration::get('PAGBANK_PIX_TIME_LIMIT');
 		$wallet_expiration = Configuration::get('PAGBANK_WALLET_TIME_LIMIT');
 		$current_hour = date("H", time());
-
 		$alternate_time = false;
 		if (((int)$current_hour > 20 || (int)$current_hour < 6) && (int)$total > 999) {
 			$alternate_time = true;
@@ -674,11 +719,28 @@ class PagBank extends PaymentModule
 		$active_payments = $this->activePayments();
 		$active_discounts = $this->activeDiscounts();
 
+		if ((int)Configuration::get('PAGBANK_TWO_CREDIT_CARD') == 1) {
+			$minimum_inst = (int)Configuration::get('PAGBANK_MINIMUM_INSTALLMENTS');
+			$minimun_val = round(($total/2), 2, PHP_ROUND_HALF_DOWN);
+			$minimum_inst_f = number_format(round($minimum_inst), 2, ',', '');
+			if ($minimun_val >= $minimum_inst) {
+				$pay_two_card_enable = 1;
+			} else {
+				$pay_two_card_enable = 0;
+			}
+		} else {
+			$pay_two_card_enable = 0;
+		}
+
 		$this->smarty->assign(array(
+			'card_value_pagbank' => number_format($total, 2, '', ''),
+			'total_pagbank' => number_format($total, 2, '.', ''),
+			'total_min_pagbank' => isset($minimum_inst_f) && $minimum_inst_f != '' ? $minimum_inst_f : '',
 			'page_name' => $page_name,
 			'active_payments' => $active_payments,
 			'active_discounts' => $active_discounts,
 			'save_credit_card' => (int)Configuration::get('PAGBANK_SAVE_CREDIT_CARD'),
+			'pay_two_card_enable' => $pay_two_card_enable,
 			'device' => $this->device,
 			'tpl_dir' => _PS_MODULE_DIR_ . $this->name . '/views/templates/v6/hook',
 			'currency' => $currency,
@@ -808,9 +870,10 @@ class PagBank extends PaymentModule
 		$this->context->smarty->assign(array(
 			'pagbank_msg' => $pagbank_msg,
 			'public_key' => $this->public_key,
-			'msg_console' => (bool)$msg_console,
+			'msg_console' => $msg_console,
 			'active_payments' => $active_payments,
 			'active_discounts' => $active_discounts,
+			'two_card_inst' => Configuration::get('PAGBANK_TWO_CREDIT_CARD_INST'),
 			'shop_name' => Configuration::get('PS_SHOP_NAME'),
 			'max_installments' => (int)Configuration::get('PAGBANK_MAX_INSTALLMENTS'),
 			'installments_min_value' => (int)Configuration::get('PAGBANK_MINIMUM_INSTALLMENTS'),
@@ -818,10 +881,12 @@ class PagBank extends PaymentModule
 			'account_id' => $this->account_id,
 			'google_merchant_id' => trim(Configuration::get('PAGBANK_GOOGLE_MERCHANT_ID')),
 			'google_environment' => $this->google_environment,
+			'recaptcha' => (int)Configuration::get('PAGBANK_RECAPTCHA'),
+			'recaptcha_site_key' => trim(Configuration::get('PAGBANK_RECAPTCHA_SITE_KEY')),
 			'device' => $this->device,
 			'ps_version' => substr(_PS_VERSION_, 0, 3),
 			'pagbank_version' => $this->version,
-			'total' => number_format($total, 2, '.', ''),
+			'total_pagbank' => number_format($total, 2, '.', ''),
 			'img_path' => $this->urls['img'],
 			'url_update' => Context::getContext()->link->getModuleLink($this->name, 'update', ['ajax' => true])
 		));
@@ -863,7 +928,7 @@ class PagBank extends PaymentModule
 			}
 		} else {
 			$payment_status = 'WAITING';
-			if (isset($transaction->qr_codes) && $transaction->qr_codes[0]->arrangements[0] == 'PIX') {
+			if (isset($transaction->qr_codes) && $transaction->qr_codes[0]->arrangements[0] === 'PIX') {
 				$pix = array();
 				$payment_type = 'PIX';
 				$pix_expiration = Configuration::get('PAGBANK_PIX_TIME_LIMIT');
@@ -873,23 +938,23 @@ class PagBank extends PaymentModule
 				$pix['deadline'] = $this->calculateDeadline($pix_expiration);
 				$pix['expiration_date'] = $qr->expiration_date;
 				foreach ($qr->links as $qr_link) {
-					if ($qr_link->media == 'image/png') {
+					if ($qr_link->media === 'image/png') {
 						$pix['link'] = $qr_link->href;
 					}
 				}
-			} elseif (isset($transaction->qr_codes) && $transaction->qr_codes[0]->arrangements[0] == 'PAGBANK' || 
+			} elseif (isset($transaction->qr_codes) && $transaction->qr_codes[0]->arrangements[0] === 'PAGBANK' || 
 			isset($transaction->deep_links) && $transaction->deep_links[0]->url){
 				$wallet = array();
 				$payment_type = 'WALLET';
 				$wallet_expiration = Configuration::get('PAGBANK_WALLET_TIME_LIMIT');
-				if(isset($transaction->qr_codes) && $transaction->qr_codes[0]->arrangements[0] == 'PAGBANK'){
+				if(isset($transaction->qr_codes) && $transaction->qr_codes[0]->arrangements[0] === 'PAGBANK'){
 					$qr = end($transaction->qr_codes);
 					$wallet['id'] = $qr->id;
 					$wallet['text'] = $qr->text;
 					$wallet['deadline'] = $this->calculateDeadline($wallet_expiration);
 					$wallet['expiration_date'] = $qr->expiration_date;
 					foreach ($qr->links as $qr_link) {
-						if ($qr_link->media == 'image/png') {
+						if ($qr_link->media === 'image/png') {
 							$wallet['link'] = $qr_link->href;
 						}
 					}
@@ -909,17 +974,16 @@ class PagBank extends PaymentModule
 		}
 
 		$customer_name = $this->context->customer->firstname;
+		$msg_console = (int)Configuration::get('PAGBANK_SHOW_CONSOLE');
 
 		$this->smarty->assign(array(
+			'msg_console' => $msg_console,
 			'device' => $this->device,
 			'ps_version' => _PS_VERSION_,
 			'customer_name' => $customer_name,
 			'info' => $info,
 			'pay_link' => isset($info['url']) && $info['url'] != '' ? $info['url'] : false,
 			'transaction_code' => $transaction_code,
-			'order_id' => $id_order,
-			'order_reference' => $order->reference,
-			'order_value' => $order->total_paid,
 			'order_products' => $order->getProducts(),
 			'transaction' => $transaction,
 			'payment_status' => $this->parseStatus($payment_status),
@@ -960,27 +1024,29 @@ class PagBank extends PaymentModule
 		}
 
 		$transaction = $this->getTransaction($info['transaction_code'], $order->id_cart);
-		$status_pagbank = isset($transaction->charges) ? $transaction->charges[0]->status : $info['status'];
-		$payment_description = isset($transaction->charges) ? $info['payment_description'] : $info['payment_description'];
-		if (isset($transaction->charges) && !empty($transaction->charges)) {
-			$transaction_code_charge = str_replace('CHAR_', '', $transaction->charges[0]->id);
-		}
+		$status_pagbank = $info['status'];
+		$payment_description = $info['payment_description'];
 
 		if (Tools::isSubmit('refundOrderPagBank')) {
 			if (in_array($status_pagbank, array('AUTHORIZED', 'PAID', 'AVAILABLE', 'DISPUTE'))) {
-				$refund_value = Tools::getValue('refundValue');
-				$capture_formatted = preg_replace('/\D/', '', $refund_value);
-				if ((int)$capture_formatted > 0) {
-					$clean_value = $capture_formatted;
+				$charge_option = Tools::getValue('charge_option');
+				if ((int)$charge_option == 1) {
+					$transaction_charge = str_replace('CHAR_', '', $transaction->charges[0]->id);
 				} else {
-					$clean_value = $transaction->charges[0]->amount->value;
+					$transaction_charge = str_replace('CHAR_', '', $transaction->charges[1]->id);
 				}
-				$api_response = $this->refundTransaction(
-					$transaction_code_charge,
-					$clean_value,
-					$order
-				);
-				if (!$api_response['errors']) {
+				$formatted = preg_replace('/\D/', '', Tools::getValue('refund_value'));
+				if ((int)$formatted > 0) {
+					$clean_value = $formatted;
+				} else {
+					if ((int)$charge_option == 1) {
+						$clean_value = $transaction->charges[0]->amount->value;
+					} else {
+						$clean_value = $transaction->charges[1]->amount->value;
+					}
+				}
+				$api_response = $this->refundTransaction($transaction_charge, $clean_value, $order, $info['transaction_code']);
+				if (isset($api_response) && $api_response === true) {
 					$this->context->smarty->assign(array(
 						'pagbank_msg' => $this->l('Pagamento Estornado no PagBank.'),
 						'reload' => 1
@@ -994,20 +1060,25 @@ class PagBank extends PaymentModule
 		}
 
 		if (Tools::isSubmit('captureOrderPagBank')) {
-			if ($status_pagbank == 'AUTHORIZED') {
-				$capture_value = Tools::getValue('captureValue');
-				$capture_formatted = preg_replace('/\D/', '', $capture_value);
-				if ((int)$capture_formatted > 0) {
-					$clean_value = $capture_formatted;
+			if ($status_pagbank === 'AUTHORIZED') {
+				$charge_option = Tools::getValue('charge_option');
+				if ((int)$charge_option == 1) {
+					$transaction_charge = str_replace('CHAR_', '', $transaction->charges[0]->id);
 				} else {
-					$clean_value = $transaction->charges[0]->amount->value;
+					$transaction_charge = str_replace('CHAR_', '', $transaction->charges[1]->id);
 				}
-				$api_response = $this->captureTransaction(
-					$transaction_code_charge,
-					$clean_value,
-					$order
-				);
-				if (!$api_response['errors']) {
+				$formatted = preg_replace('/\D/', '', Tools::getValue('capture_value'));
+				if ((int)$formatted > 0) {
+					$clean_value = $formatted;
+				} else {
+					if ((int)$charge_option == 1) {
+						$clean_value = $transaction->charges[0]->amount->value;
+					} else {
+						$clean_value = $transaction->charges[1]->amount->value;
+					}
+				}
+				$api_response = $this->captureTransaction($transaction_charge, $clean_value, $order, $info['transaction_code']);
+				if (isset($api_response) && $api_response === true) {
 					$this->context->smarty->assign(array(
 						'pagbank_msg' => $this->l('Pagamento Capturado no PagBank.'),
 						'reload' => 1
@@ -1021,6 +1092,7 @@ class PagBank extends PaymentModule
 		}
 
 		$this->context->smarty->assign(array(
+			'device' => $this->device,
 			'order' => $order,
 			'transaction' => $transaction,
 			'payment_description' => $payment_description,
@@ -1068,7 +1140,7 @@ class PagBank extends PaymentModule
 			$credential_type = $this->credential_type;
 		}
 		
-		if($environment == 1 || $environment == '' || $environment == 'NULL'){
+		if ($environment == 1 || $environment === '' || $environment === 'null') {
 			$token_code = Configuration::get('PAGBANK_TOKEN_'.$credential_type.'');
 		} else {
 			$token_code = Configuration::get('PAGBANK_TOKEN_SANDBOX_'.$credential_type.'');
@@ -1088,6 +1160,8 @@ class PagBank extends PaymentModule
 
 			'PAGBANK_CREDIT_CARD' => Tools::getValue('PAGBANK_CREDIT_CARD', Configuration::get('PAGBANK_CREDIT_CARD')),
 			'PAGBANK_SAVE_CREDIT_CARD' => Tools::getValue('PAGBANK_SAVE_CREDIT_CARD', Configuration::get('PAGBANK_SAVE_CREDIT_CARD')),
+			'PAGBANK_TWO_CREDIT_CARD' => Tools::getValue('PAGBANK_TWO_CREDIT_CARD', Configuration::get('PAGBANK_TWO_CREDIT_CARD')),
+			'PAGBANK_TWO_CREDIT_CARD_INST' => Tools::getValue('PAGBANK_TWO_CREDIT_CARD_INST', Configuration::get('PAGBANK_TWO_CREDIT_CARD_INST')),
 			'PAGBANK_CAPTURE_METHOD' => Tools::getValue('PAGBANK_CAPTURE_METHOD', Configuration::get('PAGBANK_CAPTURE_METHOD')),
 			'PAGBANK_MAX_INSTALLMENTS' => Tools::getValue('PAGBANK_MAX_INSTALLMENTS', Configuration::get('PAGBANK_MAX_INSTALLMENTS')),
 			'PAGBANK_NO_INTEREST' => Tools::getValue('PAGBANK_NO_INTEREST', Configuration::get('PAGBANK_NO_INTEREST')),
@@ -1103,6 +1177,12 @@ class PagBank extends PaymentModule
 			'PAGBANK_GOOGLE_ENVIRONMENT' => Tools::getValue('PAGBANK_GOOGLE_ENVIRONMENT', Configuration::get('PAGBANK_GOOGLE_ENVIRONMENT')),
 			'PAGBANK_GOOGLE_ORDER_DEMO' => Tools::getValue('PAGBANK_GOOGLE_ORDER_DEMO', Configuration::get('PAGBANK_GOOGLE_ORDER_DEMO')),
 			'PAGBANK_GOOGLE_MERCHANT_ID' => Tools::getValue('PAGBANK_GOOGLE_MERCHANT_ID', Configuration::get('PAGBANK_GOOGLE_MERCHANT_ID')),
+
+			'PAGBANK_RECAPTCHA' => Tools::getValue('PAGBANK_RECAPTCHA', Configuration::get('PAGBANK_RECAPTCHA')),
+			'PAGBANK_RACAPTCHA_CRITERIA' => Tools::getValue('PAGBANK_RACAPTCHA_CRITERIA', Configuration::get('PAGBANK_RACAPTCHA_CRITERIA')),
+			'PAGBANK_RECAPTCHA_SITE_KEY' => Tools::getValue('PAGBANK_RECAPTCHA_SITE_KEY', Configuration::get('PAGBANK_RECAPTCHA_SITE_KEY')),
+			'PAGBANK_RECAPTCHA_API_KEY' => Tools::getValue('PAGBANK_RECAPTCHA_API_KEY', Configuration::get('PAGBANK_RECAPTCHA_API_KEY')),
+			'PAGBANK_RECAPTCHA_URL' => Tools::getValue('PAGBANK_RECAPTCHA_URL', Configuration::get('PAGBANK_RECAPTCHA_URL')),
 
 			'PAGBANK_PAID' => Tools::getValue('PAGBANK_PAID', Configuration::get('PAGBANK_PAID')),
 			'PAGBANK_AUTHORIZED' => Tools::getValue('PAGBANK_AUTHORIZED', Configuration::get('PAGBANK_AUTHORIZED')),
@@ -1140,9 +1220,9 @@ class PagBank extends PaymentModule
 		$cred_banco = Configuration::get('PAGBANK_CREDENTIAL');
 
 		foreach (array_keys($form_values) as $key) {
-			if ($key == 'PAGBANK_CREDENTIAL' && $env_post != $env_banco) {
+			if ($key === 'PAGBANK_CREDENTIAL' && $env_post != $env_banco) {
 				Configuration::updateValue('PAGBANK_CREDENTIAL', '');
-			} elseif ($key == 'PAGBANK_CREDENTIAL' && $cred_post != $cred_banco) {
+			} elseif ($key === 'PAGBANK_CREDENTIAL' && $cred_post != $cred_banco) {
 				Configuration::updateValue('PAGBANK_CREDENTIAL', $cred_post);
 				$this->getPublicKey();
 			} else {
@@ -1188,7 +1268,7 @@ class PagBank extends PaymentModule
 		$result = Db::getInstance()->getRow("
 			SELECT `id_api_credential`, `environment`, `app`, `credit_tax`, `bankslip_tax`, `pix_tax`, `client_id`, `cipher_text`, `date_add`
 			FROM `" . _DB_PREFIX_ . "pagbank_api_credentials`
-			WHERE `environment` = " . $env . " AND `app` = '" . $app . "'
+			WHERE `environment` = " . pSQL($env) . " AND `app` = '" . pSQL($app) . "'
 		");
 		return $result;
 	}
@@ -1200,7 +1280,7 @@ class PagBank extends PaymentModule
 	{
 		$result = Db::getInstance()->getRow("
 			SELECT * FROM `" . _DB_PREFIX_ . "pagbank`
-			WHERE `" . pSQL($field) . "` = '" . $id_op . "'
+			WHERE `" . pSQL($field) . "` = '" . pSQL($id_op) . "'
 			ORDER BY `id_pagbank` DESC
 		");
 		return $result;
@@ -1223,7 +1303,7 @@ class PagBank extends PaymentModule
 		} else {
 			$updateQuery .= '`date_upd` = "' . date("Y-m-d H:i:s") . '" ';
 		}
-		$updateQuery .= ' WHERE `transaction_code` = "' . $data['transaction_code'] . '"';
+		$updateQuery .= ' WHERE `transaction_code` = "' . pSQL($data['transaction_code']) . '"';
 		if (!Db::getInstance()->execute($updateQuery)) {
 			$this->saveLog('error', 'update', false, $updateQuery, 'Pedido nao atualizado no banco.');
 			return false;
@@ -1246,15 +1326,57 @@ class PagBank extends PaymentModule
 					}
 				}
 			}
-
 			if($data['payment_type'] == "CREDIT_CARD") {
 				$capture = (int)Configuration::get('PAGBANK_CAPTURE_METHOD');
 			} else {
 				$capture = 1;
 			}
-
-			$ins_query = 'INSERT INTO `' . _DB_PREFIX_ . 'pagbank` (`id_shop`, `id_customer`, `cpf_cnpj`, `id_cart`, `id_order`, `reference`, `transaction_code`, `buyer_ip`, `status`, `status_description`, `payment_type`, `payment_description`, `installments`, `nsu`, `url`, `credential`, `capture`, `environment`, `date_add`, `date_upd`)';
-			$ins_query .= ' VALUES (' . (int)$this->shop_id . ', "' . (int)$data['id_customer'] . '", "' . pSQL($data['cpf_cnpj']) . '", ' . (int)$data['id_cart'] . ', ' . (int)$data['id_order'] . ', "' . pSQL($data['reference']) . '", "' . pSQL($data['transaction_code']) . '", "' . pSQL($data['buyer_ip']) . '", "' . pSQL($data['status']) . '", "' . pSQL($data['status_description']) . '", "' . pSQL($data['payment_type']) . '", "' . pSQL($data['payment_description']) . '", ' . (int)$data['installments'] . ', "' . pSQL($data['nsu']) . '", "' . pSQL($data['url']) . '", "' . pSQL($this->credential_type) . '", "' . (int)$capture . '", "' . (int)$this->environment . '", "' . pSQL($data['date_add']) . '", "' . date("Y-m-d H:i:s") . '")';
+			$ins_query = 'INSERT INTO `' . _DB_PREFIX_ . 'pagbank` 
+			(`id_shop`, 
+			`id_customer`, 
+			`cpf_cnpj`, 
+			`id_cart`, 
+			`id_order`, 
+			`reference`, 
+			`transaction_code`, 
+			`buyer_ip`, 
+			`status`, 
+			`status_description`, 
+			`payment_type`, 
+			`payment_description`, 
+			`installments`, 
+			`installments_two`, 
+			`nsu`, 
+			`nsu_two`, 
+			`url`, 
+			`credential`, 
+			`capture`, 
+			`environment`, 
+			`date_add`, 
+			`date_upd`)';
+			$ins_query .= ' VALUES 
+			(' . (int)$this->shop_id . ', 
+			"' . (int)$data['id_customer'] . '", 
+			"' . pSQL($data['cpf_cnpj']) . '", 
+			' . (int)$data['id_cart'] . ', 
+			' . (int)$data['id_order'] . ', 
+			"' . pSQL($data['reference']) . '", 
+			"' . pSQL($data['transaction_code']) . '", 
+			"' . pSQL($data['buyer_ip']) . '", 
+			"' . pSQL($data['status']) . '", 
+			"' . pSQL($data['status_description']) . '", 
+			"' . pSQL($data['payment_type']) . '", 
+			"' . pSQL($data['payment_description']) . '", 
+			' . (int)$data['installments'] . ', 
+			' . (int)$data['installments_two'] . ', 
+			"' . pSQL($data['nsu']) . '", 
+			"' . pSQL($data['nsu_two']) . '", 
+			"' . pSQL($data['url']) . '", 
+			"' . pSQL($this->credential_type) . '", 
+			"' . (int)$capture . '", 
+			"' . (int)$this->environment . '", 
+			"' . pSQL($data['date_add']) . '", 
+			"' . date("Y-m-d H:i:s") . '")';
 			$insert = Db::getInstance()->execute($ins_query);
 			if (!$insert || (bool)$insert !== true) {
 				$this->saveLog('error', 'insertPagBankData', $data['id_cart'], $ins_query, 'Pedido nao inserido no banco.');
@@ -1265,9 +1387,9 @@ class PagBank extends PaymentModule
 	}
 
 	/*
-	 * Calcula descontos antes de gerar o pedido
+	 * Verifica qual forma de pagamento está com o desconto ativo
 	*/
-	public function calculateDiscounts($payment_type, $installment = false)
+	public function checkDiscounts()
 	{
 		$discount_options = [];
 		if ((int)Configuration::get('PAGBANK_DISCOUNT_CREDIT') == 1) {
@@ -1285,6 +1407,16 @@ class PagBank extends PaymentModule
 		if ((int)Configuration::get('PAGBANK_DISCOUNT_GOOGLE') == 1) {
 			$discount_options[] = 'google_pay';
 		}
+
+		return $discount_options;
+	}
+
+	/*
+	 * Calcula descontos antes de gerar o pedido
+	*/
+	public function calculateDiscounts($payment_type, $installment = false)
+	{
+		$discount_options = $this->checkDiscounts();
 		$discount_type = Configuration::get('PAGBANK_DISCOUNT_TYPE');
 		$discount_value = (float)Configuration::get('PAGBANK_DISCOUNT_VALUE');
 		$total_products = $this->context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS);
@@ -1293,8 +1425,8 @@ class PagBank extends PaymentModule
 		$total_wrapping = $this->context->cart->getOrderTotal(true, Cart::ONLY_WRAPPING);
 
 		if (in_array($payment_type, $discount_options) && $discount_type >= 1 && $discount_value >= 1) {
-			if($payment_type == 'credit_card' && $installment == 1 || $payment_type != 'credit_card'
-			|| $payment_type == 'google_pay' && $installment == 1 || $payment_type != 'google_pay') {
+			if($payment_type === 'credit_card' && $installment == 1 || $payment_type != 'credit_card'
+			|| $payment_type === 'google_pay' && $installment == 1 || $payment_type != 'google_pay') {
 				if ($discount_type == 1) {
 					$total_partial = ($total_products - ($total_discounts + ($total_products * $discount_value / 100)));
 				} else {
@@ -1314,22 +1446,7 @@ class PagBank extends PaymentModule
 	*/
 	public function messageDiscounts($payment_type)
 	{
-		$discount_options = [];
-		if ((int)Configuration::get('PAGBANK_DISCOUNT_CREDIT') == 1) {
-			$discount_options[] = 'credit_card';
-		}
-		if ((int)Configuration::get('PAGBANK_DISCOUNT_BANKSLIP') == 1) {
-			$discount_options[] = 'bankslip';
-		}
-		if ((int)Configuration::get('PAGBANK_DISCOUNT_PIX') == 1) {
-			$discount_options[] = 'pix';
-		}
-		if ((int)Configuration::get('PAGBANK_DISCOUNT_WALLET') == 1) {
-			$discount_options[] = 'wallet';
-		}
-		if ((int)Configuration::get('PAGBANK_DISCOUNT_GOOGLE') == 1) {
-			$discount_options[] = 'google_pay';
-		}
+		$discount_options = $this->checkDiscounts();
 		$discount_type = Configuration::get('PAGBANK_DISCOUNT_TYPE');
 		$discount_value = (float)Configuration::get('PAGBANK_DISCOUNT_VALUE');
 		if (in_array($payment_type, $discount_options) && $discount_type >= 1 && $discount_value >= 1) {
@@ -1357,7 +1474,6 @@ class PagBank extends PaymentModule
 		$order_products = $this->processOrderProducts();
 		$pix_expiration = Configuration::get('PAGBANK_PIX_TIME_LIMIT');
 		$current_hour = date("H", time());
-
 		$total_paid = $this->calculateDiscounts('pix');
 
 		if (((int)$current_hour > 20 || (int)$current_hour < 6) && (int)$total_paid > 999) {
@@ -1408,11 +1524,11 @@ class PagBank extends PaymentModule
 		}';
 
 		$api_response = $this->curl_send('POST', $this->urls['api'] . 'orders', preg_replace('!\?\\n?\\t!', "", $json_pix), 30, $this->context->cart->id);
-		if (!$api_response['errors']) {
+		if (isset($api_response) && !$api_response['errors']) {
 			return $api_response;
 		} else {
 			$this->ps_errors[] = 'Erro no processamento do PIX.';
-			return $api_response;
+			return false;
 		}
 	}
 
@@ -1426,10 +1542,9 @@ class PagBank extends PaymentModule
 		$this->processReference();
 		$this->processFormData($form_data);
 		$order_products = $this->processOrderProducts();
-
 		$total_paid = $this->calculateDiscounts('wallet');
 
-		if($this->device == 't' || $this->device == 'm'){
+		if($this->device === 't' || $this->device === 'm'){
 			$link = new Link();
 			$qr_deep = '
 			"deep_links": [
@@ -1489,11 +1604,11 @@ class PagBank extends PaymentModule
 		}';
 
 		$api_response = $this->curl_send('POST', $this->urls['api'] . 'orders', preg_replace('!\?\\n?\\t!', "", $json_wallet), 30, $this->context->cart->id);
-		if (!$api_response['errors']) {
+		if (isset($api_response) && !$api_response['errors']) {
 			return $api_response;
 		} else {
 			$this->ps_errors[] = 'Erro no processamento via Carteira Digital.';
-			return $api_response;
+			return false;
 		}
 	}
 
@@ -1529,8 +1644,6 @@ class PagBank extends PaymentModule
 		$amount_value = $this->calculateDiscounts('google_pay', 1);
 		$formatted_value = number_format($amount_value, 2, "", "");
 		$reference = $this->ps_params['reference'];
-		$brand = strtolower($form_data['google_card_brand']);
-		$last_digits = $form_data['google_last_digits'];
 		$created_at = date(DATE_ATOM, strtotime('now'));
 
 		$json_demo = '{
@@ -1567,8 +1680,8 @@ class PagBank extends PaymentModule
 						"installments": 1,
 						"capture": true,
 						"card": {
-							"brand": "' . $brand . '",
-							"last_digits": "' . $last_digits . '",
+							"brand": "Visa",
+							"last_digits": 1234,
 							"wallet": {
 								"type": "GOOGLE_PAY"
 							}
@@ -1600,126 +1713,42 @@ class PagBank extends PaymentModule
 	 */
 	public function processCardPayment($form_data)
 	{
-		$this->ps_errors = array();
-		$this->ps_params = array();
-		$this->processReference();
-		$this->processFormData($form_data);
-		$this->processCreditCardData($form_data);
-		$order_products = $this->processOrderProducts();
 
-		if ($this->ps_params['paymentType'] == 'google_pay' &&
+		if ($form_data['payment_type'] === 'google_pay' &&
 		(int)Configuration::get('PAGBANK_GOOGLE_ENVIRONMENT') == 0 &&
 		(int)Configuration::get('PAGBANK_GOOGLE_ORDER_DEMO') == 1) {
 			return $this->orderDemoGooglePay($form_data);
 		}
 
-		if (isset($form_data['save_customer_card']) && (int)$form_data['save_customer_card'] > 0) {
-			$store_card = true;
-		} else {
-			$store_card = false;
-		}
+		$this->ps_errors = array();
+		$this->ps_params = array();
+		$this->processReference();
+		$this->processFormData($form_data);
+		$order_products = $this->processOrderProducts();
 
-		if((int)Configuration::get('PAGBANK_CAPTURE_METHOD') == 1){
-			$capture = '"capture": true';
+		if ($this->checkTwoOpt($form_data)) {
+			$json_part = '';
 		} else {
-			$capture = '"capture": false';
-		}
-		
-		if ($this->ps_params['paymentType'] == 'credit_card') {
-			$fees = json_decode($form_data['get_installments_fees']);
-			$saved_card = $form_data['saved_card'];
-			if ((int)$saved_card > 0) {
-				$check_saved = $this->getCustomerToken((int)$this->context->cart->id_customer, (int)$form_data['card_token_id']);
-				$bin = $check_saved[0]['card_first_digits'];
-				$card_brand = $check_saved[0]['card_brand'];
-				$payment_method_card = array(
-					"id" => $this->ps_params['creditCardToken']
-				);
-			} else {
-				$bin = $form_data['card_bin'];
-				$card_brand = $form_data['card_brand'];
-				$payment_method_card = array(
-					"encrypted" => $this->ps_params['creditCardToken'],
-					"store" => $store_card
-				);
+			if ($this->processCardData($form_data) === false) {
+				return false;
 			}
-			$payment_method_params = '
-			"card": ' . json_encode($payment_method_card) . ',
-			"holder": {
-				"name": "' . $this->ps_params['cardName'] . '",
-				"tax_id": "' . $this->ps_params['senderCPFCNPJ'] . '"
-			}';
-		} else {
-			$fees = json_decode($form_data['google_get_installments_fees']);
-			$bin = $form_data['google_card_bin'];
-			$card_brand = strtolower($form_data['google_card_brand']);
-			$google_signature = preg_replace('~^"?(.*?)"?$~', '$1', $this->ps_params['googleSignature']);
-			if (_PS_VERSION_ >= '1.7.0') {
-				$google_param = json_encode(stripslashes($google_signature));
-			} else {
-				$google_param = json_encode($google_signature);
-			}
-			$payment_method_params = '
-			"card": {
-				"holder": {
-					"name": "' . $this->ps_params['googleName'] . '",
-					"tax_id": "' . $this->ps_params['senderCPFCNPJ'] . '"
-				},
-				"wallet": {
-					"type": "GOOGLE_PAY",
-					"key": ' . $google_param . '
-				}
-			}';
-		}
-
-		$total_card = $this->context->cart->getOrderTotal(true, Cart::BOTH);
-
-		if((int)$this->ps_params['installmentQuantity'] == 1) {
-			if($this->ps_params['paymentType'] == 'credit_card') {
-				$amount_value = $this->calculateDiscounts('credit_card', 1);
-			} else {
-				$amount_value = $this->calculateDiscounts('google_pay', 1);
-			}
-			$formatted_value = number_format($amount_value, 2, "", "");
-			$amount = '{
-				"value": ' . $formatted_value. ',
-				"currency": "BRL"
-			}';
-			
-			$first_install = reset($fees);
-			$raw_amount_value = $first_install->amount->value;
-			$final_value = number_format($total_card, 2, "", "");
-		} else {
-			foreach($fees as $fee) {
-				if($fee->installments == (int)$this->ps_params['installmentQuantity']) {
-					if((int)$this->ps_params['installmentQuantity'] <= (int)Configuration::get('PAGBANK_NO_INTEREST')){
-						$amount = '{
-							"value": ' . $fee->amount->value. ',
-							"currency": "BRL"
-						}';
-					}else{
-						$amount = json_encode($fee->amount);
+			$json_part = ',"charges": [
+				{
+					"reference_id": "' . $this->ps_params['reference'] . '",
+					"description": "Pedido realizado na loja ' . Configuration::get('PS_SHOP_NAME') . ', em ' . date("d/m/Y") . ', no valor total de R$ ' . number_format($this->ps_params['amountDesc'], 2, ",", ".") . '",
+					"amount": ' . json_encode($this->ps_params['amount']) . ',
+					"payment_method": {
+						"type": "CREDIT_CARD",
+						"installments": ' . (int)$this->ps_params['cardInstallments'] . ',
+						"capture": ' . $this->ps_params['capture'] . ',
+						"card": ' . json_encode($this->ps_params['paymentMethodCard']) . ',
+						"holder": {
+							"name": "' . $this->ps_params['holderName'] . '",
+							"tax_id": "' . $this->ps_params['senderCPFCNPJ'] . '"
+						}
 					}
-					$amount_value = $fee->amount->value/100;
-					$raw_amount_value = $fee->amount->value;
 				}
-			}
-
-			$fomatted_value = number_format($total_card, 2, "", "");
-			$installments = $this->callGetInstallments($fomatted_value, $bin, (int)$this->context->cart->id);
-			$inst_array = json_decode(json_encode($installments['response']));
-			$plans = $inst_array->payment_methods->credit_card->{$card_brand}->installment_plans;
-			foreach($plans as $p){
-				if($p->installments == (int)$this->ps_params['installmentQuantity']) {
-					$selected_install = $p;
-				}
-			}
-			$final_value = $selected_install->amount->value;
-		}
-
-		// Validação dos valores c/ margem de segurança
-		if ((int)$raw_amount_value+10 < $final_value) {
-			return array('errors');
+			]';
 		}
 
 		$json_credit_card = '{
@@ -1753,50 +1782,18 @@ class PagBank extends PaymentModule
 			},
 			"notification_urls": [
 				"' . $this->urls['notification'] . '"
-			],
-			"charges": [
-				{
-					"reference_id": "' . $this->ps_params['reference'] . '",
-					"description": "Pedido realizado na loja ' . Configuration::get('PS_SHOP_NAME') . ', em ' . date("d/m/Y") . ', no valor total de R$ ' . number_format($amount_value, 2, ",", ".") . '",
-					"amount": ' . $amount . ',
-					"payment_method": {
-						"type": "CREDIT_CARD",
-						"installments": ' . (int)$this->ps_params['installmentQuantity'] . ',
-						' . $capture . ',
-						' . $payment_method_params . '
-					}
-				}
 			]
+			'. $json_part .'
 		}';
 
 		$api_response = $this->curl_send('POST', $this->urls['api'] . 'orders', preg_replace("!\?\\n?\\t!", "", $json_credit_card), 30, $this->context->cart->id);
-		if ((bool)$api_response['errors'] == true) {
-			$this->ps_errors[] = 'Erro no processamento do cartão.';
+		if (isset($api_response) && !$api_response['errors']) {
+			$this->saveCardTokenized($api_response, (int)$form_data['save_customer_card']);
+			return $api_response;
 		} else {
-			$payment = end($api_response['response']->charges);
-			$payment_status = $payment->status;
-
-			if (in_array($payment_status, array('AVAILABLE', 'AUTHORIZED', 'PAID', 'IN_ANALYSIS'))) {
-				if (
-					isset($form_data['save_customer_card']) &&
-					(int)$form_data['save_customer_card'] > 0 &&
-					isset($payment->payment_method->card->id)
-				) {
-					$info = array(
-						'id_customer' => (int)$this->context->cart->id_customer,
-						'card_name' => $payment->payment_method->card->holder->name,
-						'card_brand' => $payment->payment_method->card->brand,
-						'card_first_digits' => $payment->payment_method->card->first_digits,
-						'card_last_digits' => $payment->payment_method->card->last_digits,
-						'card_month' => $payment->payment_method->card->exp_month,
-						'card_year' => $payment->payment_method->card->exp_year,
-						'card_token' => $payment->payment_method->card->id
-					);
-					$this->insertCustomerToken($info);
-				}
-			}
+			$this->ps_errors[] = 'Erro no processamento do cartão.';
+			return false;
 		}
-		return $api_response;
 	}
 
 	/* 
@@ -1890,11 +1887,11 @@ class PagBank extends PaymentModule
 		}';
 
 		$api_response = $this->curl_send('POST', $this->urls['api'] . 'orders', preg_replace('!\?\\n?\\t!', "", $json_bankslip), 30, $this->context->cart->id);
-		if (!$api_response['errors']) {
+		if (isset($api_response) && !$api_response['errors']) {
 			return $api_response;
 		} else {
 			$this->ps_errors[] = 'Erro no processamento do boleto.';
-			return $api_response;
+			return false;
 		}
 	}
 
@@ -1911,8 +1908,8 @@ class PagBank extends PaymentModule
 
 			$info = $this->getOrderData($id_cart, 'id_cart');
 			if (!empty($info) && $info['environment'] == 1 ||
-			!empty($info) && $info['environment'] == '' ||
-			!empty($info) && $info['environment'] == 'NULL') {
+			!empty($info) && $info['environment'] === '' ||
+			!empty($info) && $info['environment'] === 'NULL') {
 				$this->urls['api'] = 'https://api.pagseguro.com/';
 			} else {
 				$this->urls['api'] = 'https://sandbox.api.pagseguro.com/';
@@ -1920,7 +1917,7 @@ class PagBank extends PaymentModule
 		}
 
 		$api_response = $this->curl_send('GET', $this->urls['api'] . 'orders/' . $code, false, 30, $id_cart);
-		if (!$api_response['errors']) {
+		if (isset($api_response) && !$api_response['errors']) {
 			return $api_response['response'];
 		} else {
 			$this->ps_errors[] = 'Erro ao consultar Transação.';
@@ -1933,24 +1930,23 @@ class PagBank extends PaymentModule
 	 * $code = Código da transação
 	 * $value = valor devolvido, total ou parcial
 	 */
-	public function refundTransaction($code, $value, $order)
+	public function refundTransaction($transaction_charge, $value, $order = false, $transaction_code = false)
 	{
 		$json_refund = '{
-		  "amount": {
-			"value": ' . $value . '
-		  }
+			"amount": {
+				"value": ' . $value . '
+			}
 		}';
-		$api_response = $this->curl_send('POST', $this->urls['api'] . 'charges/' . $code . '/cancel', $json_refund, 20, $order->id_cart);
-		if (!$api_response['errors']) {
-			if ($this->updateOrderStatus('REFUNDED', $order->id, date("Y-m-d H:i:s"))) {
-				if (Db::getInstance()->execute(
-					'UPDATE `' . _DB_PREFIX_ . 'pagbank` set `refund`="' . ($value / 100) . '", `status`="REFUNDED", `status_description`="' . $this->parseStatus('REFUNDED') . '" WHERE `id_cart`="' . $order->id_cart . '"'
-				)) {
-					return true;
-				} else {
-					$this->ps_errors[] = 'Erro ao salvar o estorno no banco.';
-					return false;
-				}
+		if ($order === false) {
+			$id_cart = $this->context->cart->id;
+		} else {
+			$id_cart = $order->id_cart;
+		}
+		$api_response = $this->curl_send('POST', $this->urls['api'] . 'charges/' . $transaction_charge . '/cancel', $json_refund, 20, $id_cart);
+		if (isset($api_response) && !$api_response['errors']) {
+			if ($order) {
+				$current_status = $this->checkStatusApi($transaction_code, $id_cart);
+				$this->updateOrderStatus($current_status, $order->id, date("Y-m-d H:i:s"));
 			}
 		} else {
 			$this->ps_errors[] = 'Erro ao estornar Transação.';
@@ -1963,48 +1959,61 @@ class PagBank extends PaymentModule
 	 * $code = Código da transação
 	 * $value = total ou parcial
 	 */
-	public function captureTransaction($code, $value, $order)
+	public function captureTransaction($transaction_charge, $value, $order = false, $transaction_code = false)
 	{
 		$json_capture = '{
 			"amount": {
 				"value": ' . $value . '
 			}
 		}';
-		$api_response = $this->curl_send('POST', $this->urls['api'] . 'charges/' . $code . '/capture', $json_capture, 20, $order->id_cart);
-		if (!$api_response['errors']) {
-			if ($this->updateOrderStatus('PAID', $order->id, date("Y-m-d H:i:s"))) {
-				if (Db::getInstance()->execute(
-					'UPDATE `' . _DB_PREFIX_ . 'pagbank` set `status`="PAID", `status_description`="' . $this->parseStatus('PAID') . '" WHERE `id_cart`="' . $order->id_cart . '"'
-				)) {
-					return true;
-				} else {
-					$this->ps_errors[] = 'Erro ao salvar captura no Banco.';
-					return false;
-				}
+		if ($order === false) {
+			$id_cart = $this->context->cart->id;
+		} else {
+			$id_cart = $order->id_cart;
+		}
+		$api_response = $this->curl_send('POST', $this->urls['api'] . 'charges/' . $transaction_charge . '/capture', $json_capture, 20, $id_cart);
+		if (isset($api_response) && !$api_response['errors']) {
+			if ($order) {
+				$current_status = $this->checkStatusApi($transaction_code, $id_cart);
+				$this->updateOrderStatus($current_status, $order->id, date("Y-m-d H:i:s"));
 			}
+			return true;
 		} else {
 			$this->ps_errors[] = 'Erro capturar a Transação.';
 			return false;
 		}
 	}
 
+	/*
+	* Verifica Status da Transação no PankBank
+	*/
+	public function checkStatusApi($transaction_code, $id_cart)
+	{
+		$get_transaction = $this->getTransaction($transaction_code, $id_cart);
+
+		if (isset($get_transaction->charges) && is_array($get_transaction->charges) && count($get_transaction->charges) == 2) {
+			$validate_charges = $this->validateTwoCharges($get_transaction->charges);
+			return $validate_charges['current_status'];
+		} else {
+			if (isset($get_transaction->charges) && !in_array(substr($get_transaction->charges[0]->reference_id, -2), ['_1', '_2'])) {
+				return (string)$get_transaction->charges[0]->status;
+			} else {
+				return;
+			}
+		}
+	}
+
 	/* 
 	 * Atualiza Status do pedido na loja
 	 */
-	public function updateOrderStatus($status_code, $id_order, $date_update = null, $notify = false)
+	public function updateOrderStatus($status_code, $id_order, $date_update = null)
 	{
 		$order = new Order($id_order);
-		$current_status = (int)$order->getCurrentState();
-		$status_ps = (int)$this->correspondStatus($status_code);
+		$current_order_status = (int)$order->getCurrentState();
+		$parse_status_api = (int)$this->correspondStatus($status_code);
 		$info = $this->getOrderData($order->id_cart, 'id_cart');
 
-		if ($notify) {
-			$transaction = $this->getTransaction($info['transaction_code'], $order->id_cart);
-		}
-
-		if ($current_status == $status_ps ||
-			$notify && !isset($transaction->charges) && $status_code == 'PAID' ||
-			$notify && isset($transaction->charges) && $status_code != $transaction->charges[0]->status) {
+		if ($current_order_status == $parse_status_api) {
 			return;
 		} else {
 			$status_history = $order->getHistory($this->context->language->id);
@@ -2012,20 +2021,20 @@ class PagBank extends PaymentModule
 			foreach ($status_history as $status) {
 				$s_history[] = $status['id_order_state'];
 			}
-			if (isset($status_ps) && $status_ps != false && $current_status != $status_ps) {
-				if (in_array($status_ps, $s_history)) {
+			if (isset($parse_status_api) && $parse_status_api != false && $current_order_status != $parse_status_api) {
+				if (in_array($parse_status_api, $s_history)) {
 					return;
 				} else {
 					$history = new OrderHistory();
 					$history->id_order = (int)$id_order;
-					$history->changeIdOrderState($status_ps, (int)$id_order);
+					$history->changeIdOrderState($parse_status_api, (int)$id_order);
 					$template_vars = array(
 						'{transaction_code}' => $info['transaction_code'],
 						'{status}' => $status_code,
 						'{status_description}' => $this->parseStatus($status_code)
 					);
 					if (!$history->addWithemail(true, $template_vars)) {
-						$this->saveLog('error', 'Atualiza Status', $order->id_cart, 'Status PagBank: ' . $status_ps . ' / Status Loja: ' . (int)$current_status, 'Status do pedido não atualizado na loja.');
+						$this->saveLog('error', 'Atualiza Status', $order->id_cart, 'Status PagBank: ' . $parse_status_api . ' / Status Loja: ' . (int)$current_order_status, 'Status do pedido não atualizado na loja.');
 					}
 					$history->save();
 				}
@@ -2040,6 +2049,61 @@ class PagBank extends PaymentModule
 
 				return true;
 			}
+		}
+	}
+
+	/* 
+	 * Processa o reCaptcha v3
+	 */
+	public function processRecaptcha($token)
+	{
+		$site_key = trim(Configuration::get('PAGBANK_RECAPTCHA_SITE_KEY'));
+		$api_key = trim(Configuration::get('PAGBANK_RECAPTCHA_API_KEY'));
+		$project_url = trim(Configuration::get('PAGBANK_RECAPTCHA_URL'));
+		$user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'Unknown';
+		$user_ip = $this->getUserIp();
+		$data = '{
+			"event": {
+				"token": "' . $token . '",
+				"siteKey": "' . $site_key . '",
+				"userAgent": "' . $user_agent . '",
+				"userIpAddress": "' . $user_ip . '",
+				"expectedAction": "submit"
+			}
+		}';
+		$endpoint = str_replace('API_KEY', $api_key, $project_url);
+		$api_response = $this->curl_send('POST', $endpoint, preg_replace("!\?\\n?\\t!", "", $data), 30, $this->context->cart->id, true);
+		if (isset($api_response) && !$api_response['errors']) {
+			return $this->validateRecaptcha($api_response['response']->riskAnalysis->score);
+		} else {
+			$this->ps_errors[] = 'Erro no processamento do Recaptcha.';
+			return false;
+		}
+	}
+
+	/* 
+	 * Classifica o score do reCaptcha v3
+	 */
+	public function validateRecaptcha($score)
+	{
+		$criteria = Configuration::get('PAGBANK_RACAPTCHA_CRITERIA');
+		switch (strtolower((string)$criteria)) {
+			case 'low':
+				$min = 0.3;
+				break;
+			case 'high':
+				$min = 0.7;
+				break;
+			case 'medium':
+			default:
+				$min = 0.5;
+				break;
+		}
+
+		if((float)$score >= $min) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -2065,10 +2129,10 @@ class PagBank extends PaymentModule
 			if ($product['price_wt'] <= 0) {
 				continue;
 			}
-
+			$product_name = str_replace("'", "", $product['name']);
 			$products_array[] = array(
 				"reference_id" => $product['id_product'],
-				"name" => $this->replaceSpecialChars(substr($product['name'], 0, 64)),
+				"name" => $this->replaceSpecialChars(substr($product_name, 0, 64)),
 				"quantity" => $product['cart_quantity'],
 				"unit_amount" => number_format($product['price_wt'], 2, "", ""),
 				"dimensions" => array(
@@ -2080,8 +2144,8 @@ class PagBank extends PaymentModule
 			);
 		}
 		if (empty($products_array) || count($products_array) < 1) {
-			return false;
 			$this->ps_errors[] = 'Erro ao Processar Produtos.';
+			return false;
 		} else {
 			return json_encode($products_array);
 		}
@@ -2123,7 +2187,18 @@ class PagBank extends PaymentModule
 		$this->ps_params['senderCPFCNPJ'] = $cpf_cnpj;
 		$this->ps_params['senderAreaCode'] = $telephone['area_code'];
 		$this->ps_params['senderPhone'] = $telephone['telephone_number'];
-		$this->ps_params['senderPhoneType'] = (int)substr($telephone['telephone_number'], 0, 1) == 9 ? 'MOBILE' : 'BUSINESS'; //CELLPHONE ?
+		$this->ps_params['senderPhoneType'] = (int)substr($telephone['telephone_number'], 0, 1) == 9 ? 'MOBILE' : 'BUSINESS';
+		
+		if ($this->checkTwoOpt($form_data)) {
+			$holder_name_two = trim($form_data['card_name_two']);
+			$holder_name_two = preg_replace('/\s(?=\s)/', '', $holder_name_two);
+			if (strlen($holder_name_two) > 50) {
+				$holder_name_two = substr($holder_name_two, 0, 50);
+			}
+			$this->ps_params['holderNameTwo'] = $holder_name_two;
+			$cpf_cnpj_two = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $form_data['cpf_cnpj_two']));
+			$this->ps_params['senderCPFCNPJTwo'] = $cpf_cnpj_two;
+		}
 
 		//Endereço do cliente
 		$address = new Address((int)$this->context->cart->id_address_delivery);
@@ -2150,7 +2225,9 @@ class PagBank extends PaymentModule
 		$this->ps_params['shippingAddressNumber'] = isset($address->{$this->number_field}) && strlen($address->{$this->number_field}) > 0 ? substr($address->{$this->number_field}, 0, 20) : '1';
 		$this->ps_params['shippingAddressComplement'] = isset($this->compl_field) && $address->{$this->compl_field} != '' ? substr($address->{$this->compl_field}, 0, 40) : 'N/A';
 
-		if ((empty($this->ps_params['shippingAddressState']) && empty($this->ps_params['shippingAddressCity'])) || empty($this->ps_params['shippingAddressPostalCode']) || empty($this->ps_params['shippingAddressDistrict']) || empty($this->ps_params['shippingAddressStreet']) || empty($this->ps_params['shippingAddressNumber'])) {
+		if ((empty($this->ps_params['shippingAddressState']) && empty($this->ps_params['shippingAddressCity'])) || 
+			empty($this->ps_params['shippingAddressPostalCode']) || empty($this->ps_params['shippingAddressDistrict']) || 
+			empty($this->ps_params['shippingAddressStreet']) || empty($this->ps_params['shippingAddressNumber'])) {
 			$this->ps_errors[] = 'Erro ao Processar Endereço de Entrega.';
 		}
 
@@ -2185,45 +2262,402 @@ class PagBank extends PaymentModule
 	}
 
 	/* 
-	 * Processa dados do cartão de crédito para envio ao PagBank
+	 * Processa dados do cartão de crédito para ser enviado ao PagBank
 	 */
-	public function processCreditCardData($form_data)
+	public function processCardData($form_data)
 	{
-		$cpf_cnpj = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $form_data['cpf_cnpj']));
-		$telephone = $this->formatPhoneNumber($form_data['telephone']);
-		$this->ps_params['creditCardHolderCPF'] = $cpf_cnpj;
-		$this->ps_params['paymentType'] = $form_data['payment_type'];
 
-		if ($this->ps_params['paymentType'] == 'credit_card') {
-			$card_holder = trim($form_data['card_name']);
-			$card_holder = preg_replace('/\s(?=\s)/', '', $card_holder);
-			$this->ps_params['cardName'] = $card_holder;
-			if (isset($form_data['card_token_id']) && (int)$form_data['card_token_id'] > 0) {
-				$this->ps_params['creditCardToken'] = $this->getCardToken($form_data['card_token_id']);
-			} else {
-				$this->ps_params['creditCardToken'] = $form_data['encrypted_card'];
-			}
-			$this->ps_params['installmentQuantity'] = $form_data['card_installments'];
-			$this->ps_params['installmentValue'] = str_replace(",", "", $form_data['card_installment_value']);
+		if ($this->checkFormInfo($form_data) === false) {
+			return false;
+		}
+
+		if((int)Configuration::get('PAGBANK_CAPTURE_METHOD') == 1){
+			$this->ps_params['capture'] = "true";
 		} else {
-			$card_holder = trim($form_data['google_name']);
-			$card_holder = preg_replace('/\s(?=\s)/', '', $card_holder);
-			$this->ps_params['googleName'] = $card_holder;
-			$this->ps_params['googleSignature'] = $form_data['google_signature'];
-			$this->ps_params['installmentQuantity'] = $form_data['google_installments'];
-			$this->ps_params['installmentValue'] = str_replace(",", "", $form_data['google_installment_value']);
+			$this->ps_params['capture'] = "false";
 		}
 
-		if (
-			empty($this->ps_params['installmentQuantity']) && empty($this->ps_params['installmentValue']) ||
-			empty($this->ps_params['cardName']) && $this->ps_params['paymentType'] == 'credit_card' ||
-			empty($this->ps_params['googleName']) && $this->ps_params['paymentType'] == 'google_pay' ||
-			empty($this->ps_params['creditCardToken']) && $this->ps_params['paymentType'] == 'credit_card' ||
-			empty($this->ps_params['googleSignature']) && $this->ps_params['paymentType'] == 'google_pay' ||
-			empty($this->ps_params['creditCardHolderCPF'])
-		) {
-			$this->ps_errors[] = 'Erro ao Processar Dados do Cartão.';
+		// Cartão
+		if ($form_data['payment_type'] === 'credit_card') {
+
+			if (isset($form_data['save_customer_card']) && (int)$form_data['save_customer_card'] > 0) {
+				$this->ps_params['storeCard'] = true;
+			} else {
+				$this->ps_params['storeCard'] = false;
+			}
+
+			if (isset($form_data['saved_card']) && (int)$form_data['saved_card'] > 0 
+				&& isset($form_data['card_token_id']) && (int)$form_data['card_token_id'] > 0) {
+				$check_saved = $this->getCustomerToken((int)$this->context->cart->id_customer, (int)$form_data['card_token_id']);
+				$bin = $check_saved[0]['card_first_digits'];
+				$card_brand = $check_saved[0]['card_brand'];
+				$card_hash = $this->getCardToken($form_data['card_token_id']);
+				$this->ps_params['paymentMethodCard'] = array(
+					"id" => $card_hash
+				);
+			} else {
+				$bin = $form_data['card_bin'];
+				$card_brand = $form_data['card_brand'];
+				$encrypted_card = $form_data['encrypted_card'];
+				$this->ps_params['paymentMethodCard'] = array(
+					"encrypted" => $encrypted_card,
+					"store" => $this->ps_params['storeCard']
+				);
+			}
+
+			$this->ps_params['cardInstallments'] = $form_data['card_installments'];
+
+			if ($this->checkTwoOpt($form_data)) {
+				$this->ps_params['cardInstallmentsTwo'] = $form_data['card_installments_two'];
+				$bin_two = $form_data['card_bin_two'];
+				$card_brand_two = $form_data['card_brand_two'];
+				$this->ps_params['paymentMethodCardTwo'] = $form_data['encrypted_card_two'];
+				$this->ps_params['cardOneInput'] = str_replace([',', '.'], '', $form_data['card_one_input']);
+				$this->ps_params['cardTwoInput'] = str_replace([',', '.'], '', $form_data['card_two_input']);
+			}
+
+		// Google Pay
+		} else {
+
+			$this->ps_params['cardInstallments'] = $form_data['google_installments'];
+			$bin = $form_data['google_card_bin'];
+			$card_brand = strtolower($form_data['google_card_brand']);
+			$google_signature = preg_replace('~^"?(.*?)"?$~', '$1', $form_data['google_signature']);
+
+			if (_PS_VERSION_ >= '1.7.0') {
+				$google_param = stripslashes($google_signature);
+			} else {
+				$google_param = $google_signature;
+			}
+
+			$this->ps_params['paymentMethodCard'] = [
+				"wallet" => [
+					"type" => "GOOGLE_PAY",
+					"key" => $google_param
+				]
+			];
+
 		}
+
+		$total_cart = number_format($this->context->cart->getOrderTotal(true, Cart::BOTH), 2, "", "");
+		$minimum_inst = (int)Configuration::get('PAGBANK_MINIMUM_INSTALLMENTS');
+		$card_value_pagbank = (int)$form_data['card_value_pagbank'];
+
+		// 1 ou primeiro cartão
+		if ((int)$this->ps_params['cardInstallments'] == 1) {
+			if($form_data['payment_type'] === 'credit_card') {
+				if ($this->checkTwoOpt($form_data)) {
+					$amount_value = $this->ps_params['cardOneInput'];
+				} else {
+					$amount_value = number_format($this->calculateDiscounts('credit_card', 1), 2, "", "");
+				}
+			} else {
+				$amount_value = number_format($this->calculateDiscounts('google_pay', 1), 2, "", "");
+			}
+			$this->ps_params['amountDesc'] = $amount_value/100;
+			$this->ps_params['amount'] = [
+				"value" => $amount_value,
+				"currency" => "BRL"
+			];
+			if ($this->checkTwoOpt($form_data)) {
+				$check_value = $amount_value;
+			} else {
+				$check_value = $total_cart;
+			}
+		} else {
+			if ($this->checkTwoOpt($form_data)) {
+				$installments = $this->callGetInstallments($this->ps_params['cardOneInput'], $bin, (int)$this->context->cart->id);
+			} else {
+				$installments = $this->callGetInstallments($total_cart, $bin, (int)$this->context->cart->id);
+			}
+			$inst_array = json_decode(json_encode($installments['response']));
+			$plans = $inst_array->payment_methods->credit_card->{$card_brand}->installment_plans;
+			foreach($plans as $p){
+				if($p->installments == (int)$this->ps_params['cardInstallments']) {
+					$selected_install = $p;
+				}
+			}
+			$amount_value = $selected_install->amount->value;
+			$this->ps_params['amountDesc'] = $amount_value/100;
+			if((int)$this->ps_params['cardInstallments'] <= (int)Configuration::get('PAGBANK_NO_INTEREST')) {
+				$this->ps_params['amount'] = [
+					"value" => $amount_value,
+					"currency" => "BRL"
+				];
+			} else {
+				$this->ps_params['amount'] = $selected_install->amount;
+			}
+			$check_value = $plans[0]->installment_value;
+		}
+
+		// Só segundo cartão
+		if ($this->checkTwoOpt($form_data)) {
+			if((int)$this->ps_params['cardInstallmentsTwo'] == 1) {
+				$this->ps_params['amountDescTwo'] = $this->ps_params['cardTwoInput']/100;
+				$this->ps_params['amountTwo'] = [
+					"value" => $this->ps_params['cardTwoInput'],
+					"currency" => "BRL"
+				];
+				$check_value_two = $this->ps_params['cardTwoInput'];
+			} else {
+				if ((int)Configuration::get('PAGBANK_TWO_CREDIT_CARD_INST') == 1) {
+					$installments_two = $this->callGetInstallments($this->ps_params['cardTwoInput'], $bin_two, (int)$this->context->cart->id);
+					$inst_array_two = json_decode(json_encode($installments_two['response']));
+					$plans_two = $inst_array_two->payment_methods->credit_card->{$card_brand_two}->installment_plans;
+					foreach($plans_two as $ptwo){
+						if($ptwo->installments == (int)$this->ps_params['cardInstallmentsTwo']) {
+							$selected_install_two = $ptwo;
+						}
+					}
+					$amount_value_two = $selected_install_two->amount->value;
+					$this->ps_params['amountDescTwo'] = $amount_value_two/100;
+					if((int)$this->ps_params['cardInstallmentsTwo'] <= (int)Configuration::get('PAGBANK_NO_INTEREST')) {
+						$this->ps_params['amountTwo'] = [
+							"value" => $amount_value_two,
+							"currency" => "BRL"
+						];
+					} else {
+						$this->ps_params['amountTwo'] = $selected_install_two->amount;
+					}
+					$check_value_two = $plans_two[0]->installment_value;
+				} else {
+					return false;
+				}
+			}
+		}
+
+		// Validação dos valores
+		if ($this->checkTwoOpt($form_data)) {
+			$card_input_values = $this->ps_params['cardOneInput'] + $this->ps_params['cardTwoInput'];
+			$card_api_values = $check_value + $check_value_two;
+			if ($check_value != $this->ps_params['cardOneInput'] || $check_value_two != $this->ps_params['cardTwoInput'] ||
+				$card_input_values != $total_cart || $card_api_values != $card_value_pagbank ||
+				$this->ps_params['cardTwoInput'] < $minimum_inst) {
+				return false;
+			}
+		} else {
+			if ($check_value != $card_value_pagbank) {
+				return false;
+			}
+		}
+
+	}
+
+	/*
+	* Valida dados do cartão
+	*/
+	public function checkFormInfo($form_data)
+	{
+		if ($form_data['payment_type'] === 'credit_card') {
+			if ((int)Configuration::get('PAGBANK_TWO_CREDIT_CARD') == 1 && 
+				(isset($form_data['pay_two_card_check']) && 
+				(int)$form_data['pay_two_card_check'] > 0)) {
+				if ((isset($form_data['card_name']) && $form_data['card_name'])
+					&& (isset($form_data['card_name_two']) && $form_data['card_name_two'])
+					&& (isset($form_data['cpf_cnpj']) && $form_data['cpf_cnpj'])
+					&& (isset($form_data['cpf_cnpj_two']) && $form_data['cpf_cnpj_two'])
+					&& (isset($form_data['encrypted_card']) && $form_data['encrypted_card']) 
+						|| (isset($form_data['card_token_id']) && $form_data['card_token_id'])
+					&& (isset($form_data['encrypted_card_two']) && $form_data['encrypted_card_two'])) {
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				if ((isset($form_data['card_name']) && $form_data['card_name'])
+					&& (isset($form_data['cpf_cnpj']) && $form_data['cpf_cnpj'])
+					&& (isset($form_data['encrypted_card']) && $form_data['encrypted_card']) 
+						|| (isset($form_data['card_token_id']) && $form_data['card_token_id'])) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		} else {
+				if ((isset($form_data['google_name']) && $form_data['google_name'])
+					&& (isset($form_data['cpf_cnpj']) && $form_data['cpf_cnpj'])
+					&& (isset($form_data['google_signature']) && $form_data['google_signature'])) {
+					return true;
+				} else {
+					return false;
+				}
+		}
+	}
+
+	/*
+	* Valida se o pagamento com 2 cartões está disponível
+	*/
+	public function checkTwoOpt($form_data)
+	{
+		if ($form_data['payment_type'] === 'credit_card') {
+			if ((int)Configuration::get('PAGBANK_TWO_CREDIT_CARD') == 1 && 
+				(isset($form_data['pay_two_card_check']) && 
+				(int)$form_data['pay_two_card_check'] > 0)) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	/*
+	* Salva o cartão Tokenizado
+	*/
+	public function saveCardTokenized($api_response, $saved_card)
+	{
+		if (isset($api_response['response']->charges) && isset($api_response['response']->charges[0]->payment_method->card->id)
+			&& isset($saved_card) && (int)$saved_card > 0) {
+			$charge = $api_response['response']->charges[0];
+			if (in_array($charge->status, array('AVAILABLE', 'AUTHORIZED', 'PAID', 'IN_ANALYSIS'))) {
+				$info = array(
+					'id_customer' => (int)$this->context->cart->id_customer,
+					'card_name' => $charge->payment_method->card->holder->name,
+					'card_brand' => $charge->payment_method->card->brand,
+					'card_first_digits' => $charge->payment_method->card->first_digits,
+					'card_last_digits' => $charge->payment_method->card->last_digits,
+					'card_month' => $charge->payment_method->card->exp_month,
+					'card_year' => $charge->payment_method->card->exp_year,
+					'card_token' => $charge->payment_method->card->id
+				);
+				$this->insertCustomerToken($info);
+			}
+		}
+	}
+
+	/*
+	* Processa duas charges no pagamento
+	*/
+	public function processTwoCharges($transaction_code, $form_data)
+	{
+		$this->ps_errors = array();
+		$this->ps_params = array();
+		$this->processReference();
+		$this->processFormData($form_data);
+
+		if ($this->processCardData($form_data) === false) {
+			return false;
+		}
+
+		$json_charges_one = '{
+			"charges": [
+				{
+					"reference_id": "' . $this->ps_params['reference'] . '_1",
+					"description": "Pedido realizado na loja ' . Configuration::get('PS_SHOP_NAME') . ', em ' . date("d/m/Y") . ', no valor total de R$ ' . number_format($this->ps_params['amountDesc'], 2, ".", ",") . '",
+					"amount": ' . json_encode($this->ps_params['amount']) . ',
+					"notification_urls": "' . $this->urls['notification'] . '",
+					"payment_method": {
+						"type": "CREDIT_CARD",
+						"installments": ' . (int)$this->ps_params['cardInstallments'] . ',
+						"capture": false,
+						"card": ' . json_encode($this->ps_params['paymentMethodCard']) . ',
+						"holder": {
+							"name": "' . $this->ps_params['holderName'] . '",
+							"tax_id": "' . $this->ps_params['senderCPFCNPJ'] . '"
+						}
+					}
+				}
+			]
+		}';
+
+		$json_charges_two = '{
+			"charges": [
+				{
+					"reference_id": "' . $this->ps_params['reference'] . '_2",
+					"description": "Pedido realizado na loja ' . Configuration::get('PS_SHOP_NAME') . ', em ' . date("d/m/Y") . ', no valor total de R$ ' . number_format($this->ps_params['amountDescTwo'], 2, ".", ",") . '",
+					"amount": ' . json_encode($this->ps_params['amountTwo']) . ',
+					"notification_urls": "' . $this->urls['notification'] . '",
+					"payment_method": {
+						"type": "CREDIT_CARD",
+						"installments": ' . (int)$this->ps_params['cardInstallmentsTwo'] . ',
+						"capture": false,
+						"card": {
+							"encrypted": "' . $this->ps_params['paymentMethodCardTwo'] . '",
+							"store": false
+						},
+						"holder": {
+							"name": "' . $this->ps_params['holderNameTwo'] . '",
+							"tax_id": "' . $this->ps_params['senderCPFCNPJTwo'] . '"
+						}
+					}
+				}
+			]
+		}';
+
+		$api_response_one = $this->curl_send('POST', $this->urls['api'] . 'orders/' . $transaction_code . '/pay', preg_replace("!\?\\n?\\t!", "", $json_charges_one), 30, $this->context->cart->id);
+		$api_response_two = $this->curl_send('POST', $this->urls['api'] . 'orders/' . $transaction_code . '/pay', preg_replace("!\?\\n?\\t!", "", $json_charges_two), 30, $this->context->cart->id);
+		if (!$api_response_one['errors'] && !$api_response_two['errors']) {
+			$this->saveCardTokenized($api_response_one, (int)$form_data['save_customer_card']);
+			return ["response_one" => $api_response_one, "response_two" => $api_response_two];
+		} else {
+			$this->ps_errors[] = 'Erro no processamento das Charges.';
+			return false;
+		}
+	}
+
+	/*
+	* Valida o retorno do pagamento
+	*/
+	public function validateTwoCharges($transaction_charges)
+	{
+		$declined = 0;
+		$in_analysis = false;
+		$authorized = false;
+		$paid = 0;
+		$last_digits = '';
+		$message = '';
+		$code = '';
+		foreach ($transaction_charges as $charge) {
+			if ($charge->status === 'DECLINED') {
+				$declined++;
+				$last_digits = $charge->payment_method->card->last_digits;
+				$message = $charge->payment_response->message;
+				$code = $charge->payment_response->code;
+			} elseif ($charge->status === 'IN_ANALYSIS') {
+				$in_analysis = true;
+			} elseif ($charge->status === 'AUTHORIZED') {
+				$authorized = true;
+			} elseif ($charge->status === 'PAID') {
+				$paid++;
+			}
+		}
+		if ($paid == 2) {
+			$current_status = 'PAID';
+		} else {
+			if ($in_analysis) {
+				$current_status = 'IN_ANALYSIS';
+			}
+			if ($declined > 0) {
+				foreach ($transaction_charges as $charge_d) {
+					if ($charge_d->status != 'DECLINED') {
+						$transaction_id_charge = $charge_d->id;
+						$value = $charge_d->amount->value;
+						$this->refundTransaction($transaction_id_charge, $value, false);
+					}
+				}
+				$current_status = 'DECLINED';
+			}
+			if ($authorized && !$in_analysis && $declined == 0) {
+				if((int)Configuration::get('PAGBANK_CAPTURE_METHOD') == 1){
+					foreach ($transaction_charges as $charge_a) {
+						if ($charge_a->status === 'AUTHORIZED') {
+							$transaction_id_charge = $charge_a->id;
+							$value = $charge_a->amount->value;
+							$this->captureTransaction($transaction_id_charge, $value, false);
+						}
+					}
+					$current_status = 'PAID';
+				} else {
+					$current_status = 'AUTHORIZED';
+				}
+			}
+		}
+		return ["current_status" => $current_status, 
+				"last_digits"  => $last_digits, 
+				"declined" => $declined, 
+				"message" => $message, 
+				"code" => $code];
 	}
 
 	/* 
@@ -2246,37 +2680,6 @@ class PagBank extends PaymentModule
 			'area_code' => $cod_area,
 			'telephone_number' => $tel
 		);
-	}
-
-	/* 
-	 * Parse HTTP Status
-	 */
-	public function parseHttpStatus($http)
-	{
-		switch ((int)$http) {
-			case 200:
-				$return = 'OK';
-				break;
-			case 400:
-				$return = 'BAD_REQUEST';
-				break;
-			case 401:
-				$return = 'UNAUTHORIZED';
-				break;
-			case 403:
-				$return = 'FORBIDDEN';
-				break;
-			case 404:
-				$return = 'NOT_FOUND';
-				break;
-			case 500:
-				$return = 'INTERNAL_SERVER_ERROR';
-				break;
-			case 502:
-				$return = 'BAD_GATEWAY';
-				break;
-		}
-		return $return;
 	}
 
 	/* 
@@ -2358,7 +2761,7 @@ class PagBank extends PaymentModule
 	/*
 	 * Envia chamada para a API
 	*/
-	public function curl_send($method, $post_url, $json_data = false, $timeout = 10, $id_cart = false)
+	public function curl_send($method, $post_url, $json_data = false, $timeout = 10, $id_cart = false, $recaptcha = false)
 	{
 		if ($json_data !== false && !$this->isJson($json_data)) {
 			$this->saveLog('error', $method, $id_cart, $json_data, 'Invalid JSON String.', $post_url);
@@ -2390,11 +2793,18 @@ class PagBank extends PaymentModule
 		} else {
 			curl_setopt($curl, CURLOPT_HTTPGET, true);
 		}
-		$header = array(
-			'Authorization: Bearer ' . $token_api,
-			'Accept: application/json', 
-			'Content-Type: application/json'
-		);
+		if ((bool)$recaptcha === true) {
+			$header = array(
+				'Accept: application/json',
+				'Content-Type: application/json'
+			);
+		} else {
+			$header = array(
+				'Authorization: Bearer ' . $token_api,
+				'Accept: application/json', 
+				'Content-Type: application/json'
+			);
+		}
 		curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
 		curl_setopt($curl, CURLOPT_HEADER, false);
 		curl_setopt($curl, CURLOPT_URL, $post_url);
@@ -2453,7 +2863,7 @@ class PagBank extends PaymentModule
 	*/
 	public function getPublicKey()
 	{
-		if (!$this->token || $this->token == '') {
+		if (!$this->token || $this->token === '') {
 			return false;
 		} else {
 			$api_response = $this->curl_send('POST', $this->urls['api'] . 'public-keys', '{"type": "card"}', 30);
@@ -2498,8 +2908,26 @@ class PagBank extends PaymentModule
 		$clear_data = $this->removeSensitiveData($data);
 		$clear_response = $this->removeSensitiveData($response);
 
-		$query = 'INSERT INTO `' . _DB_PREFIX_ . 'pagbank_logs` (`datetime`, `type`, `method`, `id_shop`, `id_cart`, `data`, `response`, `url`, `cron`) VALUES ';
-		$query .= ' (NOW(), "' . pSQL($type) . '", "' . pSQL($method) . '", ' . (int)$this->shop_id . ', ' . $id_cart . ', "' . addslashes($clear_data) . '", "' . addslashes($clear_response) . '" , "' . pSQL(addslashes($url)) . '", ' . $cron . ')';
+		$query = 'INSERT INTO `' . _DB_PREFIX_ . 'pagbank_logs` 
+		(`datetime`, 
+		`type`, 
+		`method`, 
+		`id_shop`, 
+		`id_cart`, 
+		`data`, 
+		`response`, 
+		`url`, 
+		`cron`)';
+		$query .= ' VALUES 
+		(NOW(), 
+		"' . pSQL($type) . '", 
+		"' . pSQL($method) . '", 
+		' . (int)$this->shop_id . ', 
+		' . $id_cart . ', 
+		"' . addslashes($clear_data) . '", 
+		"' . addslashes($clear_response) . '" , 
+		"' . pSQL(addslashes($url)) . '", 
+		' . $cron . ')';
 		if (Db::getInstance()->execute($query) === false) {
 			return false;
 		}
@@ -2516,40 +2944,59 @@ class PagBank extends PaymentModule
 			$clear_string = $string;
 		} else {
 			if (property_exists($obj, 'customer')) {
-				$obj->customer = '##########';
+				$obj->customer = '#####';
 			}
 			if (property_exists($obj, 'items')) {
-				$obj->items = '##########';
+				$obj->items = '#####';
 			}
 			if (property_exists($obj, 'shipping')) {
-				$obj->shipping = '##########';
+				$obj->shipping = '#####';
 			}
 			if (property_exists($obj, 'access_token')) {
-				$obj->access_token = '##########';
+				$obj->access_token = '#####';
 			}
 			if (property_exists($obj, 'refresh_token')) {
-				$obj->refresh_token = '##########';
+				$obj->refresh_token = '#####';
 			}
 			if (property_exists($obj, 'code')) {
-				$obj->code = '##########';
+				$obj->code = '#####';
 			}
 			if (property_exists($obj, 'code_verifier')) {
-				$obj->code_verifier = '##########';
+				$obj->code_verifier = '#####';
 			}
 			if (property_exists($obj, 'account_id')) {
-				$obj->account_id = '##########';
+				$obj->account_id = '#####';
 			}
 			if (property_exists($obj, 'payment_method')) {
-				$obj->payment_method[0]->card = '##########';
+				if ($obj->payment_method->type === 'CREDIT_CARD') {
+					$obj->payment_method->card = '#####';
+					$obj->payment_method->holder = '#####';
+				}
 			}
 			if (property_exists($obj, 'charges')) {
-				if ($obj->charges[0]->payment_method->type == 'CREDIT_CARD') {
-					$obj->charges[0]->payment_method->card = '##########';
-					$obj->charges[0]->payment_method->holder = '##########';
+				if ($obj->charges[0]->payment_method->type === 'CREDIT_CARD') {
+					$obj->charges[0]->payment_method->card = '#####';
+					$obj->charges[0]->payment_method->holder = '#####';
 				}
-				if ($obj->charges[0]->payment_method->type == 'BOLETO') {
-					$obj->charges[0]->payment_method->boleto->holder = '##########';
+				if (isset($obj->charges[1]) && $obj->charges[1]->payment_method->type === 'CREDIT_CARD') {
+					$obj->charges[1]->payment_method->card = '#####';
+					$obj->charges[1]->payment_method->holder = '#####';	
 				}
+				if ($obj->charges[0]->payment_method->type === 'BOLETO') {
+					$obj->charges[0]->payment_method->boleto->holder = '#####';
+				}
+			}
+			if (property_exists($obj, 'name')) {
+				$obj->name = '#####';
+			}
+			if (property_exists($obj, 'event')) {
+				$obj->event = '#####';
+			}
+			if (property_exists($obj, 'tokenProperties')) {
+				$obj->tokenProperties = '#####';
+			}
+			if (property_exists($obj, 'accountDefenderAssessment')) {
+				$obj->accountDefenderAssessment = '#####';
 			}
 			$clear_string = json_encode($obj);
 		}
@@ -2569,6 +3016,20 @@ class PagBank extends PaymentModule
 			$result .= $numbers[mt_rand(0, $max)];
 		}
 		return $result;
+	}
+
+	/*
+	 * Gera uma hash para notificação
+	 */
+	public function getTokenHash() 
+	{
+		if (_PS_VERSION_ >= '1.7.0') {
+			$token_hash = Tools::hashIV(_COOKIE_IV_);
+		}else{
+			$token_hash = Tools::encryptIV(_COOKIE_IV_);
+		}
+
+		return $token_hash;
 	}
 
 	/*
@@ -2653,11 +3114,11 @@ class PagBank extends PaymentModule
 	public function getAppAuthorization($code, $app)
 	{
 		$app = (string)$app;
-		if ($app == 'TAX') {
+		if ($app === 'TAX') {
 			$code_verifier = Configuration::get('PAGBANK_CODE_VERIFIER_TAX');
-		} elseif ($app == 'D14') {
+		} elseif ($app === 'D14') {
 			$code_verifier = Configuration::get('PAGBANK_CODE_VERIFIER_D14');
-		} elseif ($app == 'D30') {
+		} elseif ($app === 'D30') {
 			$code_verifier = Configuration::get('PAGBANK_CODE_VERIFIER_D30');
 		}
 		$api_info = $this->getApiInfo((int)$this->environment, $app);
@@ -2812,7 +3273,7 @@ class PagBank extends PaymentModule
 			}
 
 			if (!empty($token_expires) && !empty($token_refresh) && (strtotime($today) >= strtotime($token_expires)) ||
-				empty($this->account_id) || $this->account_id == 'NULL') {
+				empty($this->account_id) || $this->account_id === 'NULL') {
 				$this->refreshToken($token_refresh, $this->credential_type);
 			}
 		}
@@ -2888,8 +3349,28 @@ class PagBank extends PaymentModule
 	*/
 	public function insertCustomerToken($info)
 	{
-		$ins_query = 'INSERT INTO `' . _DB_PREFIX_ . 'pagbank_customer_token` (`id_shop`, `id_customer`, `card_name`, `card_brand`, `card_first_digits`, `card_last_digits`, `card_month`, `card_year`, `card_token`, `date_add`) ';
-		$ins_query .= ' VALUES (' . (int)$this->shop_id . ', ' . (int)$info['id_customer'] . ', "' . pSQL($info['card_name']) . '", "' . pSQL($info['card_brand']) . '", ' . (int)$info['card_first_digits'] . ', ' . (int)$info['card_last_digits'] . ', "' . pSQL($info['card_month']) . '", ' . (int)$info['card_year'] . ', "' . pSQL($info['card_token']) . '", "' . date("Y-m-d H:i:s") . '")';
+		$ins_query = 'INSERT INTO `' . _DB_PREFIX_ . 'pagbank_customer_token` 
+		(`id_shop`, 
+		`id_customer`, 
+		`card_name`, 
+		`card_brand`, 
+		`card_first_digits`, 
+		`card_last_digits`, 
+		`card_month`, 
+		`card_year`, 
+		`card_token`, 
+		`date_add`) ';
+		$ins_query .= ' VALUES 
+		(' . (int)$this->shop_id . ', 
+		' . (int)$info['id_customer'] . ', 
+		"' . pSQL($info['card_name']) . '", 
+		"' . pSQL($info['card_brand']) . '", 
+		' . (int)$info['card_first_digits'] . ', 
+		' . (int)$info['card_last_digits'] . ', 
+		"' . pSQL($info['card_month']) . '", 
+		' . (int)$info['card_year'] . ', 
+		"' . pSQL($info['card_token']) . '", 
+		"' . date("Y-m-d H:i:s") . '")';
 		if (!Db::getInstance()->execute($ins_query)) {
 			$this->saveLog('error', 'insertCustomerToken', $info['id_customer'], $ins_query, 'Cartão Criptografado não salvo no banco.');
 			return false;
@@ -2902,7 +3383,9 @@ class PagBank extends PaymentModule
 	*/
 	public function getCustomerToken($id_customer, $id_customer_token = false)
 	{
-		$get_query = 'SELECT * FROM `' . _DB_PREFIX_ . 'pagbank_customer_token` WHERE (`id_shop` = ' . (int)$this->shop_id . ' OR `id_shop` IS NULL) AND `id_customer` = ' . (int)$id_customer;
+		$get_query = 'SELECT * FROM `' . _DB_PREFIX_ . 'pagbank_customer_token` WHERE 
+		(`id_shop` = ' . (int)$this->shop_id . ' OR `id_shop` IS NULL) AND 
+		`id_customer` = ' . (int)$id_customer;
 		if ($id_customer_token && (int)$id_customer_token > 0) {
 			$get_query .= ' AND `id_customer_token` = ' . (int)$id_customer_token;
 		}
@@ -2918,7 +3401,10 @@ class PagBank extends PaymentModule
 	*/
 	public function getCardToken($id_customer_token)
 	{
-		$get_query = 'SELECT `card_token` FROM `' . _DB_PREFIX_ . 'pagbank_customer_token` WHERE (`id_shop` = ' . (int)$this->shop_id . ' OR `id_shop` IS NULL) AND `id_customer` = ' . (int)$this->context->cart->id_customer . ' AND `id_customer_token` = ' . (int)$id_customer_token;
+		$get_query = 'SELECT `card_token` FROM `' . _DB_PREFIX_ . 'pagbank_customer_token` WHERE 
+		(`id_shop` = ' . (int)$this->shop_id . ' OR `id_shop` IS NULL) AND 
+		`id_customer` = ' . (int)$this->context->cart->id_customer . ' AND 
+		`id_customer_token` = ' . (int)$id_customer_token;
 		$return = Db::getInstance()->getValue($get_query);
 		if (!$return) {
 			$this->saveLog('error', 'getCardToken', $id_customer_token, $get_query, 'Erro ao consultar os dados de cartão salvos para o cliente.');
@@ -2932,7 +3418,10 @@ class PagBank extends PaymentModule
 	*/
 	public function deleteCustomerToken($id_customer_token)
 	{
-		$delete_query = 'DELETE FROM `' . _DB_PREFIX_ . 'pagbank_customer_token` WHERE (`id_shop` = ' . (int)$this->shop_id . ' OR `id_shop` IS NULL) AND `id_customer` = ' . (int)$this->context->cart->id_customer . ' AND `id_customer_token` = ' . (int)$id_customer_token;
+		$delete_query = 'DELETE FROM `' . _DB_PREFIX_ . 'pagbank_customer_token` WHERE 
+		(`id_shop` = ' . (int)$this->shop_id . ' OR `id_shop` IS NULL) AND 
+		`id_customer` = ' . (int)$this->context->cart->id_customer . ' AND 
+		`id_customer_token` = ' . (int)$id_customer_token;
 		if (!Db::getInstance()->execute($delete_query)) {
 			$this->saveLog('error', 'delete', $id_customer_token, $delete_query, 'Erro ao apagar cartão criptografado do banco.');
 			return false;
@@ -2974,7 +3463,7 @@ class PagBank extends PaymentModule
 			'Ţ', 'ţ', 'Ť', 'ť', 'Ŧ', 'ŧ', 'Ũ', 'ũ', 'Ū', 'ū', 'Ŭ', 'ŭ', 'Ů', 'ů', 'Ű', 'ű', 'Ų', 'ų', 'Ŵ', 'ŵ', 'Ŷ', 'ŷ',
 			'Ÿ', 'Ź', 'ź', 'Ż', 'ż', 'Ž', 'ž', 'ſ', 'ƒ', 'Ơ', 'ơ', 'Ư', 'ư', 'Ǎ', 'ǎ', 'Ǐ', 'ǐ', 'Ǒ', 'ǒ', 'Ǔ', 'ǔ', 'Ǖ',
 			'ǖ', 'Ǘ', 'ǘ', 'Ǚ', 'ǚ', 'Ǜ', 'ǜ', 'Ǻ', 'ǻ', 'Ǽ', 'ǽ', 'Ǿ', 'ǿ', 'Ά', 'ά', 'Έ', 'έ', 'Ό', 'ό', 'Ώ', 'ώ', 'Ί',
-			'ί', 'ϊ', 'ΐ', 'Ύ', 'ύ', 'ϋ', 'ΰ', 'Ή', 'ή', '(', ')', 'º', 'ª', '"', '°'
+			'ί', 'ϊ', 'ΐ', 'Ύ', 'ύ', 'ϋ', 'ΰ', 'Ή', 'ή', '(', ')', 'º', 'ª', '"', '°', '–'
 		);
 
 		$b = array(
@@ -2988,7 +3477,7 @@ class PagBank extends PaymentModule
 			'T', 't', 'T', 't', 'T', 't', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'W', 'w', 'Y', 'y',
 			'Y', 'Z', 'z', 'Z', 'z', 'Z', 'z', 's', 'f', 'O', 'o', 'U', 'u', 'A', 'a', 'I', 'i', 'O', 'o', 'U', 'u', 'U',
 			'u', 'U', 'u', 'U', 'u', 'U', 'u', 'A', 'a', 'AE', 'ae', 'O', 'o', 'Α', 'α', 'Ε', 'ε', 'Ο', 'ο', 'Ω', 'ω', 'Ι',
-			'ι', 'ι', 'ι', 'Υ', 'υ', 'υ', 'υ', 'Η', 'η', '- ', '', 'o', 'a', '', ''
+			'ι', 'ι', 'ι', 'Υ', 'υ', 'υ', 'υ', 'Η', 'η', '- ', '', 'o', 'a', '', '', '-'
 		);
 
 		return str_replace($a, $b, $str);

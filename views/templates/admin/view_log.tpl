@@ -17,14 +17,10 @@
  *}
 
 <div class="panel">
-	<div class="row pagbanklogs-header">
-		<div class="col-xs-3 col-md-3 text-left">
-			<a href="https://pagbank.com.br/" title="PagBank" target="_blank">
-				<img src="../modules/pagbank/img/logo_pagbank.png" class="img-responsive" />
-			</a>
-		</div>
-		<div class="col-xs-6 col-md-6 text-left">
-			<h2 style="padding-left:30px;">{l s='Ver Log' mod='pagbank'}</h2>
+	<div class="row">
+		<div class="col-xs-12 col-sm-12 col-lg-12 text-left pagbanklogs-header">
+			<h2>{l s='Ver Log' mod='pagbank'}</h2>
+			<img src="../modules/pagbank/img/pagbank-logo-animado_35px.gif" class="img-responsive" />
 		</div>
 	</div>
 </div>

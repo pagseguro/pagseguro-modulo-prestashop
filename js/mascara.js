@@ -17,13 +17,9 @@
  */
 
 function mascara(o, f) {
-  v_obj = o;
-  v_fun = f;
-  setTimeout("execmascara()", 1);
-}
-
-function execmascara() {
-  v_obj.value = v_fun(v_obj.value);
+  setTimeout(function () {
+    o.value = f(o.value);
+  }, 1);
 }
 
 function telefone(v) {
@@ -71,5 +67,15 @@ function creditcard(v) {
 function valormask(v) {
   v = v.replace(/\D/g, "");
   v = v.replace(/(\d{1})(\d{1,2})$/, "$1.$2");
+  return v;
+}
+
+function valorcardmask(v) {
+  v = v.replace(/\D/g, '');
+  if (v === '') return '';
+  let centavos = parseInt(v, 10);
+  v = centavos.toString().padStart(3, '0');
+  v = v.replace(/(\d{2})$/, ',$1');
+  v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
   return v;
 }

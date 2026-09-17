@@ -32,32 +32,33 @@
 					<h4 class="modal-title">{l s='Detalhes da transação' mod='pagbank'}</h4>
 				</div>
 				<div class="modal-body">
-					<p class="msg-err alert alert-danger">{$pagbank_msg nofilter}</p>
+					<p class="msg-err alert alert-danger"><b>{$pagbank_msg nofilter}</b></p>
 				</div>
 			</div>
 		</div>
 	</div>
 {/if}
-<input type="hidden" name="order_value" id="order_value" value="{$total}" />
+<input type="hidden" name="order_value_pagbank" id="order_value_pagbank" value="{$total_pagbank}" />
 <div id="fancy_load" class="clearfix">
-	<div id="pagbankproccess" style="display:none;" class="container clearfix">
-		<div class="col-xs-12 col-sm-12" id="pagbank_load" align="center">
+	<div id="pagbank_process" style="display:none;" class="container clearfix">
+		<div class="col-xs-12 col-sm-12 col-lg-12" id="pagbank_load" align="center">
 			<img src="{$img_path}loading.gif" class="img-responsive" />
 		</div>
-		<div class="col-xs-12 col-sm-12 text-center" id="pagbankmsg"></div>
+		<div class="col-xs-12 col-sm-12 col-lg-12 text-center" id="pagbank_msg"></div>
 	</div>
 </div>
 {literal}
 	<script type="text/javascript">
 		var pgb_public_key = '{/literal}{$public_key}{literal}';
-		var pgb_max_installments = '{/literal}{$max_installments}{literal}';
-		var pgb_installments_min_value = '{/literal}{$installments_min_value}{literal}';
-		var pgb_installments_min_type = '{/literal}{$installments_min_type}{literal}';
+		var pgb_max_installments = {/literal}{$max_installments|intval}{literal};
+		var pgb_installments_min_value = {/literal}{$installments_min_value|floatval}{literal};
+		var pgb_installments_min_type = {/literal}{$installments_min_type|intval}{literal};
+		var pgb_two_card_inst = {/literal}{$two_card_inst|intval}{literal};
 		var pgb_function_url = '{/literal}{$url_update}{literal}';
 		var pgb_img_path = '{/literal}{$img_path}{literal}';
 		var pgb_shop_name = '{/literal}{$shop_name}{literal}';
-		var pgb_discount_type = {/literal}{$active_discounts.discount_type}{literal};
-		var pgb_discount_value = {/literal}{if $active_discounts.discount_value}{$active_discounts.discount_value}{else}0{/if}{literal};
+		var pgb_discount_type = {/literal}{$active_discounts.discount_type|intval}{literal};
+		var pgb_discount_value = {/literal}{if $active_discounts.discount_value}{$active_discounts.discount_value|floatval}{else}0{/if}{literal};
 		var pgb_discount_card = {/literal}{$active_discounts.credit_card|intval}{literal};
 		var pgb_credit_card_value = {/literal}{$active_discounts.credit_card_value|floatval}{literal};
 		var pgb_discount_bankslip = {/literal}{$active_discounts.bankslip|intval}{literal};
@@ -66,9 +67,11 @@
 		var pgb_discount_google = {/literal}{$active_discounts.google_pay|intval}{literal};
 		var pgb_google_pay_value = {/literal}{$active_discounts.google_pay_value|floatval}{literal};
 		var pgb_account_id = '{/literal}{$account_id}{literal}';
-		var pgb_payment_google_pay = '{/literal}{$active_payments.google_pay}{literal}';
+		var pgb_payment_google_pay = {/literal}{$active_payments.google_pay|intval}{literal};
 		var pgb_google_merchant_id = '{/literal}{$google_merchant_id}{literal}';
-		var pgb_google_environment = '{/literal}{$google_environment}{literal}';
+		var pgb_google_environment = {/literal}{$google_environment|intval}{literal};
+		var pgb_recaptcha = {/literal}{$recaptcha|intval}{literal};
+		var pgb_recaptcha_site_key = '{/literal}{$recaptcha_site_key}{literal}';
 		var pgb_msg_console = {/literal}{$msg_console|intval}{literal};
 		var pgb_ps_version = '{/literal}{$ps_version}{literal}';
 		var pgb_pagbank_version = '{/literal}{$pagbank_version}{literal}';

@@ -24,6 +24,7 @@
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   border-radius: 6px;
+  word-break: break-all;
 }
 
 #pagbank_config .info-cron h2 {
@@ -336,4 +337,13 @@
   padding-right: 3px;
   vertical-align: middle;
   font-weight: 900;
+}
+
+.pagbanklogs-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.pagbanklogs-header h2 {
+    margin: 0;
 }

@@ -27,33 +27,43 @@ class PagBankNotifyModuleFrontController extends ModuleFrontController
 
 	public function initContent()
     {
-        $payload = Tools::file_get_contents('php://input');
+        $token = Tools::getValue('token');
+        $token_notify = $this->module->getTokenHash();
+        $token_valid = false;
+        if (is_string($token) && $token !== '' && is_string($token_notify) && $token_notify !== '' && hash_equals($token_notify, $token)) {
+            $token_valid = true;
+        }
 
-        if (!isset($payload) || empty($payload) || $payload == 'NULL') {
-            die('JSON não localizado.');
-        } else {
-            $pagbank = new PagBank();
-            $transaction = json_decode($payload);
-            $transaction_code = $pagbank->getOrderData($transaction->id, 'transaction_code');
+        if ($token_valid) {
+            $payload = Tools::file_get_contents('php://input');
 
-            if (!isset($transaction_code) || empty($transaction_code)) {
-                die('Transação não localizada.');
+            if (!isset($payload) || empty($payload) || $payload === 'NULL') {
+                die('JSON não localizado.');
+            } else {
+                $transaction = json_decode($payload);
+                $transaction_code = $this->module->getOrderData($transaction->id, 'transaction_code');
+
+                if (!isset($transaction_code) || empty($transaction_code)) {
+                    die('Transação não localizada.');
+                }
+
+                $id_cart = $transaction_code['id_cart'];
+                $id_order = $transaction_code['id_order'];
             }
 
-            $id_cart = $transaction_code['id_cart'];
-            $id_order = $transaction_code['id_order'];
-        }
+            if ((int)Configuration::get('PAGBANK_FULL_LOG') == 1) {
+                $this->module->saveLog('success', 'callback', $id_cart, '', (string)$payload, 'Notificação Recebida');
+            }
 
-        if ((bool)Configuration::get('PAGBANK_FULL_LOG') !== false) {
-            $pagbank->saveLog('success', 'callback', $id_cart, '', (string)$payload, 'Notificação Recebida');
-        }
+            $current_status = $this->module->checkStatusApi($transaction_code['transaction_code'], $id_cart);
 
-        $current_status = isset($transaction->charges) ? (string)$transaction->charges[0]->status : false;
-
-        if (!$pagbank->updateOrderStatus($current_status, $id_order, date("Y-m-d H:i:s"), true)) {
-            die('Status do pedido não atualizado.');
+            if (!$this->module->updateOrderStatus($current_status, $id_order, date("Y-m-d H:i:s"))) {
+                die('Status do pedido não atualizado.');
+            } else {
+                die('Status do pedido atualizado com sucesso!');
+            }
         } else {
-            die('Status do pedido atualizado com sucesso!');
+            die('Token Inválido.');
         }
 	}
 }

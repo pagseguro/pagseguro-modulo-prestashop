@@ -19,8 +19,8 @@
 <div id="pagbank-confirmation" class="container">
 	<div class="content clearfix">
 		<div class="row clearfix">
-			<div class="col-xs-12 col-sm-8 col-lg-6 data_waiting mt-2 mb-2" id="pay_links">
-				{if ($payment_type == 'BOLETO')}
+			<div class="col-xs-12 col-sm-12 col-lg-8 data_waiting mt-2 mb-2" id="pay_links">
+				{if ($payment_type === 'BOLETO')}
 					<div class="card">
 						<div class="card-header bg-success text-white heading-boleto">
 							<h5 class="card-title mb-0">
@@ -41,12 +41,12 @@
 									{l s='Clique para imprimir o boleto' d='Modules.PagBank.Shop'}
 								</a>
 							</p>
-							<p class="alert alert-warning text-xs-center text-sm-center">
+							<p class="alert alert-warning text-xs-center text-sm-center text-lg-center">
 								{l s='Seu pedido só será processado após a confirmação do pagamento.' d='Modules.PagBank.Shop'}
 							</p>
 						</div>
 					</div>
-				{elseif ($payment_type == 'PIX')}
+				{elseif ($payment_type === 'PIX')}
 					<div class="card" id="pix_window">
 						<div class="card-header bg-success text-white heading-pix mb-2">
 							<h5 class="card-title mb-0">
@@ -59,7 +59,7 @@
 							</h5>
 						</div>
 						<div class="card-body">
-							<p class="text-xs-center text-sm-center">
+							<p class="text-xs-center text-sm-center text-lg-center">
 								<img src="{$pix.link}" alt="{$pix.text}" class="img-responsive mb-2" style="margin:auto; max-width:220px;" />
 								<br />
 								<textarea id="pix_text" class="form-control" rows="6" onClick="this.select();">{$pix.text}</textarea>
@@ -68,7 +68,7 @@
 									{l s='Copiar código Pix' d='Modules.PagBank.Shop'}
 								</button>
 							</p>
-							<p class="alert alert-warning text-xs-center text-sm-center">
+							<p class="alert alert-warning text-xs-center text-sm-center text-lg-center">
 								{if $alternate_time}
 									{l s='Devido ao horário, o limite para pagamentos via pix pode ser reduzido, verifique junto ao seu banco.' d='Modules.PagBank.Shop'}
 									<br />
@@ -96,7 +96,7 @@
 							</p>
 						</div>
 					</div>
-				{elseif ($payment_type == 'WALLET')}
+				{elseif ($payment_type === 'WALLET')}
 					<div class="card" id="wallet_window">
 						<div class="card-header bg-success text-white heading-wallet mb-2">
 							<h5 class="card-title mb-0">
@@ -105,7 +105,7 @@
 									{l s=','}
 								{/if}
 								{l s='recebemos o seu pedido.' d='Modules.PagBank.Shop'} <br />
-								{if $device == 'd' || $device == 't'}
+								{if $device === 'd' || $device === 't'}
 									{l s='Para finalizar sua compra, escaneie o QR Code abaixo através do app PagBank e escolha se deseja pagar com o saldo ou cartão cadastrado.' d='Modules.PagBank.Shop'}
 								{else}
 									{l s='Para finalizar sua compra, clique no botão abaixo para realizar o pagamento através do app PagBank, utilizando o seu saldo ou cartão cadastrado.' d='Modules.PagBank.Shop'}
@@ -113,8 +113,8 @@
 							</h5>
 						</div>
 						<div class="card-body">
-							<p class="text-xs-center text-sm-center">
-								{if $device == 'd'}
+							<p class="text-xs-center text-sm-center text-lg-center">
+								{if $device === 'd'}
 									<img src="{$wallet.link}" alt="{$wallet.text}" class="img-responsive mb-2" style="margin:auto; max-width:220px;" />
 									<br />
 									<textarea id="wallet_text" class="form-control" rows="4" onClick="this.select();">{$wallet.text}</textarea>
@@ -127,15 +127,15 @@
 									</a>
 								{/if}
 							</p>
-							<p class="alert alert-warning text-xs-center text-sm-center">
+							<p class="alert alert-warning text-xs-center text-sm-center text-lg-center">
 								{l s='Efetue o pagamento imediatamente.' d='Modules.PagBank.Shop'}<br />
 								{l s='O pedido tem um prazo de' d='Modules.PagBank.Shop'}
 								<span>
 									{if {$wallet.deadline.hours} > 0}
-										{$wallet.deadline.hours} {l s='horas,' d='Modules.PagBank.Shop'}
+										{$wallet.deadline.hours} {l s='horas.' d='Modules.PagBank.Shop'}
 									{/if}
 									{if {$wallet.deadline.minutes} > 0} 
-										{$wallet.deadline.minutes} {l s='minutos,' d='Modules.PagBank.Shop'}
+										{$wallet.deadline.minutes} {l s='minutos.' d='Modules.PagBank.Shop'}
 									{/if}
 								</span>
 								<br />
@@ -162,23 +162,32 @@
 						<h4 class="title-box">
 							{l s='Abaixo os dados referente ao seu pagamento:' d='Modules.PagBank.Shop'}</h4>
 						<ul class="list clearfix">
-							<li><b>Código da transação:</b> {$transaction_code}</li>
-							<li><b>Número do pedido:</b> {$info.reference}</li>
-							<li><b>Referência do pedido:</b> {$order_reference}</li>
+							<li><b>Número do pedido:</b> {$order->id}</li>
+							<li><b>Referência do pedido:</b> {$order->reference}</li>
 							<li>
 								<b>Valor do pedido:</b> 
 								{if $ps_version >= '9.0.0'}
-									{Context::getContext()->currentLocale->formatPrice($order_value, $currency->iso_code)}
+									{Context::getContext()->currentLocale->formatPrice($order->total_paid, $currency->iso_code)}
 								{else}
-									{Tools::displayPrice($order_value)}
-								{/if}
-								{if (isset($transaction->charges)) && $transaction->charges[0]->payment_method->type == 'CREDIT_CARD'}
-									{if $transaction->charges[0]->payment_method->installments >= 2}
-										(parcelado em {$transaction->charges[0]->payment_method->installments}x)
-									{/if}
+									{Tools::displayPrice($order->total_paid)}
 								{/if}
 							</li>
-							<li><b>Status:</b> {$info.status_description} - {$info.payment_description}</li>
+							{if isset($transaction->charges) && count($transaction->charges) > 1}
+								<li>
+									<b>Parcelamento:</b>
+									{$transaction->charges[0]->payment_method->installments}x ({$transaction->charges[0]->payment_method->card->last_digits})
+									e {$transaction->charges[1]->payment_method->installments}x ({$transaction->charges[1]->payment_method->card->last_digits})
+								</li>
+							{else}
+								{if isset($transaction->charges) && $transaction->charges[0]->payment_method->type === 'CREDIT_CARD'}
+								<li>
+									<b>Parcelamento:</b>
+									{$transaction->charges[0]->payment_method->installments}x (Final: {$transaction->charges[0]->payment_method->card->last_digits})
+								</li>
+								{/if}
+							{/if}
+							<li><b>Status:</b> {$info.status_description}</li>
+							<li><b>Forma de Pagamento:</b> {$info.payment_description}</li>
 						</ul>
 					</div>
 				</div>
@@ -283,7 +292,7 @@
 				<p>{l s='Recomendamos que confira os dados informados e tente novamente, clicando no botão abaixo' d='Modules.PagBank.Shop'}
 				</p>
 				<p align="center"><a class="btn btn-lg btn-info"
-						href="{$link->getPageLink('order')}?submitReorder=1&id_order={$order_id}"
+						href="{$link->getPageLink('order')}?submitReorder=1&id_order={$order->id}"
 						title="{l s='Refazer pedido' d='Modules.PagBank.Shop'}">{l s='Refazer pedido' d='Modules.PagBank.Shop'}</a>
 				</p>
 			</div>
@@ -296,7 +305,7 @@
 			</script>
 		{/if}
 	</div>
-	{if ($payment_type == 'BOLETO')}
+	{if ($payment_type === 'BOLETO')}
 		{literal}
 			<script type="text/javascript">
 				window.onload = function() {
@@ -306,13 +315,13 @@
 			</script>
 		{/literal}
 	{/if}
-	{if ($payment_type == 'PIX')}
+	{if ($payment_type === 'PIX')}
 		<div id="pix_success" class="clearfix">
 			<div id="proccess_pix" style="display:none;" class="container clearfix">
-				<div class="col-xs-12 col-sm-12" id="pagbank_load" align="center">
+				<div class="col-xs-12 col-sm-12 col-lg-12" id="pagbank_load" align="center">
 					<img src="{$img_path}loading.gif" class="img-responsive" />
 				</div>
-				<div class="col-xs-12 col-sm-12 text-xs-center text-sm-center" id="pagbankmsg">
+				<div class="col-xs-12 col-sm-12 col-lg-12 text-xs-center text-sm-center text-lg-center" id="pagbank_msg">
 					{l s='PIX Recebido!' d='Modules.PagBank.Shop'}<br />{l s='Redirecionando...' d='Modules.PagBank.Shop'}
 				</div>
 			</div>
@@ -320,30 +329,35 @@
 
 		{literal}
 			<script type="text/javascript">
+				var msgConsole = '{/literal}{$msg_console}{literal}';
 				function getOrderStatus() {
-					var order_id = {/literal}{$order_id}{literal};
-					var paid_state = {/literal}{$paid_state}{literal};
-					var my_orders = '{/literal}{$link->getPageLink('history')}?id_order={$order_id}{literal}';
+					var orderId = '{/literal}{$order->id}{literal}';
+					var paidState = '{/literal}{$paid_state}{literal}';
+					var myOrders = '{/literal}{$link->getPageLink('history')}?id_order={$order->id}{literal}';
 					$.ajax({
-						url: '{/literal}{$url_update}{literal}&action=checkOrder&id_order='+order_id,
+						url: '{/literal}{$url_update}{literal}&action=checkOrder&id_order='+orderId,
 						cache: false,
 						success: function(data) {
 							var json = data;
 							$.each(json, function(i, item) {
-								if (item.id_order_state == paid_state) {
+								if (item.id_order_state == paidState) {
 									document.getElementById('pix_success').classList.add('loading');
 									document.getElementById('pix_success').style.width = window.innerWidth;
 									document.getElementById('proccess_pix').style.display = 'block';
 									setInterval(function() {
-										window.location.href = my_orders;
-										console.log(my_orders);
+										window.location.href = myOrders;
+										if (msgConsole == 1) {
+											console.log(myOrders);
+										}
 									}, 4000);
 								}
 							});
 						},
 						complete: function() {},
 						error: function(xhr) {
-							console.log(xhr.status);
+							if (msgConsole == 1) {
+								console.log(xhr.status);
+							}
 						}
 					});
 				}
@@ -352,10 +366,14 @@
 					var clipboard = new ClipboardJS('#pix_text_button');
 					clipboard.on('success', function(e) {
 						window.alert('Código Pix copiado!');
-						console.log(e);
+						if (msgConsole == 1) {
+							console.log(e);
+						}
 					});
 					clipboard.on('error', function(e) {
-						console.log(e);
+						if (msgConsole == 1) {
+							console.log(e);
+						}
 					});
 
 					setTimeout(function() {
@@ -367,13 +385,13 @@
 			</script>
 		{/literal}
 	{/if}
-	{if ($payment_type == 'WALLET')}
+	{if ($payment_type === 'WALLET')}
 		<div id="wallet_success" class="clearfix">
 			<div id="proccess_wallet" style="display:none;" class="container clearfix">
-				<div class="col-xs-12 col-sm-12" id="pagbank_load" align="center">
+				<div class="col-xs-12 col-sm-12 col-lg-12" id="pagbank_load" align="center">
 					<img src="{$img_path}loading.gif" class="img-responsive" />
 				</div>
-				<div class="col-xs-12 col-sm-12 text-xs-center text-sm-center" id="pagbankmsg">
+				<div class="col-xs-12 col-sm-12 col-lg-12 text-xs-center text-sm-center text-lg-center" id="pagbank_msg">
 					{l s='Pagamento Recebido!' d='Modules.PagBank.Shop'}<br />{l s='Redirecionando...' d='Modules.PagBank.Shop'}
 				</div>
 			</div>
@@ -381,30 +399,35 @@
 
 		{literal}
 			<script type="text/javascript">
+				var msgConsole = '{/literal}{$msg_console}{literal}';
 				function getOrderStatus() {
-					var order_id = {/literal}{$order_id}{literal};
-					var paid_state = {/literal}{$paid_state}{literal};
-					var my_orders = '{/literal}{$link->getPageLink('history')}?id_order={$order_id}{literal}';
+					var orderId = '{/literal}{$order->id}{literal}';
+					var paidState = '{/literal}{$paid_state}{literal}';
+					var myOrders = '{/literal}{$link->getPageLink('history')}?id_order={$order->id}{literal}';
 					$.ajax({
-						url: '{/literal}{$url_update}{literal}&action=checkOrder&id_order='+order_id,
+						url: '{/literal}{$url_update}{literal}&action=checkOrder&id_order='+orderId,
 						cache: false,
 						success: function(data) {
 							var json = data;
 							$.each(json, function(i, item) {
-								if (item.id_order_state == paid_state) {
+								if (item.id_order_state == paidState) {
 									document.getElementById('wallet_success').classList.add('loading');
 									document.getElementById('wallet_success').style.width = window.innerWidth;
 									document.getElementById('proccess_wallet').style.display = 'block';
 									setInterval(function() {
-										window.location.href = my_orders;
-										console.log(my_orders);
+										window.location.href = myOrders;
+										if (msgConsole == 1) {
+											console.log(myOrders);
+										}
 									}, 4000);
 								}
 							});
 						},
 						complete: function() {},
 						error: function(xhr) {
-							console.log(xhr.status);
+							if (msgConsole == 1) {
+								console.log(xhr.status);
+							}
 						}
 					});
 				}
@@ -413,10 +436,14 @@
 					var clipboard = new ClipboardJS('#wallet_text_button');
 					clipboard.on('success', function(e) {
 						window.alert('Código de pagamento copiado!');
-						console.log(e);
+						if (msgConsole == 1) {
+							console.log(e);
+						}
 					});
 					clipboard.on('error', function(e) {
-						console.log(e);
+						if (msgConsole == 1) {
+							console.log(e);
+						}
 					});
 
 					setTimeout(function() {

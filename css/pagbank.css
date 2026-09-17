@@ -118,6 +118,10 @@
   max-height: 32px;
 }
 
+img.pagbank-logo-b5{
+  width: 35%;
+}
+
 #pagbank-container.opc-checkout {
   max-width: 740px;
 }
@@ -170,6 +174,11 @@
   font-size: 14px;
 }
 
+.container-card #card_one_input,
+.container-card #card_two_input {
+  border-radius: 0 7px 7px 0;
+}
+
 .container-card #card_number,
 .container-google #card_number {
   border-radius: 7px 0 0 7px;
@@ -187,13 +196,42 @@
   padding: 10px 0 0 10px;
 }
 
-.container-card .input-group .input-group-addon,
-.container-google .input-group .input-group-addon {
+.container-card .input-group .input-group-addon {
   border-radius: 0 7px 7px 0;
   padding-left: 18px !important;
   padding-right: 18px !important;
   height: 45px;
   border-left: 0;
+}
+
+.container-card #credit_icon img,
+.container-card #credit_icon_two img{
+  max-width: 44px;
+}
+
+#pagbank-container #card_pagbank #choose_card{
+  margin: 10px 0 20px 0;
+}
+
+#pagbank-container #card_pagbank .pay_opt{
+  margin: 0 0 10px 0;
+}
+
+#pagbank-container #card_pagbank .pay_opt label{
+  color: #000;
+}
+
+.container-card .input-group .input-group-addon.input-prices{
+  border-radius: 7px 0 0 7px !important;
+  padding-left: 10px !important;
+  padding-right: 30px !important;
+  height: 45px !important;
+  border-left: 1px solid rgba(0,0,0,.25) !important;
+  line-height: 1.7 !important;
+}
+
+.container-card .input-group .input-group-addon.input-prices.six{
+  padding-right: 18px !important;
 }
 
 .container-card #credit-icon img,
@@ -288,6 +326,49 @@
 .container-card #saved_cards .panel-body {
   padding-top: 0;
   padding-bottom: 0;
+}
+
+#pagbank-container #saved_cards .panel-body ul.list,
+.container-card #saved_cards .panel-body ul.list,
+#pagbank-container #saved_cards .card-body ul.list,
+.container-card #saved_cards .card-body ul.list {
+  margin: 0!important;
+}
+
+.container-card .bootstrap_5 #saved_cards,
+.container-card .bootstrap_5 .btn-info,
+.container-card .bootstrap_5 .card_data,
+.container-google .bootstrap_5 .btn-info,
+.container-bankslip .bootstrap_5 .btn-info,
+.container-pix .bootstrap_5 .btn-info,
+.container-wallet .bootstrap_5 .btn-info {
+  margin-top: 20px;
+}
+
+#pagbank-container .container-card .card_two_tab.btn_tab_alert,
+.container-card .card_two_tab.btn_tab_alert{
+  border-color: #ff0000!important;
+}
+
+#pagbank-container .bootstrap_5 #saved_cards .card-body ul.list,
+.container-card .bootstrap_5 #saved_cards .card-body ul.list {
+  margin: 0 0 10px 0!important;
+}
+
+.container-card .bootstrap_5 #saved_cards .brand{
+  padding: 0!important;
+  border: 0!important;
+}
+
+#pagbank-container #saved_cards #reload_button,
+.container-card #saved_cards #reload_button {
+    border: 0;
+    background: transparent;
+}
+
+#pagbank-container #saved_cards #reload_button img,
+.container-card #saved_cards #reload_button img{
+  float: right;
 }
 
 #pagbank-container .form-group.radiobox.card_data,
@@ -391,22 +472,28 @@
 }
 
 #order-opc #pagbank-container .form-ok #card_installment_qty,
+#order-opc #pagbank-container .form-ok #card_installment_qty_two,
 #order-opc #pagbank-container .form-ok #google_card_installment_qty,
 #order-opc #pagbank-container .form-ok #card_month,
+#order-opc #pagbank-container .form-ok #card_month_two,
 #order-opc #pagbank-container .form-ok #card_year,
+#order-opc #pagbank-container .form-ok #card_year_two,
 #order-opc #pagbank-container .form-ok #card_state_invoice,
 #order-opc #pagbank-container .form-ok #bankslip_state_invoice,
 #order-opc #pagbank-container .form-ok #pix_state_invoice,
 #order-opc #pagbank-container .form-ok #google_state_invoice,
 #order-opc #pagbank-container .form-ok #wallet_state_invoice,
 #order #pagbank-container .form-ok #card_installment_qty,
+#order #pagbank-container .form-ok #card_installment_qty_two,
 #order #pagbank-container .form-ok #google_card_installment_qty,
 #order #pagbank-container .form-ok #bankslip_state_invoice,
 #order #pagbank-container .form-ok #pix_state_invoice,
 #order #pagbank-container .form-ok #google_state_invoice,
 #order #pagbank-container .form-ok #wallet_state_invoice,
 #order #pagbank-container .form-ok #card_month,
+#order #pagbank-container .form-ok #card_month_two,
 #order #pagbank-container .form-ok #card_year,
+#order #pagbank-container .form-ok #card_year_two,
 #order #pagbank-container .form-ok #card_state_invoice {
   border: 1px solid #46a74e!important;
   color: #35b33f!important;
@@ -426,24 +513,30 @@
   width: 45%;
 }
 
-#order-opc .form-error #card_installment_qty,
-#order-opc .form-error #google_card_installment_qty,
-#order-opc .form-error #card_month,
-#order-opc .form-error #card_year,
-#order-opc .form-error #card_state_invoice,
-#order-opc .form-error #bankslip_state_invoice,
-#order-opc .form-error #pix_state_invoice,
-#order-opc .form-error #google_state_invoice,
-#order-opc .form-error #wallet_state_invoice,
-#order .form-error #card_installment_qty,
-#order .form-error #google_card_installment_qty,
-#order .form-error #bankslip_state_invoice,
-#order .form-error #pix_state_invoice,
-#order .form-error #google_state_invoice,
-#order .form-error #wallet_state_invoice,
-#order .form-error #card_month,
-#order .form-error #card_year,
-#order .form-error #card_state_invoice {
+#order-opc #pagbank-container .form-error #card_installment_qty,
+#order-opc #pagbank-container .form-error #card_installment_qty_two,
+#order-opc #pagbank-container .form-error #google_card_installment_qty,
+#order-opc #pagbank-container .form-error #card_month,
+#order-opc #pagbank-container .form-error #card_month_two,
+#order-opc #pagbank-container .form-error #card_year,
+#order-opc #pagbank-container .form-error #card_year_two,
+#order-opc #pagbank-container .form-error #card_state_invoice,
+#order-opc #pagbank-container .form-error #bankslip_state_invoice,
+#order-opc #pagbank-container .form-error #pix_state_invoice,
+#order-opc #pagbank-container .form-error #google_state_invoice,
+#order-opc #pagbank-container .form-error #wallet_state_invoice,
+#order #pagbank-container .form-error #card_installment_qty,
+#order #pagbank-container .form-error #card_installment_qty_two,
+#order #pagbank-container .form-error #google_card_installment_qty,
+#order #pagbank-container .form-error #bankslip_state_invoice,
+#order #pagbank-container .form-error #pix_state_invoice,
+#order #pagbank-container .form-error #google_state_invoice,
+#order #pagbank-container .form-error #wallet_state_invoice,
+#order #pagbank-container .form-error #card_month,
+#order #pagbank-container .form-error #card_month_two,
+#order #pagbank-container .form-error #card_year,
+#order #pagbank-container .form-error #card_year_two,
+#order #pagbank-container .form-error #card_state_invoice {
   border: 1px solid #f13340!important;
   color: #f13340!important;
   background: #fff1f2!important;
@@ -472,31 +565,37 @@
 
 #pagbank-container .btn-info,
 #pagbank-container .btn-info:focus,
-#pagbank-container .btn-info:active,
-#pagbank-container .btn-info.active,
 .container-card .btn-info,
 .container-card .btn-info:focus,
-.container-card .btn-info:active,
-.container-card .btn-info.active,
 .container-bankslip .btn-info,
 .container-bankslip .btn-info:focus,
-.container-bankslip .btn-info:active,
-.container-bankslip .btn-info.active,
 .container-pix .btn-info,
 .container-pix .btn-info:focus,
-.container-pix .btn-info:active,
-.container-pix .btn-info.active,
 .container-wallet .btn-info,
 .container-wallet .btn-info:focus,
-.container-wallet .btn-info:active,
-.container-wallet .btn-info.active,
 .container-google .btn-info,
-.container-google .btn-info:focus,
-.container-google .btn-info:active,
-.container-google .btn-info.active{
+.container-google .btn-info:focus{
   color: #fff;
   background-color: #428bca !important;
   border-color: #428bca !important;
+}
+
+#pagbank-container .btn-info:active,
+#pagbank-container .btn-info.active,
+.container-card .btn-info:active,
+.container-card .btn-info.active,
+.container-bankslip .btn-info:active,
+.container-bankslip .btn-info.active,
+.container-pix .btn-info:active,
+.container-pix .btn-info.active,
+.container-wallet .btn-info:active,
+.container-wallet .btn-info.active,
+.container-google .btn-info:active,
+.container-google .btn-info.active{
+  -webkit-box-shadow: inset 0px 0px 15px #222;
+     -moz-box-shadow: inset 0px 0px 15px #222;
+          box-shadow: inset 0px 0px 15px #222;
+   outline: none;
 }
 
 #pagbank-container .btn-info:hover,
@@ -521,15 +620,15 @@
 }
 
 /* Loader Background */
-#fancy_load.loading #pagbankproccess #loader,
+#fancy_load.loading #pagbank_process #loader,
 #pix_success.loading #proccess_pix #loader,
 #wallet_success.loading #proccess_wallet #loader {
   display: none;
 }
 
-#fancy_load #pagbankproccess #pagbankmsg,
-#pix_success #proccess_pix #pagbankmsg,
-#wallet_success #proccess_wallet #pagbankmsg {
+#fancy_load #pagbank_process #pagbank_msg,
+#pix_success #proccess_pix #pagbank_msg,
+#wallet_success #proccess_wallet #pagbank_msg {
   font-size: 15px;
   color: #555;
   padding-top: 6%;
@@ -537,14 +636,14 @@
 }
 
 @media(max-width: 767px){
-  #fancy_load #pagbankproccess #pagbankmsg,
-  #pix_success #proccess_pix #pagbankmsg,
-  #wallet_success #proccess_wallet #pagbankmsg {
+  #fancy_load #pagbank_process #pagbank_msg,
+  #pix_success #proccess_pix #pagbank_msg,
+  #wallet_success #proccess_wallet #pagbank_msg {
     font-size: 12px;
   }
 }
 
-#fancy_load #pagbankproccess #pagbank_load img,
+#fancy_load #pagbank_process #pagbank_load img,
 #pix_success #proccess_pix img,
 #wallet_success #proccess_wallet img {
   max-width: 100px;
@@ -563,7 +662,7 @@
   text-align: center;
 }
 
-body#checkout .container #fancy_load #pagbankproccess,
+body#checkout .container #fancy_load #pagbank_process,
 body#checkout .container #pix_success #proccess_pix,
 body#checkout .container #wallet_success #proccess_wallet {
   height: auto;
@@ -583,28 +682,28 @@ body#checkout .container #wallet_success #proccess_wallet {
   text-align: center;
 }
 
-#fancy_load.loading #pagbankproccess,
+#fancy_load.loading #pagbank_process,
 #pix_success.loading #proccess_pix,
 #wallet_success.loading #proccess_wallet {
   width: 300px;
   max-width: 80%;
   background: #fff;
   border: 5px solid #e0e0e0;
-  height: 200px;
+  height: auto;
   padding: 15px;
   display: block;
   margin-top: 30vh;
 }
 
 @media(max-width: 767px){
-  #fancy_load.loading #pagbankproccess,
+  #fancy_load.loading #pagbank_process,
   #pix_success.loading #proccess_pix,
   #wallet_success.loading #proccess_wallet {
     margin-top: 25vh;
   }
 }
 
-#fancy_load.loading #pagbankproccess #loader,
+#fancy_load.loading #pagbank_process #loader,
 #pix_success.loading #proccess_pix #loader,
 #wallet_success.loading #proccess_wallet #loader {
   display: block;
@@ -656,7 +755,8 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 /* Card Sample */
-#card_wrapper {
+#card_wrapper,
+#card_wrapper_two {
   width: 300px;
   max-width: 100%;
   height: 189px;
@@ -668,7 +768,8 @@ input[type="number"]::-webkit-outer-spin-button {
   z-index: 1;
 }
 
-#card_wrapper #card_container {
+#card_wrapper #card_container,
+#card_wrapper_two #card_container_two {
   background-image: url("../img/credit-card.png");
   background-repeat: no-repeat;
   background-size: contain;
@@ -683,7 +784,8 @@ input[type="number"]::-webkit-outer-spin-button {
   transform-style: preserve-3d;
 }
 
-#card_wrapper #card_container > div.card-number {
+#card_wrapper #card_container > div.mockup_number,
+#card_wrapper_two #card_container_two > div.mockup_number_two {
   position: absolute;
   z-index: 150;
   top: 112px;
@@ -696,7 +798,8 @@ input[type="number"]::-webkit-outer-spin-button {
   font-family: "Inconsolata", monospace;
 }
 
-#card_wrapper #card_container > div.card-name {
+#card_wrapper #card_container > div.mockup_name,
+#card_wrapper_two #card_container_two > div.mockup_name_two {
   position: absolute;
   z-index: 150;
   top: 160px;
@@ -710,7 +813,8 @@ input[type="number"]::-webkit-outer-spin-button {
   font-weight: bold;
 }
 
-#card_wrapper #card_container > div.card-expiry {
+#card_wrapper #card_container > div.mockup_expiry,
+#card_wrapper_two #card_container_two > div.mockup_expiry_two {
   position: absolute;
   z-index: 150;
   top: 136px;
@@ -721,7 +825,8 @@ input[type="number"]::-webkit-outer-spin-button {
   font-size: 16px !important;
 }
 
-#card_wrapper #card_container > div.card-brand {
+#card_wrapper #card_container > div.mockup_brand,
+#card_wrapper_two #card_container_two > div.mockup_brand_two {
   position: absolute;
   z-index: 150;
   top: 15px;
@@ -734,45 +839,42 @@ input[type="number"]::-webkit-outer-spin-button {
   overflow: hidden;
 }
 
-#card_wrapper #card_container > span.card-cvv {
+#card_wrapper #card_container > span.mockup_cvv,
+#card_wrapper_two #card_container_two > span.mockup_cvv_two {
   position: absolute;
-  display: none;
   z-index: 150;
   top: 77px;
   right: 26px;
   color: #333;
 }
 
-#card_wrapper #card_container.verso {
+#card_wrapper #card_container.verso,
+#card_wrapper_two #card_container_two.verso {
   background-position: center -189px;
 }
 
-#card_wrapper #card_container.flip {
+#card_wrapper #card_container.flip,
+#card_wrapper_two #card_container_two.flip {
   transform: rotateY(180deg);
 }
 
-#card_wrapper #card_container.flipback {
+#card_wrapper #card_container.flipback,
+#card_wrapper_two #card_container_two.flipback {
   transform: rotateY(-180deg);
 }
 
-#card_wrapper #card_container.verso > div {
+#card_wrapper #card_container.verso > div,
+#card_wrapper_two #card_container_two.verso > div {
   display: none;
 }
 
-#card_wrapper #card_container.verso > span.card-cvv {
+#card_wrapper #card_container.verso > span.mockup_cvv,
+#card_wrapper_two #card_container_two.verso > span.mockup_cvv_two {
   display: block;
 }
 
-.container-card .flipper {
-  -webkit-transition: 0.6s;
-  -webkit-transform-style: preserve-3d;
-  -moz-transition: 0.6s;
-  -moz-transform-style: preserve-3d;
-  -o-transition: 0.6s;
-  -o-transform-style: preserve-3d;
-  transition: 0.6s;
-  transform-style: preserve-3d;
-  position: relative;
+#card_pagbank input#card_two_input {
+  cursor: not-allowed;
 }
 
 #pagbank-container .nofloat,
@@ -881,8 +983,10 @@ input[type="number"]::-webkit-outer-spin-button {
   }
 }
 
-@media (min-width: 190px) and (max-width: 767px) {
-  #card_wrapper {
+@media (min-width: 190px) and (max-width: 1023px) {
+  .card_title,
+  #card_wrapper,
+  #card_wrapper_two {
     display: none !important;
   }
 }

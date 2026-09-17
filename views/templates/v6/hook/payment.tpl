@@ -16,10 +16,10 @@
  *
  *}
 
-{if $page_name == 'order-opc' && isset($method) && $method}
+{if $page_name === 'order-opc' && isset($method) && $method}
 	{literal}
 		<script type="text/javascript">
-			location.reload(true);
+			window.location.reload();
 		</script>
 	{/literal}
 {else}
@@ -35,8 +35,7 @@
 					<a class="active" data-toggle="tab" href="#pagbank-credit-card">
 						<i class="icon icon-credit-card fa fa-credit-card"></i>
 						{l s='Cartão de Crédito' mod='pagbank'}
-						<img src="{$img_path}logo_pagbank_mini_mobile.png"
-							class="logo-pg-mini pull-left hidden-lg hidden-md hidden-sm" />
+						<img src="{$img_path}logo_pagbank_mini_mobile.png" class="logo-pg-mini pull-left hidden-lg hidden-md hidden-sm" />
 						{if $active_discounts.discount_type > 0 && $active_discounts.discount_value > 0 && $active_discounts.credit_card}
 							{if ($active_discounts.discount_type == 1)}
 								(- {$active_discounts.discount_value}%)
@@ -51,11 +50,8 @@
 			{if $active_payments.google_pay && $google_merchant_id|strlen >= 13}
 				<li id="google-tab" class="nopadding col-xs-12 col-sm-3 {if (!$active_payments.credit_card)}active{/if}">
 					<a class="{if (!$active_payments.credit_card && !$active_payments.bankslip && !$active_payments.pix && !$active_payments.wallet)}active{/if}" data-toggle="tab" href="#pagbank-google-pay">
-						<img src="{$img_path}logo_pagbank_mini_mobile.png"
-							class="logo-pg-mini pull-left hidden-xs" />
+						<img src="{$img_path}gpay.png" class="logo-pg-mini pull-left" />
 						{l s='Google Pay' mod='pagbank'}
-						<img src="{$img_path}logo_pagbank_mini_mobile.png"
-							class="logo-pg-mini pull-left hidden-lg hidden-md hidden-sm" />
 						{if $active_discounts.discount_type > 0 && $active_discounts.discount_value > 0 && $active_discounts.google_pay}
 							{if ($active_discounts.discount_type == 1)}
 								(- {$active_discounts.discount_value}%)
@@ -73,8 +69,7 @@
 						<img src="{$img_path}pix-mini-blue.png" class="active" />
 						<img src="{$img_path}pix-mini.png" />
 						{l s='Pix' mod='pagbank'}
-						<img src="{$img_path}logo_pagbank_mini_mobile.png"
-							class="logo-pg-mini pull-left hidden-lg hidden-md hidden-sm" />
+						<img src="{$img_path}logo_pagbank_mini_mobile.png" class="logo-pg-mini pull-left hidden-lg hidden-md hidden-sm" />
 						{if $active_discounts.discount_type > 0 && $active_discounts.discount_value > 0 && $active_discounts.pix}
 							{if ($active_discounts.discount_type == 1)}
 								(- {$active_discounts.discount_value}%)
@@ -91,8 +86,7 @@
 					<a class="{if (!$active_payments.credit_card)}active{/if}" data-toggle="tab" href="#pagbank-bankslip">
 						<i class="icon icon-barcode fa fa-barcode"></i>
 						{l s='Boleto' mod='pagbank'}
-						<img src="{$img_path}logo_pagbank_mini_mobile.png"
-							class="logo-pg-mini pull-left hidden-lg hidden-md hidden-sm" />
+						<img src="{$img_path}logo_pagbank_mini_mobile.png" class="logo-pg-mini pull-left hidden-lg hidden-md hidden-sm" />
 						{if $active_discounts.discount_type > 0 && $active_discounts.discount_value > 0 && $active_discounts.bankslip}
 							{if ($active_discounts.discount_type == 1)}
 								(- {$active_discounts.discount_value}%)
@@ -107,11 +101,9 @@
 			{if $active_payments.wallet}
 				<li id="wallet-tab" class="nopadding col-xs-12 col-sm-3 {if (!$active_payments.credit_card && !$active_payments.google_pay && !$active_payments.pix && !$active_payments.bankslip)}active{/if}">
 					<a class="{if (!$active_payments.credit_card && !$active_payments.bankslip && !$active_payments.pix)}active{/if}" data-toggle="tab" href="#pagbank-wallet">
-						<img src="{$img_path}logo_pagbank_mini_mobile.png"
-							class="logo-pg-mini pull-left hidden-xs" />
+						<img src="{$img_path}logo_pagbank_mini_mobile.png" class="logo-pg-mini pull-left hidden-xs" />
 						{l s='Pagar com PagBank' mod='pagbank'}
-						<img src="{$img_path}logo_pagbank_mini_mobile.png"
-							class="logo-pg-mini pull-left hidden-lg hidden-md hidden-sm" />
+						<img src="{$img_path}logo_pagbank_mini_mobile.png" class="logo-pg-mini pull-left hidden-lg hidden-md hidden-sm" />
 						{if $active_discounts.discount_type > 0 && $active_discounts.discount_value > 0 && $active_discounts.wallet}
 							{if ($active_discounts.discount_type == 1)}
 								(- {$active_discounts.discount_value}%)

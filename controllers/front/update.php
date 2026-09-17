@@ -27,25 +27,19 @@ class PagBankUpdateModuleFrontController extends ModuleFrontController
 
 	public function initContent()
     {
-		$pagbank = new PagBank();
 		$context = Context::getContext();
 		$isLogged = $context->customer->isLogged();
 		$cart_id = (int)$context->cart->id;
 		$id_lang = (int)$context->language->id;
 		$action = Tools::getValue("action");
 		$token = Tools::getValue("token");
-
-		if (_PS_VERSION_ >= '1.7.0') {
-			$token_cron = Tools::hashIV(_COOKIE_IV_);
-		}else{
-			$token_cron = Tools::encryptIV(_COOKIE_IV_);
-		}
+		$token_cron = $this->module->getTokenHash();
 		$token_valid = false;
-		if (isset($token) && $token == $token_cron) {
-			$token_valid = true;
-		}
+        if (is_string($token) && $token !== '' && is_string($token_cron) && $token_cron !== '' && hash_equals($token_cron, $token)) {
+            $token_valid = true;
+        }
 		$request_valid = false;
-		if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+		if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
 			$request_valid = true;
 		}
 		if (Tools::getIsset('state')) {
@@ -57,11 +51,11 @@ class PagBankUpdateModuleFrontController extends ModuleFrontController
 			die("Ação não definida");
 		}
 
-		if ($action == "installments" && $request_valid === true && $isLogged) {
+		if ($action === 'installments' && $request_valid && $isLogged) {
 			$value = Tools::getValue("value");
 			$bin = Tools::getValue("credit_card_bin");
-			$api_response = $pagbank->callGetInstallments($value, $bin, $cart_id);
-		} elseif ($action == "registerUser") { 
+			$api_response = $this->module->callGetInstallments($value, $bin, $cart_id);
+		} elseif ($action === 'registerUser') { 
 			$code = Tools::getValue('code');
 			$admin_dir = $state_array[0];
 			$token_s = Configuration::get('PAGBANK_PS_SESSION');
@@ -69,9 +63,9 @@ class PagBankUpdateModuleFrontController extends ModuleFrontController
 			if (!$code || $code == '') {
 				die('Código não recebido.');
 			}
-			$authorization = $pagbank->getAppAuthorization($code, (string)$app);
+			$authorization = $this->module->getAppAuthorization($code, (string)$app);
 			if (!$authorization) {
-				$pagbank->saveLog('error', 'callback', json_encode('APP: ' . (string)$app . '.'), '', (string)$code, 'Erro ao pegar o Token de usuário para a aplicação ' . (string)$app . '.');
+				$this->module->saveLog('error', 'callback', json_encode('APP: ' . (string)$app . '.'), '', (string)$code, 'Erro ao pegar o Token de usuário para a aplicação ' . (string)$app . '.');
 			} else {
 				$app_msg = 'Usuário cadastrado com sucesso na aplicação ' . (string)$app;
 
@@ -82,14 +76,14 @@ class PagBankUpdateModuleFrontController extends ModuleFrontController
 				}
 				Tools::redirectAdmin($module_admin);
 			}
-		} elseif ($action == "deleteToken" && $request_valid === true && $isLogged) {
+		} elseif ($action === 'deleteToken' && $request_valid && $isLogged) {
 			$id_customer_token = Tools::getValue('id_customer_token');
-			$api_response = $pagbank->deleteCustomerToken($id_customer_token);
-		} elseif ($action == "checkOrder" && $request_valid === true && $isLogged) {
+			$api_response = $this->module->deleteCustomerToken($id_customer_token);
+		} elseif ($action === 'checkOrder' && $request_valid && $isLogged) {
 			$id_order = Tools::getValue('id_order');
 			$order = new Order((int)$id_order);
 			$api_response = $order->getHistory($id_lang);
-		} elseif ($action == "cancelNotPaidPix" && $token_valid === true) {
+		} elseif ($action === 'cancelNotPaidPix' && $token_valid) {
 			$awaiting_payment = Configuration::get('PAGBANK_AWAITING_PAYMENT');
 			$payment_deadline = Configuration::get('PAGBANK_PIX_TIME_LIMIT');
 			$queryStr = 'SELECT `id_order`, `id_cart` FROM `' . _DB_PREFIX_ . 'orders` WHERE `payment` like "PIX%" AND `current_state` = ' . (int)$awaiting_payment . ' AND `date_add` < DATE_SUB(NOW(),INTERVAL ' . $payment_deadline . ' MINUTE)';
@@ -103,16 +97,16 @@ class PagBankUpdateModuleFrontController extends ModuleFrontController
 					$history->changeIdOrderState((int)$cancelStatus, (int)$order['id_order']);
 					if ($history->addWithemail(true)) {
 						$api_response = 'Status do pedido ' . $order['id_order'] . ' atualizado na loja';
-						$pagbank->saveLog('success', 'Cancela Pedido Pix Não Pago', $order['id_cart'], '', 'Status do pedido atualizado na loja.', false, 1);
+						$this->module->saveLog('success', 'Cancela Pedido Pix Não Pago', $order['id_cart'], '', 'Status do pedido atualizado na loja.', false, 1);
 					} else {
 						$api_response = 'Status do pedido ' . $order['id_order'] . ' não atualizado na loja';
-						$pagbank->saveLog('error', 'Cancela Pedido Pix Não Pago', $order['id_cart'], '', 'Status do pedido não atualizado na loja.', false, 1);
+						$this->module->saveLog('error', 'Cancela Pedido Pix Não Pago', $order['id_cart'], '', 'Status do pedido não atualizado na loja.', false, 1);
 					}
 				}
 			} else {
 				$api_response = 'Sem pedidos para cancelar!';
 			}
-		} elseif ($action == "cancelNotPaidBankslip" && $token_valid === true) {
+		} elseif ($action === 'cancelNotPaidBankslip' && $token_valid) {
 			$awaiting_payment = Configuration::get('PAGBANK_AWAITING_PAYMENT');
 			$payment_deadline = Configuration::get('PAGBANK_BANKSLIP_DATE_LIMIT');
 			$queryStr = 'SELECT `id_order`, `id_cart` FROM `' . _DB_PREFIX_ . 'orders` WHERE `payment` like "BOLETO%" AND `current_state` = ' . (int)$awaiting_payment . ' AND `date_add` < DATE_SUB(NOW(),INTERVAL ' . $payment_deadline . ' DAY) AND DAYOFWEEK(NOW()) NOT IN (1,7)';
@@ -126,16 +120,16 @@ class PagBankUpdateModuleFrontController extends ModuleFrontController
 					$history->changeIdOrderState((int)$cancelStatus, (int)$order['id_order']);
 					if ($history->addWithemail(true)) {
 						$api_response = 'Status do pedido ' . $order['id_order'] . ' atualizado na loja';
-						$pagbank->saveLog('success', 'Cancela Pedido Boleto Não Pago', $order['id_cart'], '', 'Status do pedido atualizado na loja.', false, 1);
+						$this->module->saveLog('success', 'Cancela Pedido Boleto Não Pago', $order['id_cart'], '', 'Status do pedido atualizado na loja.', false, 1);
 					} else {
 						$api_response = 'Status do pedido ' . $order['id_order'] . ' não atualizado na loja';
-						$pagbank->saveLog('error', 'Cancela Pedido Boleto Não Pago', $order['id_cart'], '', 'Status do pedido não atualizado na loja.', false, 1);
+						$this->module->saveLog('error', 'Cancela Pedido Boleto Não Pago', $order['id_cart'], '', 'Status do pedido não atualizado na loja.', false, 1);
 					}
 				}
 			} else {
 				$api_response = 'Sem pedidos para cancelar!';
 			}
-		} elseif ($action == "cancelNotPaidWallet" && $token_valid === true) {
+		} elseif ($action === 'cancelNotPaidWallet' && $token_valid) {
 			$awaiting_payment = Configuration::get('PAGBANK_AWAITING_PAYMENT');
 			$payment_deadline = Configuration::get('PAGBANK_WALLET_TIME_LIMIT');
 			$queryStr = 'SELECT `id_order`, `id_cart` FROM `' . _DB_PREFIX_ . 'orders` WHERE `payment` = "Pagar com PagBank" AND `current_state` = ' . (int)$awaiting_payment . ' AND `date_add` < DATE_SUB(NOW(),INTERVAL ' . $payment_deadline . ' MINUTE)';
@@ -149,10 +143,10 @@ class PagBankUpdateModuleFrontController extends ModuleFrontController
 					$history->changeIdOrderState((int)$cancelStatus, (int)$order['id_order']);
 					if ($history->addWithemail(true)) {
 						$api_response = 'Status do pedido ' . $order['id_order'] . ' atualizado na loja';
-						$pagbank->saveLog('success', 'Cancela Pedido Carteira Digital Não Pago', $order['id_cart'], '', 'Status do pedido atualizado na loja.', false, 1);
+						$this->module->saveLog('success', 'Cancela Pedido Carteira Digital Não Pago', $order['id_cart'], '', 'Status do pedido atualizado na loja.', false, 1);
 					} else {
 						$api_response = 'Status do pedido ' . $order['id_order'] . ' não atualizado na loja';
-						$pagbank->saveLog('error', 'Cancela Pedido Carteira Digital Não Pago', $order['id_cart'], '', 'Status do pedido não atualizado na loja.', false, 1);
+						$this->module->saveLog('error', 'Cancela Pedido Carteira Digital Não Pago', $order['id_cart'], '', 'Status do pedido não atualizado na loja.', false, 1);
 					}
 				}
 			} else {

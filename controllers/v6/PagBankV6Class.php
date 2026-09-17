@@ -337,6 +337,26 @@ class PagBankV6 extends Module
 							),
 						),
 					),
+					array(
+						'type' => 'switch',
+						'class' => 'fixed-width-xs fixed-width-sm',
+						'label' => $this->l('Pagar com 2 cartões?'),
+						'name' => 'PAGBANK_TWO_CREDIT_CARD',
+						'is_bool' => true,
+						'desc' => $this->l('O cliente poderá realizar o pagamento com 2 cartões de crédito.'),
+						'values' => array(
+							array(
+								'id' => 'PAGBANK_TWO_CREDIT_CARD_on',
+								'value' => 1,
+								'label' => $this->l('Sim'),
+							),
+							array(
+								'id' => 'PAGBANK_TWO_CREDIT_CARD_off',
+								'value' => 0,
+								'label' => $this->l('Não'),
+							),
+						),
+					),
 				),
 			),
 		);
@@ -408,6 +428,7 @@ class PagBankV6 extends Module
 					array(
 						'type' => 'text',
 						'label' => $this->l('Google Merchant ID'),
+						'desc' => $this->l('Informe o seu token de usuário.'),
 						'name' => 'PAGBANK_GOOGLE_MERCHANT_ID',
 					),
 				),
@@ -461,12 +482,32 @@ class PagBankV6 extends Module
 							array(
 								'id' => 'opcao_1',
 								'value' => 0,
-								'label' => $this->l('Não processar nada abaixo do valor mínimo estipulado.') . $text_min_installments
+								'label' => $this->l('Não processar nada abaixo do valor da parcela mínima.') . $text_min_installments
 							),
 							array(
 								'id' => 'opcao_2',
 								'value' => 1,
-								'label' => $this->l('Oferecer pagamento a vista, em 1x parcela, para valores abaixo do mínimo estipulado.')
+								'label' => $this->l('Oferecer pagamento a vista, em 1x parcela, para valores abaixo da parcela mínima.')
+							),
+						),
+					),
+					array(
+						'type' => 'switch',
+						'class' => 'fixed-width-xs fixed-width-sm',
+						'label' => $this->l('Parcelar no segundo cartão?'),
+						'name' => 'PAGBANK_TWO_CREDIT_CARD_INST',
+						'is_bool' => true,
+						'desc' => $this->l('O cliente terá a opção de parcelar o valor informado no segundo cartão de crédito.'),
+						'values' => array(
+							array(
+								'id' => 'PAGBANK_TWO_CREDIT_CARD_INST_on',
+								'value' => 1,
+								'label' => $this->l('Sim'),
+							),
+							array(
+								'id' => 'PAGBANK_TWO_CREDIT_CARD_INST_off',
+								'value' => 0,
+								'label' => $this->l('Não'),
 							),
 						),
 					),
@@ -730,6 +771,78 @@ class PagBankV6 extends Module
 		$fields_form_8 = array(
 			'form' => array(
 				'legend' => array(
+					'title' => $this->l('Google reCAPTCHA v3'),
+					'icon' => 'icon-cogs',
+				),
+				'input' => array(
+					array(
+						'type' => 'switch',
+						'label' => $this->l('reCAPTCHA v3'),
+						'name' => 'PAGBANK_RECAPTCHA',
+						'is_bool' => true,
+						'desc' => $this->l('Proteção inteligente contra spam e bots.'),
+						'values' => array(
+							array(
+								'id' => 'PAGBANK_RECAPTCHA_on',
+								'value' => 1,
+								'label' => $this->l('Sim'),
+							),
+							array(
+								'id' => 'PAGBANK_RECAPTCHA_off',
+								'value' => 0,
+								'label' => $this->l('Não'),
+							),
+						),
+					),
+					array(
+						'type' => 'select',
+						'label' => $this->l('Critério'),
+						'name' => 'PAGBANK_RACAPTCHA_CRITERIA',
+						'desc' => $this->l('Defina o critério de segurança do reCAPTCHA.'),
+						'options' => array(
+							'query' => array(
+								array(
+									'id' => 'LOW',
+									'name' => $this->l('Baixo'),
+								),
+								array(
+									'id' => 'MEDIUM',
+									'name' => $this->l('Médio'),
+								),
+								array(
+									'id' => 'HIGH',
+									'name' => $this->l('Alto'),
+								),
+							),
+							'id' => 'id',
+							'name' => 'name',
+						),
+					),
+					array(
+						'type' => 'text',
+						'label' => $this->l('Site Key'),
+						'desc' => $this->l('Informe a chave reCAPTCHA associada ao site.'),
+						'name' => 'PAGBANK_RECAPTCHA_SITE_KEY',
+					),
+					array(
+						'type' => 'text',
+						'label' => $this->l('Api Key'),
+						'desc' => $this->l('Informe a chave de API associada ao projeto atual.'),
+						'name' => 'PAGBANK_RECAPTCHA_API_KEY',
+					),
+					array(
+						'type' => 'text',
+						'label' => $this->l('URL'),
+						'desc' => $this->l('Informe a sua URL associada ao projeto atual. Copie e cole como é visto, mantendo o parâmetro API_KEY na URL.'),
+						'name' => 'PAGBANK_RECAPTCHA_URL',
+					),
+				),
+			),
+		);
+
+		$fields_form_9 = array(
+			'form' => array(
+				'legend' => array(
 					'title' => $this->l('Mapeamento de Status'),
 					'icon' => 'icon-cogs',
 				),
@@ -804,7 +917,7 @@ class PagBankV6 extends Module
 			),
 		);
 
-		$fields_form_9 = array(
+		$fields_form_10 = array(
 			'form' => array(
 				'legend' => array(
 					'title' => $this->l('Debug & Logs'),
@@ -872,7 +985,7 @@ class PagBankV6 extends Module
 			),
 		);
 
-		$fields_form_10 = array(
+		$fields_form_11 = array(
 			'form' => array(
 				'legend' => array(
 					'title' => $this->l('Salvar Configurações'),
@@ -913,7 +1026,8 @@ class PagBankV6 extends Module
 					$fields_form_7,
 					$fields_form_8,
 					$fields_form_9,
-					$fields_form_10
+					$fields_form_10,
+					$fields_form_11
 				));
 	}
 }

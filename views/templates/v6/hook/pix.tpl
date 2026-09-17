@@ -17,37 +17,37 @@
  *}
 
 <div class="container-pix clearfix">
-	<div id="pagbank_pix_error" class="col-xs-10 col-sm-9 text-center nofloat-block" style="display:none;"></div>
-	<form id="pix_pagbank" name="checkout" method="post" action="{$link->getModuleLink('pagbank', 'validation', [], true)|escape:'html'}" target="_top"
-	onsubmit="showLoading();" class="clearfix">
-		<input type="hidden" name="pagbank_type" id="pagbank_type" value="pix"/>
-		<div class="col-xs-12 col-sm-6 pull-left">
+	<div id="pagbank_pix_error" class="col-xs-10 col-sm-10 col-lg-9 text-center nofloat-block" style="display:none;"></div>
+	<form id="pix_pagbank" method="post" target="_top" action="{$link->getModuleLink('pagbank', 'validation', [], true)|escape:'html'}" 
+	class="clearfix">
+		<input type="hidden" name="payment_type" id="payment_type" value="pix"/>
+		<input type="hidden" name="recaptcha_pix" id="recaptcha_pix" />
+		<div class="col-xs-12 col-sm-12 col-lg-6 pull-left">
 			<div class="form-group">
 				<label for="pix_name">{l s='Nome/Razão Social' mod='pagbank'}</label>
 				<input id="pix_name" class="form-control" name="pix_name" type="text" data-validate="isName"
-					onblur="checkField(this.id)" size="30"
+					onblur="psValidatePix();" size="30"
 					value="{if (isset($sender_name) && $sender_name)}{$sender_name}{/if}"
 					placeholder="Nome/Razão Social" required />
 			</div>
 			<div class="form-group">
 				<label for="pix_doc">{l s='CPF/CNPJ:' mod='pagbank'}</label>
 				<input id="pix_doc" class="form-control" name="cpf_cnpj" type="text" maxlength="18"
-					onkeyup="this.value.length == 14 || this.value.length == 18 ? checkField(this.id) : ''; this.value = this.value.toUpperCase();"
-					onkeydown="this.value.length > 14 ? mascara(this,cnpjmask): mascara(this,cpfmask)"
-					onblur="checkField(this.id);" value="" size="18" required />
+					onkeydown="this.value.length > 14 ? mascara(this,cnpjmask) : mascara(this,cpfmask); this.value = this.value.toUpperCase();"
+					onblur="psValidatePix();" value="" size="18" required />
 			</div>
 			<div class="form-group">
 				<label for="pix_phone">{l s='Telefone de contato:' mod='pagbank'}</label>
-				<input id="pix_phone" class="form-control" name="telephone" {if $device == 'm'}type="tel"{else}type="text"{/if} 
+				<input id="pix_phone" class="form-control" name="telephone" type="text" inputmode="numeric" pattern="[0-9]*" 
 					maxlength="15" onkeypress="mascara(this,telefone)"
 					onblur="validatePhoneNumber(this.id);mascara(this,telefone);"
 					value="{if (isset($phone) && $phone)}{$phone}{/if}" placeholder="(99) 99999-9999"
 					required />
 			</div>
 		</div>
-		<div class="col-xs-12 col-sm-6 pull-right">
+		<div class="right-side infos col-xs-12 col-sm-12 col-lg-6 pull-right">
 			<div {if $device == 'm'}class="logo-pix-mob"{else}class="logo-pix"{/if} align="center">
-				<img title="Pix" src="{$img_path}pix.png" alt="{l s='Pix' mod='pagbank'}" ondrag="return false"
+				<br /><img title="Pix" src="{$img_path}pix.png" alt="{l s='Pix' mod='pagbank'}" ondrag="return false"
 					onselec="return false" oncontextmenu="return false" />
 			</div>
 			{if ($active_discounts.discount_type > 0 && $active_discounts.discount_value > 0) && $active_discounts.pix}
@@ -86,7 +86,7 @@
 				</strong>
 			</div>
 		</div>
-		<div class="form-group clearfix col-xs-12 col-sm-12">
+		<div class="form-group clearfix col-xs-12 col-sm-12 col-lg-12">
 			<br />
 			<div class="clearfix">
 				<button type="button" class="btn btn-info" data-toggle="collapse" data-target="#pix_address">
@@ -94,28 +94,27 @@
 				</button>
 			</div>
 		</div>
-		<div class="form-group clearfix col-xs-12 col-sm-12 collapse" id="pix_address">
+		<div class="form-group clearfix col-xs-12 col-sm-12 col-lg-12 collapse" id="pix_address">
 			<div class="row">
-				<div class="col-xs-12 col-sm-6 pull-left">
+				<div class="col-xs-12 col-sm-12 col-lg-6 pull-left">
 					<div class="form-group">
 						<label for="pix_postcode_invoice">{l s='CEP:' mod='pagbank'}</label>
 						<input id="pix_postcode_invoice" class="form-control" name="postcode_invoice" type="text"
-							onblur="checkField(this.id);" autocomplete="off" maxlength="9"
+							onblur="psValidatePix();" autocomplete="off" maxlength="9"
 							value="{if isset($address_invoice->postcode)}{$address_invoice->postcode}{/if}"
 							required />
 					</div>
 					<div class="form-group">
 						<label for="pix_address_invoice">{l s='Endereço:' mod='pagbank'}</label>
 						<input id="pix_address_invoice" class="form-control" name="address_invoice" type="text"
-							onblur="checkField(this.id);" autocomplete="off" maxlength="80"
+							onblur="psValidatePix();" autocomplete="off" maxlength="80"
 							value="{if isset($address_invoice->address1)}{$address_invoice->address1}{/if}"
 							required />
 					</div>
 					<div class="form-group">
 						<label for="pix_number_invoice">{l s='Número:' mod='pagbank'}</label>
 						<input id="pix_number_invoice" class="form-control" name="number_invoice" type="text"
-							onkeyup="this.value.length >= 1 ? checkField(this.id) : ''"
-							onblur="checkField(this.id);" autocomplete="off" maxlength="10"
+							onblur="psValidatePix();" autocomplete="off" maxlength="10"
 							value="{if isset($number_invoice)}{$number_invoice}{/if}" required />
 					</div>
 					<div class="form-group">
@@ -125,24 +124,24 @@
 							value="{if isset($compl_invoice)}{$compl_invoice}{/if}" />
 					</div>
 				</div>
-				<div class="col-xs-12 col-sm-6 pull-right">
+				<div class="col-xs-12 col-sm-12 col-lg-6 pull-right">
 					<div class="form-group">
 						<label for="pix_address2_invoice">{l s='Bairro:' mod='pagbank'}</label>
 						<input id="pix_address2_invoice" class="form-control" name="address2_invoice" type="text"
-							onblur="checkField(this.id);" autocomplete="off" maxlength="60"
+							onblur="psValidatePix();" autocomplete="off" maxlength="60"
 							value="{if isset($address_invoice->address2)}{$address_invoice->address2}{/if}"
 							required />
 					</div>
 					<div class="form-group">
 						<label for="pix_city_invoice">{l s='Cidade:' mod='pagbank'}</label>
 						<input id="pix_city_invoice" class="form-control" name="city_invoice" type="text"
-							onblur="checkField(this.id);" autocomplete="off" maxlength="60"
+							onblur="psValidatePix();" autocomplete="off" maxlength="60"
 							value="{if isset($address_invoice->city)}{$address_invoice->city}{/if}" required />
 					</div>
 					<div class="form-group">
 					<label for="pix_state_invoice">{l s='Estado:' mod='pagbank'}</label>
 						<select id="pix_state_invoice" class="form-control" name="state_invoice"
-							data-no-uniform="true" onchange="checkField(this.id);" required>
+							data-no-uniform="true" onchange="psValidatePix();" required>
 							<option value=""> -- </option>
 							{foreach from=$states item=state name=uf}
 								<option value="{$state.iso_code}"
@@ -157,7 +156,7 @@
 			</div>
 		</div>
 		<div class="clear clearfix"></div>
-		<p class="cart_navigation clearfix col-xs-12 col-sm-12">
+		<p class="cart_navigation clearfix col-xs-12 col-sm-12 col-lg-12">
 			<button id="submitPix" type="button" name="submitPix" class="btn btn-success btn-lg hideOnSubmit pull-right">
 				{l s='Confirmar pedido' mod='pagbank'}
 				<i class="icon icon-check fa fa-check"></i>

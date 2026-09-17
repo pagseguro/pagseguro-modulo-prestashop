@@ -1,10 +1,10 @@
-![](https://prestabr.com.br/docpagbank/0525/head_git_pagbank.jpg)
+![](https://prestabr.com.br/docpagbank/0926/head_git_pagbank.jpg)
 
-<p align="center">PagBank - Checkout Transparente - v.2.1.0</p>
+<p align="center">PagBank - Checkout Transparente - v.2.2.0</p>
 
 ## Taxas Reduzidas!
 
-![](https://prestabr.com.br/docpagbank/0525/taxas_reduzidas.jpg "Taxas Reduzidas - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/taxas_reduzidas.jpg "Taxas Reduzidas - Módulo PagBank")
 
 ## Dúvidas, Sugestões, Suporte
 
@@ -23,20 +23,22 @@ Este módulo foi desenvolvido rigorosamente dentro dos padrões de segurança PC
 
 - Este módulo não utiliza Override;
 - Compatível com PrestaShop 1.6.x ao 9.x;
-- Compatível com PHP 5.2.0 ao 8.4.11;
+- Compatível com PHP 5.6.0 ao 8.5.9;
 - Desenvolvido, testado e homologado com base na API v.4 do PagBank;
 - Requer a biblioteca cURL ativa na hospedagem.
 - Obrigatório o uso de certificado SSL com o protocolo TLS 1.2 ou superior;
 
 ## Funcionalidades
 
-- Aceite pagamentos via Cartão de Crédito, Google Pay, Pix, Boleto Bancário e Pagar com PagBank.
+- Aceite pagamentos com 1 ou 2 Cartões de Crédito, Google Pay, Pix, Boleto Bancário e Pagar com PagBank.
+- Integração com o Google reCAPTCHA v3, protege sem interromper a experiência do usuário com caixas de seleção ou desafios visuais.
 - Transações criptografadas para Cartão de Crédito e Google Pay.
 - Compra com 1 clique utilizando tokenização e armazenamento seguro do cartão via PagBank.
 - Parcelamento em até 12x, com ou sem repasse de juros.
 - Defina o valor mínimo da parcela e configure se transações abaixo desse valor serão processadas.
 - Descontos configuráveis (percentual ou valor fixo) em todas as formas de pagamento - no Cartão de Crédito e Google Pay, o desconto aparece na primeira parcela.
 - Pagamento com ou sem pré-autorização, disponível para Cartão de Crédito e Google Pay.
+- Pagamento para PF ou PJ com validação de CNPJ Alfanumérico.
 - Google Pay com 3DS embarcado para as bandeiras Visa, MasterCard, Elo e Amex.
 - Gestão de risco com inteligência artificial, integrada ao antifraude do PagBank.
 - Cadastro em múltiplas condições comerciais, com opção de definir qual será usada para processar os pagamentos.
@@ -64,7 +66,7 @@ Para realizar a instalação do módulo PagBank, você precisará enviar o arqui
 3. Localizando o arquivo **pagbank.zip**, acesse o painel admin da sua loja e navegue até **Módulos > Gerenciador de Módulos**.
 4. Clique em **Enviar um módulo** e selecione o arquivo **pagbank.zip** baixado anteriormente.
 
-![](https://prestabr.com.br/docpagbank/0525/instalacao.jpg "Instalação - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/instalacao.jpg "Instalação - Módulo PagBank")
 
 Ao finalizar os passos descritos acima o módulo estará instalado!
 
@@ -75,6 +77,7 @@ Ao finalizar os passos descritos acima o módulo estará instalado!
 **`Nota:`**
 
 > - Ao atualizar o módulo não é preciso refazer a Configuração de Cadastro/Adesão App, durante a atualização as configurações salvas no módulo são preservadas.
+> - Se optar pela atualização manual do módulo via FTP, verifique se existem atualizações de SQL pendentes no diretório /modules/pagbank/upgrade.
 
 ## Configuração
 
@@ -86,37 +89,44 @@ O cadastramento no App é o primeiro passo para tornar a sua integração funcio
 - App D30
 - App Tax
 
-![](https://prestabr.com.br/docpagbank/0525/1_cadastro_adesao_app_0.jpg "Cadastro/Adesão App - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/1_cadastro_adesao_app_0.jpg "Cadastro/Adesão App - Módulo PagBank")
 
 O processo de adesão é muito simples, basta clicar em **Cadastrar** e seguir o passo-a-passo indicado.
 
-![](https://prestabr.com.br/docpagbank/0525/1_cadastro_adesao_app_1.jpg "Cadastro/Adesão App - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/1_cadastro_adesao_app_1.jpg "Cadastro/Adesão App - Módulo PagBank")
 
 ---
 #### 2 - Configurações do App
 
 Após se cadastrar no(s) App(s) desejado(s), marque a opção **Ambiente de Produção** como SIM e no campo **Tipo de Credencial** selecione qual App deve validar e processar os pagamentos.
 
-![](https://prestabr.com.br/docpagbank/0525/2_configuracoes_do_app_0.jpg "Configurações do App - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/2_configuracoes_do_app_0.jpg "Configurações do App - Módulo PagBank")
 
 ---
 #### 3 - Pagamento via Cartão de Crédito
 
 Marque a opção **Cartão de Crédito** como SIM para ativar o meio de pagamento.
 
-![](https://prestabr.com.br/docpagbank/0525/3_pagamento_via_cartao_de_credito_0.jpg "Pagamento via Cartão de Crédito - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/3_pagamento_via_cartao_de_credito_0.jpg "Pagamento via Cartão de Crédito - Módulo PagBank")
 
-Na opção **Compra com 1 Click**, o cliente poderá salvar o Cartão de Crédito para futuras compras. O Cartão é criptografado e armazenado pelo PagBank através do processo de Tokenização.
+Com a **Compra com 1 Click**, o cliente poderá salvar o Cartão de Crédito para futuras compras. O Cartão é criptografado e armazenado pelo PagBank através do processo de Tokenização.
 
 Após realizar a primeira compra com o cartão salvo ele ficará disponível para seleção na tela de checkout, exemplo:
 
-![](https://prestabr.com.br/docpagbank/0525/3_pagamento_via_cartao_de_credito_1.jpg "Pagamento via Cartão de Crédito - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/3_pagamento_via_cartao_de_credito_1.jpg "Pagamento via Cartão de Crédito - Módulo PagBank")
+
+Para permitir que seus clientes dividam o valor da compra em dois cartões de crédito diferentes, marque a opção **Pagar com 2 cartões**
+como SIM. 
+
+**`Nota:`**
+
+> - A opção **Pagar com 2 cartões** só será exibida se o valor cobrado em cada cartão atingir ou superar o valor da parcela mínima.
 
 #### 4 - Pagamento via Cartão de Crédito com Google Pay
 
 Marque a opção **Google Pay** como **SIM** para ativar o meio de pagamento.
 
-![](https://prestabr.com.br/docpagbank/0525/4_pagamento_via_cartao_de_credito_com_google_pay_00.jpg "Pagamento via Cartão de Crédito com Google Pay - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/4_pagamento_via_cartao_de_credito_com_google_pay_00.jpg "Pagamento via Cartão de Crédito com Google Pay - Módulo PagBank")
 
 Para aderir ao Google Pay e obter o seu **Google Merchant ID** é preciso ter uma conta do tipo **Bussiness** que pode ser criada gratuitamente junto ao Google.
 
@@ -126,7 +136,7 @@ Se você já tem uma conta ou deseja criar uma basta acessar o endereço abaixo 
 
 Ao acessar o Google Pay navegue até o menu **Perfil da Empresa** e localize as seções **Business identity** e **Business information** para conferir se há alguma informação pendente em seu cadastro, são dados obrigatórios como: nome da empresa, categoria, endereço, telefone e contato para suporte ao cliente.
 
-![](https://prestabr.com.br/docpagbank/0525/4_pagamento_via_cartao_de_credito_com_google_pay_1.jpg "Pagamento via Cartão de Crédito com Google Pay - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/4_pagamento_via_cartao_de_credito_com_google_pay_1.jpg "Pagamento via Cartão de Crédito com Google Pay - Módulo PagBank")
 
 **`Nota:`**
 
@@ -134,16 +144,16 @@ Ao acessar o Google Pay navegue até o menu **Perfil da Empresa** e localize as 
 
 Em seguida navegue até o menu **Api Google Pay**, clique em **Começar** e aceite os termos de serviço.
 
-![](https://prestabr.com.br/docpagbank/0525/4_pagamento_via_cartao_de_credito_com_google_pay_2.jpg "Pagamento via Cartão de Crédito com Google Pay - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/4_pagamento_via_cartao_de_credito_com_google_pay_2.jpg "Pagamento via Cartão de Crédito com Google Pay - Módulo PagBank")
 
 Após aceitar os termos role a página até a seção **Integrate with your website** e clique em **+ Add website**.
 
-![](https://prestabr.com.br/docpagbank/0525/4_pagamento_via_cartao_de_credito_com_google_pay_3.jpg "Pagamento via Cartão de Crédito com Google Pay - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/4_pagamento_via_cartao_de_credito_com_google_pay_3.jpg "Pagamento via Cartão de Crédito com Google Pay - Módulo PagBank")
 
 Na seção **Your website** em **Website URL** informe a url da sua loja virtual.
 Na seção **Your Google Pay API integration type** em **Tipo de Integração** escolha a opção **Gateway**.
 
-![](https://prestabr.com.br/docpagbank/0525/4_pagamento_via_cartao_de_credito_com_google_pay_4.jpg "Pagamento via Cartão de Crédito com Google Pay - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/4_pagamento_via_cartao_de_credito_com_google_pay_4.jpg "Pagamento via Cartão de Crédito com Google Pay - Módulo PagBank")
 
 Na seção **Screenshots of your buyflow** você precisará tirar prints das etapas do seu fluxo compras, que começa na página do produto e vai até a tela de confirmação do pedido/pagamento em sua loja virtual.
 
@@ -155,16 +165,16 @@ Os prints necessários são:
 4. **Google Pay API payment screen** - Tela de checkout com a opção do Google Pay selecionada junto com o poup de selecão do cartão;
 5. **Post-purchase screen** - Tela de confirmação do pedido/pagamento;
 
-![](https://prestabr.com.br/docpagbank/0525/4_pagamento_via_cartao_de_credito_com_google_pay_5.jpg "Pagamento via Cartão de Crédito com Google Pay - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/4_pagamento_via_cartao_de_credito_com_google_pay_5.jpg "Pagamento via Cartão de Crédito com Google Pay - Módulo PagBank")
 
 Para enviar o print **Post-purchase screen** você precisará criar um pedido em modo **SandBox**. Para isso marque a opção **Ambiente de Produção** como **SandBox / NÃO** e habilite a opção **Pedido Demo** como **SIM**, para poder criar o pedido e tirar um print real da tela de confirmação do pedido/pagamento.
 
-![](https://prestabr.com.br/docpagbank/0525/4_pagamento_via_cartao_de_credito_com_google_pay_6.jpg "Pagamento via Cartão de Crédito com Google Pay - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/4_pagamento_via_cartao_de_credito_com_google_pay_6.jpg "Pagamento via Cartão de Crédito com Google Pay - Módulo PagBank")
 
 Após enviar os prints e clicar em **Salvar**, role a página até o topo e localize **Web integration** e marque as três
 opções de conformidade e clique em **Submit for approval**.
 
-![](https://prestabr.com.br/docpagbank/0525/4_pagamento_via_cartao_de_credito_com_google_pay_7.jpg "Pagamento via Cartão de Crédito com Google Pay - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/4_pagamento_via_cartao_de_credito_com_google_pay_7.jpg "Pagamento via Cartão de Crédito com Google Pay - Módulo PagBank")
 
 **`Nota:`**
 
@@ -179,11 +189,12 @@ Você tem a opção de configurar o seguinte:
 
 - **Quantidade máxima de parcelas**: selecione 1 para pagamento à vista ou de 2 até 12 parcelas para pagamento parcelado.
 - **Quantidade de parcelas sem juros**.
-- **Valor da parcela mínima**: define o valor mínimo da parcela aceita pela loja no momento do parcelamento da compra.
+- **Valor da parcela mínima**: estabelece o menor valor aceito por parcela ao dividir uma compra. Se o pagamento com 2 cartões de crédito estiver ativo, essa opção só será exibida se o valor cobrado em cada cartão atingir ou superar esse limite mínimo.
 - **Comportamento da parcela mínima**: define o comportamento do checkout caso o valor da parcela seja inferior ao valor estabelecido para o valor da parcela mínima.
+- **Parcelar no segundo cartão**: O cliente terá a opção de parcelar o valor informado no segundo cartão de crédito.
 - **Tipo de Captura**: Escolha entre captura automática ou manual (pré-autorização).
 
-![](https://prestabr.com.br/docpagbank/0525/5_configuracoes_de_pagamento_via_cartao_de_credito_0.jpg "Configurações de Pagamento via Cartão de Crédito - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/5_configuracoes_de_pagamento_via_cartao_de_credito_0.jpg "Configurações de Pagamento via Cartão de Crédito - Módulo PagBank")
 
 Na opção de **Tipo de Captura: Captura Automática** o valor total da transação é debitado imediatamente do saldo do cartão de crédito, todo o processo é automatizado.
 
@@ -191,7 +202,7 @@ Na opção de **Tipo de Captura: Captura Manual (Pré-autorização)** o valor t
 
 Com o pedido gerado na loja, com o status de Pagamento Autorizado, é só acessar o histórico do pedido e informar um valor parcial ou total que você deseja debitar do cartão de crédito, exemplo:
 
-![](https://prestabr.com.br/docpagbank/0525/5_configuracoes_de_pagamento_via_cartao_de_credito_1.jpg "Configurações de Pagamento via Cartão de Crédito - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/5_configuracoes_de_pagamento_via_cartao_de_credito_1.jpg "Configurações de Pagamento via Cartão de Crédito - Módulo PagBank")
 
 #### 6 - Pagamento via PIX
 
@@ -199,7 +210,7 @@ Marque a opção **PIX** como SIM para ativar o meio de pagamento e visualizar a
 
 - Prazo limite de pagamento via PIX (O padrão é 30 minutos).
 
-![](https://prestabr.com.br/docpagbank/0525/6_pagamento_via_pix_0.jpg "Pagamento via PIX - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/6_pagamento_via_pix_0.jpg "Pagamento via PIX - Módulo PagBank")
 
 **`Nota:`**
 
@@ -212,7 +223,7 @@ Marque a opção **Boleto Bancário** como SIM para ativar o meio de pagamento e
 - Prazo de vencimento do boleto (O padrão é 2 dias).
 - Texto descritivo para o boleto.
 
-![](https://prestabr.com.br/docpagbank/0525/7_pagamento_via_boleto_bancario_0.jpg "Pagamento via Boleto Bancário - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/7_pagamento_via_boleto_bancario_0.jpg "Pagamento via Boleto Bancário - Módulo PagBank")
 
 **`Nota:`**
 
@@ -223,7 +234,7 @@ Marque a opção **Boleto Bancário** como SIM para ativar o meio de pagamento e
 Marque a opção **Pagar com PagBank** como SIM para ativar o meio de pagamento e visualizar as configurações relacionadas.
 Nesta opção de pagamento o cliente poderá realizar o pagamento com o saldo em conta ou cartão de crédito salvo no super app PagBank.
 
-![](https://prestabr.com.br/docpagbank/0525/8_pagamento_via_pagar_com_pagbank_wallet_0.jpg "Pagamento via Pagar com PagBank (Wallet) - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/8_pagamento_via_pagar_com_pagbank_wallet_0.jpg "Pagamento via Pagar com PagBank (Wallet) - Módulo PagBank")
 
 **`Nota:`**
 
@@ -249,14 +260,88 @@ Além de definir o tipo e o montante do desconto, você tem a opção de escolhe
 - Desconto no Boleto Bancário.
 - Desconto no Pix.
 
-![](https://prestabr.com.br/docpagbank/0525/9_opcoes_de_descontos_0.jpg "Opções de Descontos - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/9_opcoes_de_descontos_0.jpg "Opções de Descontos - Módulo PagBank")
 
 **`Nota:`**
 
 > - No Cartão de Crédito e Google Pay o desconto é calculado e exibido na primeira parcela.
 > - Por enquanto, a opção de desconto não está disponível na modalidade: Pagar com PagBank.
 
-#### 10 - Mapeamento de Status
+#### 10 - Google reCAPTCHA v3
+
+Marque a opção **reCAPTCHA v3** como **SIM** para ativar a proteção inteligente contra spam e bots.
+
+Defina o nível de proteção baseado na opção **Critério**:
+
+ - **Baixo**: Máxima conversão e menor atrito. Permite a passagem de quase todos os usuários, bloqueando apenas acessos com altíssima certeza de serem bots automatizados rudimentares.
+ - **Médio**: Equilíbrio entre segurança e usabilidade. É a configuração recomendada pelo Google. Filtra a maior parte do spam e bots automatizados sem penalizar usuários humanos legítimos que possam ter comportamentos ligeiramente ambíguos (como o uso de VPNs).
+ - **Alto**: Segurança máxima e tolerância zero a riscos (se estiver sob ataque). Exige um comportamento estritamente humano e limpo do navegador. Pode gerar falsos positivos, bloqueando usuários reais que possuam conexões instáveis ou navegadores muito desatualizados.
+
+ ![](https://prestabr.com.br/docpagbank/0926/10_recaptcha_1.jpg "Google reCaptcha v3 - Módulo PagBank")
+
+Para implementar o Google reCAPTCHA v3 e obter a **Site Key**, a **Api Key** e a **URL**, é necessário criar uma conta no Google (@gmail.com), disponível gratuitamente.
+
+Se você já tem uma conta ou deseja criar uma basta acessar o endereço abaixo e seguir as orientações de cadastro:
+
+**https://console.cloud.google.com/security/recaptcha**
+
+Ao acessar clique em **Selecione um projeto** e vá até a opção **Novo Projeto**.
+
+![](https://prestabr.com.br/docpagbank/0926/10_recaptcha_2.jpg "Google reCaptcha v3 - Módulo PagBank")
+
+No Menu, navegue até **Segurança > Fraud Defense**.
+
+![](https://prestabr.com.br/docpagbank/0926/10_recaptcha_3.jpg "Google reCaptcha v3 - Módulo PagBank")
+
+**Agora são duas etapas, uma para ativar o reCaptcha e criar a Site Key e a URL e outra para a API Key.**
+
+**1 - Gerando o Site Key e a URL**
+
+Em reCaptcha Enterprise API, clique em **Ativar**.
+
+![](https://prestabr.com.br/docpagbank/0926/10_recaptcha_4.jpg "Google reCaptcha v3 - Módulo PagBank")
+
+Na tab **Chaves**, na opção **Chaves de reCAPTCHA** e clique em **Criar chave**.
+
+![](https://prestabr.com.br/docpagbank/0926/10_recaptcha_5.jpg "Google reCaptcha v3 - Módulo PagBank")
+
+Dê um nome de exibição e informe o domínimo que terá autorização para utilizar a Site Key.
+
+![](https://prestabr.com.br/docpagbank/0926/10_recaptcha_6.jpg "Google reCaptcha v3 - Módulo PagBank")
+
+Com a chave criada clique em **Detalhes Importantes**.
+
+![](https://prestabr.com.br/docpagbank/0926/10_recaptcha_7.jpg "Google reCaptcha v3 - Módulo PagBank")
+
+Nesta tela, você já terá acesso ao **Site Key** e a **URL**. 
+
+Na tab **Integração**, localize o tópico **1 Adicionar reCAPTCHA ao seu site** e clique em **Avançar para a próxima etapa**.
+
+Em **2 Verificar o token do reCAPTCHA**, na tab **Rest API**, role a página e copie a **URL**.
+
+![](https://prestabr.com.br/docpagbank/0926/10_recaptcha_8.jpg "Google reCaptcha v3 - Módulo PagBank")
+
+**2 - Gerando a API Key**
+
+No Menu, navegue até **APIs e serviços > Credenciais**.
+
+![](https://prestabr.com.br/docpagbank/0926/10_recaptcha_9.jpg "Google reCaptcha v3 - Módulo PagBank")
+
+Clique em **Criar Credenciais > Chave de API**.
+
+![](https://prestabr.com.br/docpagbank/0926/10_recaptcha_10.jpg "Google reCaptcha v3 - Módulo PagBank")
+
+Na janela suspensa, no item **Selecionar restrições da API**, procure e marque a opção **reCAPTCHA Enterprise API** e dê OK.
+
+O item **Restrições do aplicativo** é opcional, a API Key é utilizada somente via Server-side. Caso queria restringir o acesso utilize a opção **IP** e informe o IP do seu Servidor de Hospedagem. Clique em **Criar** para finalizar, gerar e depois copiar a API Key.
+
+![](https://prestabr.com.br/docpagbank/0926/10_recaptcha_11.jpg "Google reCaptcha v3 - Módulo PagBank")
+
+**`Nota:`**
+
+> - O Google reCAPTCHA v3 é gratuito para até 10 mil avaliações por mês. Para mais informações acesse: **https://docs.cloud.google.com/recaptcha/docs/billing-information?hl=pt_BR**
+
+#### 11 - Mapeamento de Status
 
 Para facilitar o gerenciamento do pedido disponibilizamos a opção de mapeamento de Status. Desta forma você poderá criar status customizados que servirão especificamente para essa finalidade. 
 
@@ -271,10 +356,10 @@ Os Status disponíveis são:
 - Pagamento em Análise
 - Aguardando Pagamento
 
-![](https://prestabr.com.br/docpagbank/0525/10_mapeamento_de_status_0.jpg "Mapeamento de Status - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/11_mapeamento_de_status_0.jpg "Mapeamento de Status - Módulo PagBank")
 
 ---
-#### 11 - Debug & Logs
+#### 12 - Debug & Logs
 
 Para remover o alerta sobre configuração de Tarefa Cron marque a opção a opção **Desativar aviso Cron?** como SIM.
 
@@ -290,7 +375,7 @@ Com esta opção ativa todos os registros de transações (informações básica
 
 Este recurso serve para evitar a perda de dados ao desinstalar o módulo por acidente ou durante uma atualização da própria loja.
 
-![](https://prestabr.com.br/docpagbank/0525/11_debug_e_logs_00.jpg "Debug & Logs - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/12_debug_e_logs_00.jpg "Debug & Logs - Módulo PagBank")
 
 **`Otimize sua loja:`**
 
@@ -298,7 +383,7 @@ Este recurso serve para evitar a perda de dados ao desinstalar o módulo por aci
 
 Para vistualizar os registros de Logs acesse **PagBank > PagBank - Logs**, clique em **Ver** para analisar detalhes do que foi enviado e recebido entre a sua loja e o PagBank.
 
-![](https://prestabr.com.br/docpagbank/0525/11_debug_e_logs_1.jpg "Debug & Logs - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/12_debug_e_logs_1.jpg "Debug & Logs - Módulo PagBank")
 
 **`Dica:`**
 
@@ -312,25 +397,25 @@ Para vistualizar os registros de Logs acesse **PagBank > PagBank - Logs**, cliqu
 
 Para maiores detalhes a respeito do pedido acesse **PagBank > PagBank - Transações**, clique em **Ver**. As mesmas informações também estão disponíveis no histórico do pedido (consulta em tempo real entre a sua loja e o PagBank).
 
-![](https://prestabr.com.br/docpagbank/0525/11_debug_e_logs_2.jpg "Debug & Logs - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/12_debug_e_logs_2.jpg "Debug & Logs - Módulo PagBank")
 
 ---
-#### 12 - Tarefa Cron
+#### 13 - Tarefa Cron
 
 A **Tarefa Cron** serve para cancelar os pedidos que não forem pagos dentro do prazo estipulado para Boleto Bancário, Pix e Pagar com PagBank, também é útil para o seu gerenciamento de estoque. Para configurar a **Tarefa Cron** entre em contato com o suporte técnico do seu servidor de hospedagem e informe as URLs geradas para a sua loja.
 
-![](https://prestabr.com.br/docpagbank/0525/12_tarefa_cron_01.jpg "Tarefa Cron - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/13_tarefa_cron_01.jpg "Tarefa Cron - Módulo PagBank")
 
 **`Nota:`**
 
 > - As URLs de Tarefa Cron mudaram a partir da versão 2.0.0. Por favor, verifique e atualize junto ao seu servidor de hospedagem.
 
 ---
-#### 13 - Extra - Estorno Parcial ou Total de um Pedido
+#### 14 - Extra - Estorno Parcial ou Total de um Pedido
 
 Na PrestaShop, no menu **Compras ou Pedidos**, acesse o pedido a ser estornado, role a página até localizar **DADOS DO PEDIDO - PAGBANK**. Ao clicar em **Estornar Transação no PagBank**, em tempo real, o módulo transmitirá a requisição para o PagBank.
 
-![](https://prestabr.com.br/docpagbank/0525/13_extra_estorno_0.jpg "Extra - Módulo PagBank")
+![](https://prestabr.com.br/docpagbank/0926/14_extra_estorno_0.jpg "Extra - Módulo PagBank")
 
 Após realizar o estorno, dentro de alguns segundos, o pedido receberá uma notificação para a troca de status. Pedidos com estorno Total recebem o status mapeado como Cancelado e para estorno Parcial recebe o status mapeado como Estornado. 
 
@@ -349,97 +434,3 @@ Só é possível realizar o estorno se o pedido estiver em um destes status:
 - Aprovada
 - Em análise
 - Em disputa
-
----
-## CHANGELOG
-
-**v.1.0.0**
-
-- Lançamento;
-
-**v.1.1.0**
-
-- Correção da validação do JavaScript no Checkout para o CPF/CNPJ;
-- Correção da associação automática de mapeamento de Status na instalação (Em Análise e Aguardando Pagamento);
-- Correção p/ remover os Status na desinstalação;
-- Correção p/ exibir somente 1 ou 2 meios de pagamento quando selecionado - Só p/ PrestaShop 1.6;
-- Ajustes de layout para o Back e FrontOffice;
-
-**v.1.2.0**
-- Ajustes de layout para o FrontOffice (Boleto e Pix) - Só p/ PrestaShop 1.6;
-- Correção da opção de configuração para 1x sem juros;
-- Correção p/ não duplicar status no pedido na notificação pós transacional;
-- Correção p/ add o status de reembolsado no estorno total e parcial;
-
-**v.1.3.0**
-- Revisão, melhorias de processos e funcionalidades;
-- Correções gerais de bugs;
-
-**v.1.3.1**
-- Correção no desconto cumulativo do carrinho (voucher + desconto no meio de pagamento);
-- Correções gerais de bugs;
-
-**v.1.4.0**
-- Atualização do repasse de taxa para o parcelamento com juros no Cartão de Crédito;
-
-**v.1.5.0**
-- Add informativo do total da transação com juros no histórico do pedido;
-- Correção do refundTransaction para estornar o valor total da transação considerando juros (se houver), sem a necessidade de informar o valor no campo;
-- Add NSU no banco de dados e histórico do pedido;
-- Melhorias na usabilidade do checkout;
-- Correção da validação dos campos c/ e s/ Termos de Serviço Ativo;
-
-**v.1.5.1**
-- Atualização do payload do Cartão de Crédito para a nova regra da API - Log: FIELD BUYER CANNOT BE EMPTY;
-
-**v.1.5.2**
-- Correção - validação dos campos c/ Termos de Serviço Ativo - de acordo com a opção de pagamento;
-
-**v.1.5.3**
-- Correção/Revisão geral da validação dos campos na tela de checkout;
-
-**v.1.6.0**
-- Correção e revisão do ambiente Sandbox;
-- Correção no RefreshToken;
-- Melhorias de processos e validações;
-- Correção JS - CWE-79 e 116;
-
-**v.1.6.1**
-- Ajustes complementares p/ Sandbox;
-
-**v.1.7.0**
-- Melhoria na tratativa de retorno p/ bin não mapeada e validações gerais;
-- Add opção p/ captura manual da transação via Cartão de Crédito;
-- Melhorias e correções gerais de bugs;
-
-**v.1.7.1**
-- Melhorias na tratativa de Logs;
-
-**v.1.7.2**
-- Correções de bugs;
-- Add mecanismo p/ informar sobre novas updates na Tab de Módulos no Admin;
-
-**v.1.8.0**
-- Otimizações e correções de bugs;
-- Melhorias de compatibilidade com Multilojas;
-- Add nova opção de pagamento: pagar com PagBank;
-
-**v.1.9.0**
-- Otimizações gerais de performance, segurança e correções de bugs;
-- Add nova opção de pagamento: Google Pay;
-
-**v.1.9.1**
-- Correções de bugs;
-
-**v.1.9.2**
-- Correções de bugs p/ o Google Pay;
-- Correção de bug da Tarefa Cron do Pagar com PagBank (cancelNotPaidWallet);
-
-**v.2.0.0**
-- Otimizações e correções de bugs;
-- Compatibilidade com PrestaShop 9;
-
-**v.2.1.0**
-- Add validação para CNPJ alfanumérico;
-- Revisão e ajustes gerais de layout, otimizado para Bootstrap 3, 4 e 5.
-- Melhorias e correções gerais de bugs;

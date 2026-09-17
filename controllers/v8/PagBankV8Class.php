@@ -236,8 +236,12 @@ class PagBankV8 extends Module
 			$text_sandbox_google .= '<br /><div class="alert alert-danger"><p>' . $this->module->trans('Atenção, você está em ambiente SandBox', array(), 'Modules.PagBank.Admin') . '</p></div>';
 		}
 
-		$link_order_preferences = 'index.php?controller=AdminOrderPreferences&token=' . Tools::getAdminTokenLite('AdminOrderPreferences');
-		$text_min_installments = '<br />Em complemento, se preferir, você pode ativar a opção para restringir o valor mínimo de pedido aceito pela loja. Tab Preferências > Pedidos ou <a href="' . $link_order_preferences . '">clicando aqui</a>.';
+		if (_PS_VERSION_ >= '9.0.0') {
+			$link_order_preferences = Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . basename(_PS_ADMIN_DIR_) . '/index.php/configure/shop/order-preferences?_token=' . Tools::getAdminTokenLite('AdminPaymentPreferences');
+		} else {
+			$link_order_preferences = 'index.php?controller=AdminOrderPreferences&token=' . Tools::getAdminTokenLite('AdminOrderPreferences');
+		}
+		$text_min_installments = 'Em complemento, se preferir, você pode ativar a opção para restringir o valor mínimo de pedido aceito pela loja. Tab Parâmetros da loja > Configurações de Pedidos ou <a href="' . $link_order_preferences . '">clicando aqui</a>.';
 		$text_capture = '<br />Na captura manual (Pré-autorização) o pagamento só será debitado do cartão de crédito após ação manual no histórico do pedido. <br /> Veja mais informações na documentação <a href="https://github.com/pagseguro/pagseguro-modulo-prestashop?tab=readme-ov-file#5---configura%C3%A7%C3%B5es-de-pagamento-via-cart%C3%A3o-de-cr%C3%A9dito" target="_blank">clicando aqui</a>.';
 		$text_doc_google = '<br />Veja mais informações na documentação <a href="https://github.com/pagseguro/pagseguro-modulo-prestashop?tab=readme-ov-file#4---pagamento-via-cart%C3%A3o-de-cr%C3%A9dito-com-google-pay" target="_blank">clicando aqui</a>.';
 
@@ -280,7 +284,6 @@ class PagBankV8 extends Module
 						'label' =>  $this->module->trans('Tipo de Credencial', array(), 'Modules.PagBank.Admin'),
 						'name' => 'PAGBANK_CREDENTIAL',
 						'desc' =>  $this->module->trans('Defina o tipo de credential que a sua loja irá utilizar para processar os pagamentos.', array(), 'Modules.PagBank.Admin') . $text_credential,
-						'class' => 'credentials',
 						'options' => array(
 							'query' => $array_credentials,
 							'id' => 'id',
@@ -331,6 +334,25 @@ class PagBankV8 extends Module
 							),
 							array(
 								'id' => 'PAGBANK_SAVE_CREDIT_CARD_off',
+								'value' => 0,
+								'label' =>  $this->module->trans('Não', array(), 'Modules.PagBank.Admin'),
+							),
+						),
+					),
+					array(
+						'type' => 'switch',
+						'label' =>  $this->module->trans('Pagar com 2 cartões?', array(), 'Modules.PagBank.Admin'),
+						'name' => 'PAGBANK_TWO_CREDIT_CARD',
+						'is_bool' => true,
+						'desc' =>  $this->module->trans('O cliente poderá realizar o pagamento com 2 cartões de crédito.', array(), 'Modules.PagBank.Admin'),
+						'values' => array(
+							array(
+								'id' => 'PAGBANK_TWO_CREDIT_CARD_on',
+								'value' => 1,
+								'label' =>  $this->module->trans('Sim', array(), 'Modules.PagBank.Admin'),
+							),
+							array(
+								'id' => 'PAGBANK_TWO_CREDIT_CARD_off',
 								'value' => 0,
 								'label' =>  $this->module->trans('Não', array(), 'Modules.PagBank.Admin'),
 							),
@@ -407,6 +429,7 @@ class PagBankV8 extends Module
 					array(
 						'type' => 'text',
 						'label' =>  $this->module->trans('Google Merchant ID', array(), 'Modules.PagBank.Admin'),
+						'desc' =>  $this->module->trans('Informe o seu token de usuário.', array(), 'Modules.PagBank.Admin'),
 						'name' => 'PAGBANK_GOOGLE_MERCHANT_ID',
 					),
 				),
@@ -456,16 +479,36 @@ class PagBankV8 extends Module
 						'label' =>  $this->module->trans('Comportamento da parcela mínima', array(), 'Modules.PagBank.Admin'),
 						'name' => 'PAGBANK_INSTALLMENTS_TYPE',
 						'is_bool' => true,
+						'desc' => $text_min_installments,
 						'values' => array(
 							array(
 								'id' => 'opcao_1',
 								'value' => 0,
-								'label' =>  $this->module->trans('Não processar nada abaixo do valor mínimo estipulado.', array(), 'Modules.PagBank.Admin') . $text_min_installments
+								'label' =>  $this->module->trans('Não processar nada abaixo do valor da parcela mínima.', array(), 'Modules.PagBank.Admin')
 							),
 							array(
 								'id' => 'opcao_2',
 								'value' => 1,
-								'label' =>  $this->module->trans('Oferecer pagamento a vista, em 1x parcela, para valores abaixo do mínimo estipulado.', array(), 'Modules.PagBank.Admin')
+								'label' =>  $this->module->trans('Oferecer pagamento a vista, em 1x parcela, para valores abaixo da parcela mínima.', array(), 'Modules.PagBank.Admin')
+							),
+						),
+					),
+					array(
+						'type' => 'switch',
+						'label' =>  $this->module->trans('Parcelar no segundo cartão?', array(), 'Modules.PagBank.Admin'),
+						'name' => 'PAGBANK_TWO_CREDIT_CARD_INST',
+						'is_bool' => true,
+						'desc' =>  $this->module->trans('O cliente terá a opção de parcelar o valor informado no segundo cartão de crédito.', array(), 'Modules.PagBank.Admin'),
+						'values' => array(
+							array(
+								'id' => 'PAGBANK_TWO_CREDIT_CARD_INST_on',
+								'value' => 1,
+								'label' =>  $this->module->trans('Sim', array(), 'Modules.PagBank.Admin'),
+							),
+							array(
+								'id' => 'PAGBANK_TWO_CREDIT_CARD_INST_off',
+								'value' => 0,
+								'label' =>  $this->module->trans('Não', array(), 'Modules.PagBank.Admin'),
 							),
 						),
 					),
@@ -727,6 +770,78 @@ class PagBankV8 extends Module
 		$fields_form_8 = array(
 			'form' => array(
 				'legend' => array(
+					'title' =>  $this->module->trans('Google reCAPTCHA v3', array(), 'Modules.PagBank.Admin'),
+					'icon' => 'icon-cogs',
+				),
+				'input' => array(
+					array(
+						'type' => 'switch',
+						'label' =>  $this->module->trans('reCAPTCHA v3', array(), 'Modules.PagBank.Admin'),
+						'name' => 'PAGBANK_RECAPTCHA',
+						'is_bool' => true,
+						'desc' =>  $this->module->trans('Proteção inteligente contra spam e bots.', array(), 'Modules.PagBank.Admin'),
+						'values' => array(
+							array(
+								'id' => 'PAGBANK_RECAPTCHA_on',
+								'value' => 1,
+								'label' =>  $this->module->trans('Sim', array(), 'Modules.PagBank.Admin'),
+							),
+							array(
+								'id' => 'PAGBANK_RECAPTCHA_off',
+								'value' => 0,
+								'label' =>  $this->module->trans('Não', array(), 'Modules.PagBank.Admin'),
+							),
+						),
+					),
+					array(
+						'type' => 'select',
+						'label' =>  $this->module->trans('Critério', array(), 'Modules.PagBank.Admin'),
+						'name' => 'PAGBANK_RACAPTCHA_CRITERIA',
+						'desc' =>  $this->module->trans('Defina o critério de segurança do reCAPTCHA.', array(), 'Modules.PagBank.Admin'),
+						'options' => array(
+							'query' => array(
+								array(
+									'id' => 'LOW',
+									'name' =>  $this->module->trans('Baixo', array(), 'Modules.PagBank.Admin'),
+								),
+								array(
+									'id' => 'MEDIUM',
+									'name' =>  $this->module->trans('Médio', array(), 'Modules.PagBank.Admin'),
+								),
+								array(
+									'id' => 'HIGH',
+									'name' =>  $this->module->trans('Alto', array(), 'Modules.PagBank.Admin'),
+								),
+							),
+							'id' => 'id',
+							'name' => 'name',
+						),
+					),
+					array(
+						'type' => 'text',
+						'label' =>  $this->module->trans('Site Key', array(), 'Modules.PagBank.Admin'),
+						'desc' =>  $this->module->trans('Informe a chave reCAPTCHA associada ao site.', array(), 'Modules.PagBank.Admin'),
+						'name' => 'PAGBANK_RECAPTCHA_SITE_KEY',
+					),
+					array(
+						'type' => 'text',
+						'label' =>  $this->module->trans('Api Key', array(), 'Modules.PagBank.Admin'),
+						'desc' =>  $this->module->trans('Informe a chave de API associada ao projeto atual.', array(), 'Modules.PagBank.Admin'),
+						'name' => 'PAGBANK_RECAPTCHA_API_KEY',
+					),
+					array(
+						'type' => 'text',
+						'label' =>  $this->module->trans('URL', array(), 'Modules.PagBank.Admin'),
+						'desc' =>  $this->module->trans('Informe a sua URL associada ao projeto atual. Copie e cole como é visto, mantendo o parâmetro API_KEY na URL.', array(), 'Modules.PagBank.Admin'),
+						'name' => 'PAGBANK_RECAPTCHA_URL',
+					),
+				),
+			),
+		);
+
+		$fields_form_9 = array(
+			'form' => array(
+				'legend' => array(
 					'title' =>  $this->module->trans('Mapeamento de Status', array(), 'Modules.PagBank.Admin'),
 					'icon' => 'icon-cogs',
 				),
@@ -801,7 +916,7 @@ class PagBankV8 extends Module
 			),
 		);
 
-		$fields_form_9 = array(
+		$fields_form_10 = array(
 			'form' => array(
 				'legend' => array(
 					'title' =>  $this->module->trans('Debug & Logs', array(), 'Modules.PagBank.Admin'),
@@ -888,7 +1003,7 @@ class PagBankV8 extends Module
 			),
 		);
 
-		$fields_form_10 = array(
+		$fields_form_11 = array(
 			'form' => array(
 				'legend' => array(
 					'title' =>  $this->module->trans('Salvar Configurações', array(), 'Modules.PagBank.Admin'),
@@ -929,7 +1044,8 @@ class PagBankV8 extends Module
 					$fields_form_7,
 					$fields_form_8,
 					$fields_form_9,
-					$fields_form_10
+					$fields_form_10,
+					$fields_form_11
 				));
 	}
 }

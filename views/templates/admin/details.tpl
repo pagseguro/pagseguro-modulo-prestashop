@@ -89,7 +89,7 @@
 					<li><b>{l s='Data do pedido:' mod='pagbank'}</b>
 						<span>{$order->date_add|date_format:'%d/%m/%Y %H:%M'}</span></li>
 					<li><b>{l s='Data do pagamento:' mod='pagbank'}</b> <span>
-							{if $order->invoice_date == '0000-00-00 00:00:00'}
+							{if $order->invoice_date === '0000-00-00 00:00:00'}
 								Pendente
 							{else}
 								{$order->invoice_date|date_format:'%d/%m/%Y %H:%M'}
@@ -150,9 +150,11 @@
 			</p>
 			<p>{l s='Ao acessar a transação role a página para localizar "Extrato de movimentações da transação".' mod='pagbank'}
 			</p>
-			<p>{l s='Link de acesso:' mod='pagbank'} <a
-					href="https://minhaconta.pagbank.com.br/meu-negocio/vendas-e-recebimentos"
-					target="_blank">https://minhaconta.pagbank.com.br/meu-negocio/vendas-e-recebimentos</a></p>
+			<p>{l s='Link de acesso:' mod='pagbank'} 
+				<a href="https://minhaconta.pagbank.com.br/meu-negocio/vendas-e-recebimentos" target="_blank">
+					https://minhaconta.pagbank.com.br/meu-negocio/vendas-e-recebimentos
+				</a>
+			</p>
 		</div>
 	{/if}
 	<div class="panel card panel-info">
@@ -163,44 +165,130 @@
 			<div class="row">
 				<div class="col-xs-12 col-sm-6">
 					<ul class="list list-unstyled">
-						<li><b>{l s='Data do pedido:' mod='pagbank'}</b> <span>{$transaction->created_at}</span></li>
-						<li>
-							<b>{l s='Código no PagBank:' mod='pagbank'}</b>
-							{if (isset($transaction->charges))}
-								<span>{$transaction->charges[0]->id|replace:"CHAR_":""}</span>
-							{else}
-								<span>{$transaction->id}</span>
-							{/if}
-						</li>
-						{if (isset($transaction->reference_id))}
-							<li><b>{l s='Referência:' mod='pagbank'}</b> <span>{$transaction->reference_id}</span></li>
-						{/if}
-						<li><b>{l s='Status:' mod='pagbank'}</b> <span>{$desc_status}</span></li>
-						<li><b>{l s='Forma de Pagamento:' mod='pagbank'}</b> <span>{$payment_description}</span></li>
-						{if isset($transaction->charges) && isset($transaction->charges[0]->payment_method->installments)}
-							<li>
-								<b>{l s='Quantidade de parcelas:' mod='pagbank'}</b> <span>{$transaction->charges[0]->payment_method->installments}</span><br />
-								<b>{l s='NSU:' mod='pagbank'}</b> <span>{$transaction->charges[0]->payment_response->raw_data->nsu}</span><br />
-								<b>{if isset($transaction->charges[0]->amount->fees) && $transaction->charges[0]->amount->fees}{l s='Total c/ juros:' mod='pagbank'}{else}{l s='Total s/ juros:' mod='pagbank'}{/if}</b> <span>{displayPrice price=($transaction->charges[0]->amount->value/100) currency=$order->id_currency}</span>
-							</li>
-						{/if}
-						{if isset($transaction->qr_codes[0]) && $transaction->qr_codes[0]->arrangements[0] == 'PIX'}
-							<li><b>{l s='Link do PIX:' mod='pagbank'}</b> <span>{$transaction->qr_codes[0]->text}</span></li>
-						{/if}
-						{if (isset($transaction->charges) && $transaction->charges[0]->payment_method->type == 'BOLETO')}
-							<li>
-								<b>{l s='Link do Boleto:' mod='pagbank'}</b>
-								{foreach from=$transaction->charges[0]->links item="link" name="link"}
-									{if ($link->media == 'application/pdf')}
-										<span>
-											<a href="{$link->href}" title="{l s='Link do Boleto' mod='pagbank'}" target="_blank">
-												{$link->href}
-											</a>
-										</span>
+							{if isset($transaction->charges) && count($transaction->charges) > 1}
+								<li>
+									<b>{l s='Data do pedido:' mod='pagbank'}</b>
+									<span>{$transaction->created_at|date_format:'%d/%m/%Y %H:%M'}</span>
+								</li>
+								<li>
+									<b>{l s='Forma de Pagamento:' mod='pagbank'}</b> <span>{$payment_description}</span>
+								</li>
+								<li>
+									<b>{l s='Status:' mod='pagbank'}</b> <span>{$desc_status}</span>
+								</li>
+								<br />
+								<li>
+									<b>{l s='Cartão 1 Final:' mod='pagbank'} {$transaction->charges[0]->payment_method->card->last_digits}</b>
+								</li>
+								<li>
+									<b>{l s='Código no PagBank:' mod='pagbank'}</b> <span>{$transaction->charges[0]->id|replace:"CHAR_":""}</span>
+								</li>
+								<li>
+									<b>{l s='Referência:' mod='pagbank'}</b> <span>{$transaction->charges[0]->reference_id}</span>
+								</li>
+								<li>
+									<b>{l s='Quantidade de parcelas:' mod='pagbank'}</b> <span>{$transaction->charges[0]->payment_method->installments}</span>
+								</li>
+								<li>
+									<b>{l s='NSU:' mod='pagbank'}</b> <span>{$transaction->charges[0]->payment_response->raw_data->nsu}</span>
+								</li>
+								<li>
+									{if isset($transaction->charges[0]->amount->fees) && $transaction->charges[0]->amount->fees}
+										<b>{l s='Total c/ juros:' mod='pagbank'}</b>
+									{else}
+										<b>{l s='Total s/ juros:' mod='pagbank'}</b>
 									{/if}
-								{/foreach}
-							</li>
-						{/if}
+									<span>{displayPrice price=($transaction->charges[0]->amount->value/100) currency=$order->id_currency}</span>
+									{if $info['capture'] != 'null' && $info['capture'] == 0 && isset($transaction->charges[0]->amount->summary->paid) && $transaction->charges[0]->amount->summary->paid > 0}
+										<br /><b>{l s='Total Capturado:' mod='pagbank'}</b> 
+										<span>{displayPrice price=($transaction->charges[0]->amount->summary->paid/100) currency=$order->id_currency}</span>
+									{/if}
+								</li>
+								<br />
+								<li>
+									<b>{l s='Cartão 2 Final:' mod='pagbank'} {$transaction->charges[1]->payment_method->card->last_digits}</b>
+								</li>
+								<li>
+									<b>{l s='Código no PagBank:' mod='pagbank'}</b> <span>{$transaction->charges[1]->id|replace:"CHAR_":""}</span>
+								</li>
+								<li>
+									<b>{l s='Referência:' mod='pagbank'}</b> <span>{$transaction->charges[1]->reference_id}</span>
+								</li>
+								<li>
+									<b>{l s='Quantidade de parcelas:' mod='pagbank'}</b> <span>{$transaction->charges[1]->payment_method->installments}</span>
+								</li>
+								<li>
+									<b>{l s='NSU:' mod='pagbank'}</b> <span>{$transaction->charges[1]->payment_response->raw_data->nsu}</span>
+								</li>
+								<li>
+									{if isset($transaction->charges[1]->amount->fees) && $transaction->charges[1]->amount->fees}
+										<b>{l s='Total c/ juros:' mod='pagbank'}</b>
+									{else}
+										<b>{l s='Total s/ juros:' mod='pagbank'}</b>
+									{/if}
+									<span>{displayPrice price=($transaction->charges[1]->amount->value/100) currency=$order->id_currency}</span>
+									{if $info['capture'] != 'null' && $info['capture'] == 0 && isset($transaction->charges[1]->amount->summary->paid) && $transaction->charges[1]->amount->summary->paid > 0}
+										<br /><b>{l s='Total Capturado:' mod='pagbank'}</b> 
+										<span>{displayPrice price=($transaction->charges[1]->amount->summary->paid/100) currency=$order->id_currency}</span>
+									{/if}
+								</li>
+							{else}
+								<li>
+									<b>{l s='Data do pedido:' mod='pagbank'}</b>
+									<span>{$transaction->created_at|date_format:'%d/%m/%Y %H:%M'}</span>
+								</li>
+								<li>
+									<b>{l s='Código no PagBank:' mod='pagbank'}</b>
+									{if isset($transaction->charges)}
+										<span>{$transaction->charges[0]->id|replace:"CHAR_":""}</span>
+									{else}
+										<span>{$transaction->id}</span>
+									{/if}
+								</li>
+								{if (isset($transaction->reference_id))}
+									<li><b>{l s='Referência:' mod='pagbank'}</b> <span>{$transaction->reference_id}</span></li>
+								{/if}
+								<li><b>{l s='Status:' mod='pagbank'}</b> <span>{$desc_status}</span></li>
+								<li><b>{l s='Forma de Pagamento:' mod='pagbank'}</b> <span>{$payment_description}</span></li>
+								{if isset($transaction->charges) && isset($transaction->charges[0]->payment_method->installments)}
+									<li>
+										<b>{l s='Quantidade de parcelas:' mod='pagbank'}</b> <span>{$transaction->charges[0]->payment_method->installments}</span>
+									</li>
+									<li>
+										<b>{l s='NSU:' mod='pagbank'}</b> <span>{$transaction->charges[0]->payment_response->raw_data->nsu}</span>
+									</li>
+									<li>
+										{if isset($transaction->charges[0]->amount->fees) && $transaction->charges[0]->amount->fees}
+											<b>{l s='Total c/ juros:' mod='pagbank'}</b>
+										{else}
+											<b>{l s='Total s/ juros:' mod='pagbank'}</b>
+										{/if}
+										<span>{displayPrice price=($transaction->charges[0]->amount->value/100) currency=$order->id_currency}</span>
+										{if $info['capture'] != 'null' && $info['capture'] == 0 && isset($transaction->charges[0]->amount->summary->paid) && $transaction->charges[0]->amount->summary->paid > 0}
+											<br /><b>{l s='Total Capturado:' mod='pagbank'}</b>
+											<span>{displayPrice price=($transaction->charges[0]->amount->summary->paid/100) currency=$order->id_currency}</span>
+										{/if}
+									</li>
+								{/if}
+								{if isset($transaction->qr_codes[0]) && $transaction->qr_codes[0]->arrangements[0] === 'PIX'}
+									<li><b>{l s='Link do PIX:' mod='pagbank'}</b> <span>{$transaction->qr_codes[0]->text}</span></li>
+								{/if}
+								{if (isset($transaction->charges) && $transaction->charges[0]->payment_method->type === 'BOLETO')}
+									<li>
+										<b>{l s='Link do Boleto:' mod='pagbank'}</b>
+										{foreach from=$transaction->charges[0]->links item="link" name="link"}
+											{if ($link->media === 'application/pdf')}
+												<span>
+													<a href="{$link->href}" title="{l s='Link do Boleto' mod='pagbank'}"
+														target="_blank">
+														{$link->href}
+													</a>
+												</span>
+											{/if}
+										{/foreach}
+									</li>
+								{/if}
+							{/if}
 					</ul>
 					<ul class="list list-unstyled">
 						<li><b>{l s='Cliente:' mod='pagbank'}</b> <span>{$transaction->customer->name}</span></li>
